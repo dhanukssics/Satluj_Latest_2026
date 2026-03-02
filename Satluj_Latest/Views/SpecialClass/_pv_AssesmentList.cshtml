@@ -1,0 +1,43 @@
+﻿@model Satluj_Latest.Models.SpecialClassModel
+@{
+    long schoolId = Model.SchoolId;
+    var data = new Satluj_Latest.Data.School(schoolId).GetAllAssesmentDetails();
+    int x = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<table class="table custome-table scholastic-area-list">
+    <thead>
+        <tr>
+            <th>
+                Sl No
+            </th>
+            <th>
+                Assesment
+            </th>
+            <th>
+                Periods
+            </th>
+            @if (IsAdmin == true)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in data)
+        {
+            <tr>
+                <td>@x</td>
+                <td>@item.AssesmentName()</td>
+                <td>@item.PeriodicName</td>
+                @if (IsAdmin == true)
+                {
+                    <td>
+                        <button class="delete-assesment-tr btn btn-peek" data-ass="@item.Id"><i class="fa fa-trash"></i></button>
+                    </td>
+                }
+            </tr>
+            x = x + 1;
+        }
+    </tbody>
+</table>

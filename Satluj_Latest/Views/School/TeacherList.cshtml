@@ -1,0 +1,415 @@
+﻿@using Satluj_Latest.Models.ViewModels
+@model TeachervViewModel
+@{
+    ViewBag.Title = "TeacherList";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<input type="hidden" id="SchoolId" value="@Model.SchoolId" />
+
+@*<style>
+        .ng-teacherDetails-click {
+            cursor: pointer;
+        }
+    </style>*@
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Teacher</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                    @*<div class="input-group" style="max-width: 300px;">
+                            <input type="text" class="form-control" placeholder="Search" aria-describedby="basic-addon2">
+                            <span class="input-group-btn" id="basic-addon2"><button class="btn pay-now-btn">Search</button></span>
+                        </div>*@
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+                <div class="form-group text-right">
+                    <button class="btn pay-now-btn" id="btn-add-Teacher"><i class="fa fa-plus"></i> Add Teacher</button>
+                </div>
+            </div>
+        </div>
+
+
+         
+       @*  @{
+            var schoolModel = new Satluj_Latest.Models.SchoolId
+            {
+                schoolId = Model.SchoolId
+            };
+        } *@
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-teacher-list">
+
+                @Html.Partial("~/Views/School/_pv_teacher_list.cshtml", Model)
+            </table>
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+<div class="modal fade" id="modalTeacherAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+<div class="modal fade" id="modalTeacherEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+
+
+
+<script>
+
+    //$(document).on('click', '.ng-teacherDetails-click', function () {
+
+    //    window.location = '/School/TeacherDetails/' + $(this).attr('data-teacherid');
+    //});
+
+    $(function () {
+        $("#table-teacher-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $("#table-teacher-list").dataTable().fnDestroy()
+        $("#table-teacher-list").dataTable();
+    }
+
+    $(document).on('click', '#btn-add-Teacher', function () {
+        $.ajax({
+            url: '/School/TeacherAddModel',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalTeacherAdd').html(data);
+                $.validator.unobtrusive.parse($("#modalTeacherAdd"));
+                $('#modalTeacherAdd').modal('show');
+            }
+        });
+
+    });
+
+    $(document).on('change', '.slct-teacherclass-dropdwn', function () {
+        $('#classId').val($(this).val());
+        var id = $(this).val();
+        if (id != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                //url: '/Data/LoadFreeDivision?id=' + id ,
+                url: '/Data/LoadFreeSchoolDivision?id=' + id + '&schoolid=' + $('#schoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-free-div-dropdown").html(""); // clear before appending new list
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-free-div-dropdown").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $(".slct-free-div-dropdown").html(""); // clear before appending new list
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- No Division Found --'));
+                        $(".slct-free-div-dropdown").prop("disabled", true);
+                        $('#divisionId').val("0");
+                    }
+                }
+            });
+        }
+        else {
+            $('#division-required-teacher-add').hide();
+            //  resetDropDown('Class');
+            $(".slct-free-div-dropdown").html(""); // clear before appending new list
+            $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+            $(".slct-free-div-dropdown").prop("disabled", true);
+        }
+    });
+
+    $(document).on('change', '.slct-free-div-dropdown', function () {
+
+        $('#divisionId').val($(this).val());
+
+    });
+
+    $(document).on('click', '#btn-dummy-addteacher', function () {
+        RolesList();
+        var status = true;
+        if ($('#classId').val() != '') {
+            if ($('#divisionId').val() == 0) {
+                $('#division-required-teacher-add').text("Required");
+                $('#division-required-teacher-add').show();
+
+                var form_data = $("#form-teacher-add input[type=text]").serializeArray();
+                $(form_data).each(function () {
+                    if (this.value == "" || this.value == null) {
+                        status = false;
+                    }
+                });
+
+                if (!status) {
+                    $('#btn-addteacher').trigger('click');
+                }
+            }
+            else {
+                $('#division-required-teacher-add').hide();
+                $('#btn-addteacher').trigger('click');
+            }
+        }
+        else {
+            $('#division-required-teacher-add').hide();
+            $('#btn-addteacher').trigger('click');
+        }
+
+    });
+
+    function RefreshTable() {
+        //$.ajax({
+        //    url: '/School/TeacherListPartial',
+        //    dataType: 'html',
+        //    success: function (data) {
+        //        $('#table-teacher-list').html('');
+        //        $('#table-teacher-list').html(data);
+        //        IntializeDataTable();
+        //    },
+        //});
+        window.location.href = '/School/TeacherList/';
+    }
+
+    function AddTeacherSuccess(result) {
+
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalTeacherAdd').modal('hide');
+            RefreshTable();
+        }
+        else {
+            //$('#modalTeacherAdd').modal('hide');
+            setTimeout(function () {
+                toastrError(result.msg);
+            }, 250);
+        }
+
+    }
+
+    function EditTeacherSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalTeacherEdit').modal('hide');
+            //RefreshTable();
+            window.location.href = '/School/TeacherList/';
+        }
+        else {
+            //$('#modalTeacherEdit').modal('hide');
+            toastrError(result.msg);
+        }
+    }
+
+    $(document).on('click', '.delete-teacher-tr', function () {
+
+        var teacherId = $(this).data("id");
+        var schoolId = $("#SchoolId").val();
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        }, function (isConfirm) {
+
+            if (isConfirm) {
+
+                $.ajax({
+                    url: '/School/DeleteTeacher?id=' + teacherId + '&schoolId=' + schoolId,
+                    type: "GET",
+                    success: function (data) {
+
+                        if (data.status) {
+                            toastrSuccess(data.msg);
+
+                            setTimeout(function () {
+                                RefreshTable();
+                            }, 300);
+
+                        } else {
+                            toastrError(data.msg);
+                        }
+
+                    },
+                    error: function () {
+                        toastrError("Error while deleting teacher");
+                    }
+                });
+            }
+        });
+
+    });
+
+       $(document).on('click', '.edit-teacher-tr', function () {
+
+        var teacherId = $(this).data("id");   // <-- CORRECT
+
+        if (!teacherId) {
+            toastrError("Teacher ID not found");
+            return;
+        }
+
+        $.ajax({
+            url: '/School/TeacherEditPartial/' + teacherId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalTeacherEdit').html(data);
+                $.validator.unobtrusive.parse($("#modalTeacherEdit"));
+                $('#modalTeacherEdit').modal('show');
+                FillRolesInEdit();
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-dummy-editteacher', function () {
+        RolesEditList();
+        var status = true;
+        if ($('#classId').val() != '' && $('#classId').val() != 0) {
+            if ($('#divisionId').val() == 0) {
+                $('#division-required-teacher-edit').text("Required");
+                $('#division-required-teacher-edit').show();
+
+                var form_data = $("#form-teacher-edit input[type=text]").serializeArray();
+                $(form_data).each(function () {
+                    if (this.value == "" || this.value == null) {
+                        status = false;
+                    }
+                });
+
+                if (!status) {
+                    $('#btn-editteacher').trigger('click');
+                }
+            }
+            else {
+                $('#division-required-teacher-edit').hide();
+                $('#btn-editteacher').trigger('click');
+            }
+        }
+        else {
+            $('#division-required-teacher-edit').hide();
+            $('#btn-editteacher').trigger('click');
+        }
+
+    });
+
+    //$(document).on('blur', '#teacherContactNumber', function () { //Archana : For check teacher contact number 11-Aug-17 (Archana commended this and the checking will done in the after click)
+    //    var source = $(this);
+    //    $.ajax({
+    //        url: '/School/CheckTeacherContactNumberNo?text=' + $(source).val(),
+    //        type: "GET",
+    //        dataType: 'json',
+    //        success: function (data) {
+    //            if (data.Status) {
+    //                $('#spn-error-contactNumber').text(data.Message);
+    //                $('#ValidateForm').val(true);
+    //                $('#spn-error-contactNumber').show();
+    //                $('#btn-dummy-addteacher').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' }); //Avoid Save Buttion Click
+    //            }
+    //            else {
+    //                $('#ValidateForm').val(false);
+    //                $('#spn-error-contactNumber').hide();
+    //                $('#btn-dummy-addteacher').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+    //            }
+    //        }
+    //    });
+    //});
+
+    //$(document).on('blur', '#emailId', function () {
+    //    //debugger;
+    //    var source = $(this);
+    //    $.ajax({
+    //        url: '/Account/CheckEmail?text=' + $(source).val(),
+    //        type: "GET",
+    //        dataType: 'json',
+    //        success: function (data) {
+    //            if (data.Status) {
+    //                $('#spn-error-email-teacher').text(data.Message);
+    //                $('#spn-error-email-teacher').show();
+    //                $('#btn-dummy-addteacher').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+    //            }
+    //            else {
+    //                $('#spn-error-email-teacher').hide();
+    //                $('#btn-dummy-addteacher').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+    //            }
+    //        }
+    //    });
+    //});
+
+    function RolesList() {
+        var roles = "";
+        $('.chk-roles-cls').each(function () {
+            if ($(this).prop("checked") == true) {
+                if (roles == "") {
+                    roles += $(this).val();
+                }
+                else {
+                    roles += "~" + $(this).val();
+                }
+            }
+        });
+        $('#RolesData').val(roles);
+    };
+
+    function FillRolesInEdit() {
+        //debugger;
+        var data = $('#RolesData').val();// Teacher Assigned roles
+        if(data!="")
+        {
+            var list = data.split("~"); // Teacher Assigned roles
+            if (list != null) {
+
+                for (var i = 0; i < list.length; i++) {
+                    var roleId = list[i];
+                    $(".chk-roles-cls-edit").each(function () { // Full list
+                        var allId = $(this).val();
+                        if(roleId==allId) {
+                            $(this).prop('checked', true);
+                        }
+                    });
+                }
+            }
+        }
+    };
+
+
+    function RolesEditList() {
+        var roles = "";
+        $('.chk-roles-cls-edit').each(function () {
+            if ($(this).prop("checked") == true) {
+                if (roles == "") {
+                    roles += $(this).val();
+                }
+                else {
+                    roles += "~" + $(this).val();
+                }
+            }
+        });
+        $('#RolesData').val('');
+        $('#RolesData').val(roles);
+    }
+
+
+
+    function ajaxFailure() {
+        toastrError("Failed!");
+    }
+
+
+
+
+
+</script>

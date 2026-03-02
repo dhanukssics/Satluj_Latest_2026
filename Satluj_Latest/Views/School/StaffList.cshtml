@@ -1,0 +1,317 @@
+﻿@using Satluj_Latest.Models.ViewModels
+@model StaffListViewModel
+
+@{
+    ViewBag.Title = "Staff List";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Staff</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+                <div class="form-group text-right">
+                    <button class="btn pay-now-btn" id="btn-add-Staff"><i class="fa fa-plus"></i> Add Staff</button>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-staff-list">
+                @Html.Partial("~/Views/School/_pv_Staff_list.cshtml", Model)
+            </table>
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+<div class="modal fade" id="modalStaffAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+</div>
+<div class="modal fade" id="modalStaffEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+</div>
+
+
+
+<script>
+
+        //$(document).on('click', '.ng-teacherDetails-click', function () {
+
+        //    window.location = '/School/TeacherDetails/' + $(this).attr('data-teacherid');
+        //});
+
+        $(function () {
+            $("#table-staff-list").dataTable();
+        })
+
+        function IntializeDataTable() {
+            $("#table-staff-list").dataTable().fnDestroy()
+            $("#table-staff-list").dataTable();
+        }
+
+        $(document).on('click', '#btn-add-Staff', function () {
+
+            $.ajax({
+                url: '/School/StaffAddModel',
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#modalStaffAdd').html(data);
+                    $.validator.unobtrusive.parse($("#modalStaffAdd"));
+                    $('#modalStaffAdd').modal('show');
+
+                }
+            });
+
+        });
+        function RefreshStaffGrid() {
+            $.ajax({
+                url: '/School/StaffListPartial',
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#table-staff-list').html('');
+                    $('#table-staff-list').html(data);
+                    IntializeDataTable();
+                }
+            });
+        }
+
+        $(document).on('change', '.slct-teacherclass-dropdwn', function () {
+            $('#classId').val($(this).val());
+            var id = $(this).val();
+            if (id != '') {
+                // resetDropDown('Class');
+                $.ajax({
+                    //url: '/Data/LoadFreeDivision?id=' + id ,
+                    url: '/Data/LoadFreeSchoolDivision?id=' + id + '&schoolid=' + $('#schoolId').val(),
+                    type: "GET",
+                    success: function (result) {
+                        if (result.list.length > 0) {
+                            $(".slct-free-div-dropdown").html(""); // clear before appending new list
+                            $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                            $.each(result.list, function (i, item) {
+                                $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            });
+                            $(".slct-free-div-dropdown").prop("disabled", false);
+                        }
+                        else {
+                            // resetDropDown('Class');
+                            $(".slct-free-div-dropdown").html(""); // clear before appending new list
+                            $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- No Division Found --'));
+                            $(".slct-free-div-dropdown").prop("disabled", true);
+                            $('#divisionId').val("0");
+                        }
+                    }
+                });
+            }
+            else {
+                $('#division-required-teacher-add').hide();
+                //  resetDropDown('Class');
+                $(".slct-free-div-dropdown").html(""); // clear before appending new list
+                $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                $(".slct-free-div-dropdown").prop("disabled", true);
+            }
+        });
+
+        $(document).on('change', '.slct-free-div-dropdown', function () {
+
+            $('#divisionId').val($(this).val());
+
+        });
+
+
+        $(document).on('click', '#btn-dummy-addteacher', function () {
+            RolesList();
+            var status = true;
+            if ($('#classId').val() != '') {
+                if ($('#divisionId').val() == 0) {
+                    $('#division-required-teacher-add').text("Required");
+                    $('#division-required-teacher-add').show();
+                    var form_data = $("#form-teacher-add input[type=text]").serializeArray();
+                    $(form_data).each(function () {
+                        if (this.value == "" || this.value == null) {
+                            status = false;
+                        }
+                    });
+
+                    if (!status) {
+                        $('#btn-addteacher').trigger('click');
+                    }
+                }
+                else {
+                    $('#division-required-teacher-add').hide();
+                    $('#btn-addteacher').trigger('click');
+                }
+            }
+            else {
+                $('#division-required-teacher-add').hide();
+                $('#btn-addteacher').trigger('click');
+            }
+
+        });
+
+
+
+
+        function AddStaffSuccess(result) {
+
+            if (result.status) {
+                toastrSuccess(result.msg);
+                $('#modalStaffAdd').modal('hide');
+                RefreshStaffGrid();
+            }
+            else {
+                $('#modalStaffAdd').modal('hide');
+                toastrError(result.msg);
+            }
+
+        }
+
+        function EditStaffSuccess(result) {
+
+            if (result.status) {
+                toastrSuccess(result.msg);
+                $('#modalStaffEdit').modal('hide');
+                RefreshStaffGrid();
+            }
+            else {
+                $('#modalStaffEdit').modal('hide');
+                toastrError(result.msg);
+            }
+
+        }
+
+        $(document).on('click', '.delete-teacher-tr', function () {
+            var id = $(this).attr('data-staffid');
+
+            swal({
+                title: "Are you sure?",
+                text: "You will not be able to undo this !",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel it!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+    function (isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: '/School/DeleteStaff/' + id,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status) {
+                        toastrSuccess(data.msg);
+                        RefreshStaffGrid();
+                    }
+                    else {
+                        toastrError(data.msg);
+                    }
+                }
+            });
+            //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+        }
+        //else {
+        //    swal("Cancelled", "Your imaginary file is safe :)", "error");
+        //}
+    });
+
+        });
+
+
+        $(document).on('click', '.edit-staff-tr', function () {
+
+            var id = $(this).attr('data-staffid');
+
+            $.ajax({
+                url: '/School/StaffEditModel/' + id,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#modalStaffEdit').html(data);
+                    $.validator.unobtrusive.parse($("#modalStaffEdit"));
+                    $('#modalStaffEdit').modal('show');
+                    FillRolesInEdit();
+                }
+            });
+
+        });
+
+        function RolesList() {
+            var roles = "";
+            $('.chk-roles-cls').each(function () {
+                if ($(this).prop("checked") == true) {
+                    if (roles == "") {
+                        roles += $(this).val();
+                    }
+                    else {
+                        roles += "~" + $(this).val();
+                    }
+                }
+            });
+            $('#RoleData').val(roles);
+        };
+
+
+
+        function FillRolesInEdit() {
+            //debugger;
+            var data = $('#RoleData').val();// Teacher Assigned roles
+            if (data != "") {
+                var list = data.split("~"); // Teacher Assigned roles
+                if (list != null) {
+
+                    for (var i = 0; i < list.length; i++) {
+                        var roleId = list[i];
+                        $(".chk-roles-cls-edit").each(function () { // Full list
+                            var allId = $(this).val();
+                            if (roleId == allId) {
+                                $(this).prop('checked', true);
+                            }
+                        });
+                    }
+                }
+            }
+        };
+
+        function RolesEditList() {
+            var roles = "";
+            $('.chk-roles-cls-edit').each(function () {
+                if ($(this).prop("checked") == true) {
+                    if (roles == "") {
+                        roles += $(this).val();
+                    }
+                    else {
+                        roles += "~" + $(this).val();
+                    }
+                }
+            });
+            $('#RoleData').val('');
+            $('#RoleData').val(roles);
+        }
+
+
+        $(document).on('click', '#btn-dummy-editstaff', function () {
+            RolesEditList();
+            $('#btn-edit').trigger('click');
+        });
+
+        function ajaxFailure() {
+            toastrError("Failed!");
+        }
+</script>

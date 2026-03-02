@@ -1,0 +1,50 @@
+﻿@model Satluj_Latest.MapModel.ParentTeacherConversationMapModel
+
+@{
+
+    var messages = new Satluj_Latest.Data.Admin().ParentTeacherConversation(Model.StudentId, Model.start, Model.length);
+    var c = Model.StudentId;
+    var divIdDyn = "msgDiv-conver-"+ Model.length;
+}
+<div id="@divIdDyn" class="msg-sty-dev">
+
+    @if (messages.Count() > 0)
+    {
+        foreach (var msg in messages)
+        {
+            <div>
+                @if (msg.role == "Parent")
+            {
+            <div class="chatMain chatRight">
+                <div class="pull-right chatSngl">
+
+                    <span style="font-weight: 600;">@msg.subject</span>
+                    <span>@msg.description</span>
+                    <span class="timeCht">@msg.TimeStamp.ToString("dd/MM/yyyy")<span style="float: right;">@msg.TimeStamp.ToString("hh:mm tt")</span></span>
+                </div>
+            </div>
+            }
+            else
+            {
+            <div class="chatMain chatLeft">
+                <div class="pull-left chatSngl">
+                    <span class="tchrNme">Teacher name@*@msg.teacherName*@</span>
+                    <span style="font-weight: 600;">@msg.subject</span>
+                    <span>@msg.description</span>
+                    <span class="timeCht">@msg.TimeStamp.ToString("dd/MM/yyyy")<span style="float: right;">@msg.TimeStamp.ToString("hh:mm tt")</span></span>
+
+                </div>
+            </div>
+            }
+            </div>
+        }
+    }
+    else
+    {
+<div id="no-msg-div" class="">
+    <div class="noMsg"> No message for this student</div>
+</div>
+    }
+
+</div>
+<input type="hidden" id="hfIsMsgCount" value="@messages.Count()" />

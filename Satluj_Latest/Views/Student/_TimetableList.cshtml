@@ -1,0 +1,131 @@
+﻿@model Satluj_Latest.Models.TimetableModel
+@{
+    var timeTable = new Satluj_Latest.Data.School(Model.SchoolId).GetTimetable(Model.ClassId, Model.DivisonId);
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+
+
+<thead>
+    <tr><td colspan="9" align="center" style="text-align:center; font-size: large;">@Model.ClassName / @Model.DivisionName</td></tr>
+    <tr>
+        <th>
+            Day
+        </th>
+        <th>
+            1
+        </th>
+        <th>
+            2
+        </th>
+        <th>
+            3
+        </th>
+        <th>
+            4
+        </th>
+        <th>
+            5
+        </th>
+        <th>
+            6
+        </th>
+        <th>
+            7
+        </th>
+        <th>
+            8
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        foreach (var table in timeTable)
+        {
+            <tr style="color:black;">
+                <td style="font-weight:bold;">
+                    @table.DayName
+                </td>
+                @if (IsAdmin == true)
+                {
+                    <td>
+                        <a><i class="fa fa-edit edit-time-table" data-id="1" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.One"></i></a>
+                        @table.One
+                    </td>
+                    <td>
+                        <a><i class="fa fa-edit edit-time-table" data-id="2" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.two"></i></a>
+                        @table.two
+                    </td>
+                    <td>
+                        <a><i class="fa fa-edit edit-time-table" data-id="3" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.three"></i></a>
+                        @table.three
+                    </td>
+                    <td>
+                        <a><i class="fa fa-edit edit-time-table" data-id="4" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.four"></i></a>
+                        @table.four
+                    </td>
+                    <td>
+                        <a><i class="fa fa-edit edit-time-table" data-id="5" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.five"></i></a>
+                        @table.five
+                    </td>
+                    <td>
+                        <a><i class="fa fa-edit edit-time-table" data-id="6" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.six"></i></a>
+                        @table.six
+                    </td>
+                    <td>
+                        <a><i class="fa fa-edit edit-time-table" data-id="7" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.seven"></i></a>
+                        @table.seven
+                    </td>
+                    <td>
+                        <a><i class="fa fa-edit edit-time-table" data-id="8" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.eight"></i></a>
+                        @table.eight
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a><i  data-id="1" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.One"></i></a>
+                        @table.One
+                    </td>
+                    <td>
+                        <a><i data-id="2" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.two"></i></a>
+                        @table.two
+                    </td>
+                    <td>
+                        <a><i  data-id="3" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.three"></i></a>
+                        @table.three
+                    </td>
+                    <td>
+                        <a><i  data-id="4" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.four"></i></a>
+                        @table.four
+                    </td>
+                    <td>
+                        <a><i  data-id="5" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.five"></i></a>
+                        @table.five
+                    </td>
+                    <td>
+                        <a><i  data-id="6" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.six"></i></a>
+                        @table.six
+                    </td>
+                    <td>
+                        <a><i  data-id="7" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.seven"></i></a>
+                        @table.seven
+                    </td>
+                    <td>
+                        <a><i  data-id="8" data-day="@table.DayName" data-class="@Model.ClassId" data-div="@Model.DivisonId" data-sub="@table.eight"></i></a>
+                        @table.eight
+                    </td>
+                }
+
+            </tr>
+            i++;
+        }
+    }
+</tbody>
+<tfoot>
+    <tr>
+        <td colspan="9">
+            <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('time-table')"><i class="fa fa-print"></i> Print</button>
+        </td>
+    </tr>
+</tfoot>

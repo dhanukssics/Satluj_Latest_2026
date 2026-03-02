@@ -1,0 +1,132 @@
+﻿@model Satluj_Latest.Models.BankStatementModel
+@{
+    ViewBag.Title = "BalanceStatement";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="form-group col-sm-2">
+        <label>Start</label>
+        <div class="with-icon">
+            <input type="text" class="form-control bank-statement-start-date date-bank-statement" data-date-end-date="0d" value="@Model.StartDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+
+    <div class="form-group col-sm-2">
+        <label>End</label>
+        <div class="with-icon">
+            <input type="text" class="form-control bank-statement-end-date date-bank-statement" data-date-end-date="0d" value="@Model.EndDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+    <div class="form-group col-sm-3">
+        <label>Bank</label>
+        <div class="with-icon">
+            @*<input type="text" class="form-control bank-statement-end-date date-bank-statement" data-date-end-date="0d" value="@Model.EndDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>*@
+            <select asp-for="BankId"
+                    asp-items="ViewBag.BankList"
+                    class="form-control accHead-drop-down"
+                    id="bank-Name-id">
+                <option value="">All</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+        <button type="button" class="btn btn-sm btn-info btn-search" id="searchBankStatementData">Search</button>
+    </div>
+</div>
+<div class="row">
+    <div class="form-group text-center">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+        <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+    </div>
+</div>
+
+<div id="print-trial-bal">
+   <h3 style="text-align:center;" id="bankStatement_heading"></h3> <h5 style="text-align:center;" id="datecheck"></h5>
+    <table class="table custome-table" id="Bank-statement-table-id"></table>
+    @*@Html.Partial("~/Views/Journal/_pv_BankStatementList.cshtml", Model)*@
+</div>
+<script>
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Journal/BankStatement';
+    }
+
+    $('.date-bank-statement').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var head = "Trial Balance as on " + $('#StartDate').val() + " to " + $('#EndDate').val();
+        $("#Bank-statement-table-id").table2excel({
+            name: "Table2Excel",
+            filename: head,
+            fileext: ".xls"
+        });
+    });
+
+    $(document).ready(function () {
+               BankStatementWithDate();
+    });
+
+
+    function BankStatementWithDate() {
+        //debugger;
+        var date = $('.bank-statement-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.bank-statement-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        var bankid = $('#day-bank-Name-id').val();
+        $.ajax({
+            url: '/Journal/SearchBankBalanceData/' + start + '~' + end + '~' + bankid,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#Bank-statement-table-id').html('');
+                $('#Bank-statement-table-id').html(data);
+                var ss = $('.bank-statement-start-date').val() + " to " + $('.bank-statement-end-date').val();
+                if ($('#day-bank-Name-id option:selected').text() == "All")
+                {
+                    var heading = "Bank Statement";
+                    $('#bankStatement_heading').text(heading);
+                }
+                else
+                {
+                    var heading = $('#day-bank-Name-id option:selected').text() + " Bank Statement";
+                    $('#bankStatement_heading').text(heading);
+                }
+                
+                $('#datecheck').text(ss);
+            }
+        });
+    }
+
+    $(document).on('click', '#searchBankStatementData', function () {
+        BankStatementWithDate();
+    });
+
+</script>
+

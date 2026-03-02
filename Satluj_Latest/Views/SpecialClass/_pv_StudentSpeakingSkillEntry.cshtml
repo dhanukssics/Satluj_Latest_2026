@@ -1,0 +1,140 @@
+﻿
+
+@model Satluj_Latest.Models.StudentSkillMarks
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+    var scoreDetails = new Satluj_Latest.Data.School(Model.SchoolId).Get_V_TotalScores(11);
+    //var Conversation = "";
+    //var Recitation = "";
+    var Speaking_total = "";
+    if (scoreDetails != null && scoreDetails.Count > 0)
+    {
+        //if (scoreDetails.Any(x => x.SubTitle == "Conversation"))
+        //{
+        //    Conversation = scoreDetails.Where(x => x.SubTitle == "Conversation").FirstOrDefault().Mark.ToString();
+        //}
+        //if (scoreDetails.Any(x => x.SubTitle == "Recitation"))
+        //{
+        //    Recitation = scoreDetails.Where(x => x.SubTitle == "Recitation").FirstOrDefault().Mark.ToString();
+        //}
+        if (scoreDetails.Any(x => x.SubTitle == "Speaking Skills"))
+        {
+            Speaking_total = scoreDetails.Where(x => x.SubTitle == "Speaking Skills").FirstOrDefault().Mark.ToString();
+        }
+    }
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                SPEAKING (@Speaking_total)
+            </th>
+            @*<th style="color: black;">
+            CONVERSATION (@Conversation)
+        </th>
+        <th style="color: black;">
+            RECITATION (@Recitation)
+        </th>*@
+
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td style="width:10%;">
+                        @count
+                    </td>
+                    <td style="width:50%;">
+                        @item.StudentName
+                    </td>
+                    <td style="width:40%;">
+                        @if (item._SpeakingSkill.Conversation == "" || item._SpeakingSkill.Conversation ==null)
+                        {
+                            <div>
+                                <input value="@item._SpeakingSkill.Conversation" type="number" maxlength="3" style="color:black; " class="cls-mark-Speaking_Skill" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._SpeakingSkill.Conversation" type="number" maxlength="3" style="color:black; " class="cls-mark-Speaking_Skill" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._SpeakingSkill.Conversation" type="number" maxlength="3" style="color:black; " class="cls-mark-Speaking_Skill" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                        @*@if (item._SpeakingSkill.Conversation.Trim() == "")
+            {
+                <div>
+                    <input value="@item._SpeakingSkill.Conversation" type="number" maxlength="3" style="color:black; " class="cls-mark-Conversation" id="@count" />
+                </div>
+            }
+            else
+            {
+
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._SpeakingSkill.Conversation" type="number" maxlength="3" style="color:black; " class="cls-mark-Conversation" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._SpeakingSkill.Conversation" type="number" maxlength="3" style="color:black; " class="cls-mark-Conversation" readonly id="@count" />
+                    }
+                </div>
+            }
+
+        </td>
+        <td style="width:40%;">
+            @if (item._SpeakingSkill.Recitation.Trim() == "")
+            {
+                <div>
+                    <input value="@item._SpeakingSkill.Recitation" type="number" maxlength="3" style="color:black; " class="cls-mark-Recitation" id="@count" />
+                </div>
+            }
+            else
+            {
+
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._SpeakingSkill.Recitation" type="number" maxlength="3" style="color:black; " class="cls-mark-Recitation" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._SpeakingSkill.Recitation" type="number" maxlength="3" style="color:black; " class="cls-mark-Recitation" readonly id="@count" />
+                    }
+                </div>
+            }
+
+        </td>*@
+</tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-speaking-skills-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

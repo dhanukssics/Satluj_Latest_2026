@@ -1,0 +1,28 @@
+﻿@model Satluj_Latest.Models.SMTPDetailsModel
+
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<div class="row">
+    <div class="col-md-12">
+        <h3>SMTP Details</h3>
+
+        <div class="row">
+
+            <div id="smtp-div">
+                @if (Model.email != null)
+                {
+                    @Html.Partial("~/Views/School/_pv_SMTP_Edit.cshtml")
+                }
+                else
+                {
+                    @Html.Partial("~/Views/School/_pv_SMTP_Add.cshtml")
+                }
+            </div>
+
+        </div><!-- end of col md 8 -->
+    </div>
+</div>
+    <script>
+
+    </script>

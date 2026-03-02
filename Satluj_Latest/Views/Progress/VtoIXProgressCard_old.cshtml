@@ -1,0 +1,1248 @@
+﻿
+@model Satluj_Latest.Models.StudentTerm2ProgressCardModel
+
+@{
+    var logo = "http://satluj.schoolman.in" + Model.SchoolLogo;
+    var studentImage = "http://satluj.edumanonline.com" + Model.SchoolLogo;
+    var ScholasticList = new List<Satluj_Latest.Models.ScolasticAreaList>();
+    var ScholasticList2 = new List<Satluj_Latest.Models.ScolasticAreaList>();
+    ////////////////////////////////////
+    var SubjectList = new List<Satluj_Latest.Models.SubjectDetails>();
+    var SubjectList_Sorting = new List<Satluj_Latest.Models.SubjectDetails>();
+    var SubjectList_Compale = new List<Satluj_Latest.Models.SubjectDetails>();
+    //var var_sublist = new Satluj_Latest.Data.School(Model.SchoolId).GetAllDeclaredExamSubjectList(Model.ExamId);
+    var var_sublist = new Satluj_Latest.Data.School(Model.SchoolId).GetAllDeclaredExamSubjectList_V_VIII(Model.ExamId);
+
+    foreach (var a1 in var_sublist.List)
+    {
+        Satluj_Latest.Models.SubjectDetails mo = new Satluj_Latest.Models.SubjectDetails();
+
+        if (a1.Subject1 != "Punjabi")
+        {
+            mo.SubjectName = a1.Subject1;
+            SubjectList_Sorting.Add(mo);
+        }
+        else
+        {
+
+
+        }
+
+
+    }
+
+    Satluj_Latest.Models.SubjectDetails mo23 = new Satluj_Latest.Models.SubjectDetails();
+
+    mo23.SubjectName = "Punjabi";
+    SubjectList_Sorting.Add(mo23);
+
+    Satluj_Latest.Models.SubjectDetails mo24 = new Satluj_Latest.Models.SubjectDetails();
+
+    mo24.SubjectName = "Sanskrit";
+    SubjectList_Sorting.Add(mo24);
+
+
+
+
+    /////////////////////////////////////
+    var CoScholasticArea = new List<Satluj_Latest.Models.CoscholasticAreaList>();
+    int totalScolasticCount = 0;
+    if (Model.IsIssued == false)
+    {
+        ScholasticList = Model.TermDataList[0].scholasticList.ToList();
+        SubjectList_Compale = ScholasticList[0].subjectList.ToList();
+        ////////////////////////////////////
+        foreach (var a1 in SubjectList_Sorting)
+        {
+            var datas_Sort = SubjectList_Compale.Where(x => x.SubjectName == a1.SubjectName).FirstOrDefault();
+            if (datas_Sort != null)
+            {
+                Satluj_Latest.Models.SubjectDetails mo = new Satluj_Latest.Models.SubjectDetails();
+                mo.SubjectName = datas_Sort.SubjectName;
+                mo.Mark = datas_Sort.Mark;
+                mo.PracticalScore = datas_Sort.PracticalScore;
+                mo.MarkTotal = datas_Sort.MarkTotal;
+                mo.PracticalScoreTotal = datas_Sort.PracticalScoreTotal;
+                SubjectList.Add(mo);
+            }
+
+        }
+
+
+
+        ///////////////////////////////////
+
+        CoScholasticArea = Model.TermDataList[0].ColasticAreaResult.ToList();
+        totalScolasticCount = ScholasticList.Count() + 1;
+        totalScolasticCount = totalScolasticCount / 2;
+    }
+
+
+
+
+
+    int totalScore = 0;
+    List<int> TotalScoreOfTerms = new List<int>();
+    var count = 0;
+    var studentData = new Satluj_Latest.Data.Student(Model.StudentId);
+    //var attendanceData = studentData.GetAcademicPeriods(); // Data taking from attendance table
+    var attendanceData = studentData.GetStudentsAttendanceData(); // Data taking from the attendance period table
+    var HealthData = studentData.GetHealthDetails();
+    var remarks = studentData.StudentRemarks();
+    var colmSpan = ScholasticList.Count() + 2;
+    decimal totalMark = 0;
+    decimal totalOutOff = 0;
+    decimal totalMark2 = 0;
+    decimal totalOutOff2 = 0;
+    int lastScholastic = 0;
+    int schoCount = 0;
+    int co_count = 0;
+    int lastCo_Count = studentData.GetCoScholasticNonHeadCount(Model.RegionId);
+    if (Model.IsOneTerm == true && Model.csList != null && Model.csList.Count() > 0)
+    {
+        if (Model.csList[0].PracticalScore == "")
+        {
+            Model.csList[0].PracticalScore = "0";
+        }
+        if (Model.csList[0].TheoryScore == "")
+        {
+            Model.csList[0].TheoryScore = "0";
+        }
+        totalMark = Convert.ToDecimal(Model.csList[0].PracticalScore) + Convert.ToDecimal(Model.csList[0].TheoryScore);
+        totalOutOff = 100;
+    }
+    else if (Model.csList != null && Model.csList.Count() > 0)
+    {
+        if (Model.csList[0].PracticalScore == "")
+        {
+            Model.csList[0].PracticalScore = "0";
+        }
+        if (Model.csList[0].TheoryScore == "")
+        {
+            Model.csList[0].TheoryScore = "0";
+        }
+
+
+
+        if (Model.csList[1].PracticalScore == "")
+        {
+            Model.csList[1].PracticalScore = "0";
+        }
+        if (Model.csList[1].TheoryScore == "")
+        {
+            Model.csList[1].TheoryScore = "0";
+        }
+
+
+
+
+        totalMark = Convert.ToDecimal(Model.csList[0].PracticalScore) + Convert.ToDecimal(Model.csList[0].TheoryScore);
+        totalMark2 = Convert.ToDecimal(Model.csList[1].PracticalScore) + Convert.ToDecimal(Model.csList[1].TheoryScore);
+        totalOutOff = 100;
+        totalOutOff2 = 100;
+    }
+    else
+    {
+    }
+    if (Model.IsOneTerm == false && Model.IsIssued == false)
+    {
+        ScholasticList2 = Model.TermDataList[1].scholasticList.ToList();
+    }
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Report Card - Satluj School</title>
+</head>
+<body style="font-family:Arial;">
+    @*--------------------PRINT BUTTON----------------------------------------------*@
+    @*<div style="height:30px;">*@
+    <button type="button" class="btn btn-success btn-style" id="btn-print" style="width: 200px;background-color: #7c89ad; position:absolute; right:20px; top:20px; width: 100px;
+     padding: 10px; color: rgb(255, 255, 255); background-color: rgb(124, 137, 173); position: absolute; right: 20px; top: 20px; border: none; display: block; z-index: 999;   visibility: visible;cursor: pointer;" onclick="myFunction()">
+        Print
+    </button>
+    @*</div>*@
+    @*--------------------PRINT BUTTON----------------------------------------------*@
+    <div class="report-card" style="box-sizing:border-box;">
+        <table style="width:100%; font-size:12px;">
+            @*15px*@
+            <tbody>
+                <tr>
+                    <th colspan="2" align="left">
+                        <img src="@logo" width="190" style="float:left; margin-right:20px; width:250px;" />
+                        <div style="margin-right:200px;">
+                            @*<h3 align="left" style="padding:0px; margin:0px;">Evaluation Report</h3>*@
+                            <h3 align="center" style="padding:0px; margin:0px;">@Model.ReportName</h3>
+                            <p align="center" style="font-size:12px; margin-bottom:0px; margin-top:5px;">
+                                @*14px*@
+                                @*@Model.SchoolName
+                                    <br />*@
+                                @Model.SchoolAdddress &nbsp;&nbsp;
+                                <br />
+                                Email: satlujps@yahoo.co.in @*@Model.SchoolEmail*@ &nbsp;&nbsp;&nbsp;
+                                <br />
+                                Website: @Model.SchoolWebsite
+                            </p>
+                        </div>
+                    </th>
+                </tr>
+
+                <tr>
+                    <th colspan="2">
+                        <h3 style="margin:0; padding:0; margin-left: 65px;">
+                            Academic Performance
+                            <br />
+                            Classes VI-VIII &nbsp;&nbsp; Session: @Model.AccademicSession
+                        </h3>
+                    </th>
+                </tr>
+
+                <tr>
+                    <th width="50%">
+                        <h4 align="left" style="padding: 5px 0px; margin: 0px;">
+                            Name: @Model.StudentName
+                            <br />
+                            Father's Name: @Model.FathersName
+
+                            <br />
+                            Mother's Name: @Model.MothersName
+
+                        </h4>
+                    </th>
+                    <th width="50%">
+                        <div style="float:left;">
+                            <h4 align="left" style="padding: 5px 0px; margin: 0px; margin-left: -65px; text-align: center;">
+                                Roll No.: @Model.RollNo <span style="margin-left: 10px;">Adm.No.: @Model.AdmissionNo </span>
+                                <br />
+                                Date of Birth: @Model.DateOfBirth
+                                <br />
+                                Class: @Model.ClassDivision
+                            </h4>
+                        </div>
+                        <img src="@Model.StudentImage" style="width:65px; height:65px; margin-left:300px;" />
+                    </th>
+                </tr>
+                @*--------------------------------------------------------------------------------------------------*@
+                @if (Model.IsOneTerm == true) // One Term Progress Card
+                {
+                    <tr>
+                        <th colspan="2">
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:100%;">
+                                @*13px*@
+                                <thead>
+                                    <tr>
+                                        <th style="width:35%; font-weight:bolder;" rowspan="3">SCHOLASTIC SUBJECTS</th>
+                                        @*<th colspan="8">Term I - @Model.Periods</th>*@
+                                        <th colspan="8" style="font-weight:bolder;">TERM 1</th>
+                                    </tr>
+                                    <tr>
+                                        @foreach (var terms in Model.TermDataList) // Exam Heading List
+                                        {
+                                            foreach (var item in ScholasticList) // Full Scholastics
+                                            {
+                                        <th sibi1 style="width:8.5%">@item.ScolasticArea </th>
+                                            }
+                                        <th style="width:8.5%;">Grand Total</th>
+                                        <th>Grade</th>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        @foreach (var terms in Model.TermDataList) // Full out of marks
+                                        {
+                                            totalScore = 0;
+                                            int scoCount = 0;
+                                            foreach (var item in ScholasticList) // Full Scholastics out of Marks
+                                            {
+                                                if (item.TotalScore != string.Empty && item.TotalScore != "" && scoCount != 4)
+                                                {
+                                                    totalScore = totalScore + Convert.ToInt32(item.TotalScore);
+                                                }
+                                        <th sibi2>@item.TotalScore</th>
+                                                scoCount = scoCount + 1;
+                                            }
+                                        <th sibi3>@totalScore</th>
+                                        <th></th>
+                                            TotalScoreOfTerms.Add(totalScore);
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var subjects in SubjectList)// Sujects and their marks listing section
+                                    {
+                                        count = 0;
+                                    <tr>
+                                        <td align="left">@subjects.SubjectName.ToUpper()</td>
+                                        @foreach (var terms in Model.TermDataList)
+                                            {
+                                                var data = terms.scholasticList.ToList();
+                                                decimal tot = 0;
+                                                var grade = "";
+                                                int avoidTotalFieldTotal = 0;
+                                                foreach (var result in data)
+                                                {
+
+                                                    var areaName = result.ScolasticArea;
+                                                    var areaviseData = ((IEnumerable<dynamic>)result.subjectList).Where(X => X.SubjectName == subjects.SubjectName).FirstOrDefault();
+                                                    decimal zz = Convert.ToDecimal(areaviseData.Mark);
+                                                    if (avoidTotalFieldTotal != 4)
+                                                    {
+                                                        tot = tot + zz;
+                                                    }
+                                                    if (areaviseData.Mark == "0")
+                                                    {
+                                            <td>-</td>
+                                                    }
+                                                    else
+                                                    {
+                                            @*<td>@areaviseData.Mark</td>*@
+                                            <td>@Convert.ToInt32(zz)</td>
+                                                    }
+                                                    avoidTotalFieldTotal = avoidTotalFieldTotal + 1;
+                                                }
+                                            <td>@Convert.ToInt32(tot)</td>
+                                            var persentage = Math.Round(((tot / TotalScoreOfTerms[count]) * 100), MidpointRounding.AwayFromZero);
+                                            if (persentage > 90)
+                                            {
+                                                grade = "A1";
+                                            }
+                                            else if (80 < persentage && persentage < 91)
+                                            {
+                                                grade = "A2";
+                                            }
+                                            else if (70 < persentage && persentage < 81)
+                                            {
+                                                grade = "B1";
+                                            }
+                                            else if (60 < persentage && persentage < 71)
+                                            {
+                                                grade = "B2";
+                                            }
+                                            else if (50 < persentage && persentage < 61)
+                                            {
+                                                grade = "C1";
+                                            }
+                                            else if (40 < persentage && persentage < 51)
+                                            {
+                                                grade = "C2";
+                                            }
+                                            else if (32 < persentage && persentage < 41)
+                                            {
+                                                grade = "D";
+                                            }
+                                            else
+                                            {
+                                                grade = "E";
+                                            }
+                                            <td>@grade</td>
+                                                totalMark = totalMark + tot;
+                                                totalOutOff = totalOutOff + TotalScoreOfTerms[count];
+                                                count = count + 1;
+                                            }
+                                    </tr>
+                                    }
+                                    @*COMPUTER SCIENCE*@
+                                    @if (Model.csList.Count() > 0 && Model.csList != null)
+                                    {
+                                        decimal first = Convert.ToDecimal(Model.csList[0].PracticalScore) + Convert.ToDecimal(Model.csList[0].TheoryScore);
+                                        decimal x = Convert.ToDecimal(Model.csList[0].PracticalScore);
+                                        decimal y = Convert.ToDecimal(Model.csList[0].PracticalTotal);
+                                        decimal p = Convert.ToDecimal(Model.csList[0].TheoryScore);
+                                        decimal q = Convert.ToDecimal(Model.csList[0].TheoryTotal);
+                                        var grade1 = "";
+                                    <tr>
+                                        <td colspan="1" align="left">@Model.csList[0].SubjectName.ToUpper()</td>
+                                        @if (Model.csList[0].PracticalScore == "0")
+                                            {
+                                            <td colspan="3">-</td>
+                                            }
+                                            else
+                                            {
+                                            @*<td colspan="3">Practical @Model.csList[0].PracticalScore / @Model.csList[0].PracticalTotal</td>*@
+                                            <td colspan="3">Practical @Convert.ToInt32(x)/@Convert.ToInt32(y)</td>
+                                            }
+                                        @if (Model.csList[0].TheoryScore == "0")
+                                            {
+                                            <td colspan="3">-</td>
+                                            }
+                                            else
+                                            {
+                                            @*<td colspan="3">Theory @Model.csList[0].TheoryScore / @Model.csList[0].TheoryTotal</td>*@
+                                            <td colspan="3">Theory @Convert.ToInt32(p)/@Convert.ToInt32(q)</td>
+                                            }
+
+                                        <td colspan="1">@Convert.ToInt32(first) </td>
+                                        @if (first > 90)
+                                            {
+                                                grade1 = "A1";
+                                            }
+                                            else if (80 < first && first < 91)
+                                            {
+                                                grade1 = "A2";
+                                            }
+                                            else if (70 < first && first < 81)
+                                            {
+                                                grade1 = "B1";
+                                            }
+                                            else if (60 < first && first < 71)
+                                            {
+                                                grade1 = "B2";
+                                            }
+                                            else if (50 < first && first < 61)
+                                            {
+                                                grade1 = "C1";
+                                            }
+                                            else if (40 < first && first < 51)
+                                            {
+                                                grade1 = "C2";
+                                            }
+                                            else if (32 < first && first < 41)
+                                            {
+                                                grade1 = "D";
+                                            }
+                                            else
+                                            {
+                                                grade1 = "E";
+                                            }
+                                        <td colspan="1">@grade1</td>
+                                    </tr>
+
+                                    }@*COMPUTER SCIENCE*@
+                                    @*<tr>
+                                            <td>TOTAL</td>
+                                            <td colspan="@colmSpan">@totalMark</td>
+                                        </tr>*@
+                                    @*<tr>
+                                        <td>Percentage</td>
+                                        @if (totalOutOff != 0)
+                                        {
+                                            var per = Math.Round((totalMark / totalOutOff) * 100, 2);
+                                            var totgrade = "";
+                                            if (per > 90)
+                                            {
+                                                totgrade = "A1";
+                                            }
+                                            else if (80 < per && per < 91)
+                                            {
+                                                totgrade = "A2";
+                                            }
+                                            else if (70 < per && per < 81)
+                                            {
+                                                totgrade = "B1";
+                                            }
+                                            else if (60 < per && per < 71)
+                                            {
+                                                totgrade = "B2";
+                                            }
+                                            else if (50 < per && per < 61)
+                                            {
+                                                totgrade = "C1";
+                                            }
+                                            else if (40 < per && per < 51)
+                                            {
+                                                totgrade = "C2";
+                                            }
+                                            else if (32 < per && per < 41)
+                                            {
+                                                totgrade = "D";
+                                            }
+                                            else
+                                            {
+                                                totgrade = "E";
+                                            }*@
+                                    @*<td colspan="@colmSpan"> @per % ( @totgrade ) </td>*@
+                                    @*<td colspan="@colmSpan"> @per % </td>
+                                            }
+                                            else
+                                            {
+                                            <td colspan="@colmSpan"></td>
+                                            }
+                                        </tr>*@
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <th>
+                            @*<table border="1" style="border-collapse: collapse; font-size:10px; width:35%;">
+                                    <tr>
+                                        <td style="text-align:left">*M.A: Multiple Assessment</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:left">*S.E: Subject Enrichment</td>
+                                    </tr>
+                                </table>*@
+                            @*Co - scholastic Area Results*@
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:left; font-weight:bolder;" >CO-SCHOLASTIC SUBJECTS</th>
+                                        <th>Term I</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center;">
+                                    @foreach (var co in CoScholasticArea)
+                                    {
+                                        if (co_count == lastCo_Count)
+                                        {
+                                            <tr>
+                                                <th style="border-right:hidden;font-weight:bolder; text-align:left;">HEALTH AND PHYSICAL FITNESS</th>
+                                                <th></th>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <td align="left">@co.CoScholasticData.ToUpper()</td>
+                                            @foreach (var terms in Model.TermDataList)
+                                            {
+                                                var coData = terms.ColasticAreaResult;
+                                                var results = ((IEnumerable<dynamic>)coData).Where(x => x.CoScholasticData == co.CoScholasticData).Select(x => x.CoScholasticResult).FirstOrDefault();
+                                                <td>@results.ToUpper()</td>
+                                            }
+                                        </tr>
+                                        co_count = co_count + 1;
+                                    }
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr style="vertical-align:text-top;">
+                        <th>
+                            @*<table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                    <thead>
+                                        <tr>
+                                            <th>CO-SCHOLASTIC SUBJECTS</th>
+                                            <th>Term I</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="text-align:center;">
+                                        @foreach (var co in CoScholasticArea)
+                                        {
+                                            <tr>
+                                                <td align="left">@co.CoScholasticData.ToUpper()</td>
+                                                @foreach (var terms in Model.TermDataList)
+                                                {
+                                                    var coData = terms.ColasticAreaResult;
+                                                    var results = ((IEnumerable<dynamic>)coData).Where(x => x.CoScholasticData == co.CoScholasticData).Select(x => x.CoScholasticResult).FirstOrDefault();
+                                                    <td>@results.ToUpper()</td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>*@
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                <tr>
+                                    <td style="text-align:left">*M.A: Multiple Assessment</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left">*S.E: Subject Enrichment</td>
+                                </tr>
+                            </table>
+                        </th>
+                        <th>
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%; margin-top:-120px;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2" width="50%" style="font-weight:bolder;">ATTENDANCE</th>
+                                        <th colspan="2" width="50%" style="font-weight:bolder;">HEALTH STATUS</th>
+                                    </tr>
+                                    <tr>
+                                        <th>STATUS</th>
+                                        <th>Term I</th>
+
+                                        <th></th>
+                                        <th>Term I</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td align="left">No. of Working Days</td>
+                                        @if (attendanceData != null && attendanceData.Count > 0)
+                                        {
+                                            <td>@attendanceData[0].Total</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                        <td align="left">Height (cms)</td>
+                                        @if (HealthData != null && HealthData.Count > 0)
+                                        {
+                                            string as1 = HealthData[0].Height.ToString();
+                                            string as2 = "0.01";
+                                            if (as1 == as2)
+                                            {
+                                                <td>0.00</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@HealthData[0].Height</td>
+                                            }
+
+
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td align="left">Days Attended</td>
+                                        @if (attendanceData != null && attendanceData.Count > 0)
+                                        {
+                                            <td>@attendanceData[0].Present</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                        <td align="left">Weight (kgs)</td>
+                                        @if (HealthData != null && HealthData.Count > 0)
+                                        {
+
+                                            string as1 = HealthData[0].Weight.ToString();
+                                            string as2 = "0.01";
+                                            if (as1 == as2)
+                                            {
+                                                <td>0.00</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@HealthData[0].Weight</td>
+                                            }
+
+
+
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table border="1" style="border-collapse:collapse; font-size:10px; width:70%; margin-top:10px;">
+                                @*13px*@
+                                <thead>
+                                    <tr>
+                                        <td style="font-weight:bolder;">REMARKS</td>
+                                    </tr>
+                                    <tr>
+                                        <th width="50%"> Term I</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        @if (remarks != null && remarks.Count > 0)
+                                        {
+
+                                            if (remarks.Count > 2)
+                                            {
+                                                <td align="left">@remarks[1].Remark</td>
+                                            }
+                                            else
+                                            {
+                                                <td align="left">@remarks[0].Remark</td>
+                                            }
+
+
+                                            @*<td align="left">@remarks[0].Remark</td>*@
+                                        }
+                                        else
+                                        {
+                                            <td align="left"></td>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Class Teacher/ HOY/ Link Officer Signature</h5>
+                            </div>
+
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Parent's Signature</h5>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Managing Director Signature</h5>
+                            </div>
+
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Co-Chairman/ Principal's Signature</h5>
+                            </div>
+                        </td>
+                    </tr>
+
+                }
+                @*---------------------------------------------------------------------------------------------------*@
+                else
+                {
+                    <tr>
+                        <th colspan="2">
+                            <table border="1" width="100%" style="border-collapse: collapse; font-size:10px;">
+                                @*13px*@
+                                <thead>
+                                    <tr>
+                                        <th rowspan="3" style="font-weight:bolder;">SCHOLASTIC SUBJECTS</th>
+                                        @*<th colspan="@colmSpan">Term I - @Model.Periods</th>*@
+                                        <th colspan="@colmSpan" style="font-weight:bolder;">TERM 1</th>
+                                        <th colspan="@colmSpan" style="font-weight:bolder;">TERM 2 </th>
+                                    </tr>
+                                    <tr>
+                                        @foreach (var terms in Model.TermDataList) // Exam Heading List
+                                        {
+                                            if (schoCount == 0)
+                                            {
+                                                foreach (var item in ScholasticList) // Full Scholastics
+                                                {
+                                                    lastScholastic = lastScholastic + 1;
+                                        <th>@item.ScolasticArea </th>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                foreach (var item in ScholasticList2) // Full Scholastics
+                                                {
+                                                    lastScholastic = lastScholastic + 1;
+                                        <th>@item.ScolasticArea </th>
+                                                }
+                                            }
+                                        <th>Grand Total</th>
+                                        <th>Grade</th>
+                                            schoCount = schoCount + 1;
+                                        }
+                                    </tr>
+                                    <tr>
+                                        @foreach (var terms in Model.TermDataList) // Full out of marks
+                                        {
+                                            totalScore = 0;
+                                            int avoidScolasticTotalInTotal = 0;
+                                            foreach (var item in ScholasticList) // Full Scholastics out of Marks
+                                            {
+                                                if (item.TotalScore != string.Empty && item.TotalScore != "" && avoidScolasticTotalInTotal != 4)
+                                                {
+                                                    totalScore = totalScore + Convert.ToInt32(item.TotalScore);
+                                                }
+                                        <th>@item.TotalScore</th>
+                                                avoidScolasticTotalInTotal = avoidScolasticTotalInTotal + 1;
+                                            }
+                                        <th>@totalScore</th>
+                                        <th></th>
+                                            TotalScoreOfTerms.Add(totalScore);
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var subjects in SubjectList)// Sujects and their marks listing section
+                                    {
+                                        count = 0;
+                                    <tr>
+                                        <td align="left">@subjects.SubjectName.ToUpper()</td>
+                                        @foreach (var terms in Model.TermDataList)
+                                            {
+                                                var data = terms.scholasticList.ToList();
+                                                decimal tot = 0;
+                                                var grade = "";
+                                                int avoidScolasticTotalInTotal = 0;
+                                                foreach (var result in data)
+                                                {
+                                                    var areaName = result.ScolasticArea;
+                                                    var areaviseData = ((IEnumerable<dynamic>)result.subjectList).Where(X => X.SubjectName == subjects.SubjectName).FirstOrDefault();
+                                                    decimal zz = Convert.ToDecimal(areaviseData.Mark);
+                                                    if (avoidScolasticTotalInTotal != 4)
+                                                    {
+                                                        tot = tot + zz;
+                                                    }
+                                                    if (areaviseData.Mark == "0")
+                                                    {
+                                            <td>-</td>
+                                                    }
+                                                    else
+                                                    {
+                                            @*<td>@areaviseData.Mark</td>*@
+                                            <td>@Convert.ToInt32(zz)</td>
+                                                    }
+                                                    avoidScolasticTotalInTotal = avoidScolasticTotalInTotal + 1;
+                                                }
+                                            <td>@Convert.ToInt32(tot)</td>
+                                            var persentage = Math.Round(((tot / TotalScoreOfTerms[count]) * 100), MidpointRounding.AwayFromZero);
+                                            if (persentage > 90)
+                                            {
+                                                grade = "A1";
+                                            }
+                                            else if (80 < persentage && persentage < 91)
+                                            {
+                                                grade = "A2";
+                                            }
+                                            else if (70 < persentage && persentage < 81)
+                                            {
+                                                grade = "B1";
+                                            }
+                                            else if (60 < persentage && persentage < 71)
+                                            {
+                                                grade = "B2";
+                                            }
+                                            else if (50 < persentage && persentage < 61)
+                                            {
+                                                grade = "C1";
+                                            }
+                                            else if (40 < persentage && persentage < 51)
+                                            {
+                                                grade = "C2";
+                                            }
+                                            else if (32 < persentage && persentage < 41)
+                                            {
+                                                grade = "D";
+                                            }
+                                            else
+                                            {
+                                                grade = "E";
+                                            }
+                                            <td>@grade</td>
+                                                if (count == 0)
+                                                {
+                                                    totalMark = totalMark + tot;
+                                                    totalOutOff = totalOutOff + TotalScoreOfTerms[count];
+                                                }
+                                                else
+                                                {
+                                                    totalMark2 = totalMark2 + tot;
+                                                    totalOutOff2 = totalOutOff2 + TotalScoreOfTerms[count];
+                                                }
+                                                count = count + 1;
+                                            }
+                                    </tr>
+                                    }
+                                    @*COMPUTER SCIENCE*@
+                                    @if (Model.csList.Count() > 0 && Model.csList != null)
+                                    {
+                                        decimal first = Convert.ToDecimal(Model.csList[0].PracticalScore) + Convert.ToDecimal(Model.csList[0].TheoryScore);
+                                        decimal second = Convert.ToDecimal(Model.csList[1].PracticalScore) + Convert.ToDecimal(Model.csList[1].TheoryScore);
+                                        decimal x = Convert.ToDecimal(Model.csList[0].PracticalScore);
+                                        decimal y = Convert.ToDecimal(Model.csList[0].PracticalTotal);
+                                        decimal p = Convert.ToDecimal(Model.csList[0].TheoryScore);
+                                        decimal q = Convert.ToDecimal(Model.csList[0].TheoryTotal);
+
+                                        decimal x2 = Convert.ToDecimal(Model.csList[1].PracticalScore);
+                                        decimal y2 = Convert.ToDecimal(Model.csList[1].PracticalTotal);
+                                        decimal p2 = Convert.ToDecimal(Model.csList[1].TheoryScore);
+                                        decimal q2 = Convert.ToDecimal(Model.csList[1].TheoryTotal);
+                                        var grade1 = "";
+                                        var grade2 = "";
+                                    <tr>
+                                        <td align="left">@Model.csList[0].SubjectName.ToUpper()</td>
+                                        @if (Model.csList[0].PracticalScore == "0")
+                                            {
+                                            <td colspan="3">-</td>
+                                            }
+                                            else
+                                            {
+                                            @*<td colspan="3">Practical @Model.csList[0].PracticalScore / @Model.csList[0].PracticalTotal</td>*@
+                                            <td colspan="3">Practical @Convert.ToInt32(x)/@Convert.ToInt32(y)</td>
+                                            }
+                                        @if (Model.csList[0].TheoryScore == "0")
+                                            {
+                                            <td colspan="3">-</td>
+                                            }
+                                            else
+                                            {
+                                            @*<td colspan="3">Theory @Model.csList[0].TheoryScore / @Model.csList[0].TheoryTotal</td>*@
+                                            <td colspan="3">Theory @Convert.ToInt32(p)/@Convert.ToInt32(q)</td>
+                                            }
+
+                                        <td colspan="1">@Convert.ToInt32(first) </td>
+                                        @if (first > 90)
+                                            {
+                                                grade1 = "A1";
+                                            }
+                                            else if (80 < first && first < 91)
+                                            {
+                                                grade1 = "A2";
+                                            }
+                                            else if (70 < first && first < 81)
+                                            {
+                                                grade1 = "B1";
+                                            }
+                                            else if (60 < first && first < 71)
+                                            {
+                                                grade1 = "B2";
+                                            }
+                                            else if (50 < first && first < 61)
+                                            {
+                                                grade1 = "C1";
+                                            }
+                                            else if (40 < first && first < 51)
+                                            {
+                                                grade1 = "C2";
+                                            }
+                                            else if (32 < first && first < 41)
+                                            {
+                                                grade1 = "D";
+                                            }
+                                            else
+                                            {
+                                                grade1 = "E";
+                                            }
+                                        <td colspan="1">@grade1</td>
+
+                                        @*Second term*@
+                                        @if (Model.csList[1].PracticalScore == "0")
+                                            {
+                                            <td colspan="3">-</td>
+                                            }
+                                            else
+                                            {
+                                            @*<td colspan="3">Practical @Model.csList[1].PracticalScore / @Model.csList[1].PracticalTotal</td>*@
+                                            <td colspan="3">Practical @Convert.ToInt32(x2)/@Convert.ToInt32(y2)</td>
+                                            }
+                                        @if (Model.csList[1].TheoryScore == "0")
+                                            {
+                                            <td colspan="3">-</td>
+                                            }
+                                            else
+                                            {
+                                            @*<td colspan="3">Theory @Model.csList[1].TheoryScore / @Model.csList[1].TheoryTotal</td>*@
+                                            <td colspan="3">Theory @Convert.ToInt32(p2)/@Convert.ToInt32(q2)</td>
+                                            }
+                                        <td colspan="1"> @Math.Round(second) </td>
+                                        @if (second > 90)
+                                            {
+                                                grade2 = "A1";
+                                            }
+                                            else if (80 < second && second < 91)
+                                            {
+                                                grade2 = "A2";
+                                            }
+                                            else if (70 < second && second < 81)
+                                            {
+                                                grade2 = "B1";
+                                            }
+                                            else if (60 < second && second < 71)
+                                            {
+                                                grade2 = "B2";
+                                            }
+                                            else if (50 < second && second < 61)
+                                            {
+                                                grade2 = "C1";
+                                            }
+                                            else if (40 < second && second < 51)
+                                            {
+                                                grade2 = "C2";
+                                            }
+                                            else if (32 < second && second < 41)
+                                            {
+                                                grade2 = "D";
+                                            }
+                                            else
+                                            {
+                                                grade2 = "E";
+                                            }
+                                        <td colspan="1">@grade2</td>
+                                    </tr>
+
+                                    }@*COMPUTER SCIENCE*@
+
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <th>
+                            @*<table border="1" style="border-collapse: collapse; font-size:10px; width:35%;">
+                                    <tr>
+                                        <td style="text-align:left">*M.A: Multiple Assessment</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:left">*S.E: Subject Enrichment</td>
+                                    </tr>
+                                </table>*@
+                            @*Co - scholastic Area Results*@
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:left; font-weight:bolder;">CO-SCHOLASTIC SUBJECTS</th>
+                                        <th>Term I</th>
+                                        <th>Term II</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center;">
+                                    @foreach (var co in CoScholasticArea)
+                                    {
+                                        if (co_count == lastCo_Count)
+                                        {
+                                            <tr>
+                                                <th style="border-right:hidden;font-weight:bolder; text-align:left;">HEALTH AND PHYSICAL FITNESS</th>
+                                                <th></th>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <td align="left">@co.CoScholasticData.ToUpper()</td>
+                                            @foreach (var terms in Model.TermDataList)
+                                            {
+                                                var coData = terms.ColasticAreaResult;
+                                                var results = ((IEnumerable<dynamic>)coData).Where(x => x.CoScholasticData == co.CoScholasticData).Select(x => x.CoScholasticResult).FirstOrDefault();
+                                                <td>@results.ToUpper()</td>
+                                            }
+                                        </tr>
+                                        co_count = co_count + 1;
+                                    }
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr style="vertical-align: text-top;">
+                        <th>
+
+                            @*<table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                    <thead>
+                                        <tr>
+                                            <th>CO-SCHOLASTIC SUBJECTS</th>
+                                            <th>Term I</th>
+                                            <th>Term I</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="text-align:center;">
+                                        @foreach (var co in CoScholasticArea)
+                                        {
+                                            <tr>
+                                                <td align="left">@co.CoScholasticData.ToUpper()</td>
+                                                @foreach (var terms in Model.TermDataList)
+                                                {
+                                                    var coData = terms.ColasticAreaResult;
+                                                    var results = ((IEnumerable<dynamic>)coData).Where(x => x.CoScholasticData == co.CoScholasticData).Select(x => x.CoScholasticResult).FirstOrDefault();
+                                                    <td>@results.ToUpper()</td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>*@
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                <tr>
+                                    <td style="text-align:left">*M.A: Multiple Assessment</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left">*S.E: Subject Enrichment</td>
+                                </tr>
+                            </table>
+                        </th>
+                        <th>
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%; margin-top:-117px;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3" width="50%" style="font-weight:bolder;">ATTENDANCE</th>
+                                        <th colspan="3" width="50%"  style="font-weight:bolder;">HEALTH STATUS</th>
+                                    </tr>
+                                    <tr>
+                                        <th>STATUS</th>
+                                        <th>Term I</th>
+                                        <th>Term II</th>
+
+                                        <th></th>
+                                        <th>Term I</th>
+                                        <th>Term II</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td align="left">No. of Working Days</td>
+                                        @if (attendanceData != null && attendanceData.Count > 0)
+                                        {
+                                            <td>@attendanceData[0].Total</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                        @if (attendanceData != null && attendanceData.Count > 1)
+                                        {
+                                            <td>@attendanceData[1].Total</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                        <td align="left">Height (cms)</td>
+                                        @if (HealthData != null && HealthData.Count > 0)
+                                        {
+
+                                            string as1 = HealthData[0].Height.ToString();
+                                            string as2 = "0.01";
+                                            if (as1 == as2)
+                                            {
+                                                <td>0.00</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@HealthData[0].Height</td>
+                                            }
+
+
+                                            
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                        @if (HealthData != null && HealthData.Count > 1)
+                                        {
+                                            <td>@HealthData[1].Height</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td align="left">Days Attended</td>
+                                        @if (attendanceData != null && attendanceData.Count > 0)
+                                        {
+                                            <td>@attendanceData[0].Present</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                        @if (attendanceData != null && attendanceData.Count > 1)
+                                        {
+                                            <td>@attendanceData[1].Present</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                        <td align="left">Weight (kgs)</td>
+                                        @if (HealthData != null && HealthData.Count > 0)
+                                        {
+
+
+                                            string as1 = HealthData[0].Weight.ToString();
+                                            string as2 = "0.01";
+                                            if (as1 == as2)
+                                            {
+                                                <td>0.00</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@HealthData[0].Weight</td>
+                                            }
+
+
+
+                                           
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                        @if (HealthData != null && HealthData.Count > 1)
+                                        {
+                                            <td>@HealthData[1].Weight</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table border="1" style="border-collapse:collapse; font-size:10px; width:70%; margin-top:10px;">
+                                @*13px*@
+                                <thead>
+                                    <tr>
+                                        <td colspan="2" style="font-weight:bolder;">REMARKS</td>
+                                    </tr>
+                                    <tr>
+                                        <th width="50%"> Term I</th>
+                                        <th width="50%"> Term II</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        @if (remarks != null && remarks.Count > 0)
+                                        {
+                                            if (remarks[0].Remark == "0")
+                                            {
+                                                <td align="left"></td>
+                                            }
+                                            else
+                                            {
+                                                <td align="left">@Model.Remark</td>
+                                                @*Changed by razi to load remarks of term1*@
+                                            }
+
+
+
+                                        }
+                                        else
+                                        {
+                                            <td align="left"></td>
+                                        }
+                                        @if (remarks != null && remarks.Count > 1)
+                                        {
+                                            <td align="left">@Model.Remark2</td>
+                                            @*Changed by razi to load remarks of term2*@
+                                        }
+                                        else
+                                        {
+                                            <td align="left"></td>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Class Teacher/ HOY/ Link Officer Signature</h5>
+                            </div>
+
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Parent's Signature</h5>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Managing Director Signature</h5>
+                            </div>
+
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Co-Chairman/ Principal's Signature</h5>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+
+<script>
+    function myFunction() {
+        var printButton = document.getElementById("btn-print");
+        printButton.style.visibility = 'hidden';
+        window.print();
+        printButton.style.visibility = 'visible';
+    }
+</script>

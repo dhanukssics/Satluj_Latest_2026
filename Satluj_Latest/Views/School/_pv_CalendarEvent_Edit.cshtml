@@ -1,0 +1,88 @@
+﻿@model Satluj_Latest.Models.CalendarEventModels
+
+<div class="modal-dialog modal-sm" role="document">
+
+    <style>
+        span {
+            color: red;
+        }
+    </style>
+
+    <form id="form-calendar-event-edit"
+          asp-action="EditCalendarEvent"
+          asp-controller="School"
+          method="post">
+
+        <input type="hidden" asp-for="eventId" />
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Event</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label asp-for="eventDate"></label>
+                    <input asp-for="eventDate"
+                           id="eventDate"
+                           class="form-control"
+                           autocomplete="off"
+                           placeholder="Select Date" />
+                    <span asp-validation-for="eventDate"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="eventHead"></label>
+                    <input asp-for="eventHead"
+                           class="form-control"
+                           autocomplete="off"
+                           placeholder="Event Head" />
+                    <span asp-validation-for="eventHead"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="eventDetails"></label>
+                    <textarea asp-for="eventDetails"
+                              class="form-control"
+                              rows="5"
+                              placeholder="Event Details"></textarea>
+                    <span asp-validation-for="eventDetails"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="submit" class="btn pay-now-btn">
+                    Save
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('#form-calendar-event-edit').submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                EditEventSuccess(response);
+            },
+            error: function () {
+                ajaxFailure();
+            }
+        });
+    });
+    $('#eventDate').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+</script>

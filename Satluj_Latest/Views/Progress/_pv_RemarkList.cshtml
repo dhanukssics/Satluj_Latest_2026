@@ -1,0 +1,43 @@
+﻿@model Satluj_Latest.Models.RemarkModel
+@{
+    var remarkDetails = new Satluj_Latest.Data.School(Model.SchoolId).GetAllRemarks();
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Remark
+        </th>
+        @if (IsAdmin == true)
+        {
+            <th></th>
+        }
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        foreach (var mark in remarkDetails)
+        {
+            <tr>
+                <td class="ng-teacherDetails-click" data-staffid="@mark.Id">
+                    @i
+                </td>
+                <td class="ng-teacherDetails-click" data-staffid="@mark.Id">
+                    @mark.Remark
+                </td>
+                @if (IsAdmin == true)
+                {
+                    <td data-teacherid="@mark.Id">
+                        <button class="delete-remark-tr btn btn-peek" data-remarkId="@mark.Id"><i class="fa fa-trash "></i></button>
+                        <button class="edit-remark-tr btn btn-peek" data-remarkId="@mark.Id"><i class="fa fa-edit"></i></button>
+                    </td>
+                }
+            </tr>
+            i++;
+        }
+    }
+</tbody>

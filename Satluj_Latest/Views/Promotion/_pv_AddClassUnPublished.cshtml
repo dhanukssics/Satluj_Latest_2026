@@ -1,0 +1,81 @@
+﻿@model Satluj_Latest.Models.AddClassModel
+
+<div class="modal-dialog modal-sm" role="document">
+
+    <form asp-action="AddClassUnPublished"
+          asp-controller="Promotion"
+          method="post"
+          id="form-login">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title">Add Class</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" asp-for="SchoolId" />
+
+                <div class="form-group">
+                    <label>Class</label>
+                    <select asp-for="ClassName"
+                            asp-items="Model.ClassList"
+                            class="form-control">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="ClassName" class="text-danger"></span>
+
+                    <span asp-validation-for="ClassName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Division</label>
+                    <input asp-for="Division"
+                           class="form-control"
+                           placeholder="Division"
+                           autocomplete="off" />
+                    <span asp-validation-for="Division" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Academic Year</label>
+                    <select asp-for="AcademicYearId"
+                            asp-items="Model.currentacademiclist"
+                            class="form-control">
+                        <option value="">--Choose--</option>
+                    </select>
+                    <span asp-validation-for="AcademicYearId" class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn pay-now-btn">Save</button>
+            </div>
+
+        </div>
+    </form>
+</div>
+<script>
+    $("#form-login").on("submit", function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                AddClassSuccess(response);
+            },
+            error: function () {
+                ajaxFailure();
+            }
+        });
+    });
+</script>

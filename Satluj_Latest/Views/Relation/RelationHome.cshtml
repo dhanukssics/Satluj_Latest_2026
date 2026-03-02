@@ -1,0 +1,181 @@
+﻿@model Satluj_Latest.Models.RelationModel
+@{
+    ViewBag.Title = "RelationHome";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var allSubjects = new Satluj_Latest.Data.School(Model.SchoolId).GetAllSubjects().OrderBy(x => x.SubjectName).ToList();
+}
+
+<input type="hidden" asp-for="SchoolId" />
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Relation</h3>
+
+        <div class="row">
+            <!-- User Type -->
+            <div class="form-group col-sm-3">
+                <label>Types :</label>
+                <select asp-for="UserDesTypeId"
+                        asp-items="@(IEnumerable<SelectListItem>)ViewBag.UserTypeList"
+                        class="form-control">
+                </select>
+                <span asp-validation-for="UserDesTypeId" class="text-danger"></span>
+            </div>
+
+            <!-- Teachers -->
+            <div class="form-group col-sm-3">
+                <label>Teachers :</label>
+                <select asp-for="UserId"
+                        asp-items="@(IEnumerable<SelectListItem>)ViewBag.TeacherList"
+                        class="form-control"
+                        data-live-search="true">
+                </select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+
+            <!-- Region -->
+            <div class="form-group col-sm-3">
+                <label>Region :</label>
+                <select asp-for="WingId"
+                        asp-items="@(IEnumerable<SelectListItem>)ViewBag.RegionList"
+                        class="form-control"
+                        data-live-search="true">
+                </select>
+                <span asp-validation-for="WingId" class="text-danger"></span>
+            </div>
+
+            <!-- Remark -->
+            <div class="form-group col-sm-3">
+                <label>Remark</label>
+                <input asp-for="Remark" class="form-control" placeholder="Remark" autocomplete="off" />
+                <span asp-validation-for="Remark" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Subjects -->
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <label>Subjects :</label>
+
+                <div class="dropdown_main">
+                    <span class="dropdown_btn">Subjects <i class="fa fa-caret-down"></i></span>
+                    <ul class="dropdown_lists">
+                        @foreach (var item in (IEnumerable<dynamic>)ViewBag.SubjectList)
+                        {
+                            <li>
+                                <label class="label_container">
+                                    @item.SubjectName
+                                    <input type="checkbox" value="@item.SubId" class="chk-roles-cls" />
+                                    <span class="checkmark"></span>
+                                </label>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-group col-lg-6">
+                <button type="button" id="btn-dummy-addRelation"
+                        class="btn pay-now-btn"
+                        style="margin-top:30px; width:100px;">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('.dropdown_btn').click(function () {
+        $(this).siblings().toggle();
+    });
+
+    $(document).on('click', '#btn-dummy-addRelation',function (){}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>

@@ -1,0 +1,49 @@
+﻿@model Satluj_Latest.Models.PaymentModels
+
+@{
+    ViewBag.Title = "Payment";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+
+}
+
+
+
+<form method="post" action="/Account/PaymentPost" novalidate="novalidate" name="frmTransaction" id="frmTransaction">
+    <input name="channel" type="hidden" value="10" />
+    <input name="account_id" type="hidden" value="163782" />
+    <input name="secretkey" type="hidden" value="3891AA5249F6E3DBA928422EB4BA18DD"/>
+    <input name="reference_no" type="hidden" value="@Model.ReferenceNo" />
+    <input name="amount" type="hidden" value="@Model.Amount" />
+    <input name="mode" type="hidden" value="LIVE" />
+    <input name="currency" type="hidden" value="INR" />
+    <input name="description" type="hidden" value="@Model.Description" />
+    <input name="return_url" type="hidden" value="@Model.ReturnUrl" />
+    <input name="name" type="hidden" value="@Model.Name" />
+    <input name="address" type="hidden" value="@Model.Address" />
+    <input name="city" type="hidden" value="@Model.City" />
+    <input name="state" type="hidden" value="@Model.State" />
+    <input name="country" type="hidden" value="IND" />
+    <input name="postal_code" type="hidden" value="@Model.PostalCode" />
+    <input name="phone" type="hidden" value="@Model.PhoneNo" />
+    <input name="email" type="hidden" value="@Model.Email" />
+    @*<input name="ship_name" type="hidden" value="" />
+        <input name="ship_address" type="hidden" value="" />
+        <input name="ship_country" type="hidden" value="" />
+        <input name="ship_state" type="hidden" value="" />
+        <input name="ship_city" type="hidden" value="" />
+        <input name="ship_postal_code" type="hidden" value="" />*@
+    @*<input name="ship_phone" type="hidden" value="" />*@
+    <input value="Submit" type="submit" class="submit-trigger isHidden" />
+</form>
+
+<script>
+    $(document).ready(function () {
+        //ajaxLoaderStop();
+        //$('body').pleaseWait();
+        //$('.nav_bar_main').addClass('isHidden');
+        //$('.footer_main').addClass('isHidden');
+        $('.submit-trigger').hide();
+        $('.submit-trigger').trigger('click');
+
+    });
+</script>

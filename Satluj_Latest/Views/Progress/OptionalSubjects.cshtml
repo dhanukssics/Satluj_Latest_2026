@@ -1,0 +1,266 @@
+﻿@model Satluj_Latest.Models.ExamResultMainModel
+@{
+    ViewBag.Title = "ExamDeclaration";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+@Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
+@Html.HiddenFor(z => z.SubjectId, new { Value = 0 })
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;"> Optional Subjects</h3>
+        <div class="row">
+
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Subjects : </label>
+                    <br />
+                    <select asp-for="SubjectId"
+                            asp-items="Model.SubjectList"
+                            class="form-control"
+                            id="subjectId">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="SubjectId" class="text-danger"></span>
+
+                </div>
+            </div>
+
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Class : </label>
+                    <br />
+                    <select asp-for="ClassId"
+                            asp-items="ViewBag.ClassList"
+                            class="form-control pv_class-drop-down"
+                            id="classDataDropdown">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="ClassId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group col-sm-3">
+                <label>Division</label>
+                <br />
+                <select id="division-drop-down" class="form-control slct-free-div-dropdown" disabled>
+                    <option>--Select Division --</option>
+                </select>
+                <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+            </div>
+
+            <div class="form-group col-sm-3">
+                <div>
+                    <br />
+                    <button class="btn pay-now-btn" data-toggle="modal" id="saveSubject"><i class="fa fa-save"></i> Save </button>
+                </div>
+            </div>
+
+            @*/--------------------------------------*@
+        </div>
+
+        <div class="table-responsive">
+            <table class="table custome-table" id="optional-subjects-student-mark-list"></table>
+        </div>
+
+    </div>
+</div>
+<script>
+
+    //Division listing -Class Change
+    $(document).on('change', '.class-drop-down', function () {
+        array = [];
+        var id = $(this).val();
+        $('#ClassId').val($(this).val());
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html("");
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                        $('#optional-subjects-student-mark-list').html('');
+                    }
+                    else {
+                        $(".slct-free-div-dropdown").html(""); // Division
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
+                        $(".slct-free-div-dropdown").prop("disabled", true);
+                        $('#optional-subjects-student-mark-list').html('');
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-free-div-dropdown").html(""); // Division
+            $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
+            $(".slct-free-div-dropdown").prop("disabled", true);
+            $('#optional-subjects-student-mark-list').html('');
+        }
+    });
+
+    $(document).on('change', '.slct-free-div-dropdown', function () {
+        array = [];
+        $('#optional-subjects-student-mark-list').html('');
+        $('#DivisionId').val($(this).val());
+        $('#SubjectId').val($('#subjectId').val());
+        var classId = $('#ClassId').val();
+        var divisionId = $('#DivisionId').val();
+        var SchoolId = $('#SchoolId').val();
+        var subjectId = $('#SubjectId').val();
+        if (classId != '' && divisionId != '' && subjectId != '0') {
+            $.ajax({
+                url: '/Progress/SudentListForOptionalStubjects/' + subjectId + '~' + SchoolId + '~' + classId + '~' + divisionId,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#optional-subjects-student-mark-list').html(data);
+                }
+            });
+        }
+        else {
+            toastrError('Please select all details!');
+            $('#optional-subjects-student-mark-list').html('');
+        }
+    });
+
+    var array = [];
+
+    function AddRemoveUser(source) {
+        //var btnStatus = $('#hfBtnStatus').val();
+        //if (array != null) {
+        //    $("#btn-homework").removeClass('isDisabled');
+        //}
+        //else {
+        //    $("#btn-homework").addClass('isDisabled');
+        //}
+        //debugger;
+        var userId = $(source).attr("data-id");
+        if ($(source).is(":checked")) {
+            // it is checked
+            array.push(userId);
+            $('#btn-homework').attr('disabled', false);
+        }
+        else {
+            for (var i = array.length - 1; i >= 0; i--) {
+                if (array[i] === userId) {
+                    array.splice(i, 1);
+                }
+            }
+            //if (array.length == 0) {
+            //    $('#btn-homework').attr('disabled', true);
+            //}
+            $('.check-all').prop('checked', false);
+            console.log(JSON.stringify(array));
+        }
+        var cheNo = $('input:checkbox').length;
+        if (array.length == (cheNo-1) ) {
+            $('.check-all').prop('checked', true);
+        }
+    }
+
+    $("#saveSubject").click(function () {
+        //debugger;
+        if ($('#SubjectId').val() != '') {
+            if ($('#ClassId').val() != '' && $('#DivisionId').val() != 0) {
+                if (array.length > 0) {
+                    var dataList = new Object();
+                    dataList.ClassId = $('#ClassId').val();
+                    dataList.DivisionId = $('#DivisionId').val();
+                    dataList.SubjectId = $('#SubjectId').val();
+                    dataList.Data = [];
+                    array.forEach(function (element) {
+                        var data = new Object();
+                        data.StudentId = element;
+                        dataList.Data.push(data);
+                    });
+                    $.ajax({
+                        url: "/Progress/SubmitStudentsForOptionalSubjects",
+                        type: "POST",
+                        dataType: 'json',
+                        data: dataList,
+                        global: false,
+                        success: function (response) {
+                            if (response.status) {
+                                toastrSuccess(response.msg);
+                                //window.location.href = '/Progress/OptionalSubjects/';
+                                Refresh();
+                            }
+                            else {
+                                toastrError(response.msg);
+                                //window.location.href = '/Progress/OptionalSubjects/';
+                                Refresh();
+                            }
+                        },
+                        error: function (data) {
+                        }
+                    });
+                }
+                else {
+                    toastrWarning("Please select student");
+                }
+            }
+            else {
+                toastrError('Please select Class and Division!');
+            }
+        }
+        else {
+            toastrError('Please select Subject!');
+        }
+    });
+
+    function Refresh() {
+        array = [];
+        $('#optional-subjects-student-mark-list').html('');
+        $('#DivisionId').val();
+        $('#SubjectId').val($('#subjectId').val());
+        var classId = $('#ClassId').val();
+        var divisionId = $('#DivisionId').val();
+        var SchoolId = $('#SchoolId').val();
+        var subjectId = $('#SubjectId').val();
+        if (classId != '' && divisionId != '' && subjectId != '0') {
+            $.ajax({
+                url: '/Progress/SudentListForOptionalStubjects/' + subjectId + '~' + SchoolId + '~' + classId + '~' + divisionId,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#optional-subjects-student-mark-list').html(data);
+                }
+            });
+        }
+        else {
+            toastrError('Please select all details!');
+            $('#optional-subjects-student-mark-list').html('');
+        }
+    }
+
+    $(document).on('change', '.check-all', function () {
+        //debugger;
+        array = [];
+        if ($(this).prop("checked") == true) {
+            //debugger;
+            $('.checkbox-input').each(function () {
+                var userId = $(this).attr("data-id");
+                $(this).prop('checked', true);
+                array.push(userId);
+            });
+        }
+        else {
+            $('input[type=checkbox]').each(function () {
+                //debugger;
+                $(this).prop('checked', false);
+                array = [];
+            });
+        }
+
+    });
+
+
+</script>

@@ -1,0 +1,278 @@
+﻿@model Satluj_Latest.Models.SchoolModelForId
+@{
+    ViewBag.Title = "Installation Instruction";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var classModel = new Satluj_Latest.PostModel.SchoolClassListPostModel();
+    classModel.schoolId = Convert.ToString(Model.SchoolId);
+    var DivModel = new Satluj_Latest.PostModel.SchoolDivisionListPostModel();
+    DivModel.schoolId = Convert.ToString(Model.SchoolId);
+    var StudentModel = new Satluj_Latest.PostModel.SchoolFullStudentListPostModel();
+    StudentModel.schoolId = Convert.ToString(Model.SchoolId);
+    var ClassResult = new Satluj_Latest.Repository.SchoolRepository().FullClassList(classModel);
+    var ClassList = ClassResult.Item3;
+    var studentResult = Tuple.Create<string, string, List<Satluj_Latest.Models.TbStudent>>(null, null, (dynamic)null);
+}
+<style>
+    .popup-btn {
+        margin-top: 10px;
+        margin: auto;
+        display: block;
+    }
+
+    .toggleable-div {
+        margin-bottom: 10px;
+    }
+
+    .toggle-heading {
+        background: #03a9f4;
+        color: #fff;
+        padding: 5px 15px;
+    }
+
+        .toggle-heading i {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+    .toggle-body {
+        background: #ccc;
+        padding: 15px;
+        display: none;
+        float: left;
+        width: 100%;
+    }
+
+        .toggle-body ul {
+            padding: 0;
+        }
+
+            .toggle-body ul li {
+                display: block;
+                float: left;
+                margin-right: 30px;
+                width: 22%;
+                margin-bottom: 10px;
+            }
+
+    .sub-menu ul li > a > i {
+        font-size: 9px !important;
+    }
+
+    .toggle-body ul li input[type=checkbox] {
+        margin-right: 5px;
+        margin-top: 7px;
+        float: left;
+    }
+
+    .toggle-body ul li span {
+        float: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: calc(100% - 25px);
+        overflow: hidden;
+    }
+</style>
+
+<h1>SEND SMS</h1>
+<form id="form-dev"
+      asp-controller="Student"
+      asp-action="SendInstallationInstruction"
+      method="post">
+
+    <input type="hidden" asp-for="Data" />
+    <input type="hidden" asp-for="MessageSentPerStudent" />
+    <input type="hidden" asp-for="SchoolId" />
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="toggleable-div">
+                <div class="toggle-heading">
+                    <input type="checkbox" class="check-all" />
+                    <span>Select all</span>
+                </div>
+            </div>
+
+            @foreach (var cls in ClassList)
+            {
+                <div class="toggleable-div">
+                    @foreach (var div in cls.Division)
+                    {
+                        <div class="maindiv">
+                            <div class="toggle-heading">
+                                <input type="checkbox" class="checklist-sub" />
+                                <span>@cls.ClassName @div.DivisionName.ToUpper()</span>
+                                <i class="fa fa-caret-down pull-right"></i>
+                            </div>
+
+                            <div class="toggle-body">
+                                <ul>
+                                    @if (div.Students.Any())
+                                    {
+                                        foreach (var student in div.Students)
+                                        {
+                                            if (!string.IsNullOrEmpty(student.ContactNumber))
+                                            {
+                                                <li>
+                                                    <input type="checkbox"
+                                                           class="chk"
+                                                           value="@student.ContactNumber"
+                                                           data-id="@student.StudentId" />
+                                                    <span>@student.StudentName</span>
+                                                </li>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <li><span>No data found</span></li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <button type="submit"
+            class="btn btn-info btn-lg"
+            id="btn-send"
+            style="display:none">
+        SEND MESSAGE
+    </button>
+
+    <button type="button"
+            class="btn btn-info btn-lg"
+            id="btn-send-dummy">
+        SEND MESSAGE
+    </button>
+
+</form>
+
+<script>
+    var chkArray = [];
+    var studentArray = [];
+    var item = new Object();
+    var list = [];
+    var newitem = new Object();
+    newitem.List = [];
+
+     
+
+    $("#form-dev").on("submit", function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: AddMsgSuccess,
+            error: ajaxFailure
+        });
+    });
+
+    $(document).ready(function () {
+        $("#btn-send-dummy").removeClass('isDisabled');
+    });
+
+    function AddMsgSuccess(result) {
+        //debugger;
+        if (result.message == 'success') {
+            toastrSuccess(result.message);
+            window.location.href = '/Student/InstallationInstruction';
+            $("#btn-send-dummy").removeClass('isDisabled');
+        }
+        else {
+            toastrError(result.message);
+            window.location.href = '/Student/InstallationInstruction';
+            $("#btn-send-dummy").removeClass('isDisabled');
+        }
+    }
+    function ajaxFailure() {
+        //debugger;
+        toastrError("Failed!");
+        $("#btn-send-dummy").removeClass('isDisabled');
+    }
+    
+    $(document).on('click', '#btn-send-dummy', function () {
+        $("#btn-send-dummy").addClass('isDisabled');
+        newitem.List = [];
+        list = [];
+        chkArray = [];
+        $('.spn-char-count').text('');
+        $('.spn-msg-count').text('');
+        $('#txt-mesage').val('');
+
+        $(".chk:checked").each(function () {
+            var ob = new Object();
+            var StudentId = $(this).attr('data-id');
+            studentArray.push(StudentId);
+            chkArray.push(($(this).val()));
+            ob.Number = $(this).val();
+            ob.StudentId = StudentId;
+            newitem.List.push(ob);
+            console.log($(this).val())
+        });
+        list.push(newitem)
+        if (chkArray.length > 0) {
+            //Archana 20-Jun-2018** - Send Installation Instruction directly
+            item.Description = "Installation Instruction";
+            item.Numbers = chkArray.toString();
+            item.StudentId = studentArray.toString();
+            newitem.Phone = chkArray.toString();
+            $('#Data').val(JSON.stringify(list));
+            $('#btn-send').trigger('click');
+        }
+        else {
+            $("#btn-send-dummy").removeClass('isDisabled');
+            toastr.warning("Please select")
+        }
+    });
+
+    $('.toggle-heading i').click(function () {
+        $(this).parent().siblings().toggle();
+    });
+
+    $(".check-all").change(function () {  //"select all" change
+        $("[type=checkbox]").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
+    });
+
+    $(".checklist-sub").change(function () {
+
+        var source = $(this).parent();
+        source.parent().children().eq(1).find('.chk').prop('checked', true);
+
+
+
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            source.parent().children().eq(1).find('.chk').prop('checked', false); //change "select all" checked status to false
+        }
+        ////check "select all" if all checkbox items are checked
+        //if ($('[type=checkbox]:checked').length == $('[type=checkbox]').length) {
+        //    $(".check-all").prop('checked', true);
+        //}
+    });
+
+    $(".chk").change(function () {
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            console.log($(this).parent().parent().parent().parent().find('.checklist-sub'))
+            var source = $(this).parent().parent().parent().parent();
+            source.find('.checklist-sub').prop('checked', false); //change "select all" checked status to false
+        }
+    });
+      
+    $('[type=checkbox]').change(function () {
+        //uncheck "select all", if one of the listed checkbox item is unchecked
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            $(".check-all").prop('checked', false); //change "select all" checked status to false
+            chkArray = [];
+        }
+        //check "select all" if all checkbox items are checked
+        if ($('[type=checkbox]:checked').length == $('[type=checkbox]').length) {
+            $(".check-all").prop('checked', true);
+        }
+    });
+</script>

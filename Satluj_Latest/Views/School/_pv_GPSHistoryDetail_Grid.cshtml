@@ -1,0 +1,76 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    var trips = new Satluj_Latest.Data.School(Model.schoolId).GetTripDetailById(Model.curredntDateTime, Model.busId);
+}
+<table class="table custome-table">
+    <thead>
+        <tr>
+            <th>
+                Slno
+            </th>
+            <th>
+                TripId
+            </th>
+            <th>
+                Bus Name
+            </th>
+            <th>
+                Driver Name
+            </th>
+            <th>
+                Start Time
+            </th>
+            <th>
+                Current Locatoin
+            </th>
+            <th>
+                Status
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 1;
+            foreach (var trip in trips)
+            {
+                <tr>
+                    <td class="">
+                        @i
+                    </td>
+                    <td class="">
+                        @trip.TripId
+                    </td>
+                    <td class="">
+                        @trip.Bus
+                    </td>
+                    <td class="">
+                        @trip.Driver
+                    </td>
+                    <td class="">
+                        @trip.StartTime
+                    </td>
+                    <td class="">
+                        @trip.FromLocation
+                    </td>
+                    <td class="">
+                        @if (trip.TravellingStatus == 0)
+                        {
+                            <span class="green-round"></span>
+                        }
+                        else if (trip.TravellingStatus == 1)
+                        {
+                            <span class="green-round"></span>
+                        }
+                        else
+                        {
+                            <span class="red-round"></span>
+                        }
+
+                    </td>
+                </tr>
+                i++;
+            }
+        }
+    </tbody>
+</table>

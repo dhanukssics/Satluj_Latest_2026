@@ -1,0 +1,52 @@
+﻿@model Satluj_Latest.Models.SchoolValue
+@{
+    ViewBag.Title = "PromoteStudents";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+    <div>
+        <div class="row text-center">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="form-group col-lg-4">
+                        <label>Enter Password</label>
+                        @Html.TextBoxFor(m => m.Password, new { autocomplete = "off", placeholder = "Password", type = "password", @class = "form-control" })
+                        @Html.ValidationMessageFor(z => z.Password)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-sm-4">
+                        <button class="btn pay-now-btn" id="btn-studnet-publish-login">Go</button>
+                    </div>
+                </div>
+                <div class="row" id="error-message-div" style="display:none; color:red;">
+                    <label>The  Password you entered is incorrect !</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+    $(document).on('click', '#btn-studnet-publish-login', function () {
+        debugger;
+        var passwordEntered = $('#Password').val();
+        if (passwordEntered == 'promotion@school') {
+            $('#error-message-div').hide();
+            window.location.href = "/Promotion/StudentPromotionHome";
+        }
+        else {
+            $('#error-message-div').show();
+        }
+    });
+
+    $("input").keyup(function () {
+        $('#error-message-div').hide();
+    });
+
+
+
+
+
+
+</script>

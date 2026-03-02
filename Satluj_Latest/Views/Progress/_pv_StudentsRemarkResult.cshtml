@@ -1,0 +1,166 @@
+﻿
+
+@model Satluj_Latest.Models.StudentRemarkModel
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+
+<style>
+    .iput_width{
+        width:100%;
+        height:45px;
+    }
+</style>
+
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = @Model.ClassId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.ExamId, new { Value = @Model.ExamId })
+
+
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black; width:15%;">
+                Student Name
+            </th>
+            <th style="color: black; width:40%;">
+                Remark
+            </th>
+            <th style="color: black; width:40%;">
+                Additional Remark
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model.list)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td>
+                        @count
+                    </td>
+                    <td>
+                        @item.StudentName
+                    </td>
+                    <td>
+                        <div>
+                            @*@if (IsAdmin == true)
+                            {
+                                if (item.Remark == " ")
+                                {
+                                    <input type="textarea" wrap="hard" maxlength="10000" value="@item.Remark" style="color:black; width:95%;" class="cls-mark autocomplete-remarks" id="@count" />
+                                }
+                                else
+                                {
+                                    <input type="textarea" wrap="hard" maxlength="10000" value="@item.Remark" style="color:black; width:95%;" class="cls-mark" id="@count" />
+                                }
+                            }
+                            else
+                            {
+                                if (item.Remark == " ")
+                                {
+                                    <input type="textarea" wrap="hard" autocomplete="off" maxlength="10000" value="@item.Remark" style="color:black; width:95%;" class="cls-mark autocomplete-remarks" id="@count" />
+                                }
+                                else
+                                {
+                                    <input type="textarea" wrap="hard" maxlength="10000" value="@item.Remark" style="color:black; width:95%;" readonly class="cls-mark" id="@count" />
+                                }
+                            }*@
+
+                            @if (IsAdmin == true)
+                            {
+                                @Html.DropDownListFor(model => item.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId),item.Remark ,  new {@class="cls-mark" })
+                            }
+                            else
+                            {
+                                if (item.Remark.Trim() == "")
+                                {
+                                    @Html.DropDownListFor(model => item.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item.Remark, new { @class = "cls-mark" })
+                                }
+                                else
+                                {
+                                    //Html.DropDownListFor(model => item.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item.Remark,new { @class = "cls-mark", @disabled = "disabled" })
+                                    @Html.DropDownListFor(model => item.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item.Remark, new { @class = "cls-mark" })
+
+                                }
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        @if (item.AdditionalRemark == "")
+                        {
+                            <div>
+                                <input type="textarea" wrap="hard" autocomplete="off" maxlength="10000" value="@item.AdditionalRemark" style="color:black; " class="cls-AdditionalRemark iput_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input type="textarea" wrap="hard" autocomplete="off" maxlength="10000" value="@item.AdditionalRemark" style="color:black; " class="cls-AdditionalRemark iput_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input type="textarea" wrap="hard" autocomplete="off" maxlength="10000" value="@item.AdditionalRemark" style="color:black; " class="cls-AdditionalRemark iput_width" id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-Remark-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $('.autocomplete-remarks').val('');
+        RemarkList();
+    });
+
+    function RemarkList() {
+        $.ajax({
+            url: '/Progress/GetAllRemarks',
+            type: "POST",
+            dataType: 'json',
+            global: false,
+            success: function (data) {
+                var options = {
+                    data: data.result,
+                    list: {
+                        match: {
+                            enabled: true
+                        }
+                    },
+                };
+                $(".autocomplete-remarks").easyAutocomplete(options);
+            }
+        });
+    }
+
+    $('.cls-mark').keyup(function (e) {
+        var Id = $(e.target.id);
+        $(this).addClass("autocomplete-remarks");
+        RemarkList();
+    });
+
+
+
+
+
+
+
+
+</script>

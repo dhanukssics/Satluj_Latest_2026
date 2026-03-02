@@ -1,0 +1,125 @@
+﻿@model Satluj_Latest.Models.ExamDeclarationModel
+
+<div class="modal-dialog modal-lg" role="document">
+
+    <form id="form-teacher-edit"
+          asp-action="EditDeclaredExam"
+          asp-controller="Progress"
+          method="post">
+
+        <input type="hidden" asp-for="SchoolId" />
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="TermId" />
+        <input type="hidden" asp-for="ClassId" />
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <h4 class="modal-title" id="myModalLabel">
+                    Edit Declared Exam
+                </h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Class :</label><br />
+
+                            <input asp-for="ClassName"
+                                   class="form-control"
+                                   placeholder="Class"
+                                   readonly />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Terms :</label><br />
+
+                            <input asp-for="TermName"
+                                   class="form-control"
+                                   placeholder="Term Name"
+                                   readonly />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Exam Name :</label>
+
+                            <input asp-for="ExamName"
+                                   class="form-control"
+                                   placeholder="Exam Name" />
+
+                            <span asp-validation-for="ExamName" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Start Date :</label><br />
+
+                            <input asp-for="StartDateString"
+                                   class="form-control date-cashentry-add" />
+
+                            <i class="fa"></i>
+
+                            <span asp-validation-for="StartDateString" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>End Date :</label><br />
+
+                            <input asp-for="EndDateString"
+                                   class="form-control date-cashentry-add" />
+
+                            <i class="fa"></i>
+
+                            <span asp-validation-for="EndDateString" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        id="btn-editteacher"
+                        class="btn pay-now-btn">
+                    Edit
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $("#form-teacher-edit").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: EditDeclareExamSuccess,
+            error: ajaxFailure
+        });
+    });
+</script>

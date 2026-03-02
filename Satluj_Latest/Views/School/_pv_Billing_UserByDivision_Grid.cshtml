@@ -1,0 +1,81 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    List<Satluj_Latest.Data.Student> students;
+
+
+
+
+    if (Model.divisionId != 0)
+    {
+        students = new Satluj_Latest.Data.Division(Model.divisionId).GetStudentDetails();
+    }
+    else
+    {
+        if (Model.classId != 0)
+        {
+            students = new Satluj_Latest.Data.Class(Model.classId).GetStudentDetails();
+        }
+        else
+        {
+            students = new Satluj_Latest.Data.School(Model.schoolId).GetStudentDetails().OrderBy(z => z.StundentName).ToList();
+        }
+    }
+
+
+}
+<table class="table custome-table" id="listByDiv">
+    <thead>
+        <tr>
+            <th>
+                Slno
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Class
+            </th>
+            <th>
+                Division
+            </th>
+            <th>
+                Roll No.
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var index = 1;
+        }
+        @if(Model.classId != 0)
+        {
+        @foreach (var student in students)
+        {
+
+
+            <tr class="ng-click" data-id="@student.StudentId">
+                <td>
+                    @index
+
+                </td>
+                <td>
+                    @student.StundentName
+                </td>
+                <td>
+                    @student.ClassName
+                </td>
+                <td>
+                    @student.Division.DivisionName
+                </td>
+                <td>
+                    @student.ClasssNumber
+                </td>
+            </tr>
+            index++;
+        }
+
+        }
+          </tbody>
+</table>
+
+

@@ -1,0 +1,518 @@
+﻿@model Satluj_Latest.Models.HomeWorkSmsModel
+@{
+    ViewBag.Title = "Messages";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var classModel = new Satluj_Latest.PostModel.SchoolClassListPostModel();
+    classModel.schoolId = Convert.ToString(Model.SchoolId);
+    var DivModel = new Satluj_Latest.PostModel.SchoolDivisionListPostModel();
+    DivModel.schoolId = Convert.ToString(Model.SchoolId);
+    var StudentModel = new Satluj_Latest.PostModel.SchoolFullStudentListPostModel();
+    StudentModel.schoolId = Convert.ToString(Model.SchoolId);
+    var ClassResult = new Satluj_Latest.Repository.SchoolRepository().FullClassList(classModel);
+    var ClassList = ClassResult.Item3;
+    var studentResult = Tuple.Create<string, string, List<Satluj_Latest.Models.TbStudent>>(null, null, (dynamic)null);
+}
+<style>
+    .popup-btn {
+        margin-top: 10px;
+        margin: auto;
+        display: block;
+    }
+
+    .toggleable-div {
+        margin-bottom: 10px;
+    }
+
+    .toggle-heading {
+        background: #03a9f4;
+        color: #fff;
+        padding: 5px 15px;
+    }
+
+        .toggle-heading i {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+    .toggle-body {
+        background: #ccc;
+        padding: 15px;
+        display: none;
+        float: left;
+        width: 100%;
+    }
+
+        .toggle-body ul {
+            padding: 0;
+        }
+
+            .toggle-body ul li {
+                display: block;
+                float: left;
+                margin-right: 30px;
+                width: 22%;
+                margin-bottom: 10px;
+            }
+
+    .sub-menu ul li > a > i {
+        font-size: 9px !important;
+    }
+
+    .toggle-body ul li input[type=checkbox] {
+        margin-right: 5px;
+        margin-top: 7px;
+        float: left;
+    }
+
+    .toggle-body ul li span {
+        float: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: calc(100% - 25px);
+        overflow: hidden;
+    }
+
+    #delete-message-div {
+        width: 20px;
+        height: 23px;
+        background: red;
+        color: #fff;
+        display: inline-block;
+        text-align: center;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-left: 10px;
+        padding-top: 2px;
+        padding-left: 8px;
+    }
+
+    .text-message-class {
+        width: calc(100% - 30px);
+        float: left;
+        resize: none;
+    }
+
+    #subject-div {
+        position: relative;
+    }
+
+        #subject-div span {
+            width: 30px;
+            height: 34px;
+            background: #009083;
+            float: left;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            border-radius: 4px 0px 0px 4px;
+        }
+
+            #subject-div span i {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%,-50%);
+            }
+
+        #subject-div select {
+            width: calc(100% - 30px);
+            border-radius: 0px 4px 4px 0px;
+        }
+
+    .mesageBt {
+        background: #e4e4e4;
+        border: 1px solid #cacaca;
+        display: block;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    #message-content {
+        line-height: 30px;
+    }
+</style>
+
+<h1>Homework</h1>
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="toggleable-div">
+            <div class="toggle-heading">
+                <input type="checkbox" class="check-all" />
+                <span>Select all</span>
+            </div><!-- ./toggle-heading -->
+        </div><!-- ./toggleable-div -->
+        @foreach (var cls in ClassList)
+        {
+            DivModel.classId = Convert.ToString(cls.ClassId);
+            StudentModel.classId = Convert.ToString(cls.ClassId);
+            var DivisionResult = new Satluj_Latest.Repository.SchoolRepository().FullDivisionList(DivModel);
+            <div class="toggleable-div">
+
+                @foreach (var div in DivisionResult.Item3)
+                {
+                    StudentModel.divisionId = Convert.ToString(div.DivisionId);
+                    studentResult = new Satluj_Latest.Repository.SchoolRepository().FullStudentList(StudentModel);
+                    <div class="maindiv">
+                        <div class="toggle-heading">
+                            <input type="checkbox" class="checklist-sub" />
+                            <span>
+                                @cls.ClassName
+                                @div.DivisionName.ToUpper()
+                            </span>
+                            <i class="fa fa-caret-down pull-right"></i>
+                        </div>
+                        <!-- ./toggle-heading -->
+                        <div class="toggle-body">
+                            <ul>
+                                @if (studentResult.Item3.Count > 0)
+                                {
+                                    foreach (var student in studentResult.Item3)
+                                    {
+                                        if (student.ContactNumber != null)
+                                        {
+                                            <li>
+                                                <input type="checkbox" class="chk" value="@student.ContactNumber" name="chkphone" data-id="@student.StudentId" /><span>@student.StundentName</span>
+                                            </li>
+                                            @*<span class="tooltiptext">@student.StundentName</span>*@
+                                        }
+
+                                    }
+                                }
+                                else
+                                {
+                                    <li><span>No data found</span></li>
+
+                                }
+
+
+                            </ul>
+
+
+                        </div><!-- ./toggle-body -->
+                    </div>
+                }
+
+
+            </div><!-- ./toggleable-div -->
+        }
+
+
+
+
+    </div>
+</div><!-- ./row -->
+<!-- Trigger the modal with a button -->
+<button type="button" class="btn btn-info btn-lg" id="btn-send">SEND MESSAGE</button>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Message</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-dev"
+                      asp-controller="School"
+                      asp-action="HomeworkSMS"
+                      method="post">
+
+                    <input type="hidden" asp-for="Data" />
+                    <input type="hidden" asp-for="MessageSentPerStudent" />
+
+                    <div class="form-group">
+                        <div id="main-homework-div">
+                            <div id="message-sub-text-div" class="message-sub-text-class row">
+                                <div class="col-md-3" id="subject-div">
+                                    <span><i class="fa fa-book"></i></span>
+
+                                    <select asp-for="SubjectId"
+                                            asp-items="ViewBag.Subjects"
+                                            class="form-control subject-class"
+                                            data-live-search="true">
+                                        <option value="">--Choose--</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-8">
+                                    <textarea rows="3"
+                                              class="form-control text-message-class"
+                                              style="margin-bottom:15px;"></textarea>
+                                </div>
+
+                                <span id="delete-message-div" class="col-md-1">X</span>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="txt-mesage" />
+
+                        <div class="btn-block form-group">
+                            <div id="add-new-message" class="btn btn-primary">Add+</div>
+                        </div>
+
+                        <div class="form-group">
+                            <span>Character Count :</span>
+                            <span class="spn-char-count"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <span>Message Count :</span>
+                            <span class="spn-msg-count"></span>
+                        </div>
+
+                        <span class="mesageBt"><p id="message-content"></p></span>
+
+                        <button type="button"
+                                class="btn btn-primary popup-btn"
+                                id="btn-submit-msg">
+                            Send
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary popup-btn"
+                                id="btn-submit-msg-dummy"
+                                style="display:none">
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    var chkArray = [];
+    var studentArray = [];
+    var item = new Object();
+    var list = [];
+    var newitem = new Object();
+    newitem.List = [];
+
+    var textAreaCount = 1;
+
+    var copyDiv = "<div class=\"message-sub-text-class row\">";
+
+    $(document).ready(function () {
+        copyDiv = copyDiv + $('#message-sub-text-div').html() + "</div>";
+
+    });
+    //$(document).on('keyup', '#txt-mesage', function () {
+    //    $("#btn-submit-msg").removeClass('isDisabled');
+    //    //debugger;
+    //    var messagecount = 0;
+    //    var charcount = $("#txt-mesage").val().length;
+    //    var s = charcount / 160;
+    //    $('.spn-char-count').text(charcount)
+    //    var dec = (s - Math.floor(s));
+    //    if (dec > 0) {
+    //        if (charcount != 0) {
+    //            messagecount = parseInt(s) + 1;
+    //            $('.spn-msg-count').text(messagecount)
+    //        }
+    //        else {
+    //            $('.spn-msg-count').text('');
+    //        }
+    //    }
+    //    else {
+    //        $('.spn-msg-count').text('');
+    //    }
+    //    $('#MessageSentPerStudent').val(messagecount)
+    //});
+
+
+    $(document).on('keyup', '.text-message-class', function () {
+        CountShowMessage();
+    });
+
+
+
+    $(document).on('change', '.subject-class', function () {
+        CountShowMessage();
+    });
+
+
+    $(document).on('click', '#add-new-message', function () {
+        //debugger;
+        $('#main-homework-div').append(copyDiv);
+    });
+
+
+    $(document).on('click', '#delete-message-div', function () {
+        //debugger;
+        $(this).parent().remove();
+        CountShowMessage();
+    });
+
+    function CountShowMessage() {
+        var finalMessage = "HOMEWORK:-";
+        $('.message-sub-text-class').each(function () {
+            var subject = $(this).find('.subject-class option:selected').text();
+            var message = $(this).find('.text-message-class').val();
+            finalMessage = finalMessage + subject + ": " + message + "</br>";
+        });
+        //  console.log(finalMessage);
+        $('#message-content').html(finalMessage);
+        var messagecount = 0;
+        var charcount = finalMessage.length;
+        var s = charcount / 160;
+        $('.spn-char-count').text(charcount)
+        var dec = (s - Math.floor(s));
+        if (dec > 0) {
+            if (charcount != 0) {
+                messagecount = parseInt(s) + 1;
+                $('.spn-msg-count').text(messagecount)
+            }
+            else {
+                $('.spn-msg-count').text('');
+            }
+        }
+        else {
+            $('.spn-msg-count').text('');
+        }
+        $('#MessageSentPerStudent').val(messagecount);
+        var replacedtxt = finalMessage.replace(new RegExp('</br>', 'g'), '\n');
+        $('#txt-mesage').val(replacedtxt);
+    }
+
+
+
+    function AddMsgSuccess(result) {
+
+        if (result.message = 'success') {
+            //console.log(result.list)
+            chkArray = [];
+            newitem.List = [];
+            studentArray = [];
+            list = [];
+            toastrSuccess("Success");
+            $('#myModal').modal('hide');
+            $('#txt-mesage').val('');
+            finalMessage = "";
+            $('.spn-char-count').text('')
+            $('.spn-msg-count').text('')
+     location.reload();
+        }
+        else {
+            toastrError(result.msg);
+        }
+
+    }
+    function ajaxFailure() {
+        toastrError("Failed!");
+    }
+    $(document).on('click', '#btn-send', function () {
+
+        newitem.List = [];
+        list = [];
+        chkArray = [];
+        $('.spn-char-count').text('');
+        $('.spn-msg-count').text('');
+        $('#txt-mesage').val('');
+        finalMessage = "";
+        $(".chk:checked").each(function () {
+            var ob = new Object();
+            var StudentId = $(this).attr('data-id');
+            studentArray.push(StudentId);
+            chkArray.push(($(this).val()));
+            ob.Number = $(this).val();
+            ob.StudentId = StudentId;
+            newitem.List.push(ob);
+            //console.log($(this).val())
+        });
+        list.push(newitem)
+
+        if (chkArray.length > 0) {
+            $('#myModal').modal('show');
+
+        }
+        else {
+            toastr.warning("Please select")
+        }
+    });
+
+    $('.toggle-heading i').click(function () {
+        $(this).parent().siblings().toggle();
+    });
+    $(document).on('click', '#btn-submit-msg', function () {
+        //debugger;
+        var okMsg = true;
+        $("#btn-submit-msg").addClass('isDisabled');
+        var message = $('#txt-mesage').val();
+        $(".text-message-class").each(function () {
+            var isMsgVal = $(this).val();
+            if (isMsgVal == "" || isMsgVal == "undefined") {
+                okMsg = false;
+                return false;
+            }
+        });
+        if (okMsg == true) {
+            newitem.Description = $('#txt-mesage').val();
+            if (chkArray.length > 0) {
+                item.Description = $('#txt-mesage').val();
+                item.Numbers = chkArray.toString();
+                item.StudentId = studentArray.toString();
+                newitem.Phone = chkArray.toString();
+                $('#Data').val(JSON.stringify(list));
+                console.log($('#Data').val());
+                $("#btn-submit-msg-dummy").trigger('click');
+                //$.post("/School/SMS/", newitem, function (result) {
+                //    if (result.message = "success") {
+                //        $('#myModal').modal('hide');
+                //        toastrSuccess("Success");
+                //    }
+                //    else {
+                //        toastrError(result.msg);
+                //    }
+                //});
+            }
+        }
+        else {
+            toastr.warning("No message content!")
+
+            $("#btn-submit-msg").removeClass('isDisabled');
+        }
+    });
+
+    //select all checkboxes
+    $(".check-all").change(function () {  //"select all" change
+        $("[type=checkbox]").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
+    });
+    //checklist-sub selection
+
+    $(".checklist-sub").change(function () {
+
+        var source = $(this).parent();
+        source.parent().children().eq(1).find('.chk').prop('checked', true);
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            source.parent().children().eq(1).find('.chk').prop('checked', false); //change "select all" checked status to false
+        }
+        ////check "select all" if all checkbox items are checked
+        //if ($('[type=checkbox]:checked').length == $('[type=checkbox]').length) {
+        //    $(".check-all").prop('checked', true);
+        //}
+    });
+    $(".chk").change(function () {
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            console.log($(this).parent().parent().parent().parent().find('.checklist-sub'))
+            var source = $(this).parent().parent().parent().parent();
+            source.find('.checklist-sub').prop('checked', false); //change "select all" checked status to false
+        }
+    });
+    //".checkbox" change
+    $('[type=checkbox]').change(function () {
+        //uncheck "select all", if one of the listed checkbox item is unchecked
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            $(".check-all").prop('checked', false); //change "select all" checked status to false
+            chkArray = [];
+        }
+        //check "select all" if all checkbox items are checked
+        if ($('[type=checkbox]:checked').length == $('[type=checkbox]').length) {
+            $(".check-all").prop('checked', true);
+        }
+    });
+</script>

@@ -1,0 +1,662 @@
+﻿
+@model Satluj_Latest.Models.MonthlyAttandanceModel
+@{
+    DateTime startDate = Model.AttandanceDate;
+    long schoolId = Model.SchoolId;
+    long ClassId = Model.ClassId;
+    long DivisionId = Model.DivisionId;
+    int Shift = Model.shiftData;
+    var data = new Satluj_Latest.Data.School(schoolId).GetMonthlyAttendancereportReportDate(startDate, ClassId, DivisionId, Shift);
+}
+
+<thead>
+    <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            1
+        </th>
+        <th>
+            2
+        </th>
+        <th>
+            3
+        </th>
+        <th>
+            4
+        </th>
+
+        <th>
+            5
+        </th>
+        <th>
+            6
+        </th>
+        <th>
+            7
+        </th>
+        <th>
+            8
+        </th>
+        <th>
+            9
+        </th>
+        <th>
+            10
+        </th>
+        <th>
+            11
+        </th>
+        <th>
+            12
+        </th>
+        <th>
+            13
+        </th>
+        <th>
+            14
+        </th>
+        <th>
+            15
+        </th>
+        <th>
+            16
+        </th>
+        <th>
+            17
+        </th>
+        <th>
+            18
+        </th>
+        <th>
+            19
+        </th>
+        <th>
+            20
+        </th>
+        <th>
+            21
+        </th>
+        <th>
+            22
+        </th>
+
+        <th>
+            23
+        </th>
+        <th>
+            24
+        </th>
+        <th>
+            25
+        </th>
+        <th>
+            26
+        </th>
+        <th>
+            27
+        </th>
+        <th>
+            28
+        </th>
+        <th>
+            29
+        </th>
+        <th>
+            30
+        </th>
+        <th>
+            31
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        foreach (var one in data)
+        {
+            <tr>
+                <td id="row-selection">
+                    @one.StundentName
+                </td>
+                @if (one.C1_ == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C1_ == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C2_ == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C2_ == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C3_ == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C3_ == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C4_ == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C4_ == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C5_ == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C5_ == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C6_ == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C6_ == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C7_ == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C7_ == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C8_ == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C8_ == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C9_ == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C9_ == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C10 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C10 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C11 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C11 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C12 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C12 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C13 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C13 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C14 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C14 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C15 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C15 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C16 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C16 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C17 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C17 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C18 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C18 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C19 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C19 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C20 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C20 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C21 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C21 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C22 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C22 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C23 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C23 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C24 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C24 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C25 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C25 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C26 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C26 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C27 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C27 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C28 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C28 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C29 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C29 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C30 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C30 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+                @if (one.C31 == 0)
+                {
+                    <td style="background-color:#f34545; border: 2px solid black;">
+                        A
+                    </td>
+                }
+                else if (one.C31 == 1)
+                {
+                    <td style="background-color:#37f537;">
+                        P
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                @*-----------------*@
+
+            </tr>
+        }
+    }
+</tbody>
+
+<script>
+    //$(document).ready(function () {
+    //    var item = $(this).val();
+
+    //    alert(item);
+
+    //});
+</script>

@@ -1,0 +1,128 @@
+﻿@model Satluj_Latest.Models.StudentModel
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>DOB</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 17px;
+            font-weight: normal;
+        }
+
+        input {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+            input:focus {
+                outline: none;
+            }
+
+        .wrapper {
+            width: 800px;
+            margin: auto;
+            padding: 20px 0px;
+        }
+
+        .date {
+            width: 900px;
+            float: left;
+        }
+
+            .date > div {
+                float: right;
+            }
+
+            .date input {
+                border: none;
+                border-bottom: 1px solid #000;
+                padding: 4px 6px;
+                width: 20px;
+            }
+
+                .date input:last-child {
+                    width: 40px;
+                }
+
+        .wrapper_body h3 {
+            text-align: center;
+            margin-top: 140px;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+            font-weight: normal;
+            font-size: 24px;
+        }
+
+        .wrapper_body p {
+            line-height: 36px;
+            font-weight: bold;
+        }
+
+        .txt_fld {
+            border: none;
+            border-bottom: 1px solid #000;
+            padding: 4px 6px;
+        }
+
+        .sign {
+            font-size: 22px;
+            margin-top: 120px;
+        }
+        .btn-style{
+            margin-top:20px;
+            float:right;
+            margin-right:10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <button type="button" class="btn btn-success btn-style" id="btn-print" onclick="myFunction()">Print</button>
+    </div>
+    <div class="wrapper">
+        <div class="date">
+            <div>
+                <span>Date:</span>
+                <input type="text"  value="@Model.CurrentDate" style="width:70%;"/>
+            </div>
+        </div>
+
+        <div class="wrapper_body">
+            <h3>Certificate</h3>
+            @*<p>This is to certify that <input type="text" value="@Model.studentName" class="txt_fld" />Daughter/Son of <input type="text" value="@Model.parentName" class="txt_fld" /> is a regular student of Class <input type="text" value="@Model.className" class="txt_fld" style="width:40px;" /> of this institution for the academic year <input type="text" class="txt_fld" style="width:40px;" /> -1 <input type="text" class="txt_fld" style="width:40px;" />. Her Date of Birth as per school record is  <input type="text" value="@Model.DOBstring.ToString()" class="txt_fld" style="width:20px;" />/<input type="text" class="txt_fld" style="width:20px;" />/<input type="text" class="txt_fld" style="width:40px;" />.</p>*@
+            <p>This is to certify that 
+            <input type="text" style="text-align:center" value="@Model.studentName" class="txt_fld" />
+            Daughter/Son of 
+            <input type="text" style="text-align:center"  value="@Model.parentName" class="txt_fld"  />
+             is a regular student of Class 
+            <input type="text"   value="@Model.className " class="txt_fld" style="width:20%; text-align:center" /> 
+            of this institution for the academic year 
+            <input type="text" value="@Model.AcademinYear" class="txt_fld" style="width:25%;" />
+            . Her Date of Birth as per school record is  
+            <input type="text" value="@Model.DOBstring" class="txt_fld"  style="width:100px; text-align:center" />
+            .</p>
+
+        </div>
+
+        <div class="sign">
+            <span>Principal</span>
+        </div>
+    </div>
+
+</body>
+</html>
+<script>
+    function myFunction() {
+        var printButton = document.getElementById("btn-print");
+        printButton.style.visibility = 'hidden';
+        window.print();
+        printButton.style.visibility = 'visible';
+    }
+</script>

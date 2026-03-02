@@ -1,0 +1,47 @@
+﻿@model Satluj_Latest.Models.LibraryModels
+@{
+    var category = new Satluj_Latest.Data.School(Model.schoolId).GetBookCategory();
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+
+
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Category
+        </th>
+        @if (IsAdmin == true)
+        {
+            <th></th>
+        }
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        foreach (var cat in category)
+        {
+            <tr>
+                <td class="ng-teacherDetails-click">
+                    @i
+                </td>
+
+
+                <td class="ng-teacherDetails-click">
+                    @cat.Category
+                </td>
+                @if (IsAdmin == true)
+                {
+                    <td>
+                        <button class="delete-category-tr btn-peek" data-id="@cat.CategoryId"><i class="fa fa-trash "></i></button>
+                        <button class="edit-staff-tr pay-now-btn" data-id="@cat.CategoryId"><i class="fa fa-edit "></i></button>
+                    </td>
+                }
+            </tr>
+            i++;
+        }
+    }
+</tbody>

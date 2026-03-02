@@ -1,0 +1,33 @@
+﻿
+@model Satluj_Latest.Models.VProgressCardList
+@{
+    var studentList = new Satluj_Latest.Data.School(Model.SchoolId).Listing_V_ClassStudents(Model.DivisionId).ToList();
+}
+<div class="table-responsive">
+    <table class="table custome-table">
+        <thead>
+            <tr>
+                <th style="width:100%;">
+                    Students
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in studentList)
+            {
+                var studentId = student.StudentId.ToString();
+                <tr>
+                    <td data-id="@student.StudentId" style="width:75%;">
+                        @student.StundentName
+                    </td>
+                    <td>
+                        <a href="~/SpecialClass/VprogressCard_Newone/@studentId" target="_blank" class="btn pay-now-btn " data-toggle="model" style="margin-left: 63px;" id="btn-student-Generate">Generate</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

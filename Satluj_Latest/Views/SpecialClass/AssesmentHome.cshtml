@@ -1,0 +1,124 @@
+﻿@model Satluj_Latest.Models.SpecialClassModel
+
+@{
+    ViewData["Title"] = "Subjects";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    .dev-adj-style {
+        padding: 3%;
+    }
+</style>
+
+<input type="hidden" asp-for="SchoolId" />
+
+<div class="row">
+    <div class="col-lg-12">
+        <h4>Remark</h4>
+
+        <div id="div-account-head">
+            <form id="form-add-exam"
+                  asp-action="SubmitAssesment"
+                  asp-controller="SpecialClass"
+                  method="post">
+
+                <div class="row">
+                    <div id="new-account-div">
+
+                        <div class="form-group col-lg-3">
+                            <label>Assessments</label>
+                            <select asp-for="AssesmentId"
+                                    asp-items="Html.GetEnumSelectList<Assesments>()"
+                                    class="form-control"
+                                    id="assesment-id">
+                            </select>
+                            <span asp-validation-for="AssesmentId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-lg-3">
+                            <label>Period</label>
+                            <select asp-for="PeriodId"
+                                    asp-items="ViewBag.PeriodList"
+                                    class="form-control"
+                                    id="periods-id">
+                            </select>
+                            <span asp-validation-for="PeriodId" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit"
+                            class="btn pay-now-btn"
+                            id="btn-Exam-Declare">
+                        Declare
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row col-lg-12" id="assesment-list-id">
+    <partial name="~/Views/SpecialClass/_pv_AssesmentList.cshtml" model="Model" />
+</div>
+<script>
+    $("#form-add-exam").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    RefreshList();
+                } else {
+                    toastrError(result.msg);
+                }
+            },
+            error: function () {
+                toastrError("Something went wrong.");
+            }
+        });
+    });
+
+    function RefreshList() {
+        $.ajax({
+            url: '/SpecialClass/AssesmentListPartialView',
+            type: "GET",
+            success: function (data) {
+                $('#assesment-list-id').html(data);
+            }
+        });
+    }
+
+    $(document).on('click', '.delete-assesment-tr', function () {
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true
+        }).then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: '/SpecialClass/DeleteAssesments/' + $(source).data('ass'),
+                    type: "GET",
+                    success: function (data) {
+                        if (data.status) {
+                            toastrSuccess(data.msg);
+                            RefreshList();
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>

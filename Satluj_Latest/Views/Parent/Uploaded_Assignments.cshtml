@@ -1,0 +1,114 @@
+﻿@model Satluj_Latest.Models.AssementUpload
+
+@{
+    ViewBag.Title = "Uploaded_Assignments";
+    Layout = "~/Views/Shared/_ParentLayout.cshtml";
+}
+
+
+@Html.HiddenFor(z => z.ClassId, new { Value = @Model.ClassId })
+@Html.HiddenFor(z => z.Division, new { Value = @Model.Division })
+@Html.HiddenFor(z => z.StudentId, new { Value = @Model.StudentId })
+
+<style>
+    .with-icon {
+        position: relative;
+    }
+
+        .with-icon i {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+        }
+
+    input[type=text], input[type=password], textarea, select {
+        border: 1px solid #ccc;
+    }
+
+    .schooJs {
+        padding: 50px 0px;
+        min-height: 85vh;
+    }
+
+    .student-name-design {
+        color: #0394d1;
+        filter: contrast;
+        margin-bottom: 10%;
+        font-weight: bold;
+    }
+</style>
+
+
+<section class="schooJs">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <input type="hidden" value="@Model.ClassId" id="hfClassId" />
+                <input type="hidden" value="@Model.Division" id="hfDivisionId" />
+                <input type="hidden" value="@Model.StudentId" id="hfStudentId" />
+                <div class="form-group col-sm-3" style="margin-top: 100px;">
+
+
+
+                    <div class="form-group">
+                        <label>Select Month</label>
+                        <div class="with-icon">
+                            <input type="text" class="form-control date-detailed" id="calender-attandance" data-date-end-date="0d">
+                            <i class="fa fa-calendar"></i>
+                            <span id="calendar-required" style="display:none; color:red;"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="table-responsive">
+
+                    <table class="table custome-table table-bordered table-hover" id="divtest"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+
+    $('.date-detailed').datepicker({
+        format: 'MM-yyyy',
+        viewMode: "months",
+        minViewMode: "months",
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).on('change', '#calender-attandance', function () {
+        var date = $(this).val();
+        var ClassId = $('#hfClassId').val();
+        var DivId = $('#hfDivisionId').val();
+        var StudId = $('#hfStudentId').val();
+
+
+        if (date != "") {
+            var res = date.split("-");
+            var mm = res[0];
+            var yyyy = res[1];
+            //$('#student-attendance-list').remove();
+            $.ajax({
+                url: '/Parent/AssessmentPartial/' + ClassId + '~' + mm + '~' + yyyy + '~' + DivId + '~' + StudId,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+
+
+                    $('#divtest').html(data);
+                }
+            });
+
+        }
+    });
+
+</script>
+

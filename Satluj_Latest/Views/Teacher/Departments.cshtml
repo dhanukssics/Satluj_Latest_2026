@@ -1,0 +1,75 @@
+﻿@model Satluj_Latest.Models.DepartmentsModel
+
+@{
+    ViewData["Title"] = "CoScholasticArea";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<input type="hidden" asp-for="SchoolId" />
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top:5px;">Departments</h3>
+
+        <div class="row">
+            <form id="form-teacher-add"
+                  asp-action="AddDepartment"
+                  asp-controller="Teacher"
+                  method="post">
+
+                <div class="form-group col-sm-3">
+                    <label>Department Name :</label>
+                    <input asp-for="DepartmentName"
+                           class="form-control"
+                           placeholder="Department Name" />
+                    <span asp-validation-for="DepartmentName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-sm-3">
+                    <label></label><br />
+                    <button type="submit"
+                            class="btn pay-now-btn"
+                            style="margin-top:9%;">
+                        <i class="fa fa-save"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            @await Html.PartialAsync("~/Views/Teacher/_pv_DeparmentList.cshtml", Model)
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDepartmentEdit" tabindex="-1" role="dialog"></div>
+<script>
+    $(function () {
+        $(".department-list").DataTable();
+
+        $("#form-teacher-add").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: "POST",
+                data: $(this).serialize(),
+                success: AddDepartmentSuccess,
+                error: AddDepartmentFailure
+            });
+        });
+    });
+
+    function AddDepartmentSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+        } else {
+            toastrError(result.msg);
+        }
+        window.location.href = '/Teacher/Departments/';
+    }
+
+    function AddDepartmentFailure() {
+        toastrError("Failed!");
+    }
+</script>

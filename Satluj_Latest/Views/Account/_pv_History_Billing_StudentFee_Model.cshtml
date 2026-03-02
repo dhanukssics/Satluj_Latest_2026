@@ -1,0 +1,122 @@
+﻿@{
+    //var historyDates = new Satluj_Latest.Data.Student(Model.SchoolModel.studentId).GetHistoryGroupByStudentId().OrderBy(z => z.Date).ToList();
+    var historyBillNo = new Satluj_Latest.Data.Student(Model.SchoolModel.studentId).GetBillHistory().OrderBy(z => z.BillNo).ToList();
+    int status = 0;
+    if (historyBillNo.Count > 0)
+    {
+        status = 1;
+    }
+}
+<input type="hidden" id="hfbillStatus" value="@status" />
+
+<style>
+    .modal-dialog {
+        width: 75% !important;
+        height: 95% !important;
+        margin: 0 auto;
+        margin-top: 1.3%;
+        padding: 0;
+    }
+
+    .modal-content {
+        /*height: auto;
+        min-height: 100%;*/
+        border-radius: 0;
+    }
+
+    .popup-sidebar {
+        margin-top: 5px;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+        .popup-sidebar ul {
+            padding: 0px;
+        }
+
+            .popup-sidebar ul li {
+                width: 100%;
+                padding: 8px 15px;
+                background: #0071c3;
+                display: block;
+                color: #fff;
+                border-bottom: 1px solid #fff;
+            }
+
+                .popup-sidebar ul li:hover {
+                    background: #0082e1;
+                }
+
+                .popup-sidebar ul li:last-child {
+                    border-bottom: none;
+                }
+
+                .popup-sidebar ul li.active {
+                    background: #ccc;
+                    color: 333;
+                }
+
+    .popup-table {
+        margin-top: 5px !important;
+    }
+</style>
+<div class="modal-dialog">
+    <input type="hidden" id="hfstudentId" value="@Model.SchoolModel.studentId" />
+    <!-- Modal content-->
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Billing History</h4>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                @if (historyBillNo.Count > 0)
+                {
+                    <div class="col-md-3">
+                        <div class="popup-sidebar">
+                            <ul id="ul-popup">
+                                @foreach (var bill in historyBillNo)
+                                {
+                                    @*<li id="li-data" data-id="@date.Date.ToString("dd/MM/yyyy")">@date.Date.ToString("dd/MM/yyyy")</li>*@
+                                    <li id="li-data" data-id="@bill.BillNo" style="cursor: pointer;"> Bill No: @bill.BillNo  -  @bill.TimeStamp.ToString("dd/MM/yyyy")</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="table-responsive custom-table popup-table" id="history-table-bill">
+
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div style="text-align: center;">
+                        <p>No history found.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    $(document).ready(function () {
+        var billStatus = $('#hfbillStatus').val();
+        if (billStatus == 1) {
+    cancel
+        var studentId = $('#hfstudentId').val();
+        var billno = $('#li-data').attr('data-id');
+        $("#ul-popup>li.active").removeClass("active");
+        $('#li-data').addClass('active');
+        $.ajax({
+            url: '/Account/LoadTableForBilling/' + billno + '~' + studentId,
+            dataType: 'html',
+            success: function (data) {
+                $('#history-table-bill').html('');
+                $('#history-table-bill').html(data);
+            },
+        });
+        }
+    })
+</script>

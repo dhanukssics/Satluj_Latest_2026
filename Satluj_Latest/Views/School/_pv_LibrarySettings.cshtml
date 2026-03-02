@@ -1,0 +1,133 @@
+﻿@model Satluj_Latest.Models.FeeAlertDataModel
+
+<div>
+
+    <!-- Library Due Days -->
+    <div class="row col-md-12">
+        <div class="form-group">
+            <label class="cust-label" style="margin-top:10px;">Library Due Days</label>
+
+            <form id="form-library-due" asp-controller="School" asp-action="AddLibraryDueDays" method="post">
+
+                <div class="form-group" style="width:50%">
+                    <input asp-for="libraryDueDay"
+                           class="form-control @(Model.libraryDueDay != 0 ? "isDisabled" : "")"
+                           type="number"
+                           autocomplete="off" />
+                </div>
+
+                <div>
+                    @if (Model.libraryDueDay == 0)
+                    {
+                        <button type="submit" class="btn pay-now-btn">Save</button>
+                    }
+                    else
+                    {
+                        <button type="button" id="btn-edit-libraryDue" class="btn pay-now-btn">Edit</button>
+                        <button type="submit" class="btn pay-now-btn isHidden">Save</button>
+                    }
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Library Fine -->
+    <div class="row col-md-12">
+        <div class="form-group">
+            <label class="cust-label" style="margin-top:10px;">Library Fine</label>
+
+            <form id="form-library-fine" asp-controller="School" asp-action="AddLibraryDueFine" method="post">
+
+                @{
+                   var feeList = ViewBag.FeeList as List<SelectListItem>;
+                }
+
+                <!-- Fee Dropdown -->
+                <div class="form-group">
+                    <label style="width:100px; float:left;">Fee Name:</label>
+
+                    @if (feeList == null || !feeList.Any())
+                    {
+                        <p style="color:red;">No Special Fee available. Add one first.</p>
+                    }
+                    else
+                    {
+                        @Html.DropDownListFor(
+                            m => m.feeId,
+                            feeList,
+                            "--Choose Fee--",
+                            new {
+                                @class = "form-control slct-fee-dropdwn",
+                                style = "width:calc(100% - 160px);"
+                            })
+                    }
+                </div>
+
+                <!-- Fine Amount -->
+                <div class="form-group">
+                    <label style="width:100px; float:left;">Fine Amount:</label>
+
+                   @if (Model.feeId != 0)
+                    {
+                        <input asp-for="libFineAmount"
+                                type="number"
+                                class="form-control"
+                                readonly
+                                placeholder="Enter Amount"
+                                style="width:calc(100% - 160px);" />
+                    }
+                    else
+                    {
+                        <input asp-for="libFineAmount"
+                                type="number"
+                                class="form-control"
+                                placeholder="Enter Amount"
+                                style="width:calc(100% - 160px);" />
+                    }
+                </div>
+
+                <div>
+                    @if (Model.feeId == 0)
+                    {
+                        <button type="submit" class="btn pay-now-btn">Save</button>
+                    }
+                    else
+                    {
+                        <button type="button" id="btn-edit-libraryFine" class="btn pay-now-btn">Edit</button>
+                        <button type="submit" class="btn pay-now-btn isHidden">Save</button>
+                    }
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Enable editing for Due Days
+    $("#btn-edit-libraryDue").on("click", function () {
+        $("input[name='libraryDueDay']").prop("disabled", false).removeClass("isDisabled");
+        $("#form-library-due .isHidden").removeClass("isHidden");
+    });
+
+    // Enable editing for Fine
+    $(document).on("click", "#btn-edit-libraryFine", function () {
+        $("input[name='libFineAmount']").removeAttr("readonly");
+        $("#form-library-fine .isHidden").removeClass("isHidden");
+    });
+    // AJAX Submit Library Due Days
+    $("#form-library-due").submit(function (e) {
+        e.preventDefault();
+        $.post($(this).attr("action"), $(this).serialize(), AddLibraryDueDaysSuccess)
+         .fail(AddLibraryDueDaysFailure);
+    });
+
+    // AJAX Submit Library Fine
+    $(document).on("submit", "#form-library-fine", function (e) {
+        e.preventDefault();
+        $.post($(this).attr("action"), $(this).serialize(), AddLibraryDueFineSuccess)
+         .fail(AddLibraryDueFineFailure);
+    });
+</script>

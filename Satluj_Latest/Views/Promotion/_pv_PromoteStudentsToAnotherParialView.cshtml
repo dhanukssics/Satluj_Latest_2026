@@ -1,0 +1,81 @@
+﻿@model Satluj_Latest.Models.PromoteStudents
+
+<div class="modal-dialog modal-sm" role="document">
+    <style>
+        span {
+            color: red;
+        }
+    </style>
+
+    <form id="form-login" method="post">
+        <!-- Hidden fields -->
+        <input type="hidden" asp-for="SchoolId" />
+        <input type="hidden" asp-for="OldClassId" />
+        <input type="hidden" asp-for="OldDivId" />
+        <input type="hidden" asp-for="OldAcademicyearId" />
+        <input type="hidden" asp-for="StudentListString" />
+        <input type="hidden" asp-for="NewAcademicYearId" value="0" />
+        <input type="hidden" asp-for="NewCLassId" value="0" />
+        <input type="hidden" asp-for="NewDivId" value="0" />
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title">Promote Students to</h4>
+            </div>
+
+            <div class="modal-body">
+                <!-- Academic Year -->
+                <div class="form-group">
+                    <label>Academic Year</label>
+                    <select asp-for="NewAcademicYearId"
+                            asp-items="ViewBag.OtherAcademicYears"
+                            class="form-control"
+                            id="academic-year-dropdown-id-new">
+                        <option value="">--Choose--</option>
+                    </select>
+                    <span asp-validation-for="NewAcademicYearId" class="text-danger"></span>
+                </div>
+
+                <!-- Class -->
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="class-drop-down-new" class="form-control" disabled>
+                        <option>-- Please select Class --</option>
+                    </select>
+                </div>
+
+                <!-- Division -->
+                <div class="form-group">
+                    <label>Division</label>
+                    <select id="division-drop-down-new" class="form-control" disabled>
+                        <option>-- Please select division --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn pay-now-btn" id="btn-promote" style="display:none;">Promote</button>
+                <button type="button" class="btn pay-now-btn" id="btn-promote-dummy">Promote</button>
+            </div>
+        </div>
+    </form>
+</div>
+$('#form-login').submit(function (e) {
+    e.preventDefault();
+
+    $.ajax({
+        url: '/Promotion/AddPromoteStudents',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function (result) {
+            AddPromoteStudents(result);
+        },
+        error: function () {
+            ajaxFailure();
+        }
+    });
+});

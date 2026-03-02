@@ -1,0 +1,163 @@
+﻿
+
+@model Satluj_Latest.Models.StudentSkillMarks
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+    var scoreDetails = new Satluj_Latest.Data.School(Model.SchoolId).Get_V_TotalScores(16);
+    var Activity_Pproject = "";
+    var Written_Work = "";
+    var Work_Sheet = "";
+    if (scoreDetails != null && scoreDetails.Count > 0)
+    {
+        if (scoreDetails.Any(x => x.SubTitle == "Activity/VIVA"))
+        {
+            Activity_Pproject = scoreDetails.Where(x => x.SubTitle == "Activity/VIVA").FirstOrDefault().Mark.ToString();
+        }
+        //if (scoreDetails.Any(x => x.SubTitle == "Group_Discussion"))
+        //{
+        //    Group_Discussion = scoreDetails.Where(x => x.SubTitle == "Group_Discussion").FirstOrDefault().Mark.ToString();
+        //}
+        if (scoreDetails.Any(x => x.SubTitle == "Written Work"))
+        {
+            Written_Work = scoreDetails.Where(x => x.SubTitle == "Written Work").FirstOrDefault().Mark.ToString();
+        }
+        if (scoreDetails.Any(x => x.SubTitle == "Weekly Assessment"))
+        {
+            Work_Sheet = scoreDetails.Where(x => x.SubTitle == "Weekly Assessment").FirstOrDefault().Mark.ToString();
+        }
+    }
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                ACTIVITY / VIVA (@Activity_Pproject)
+            </th>
+            @*<th style="color: black;">
+                GROUP DISCUSSION    (@Group_Discussion)
+            </th>*@
+            <th style="color: black;">
+                WRITTEN WORK  (@Written_Work)
+            </th>
+            <th style="color: black;">
+                WEEKLY ASSESSMENT (@Work_Sheet )
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td style="width:10%;">
+                        @count
+                    </td>
+                    <td style="width:20%;">
+                        @item.StudentName
+                    </td>
+                    <td>
+                        @if (item._AspectsNaturalScience.ActivityProject == "" || item._AspectsNaturalScience.ActivityProject ==null)
+                        {
+                            <div>
+                                <input value="@item._AspectsNaturalScience.ActivityProject" type="number" maxlength="3" style="color:black; " class="cls-mark-ActivityProject" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsNaturalScience.ActivityProject" type="number" maxlength="3"  style="color:black; " class="cls-mark-ActivityProject" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsNaturalScience.ActivityProject" type="number" maxlength="3"  style="color:black; " class="cls-mark-ActivityProject" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                    @*<td>
+                        @if (item._AspectsNaturalScience.GroupDiscussion.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._AspectsNaturalScience.GroupDiscussion" type="number" maxlength="3"  style="color:black; " class="cls-mark-GroupDiscussion" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsNaturalScience.GroupDiscussion"  type="number" maxlength="3" style="color:black; " class="cls-mark-GroupDiscussion" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsNaturalScience.GroupDiscussion" type="number" maxlength="3"  style="color:black; " class="cls-mark-GroupDiscussion" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>*@
+                    <td>
+                        @if (item._AspectsNaturalScience.WrittenWork == ""  || item._AspectsNaturalScience.WrittenWork == null)
+                        {
+                            <div>
+                                <input value="@item._AspectsNaturalScience.WrittenWork" type="number" maxlength="3"  style="color:black; " class="cls-mark-WrittenWork" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsNaturalScience.WrittenWork" type="number" maxlength="3"  style="color:black; " class="cls-mark-WrittenWork" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsNaturalScience.WrittenWork" type="number" maxlength="3"  style="color:black; " class="cls-mark-WrittenWork" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @if (item._AspectsNaturalScience.WorkSheet == "" || item._AspectsNaturalScience.WorkSheet == null)
+                        {
+                            <div>
+                                <input value="@item._AspectsNaturalScience.WorkSheet" type="number" maxlength="3"  style="color:black; " class="cls-mark-WorkSheet" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsNaturalScience.WorkSheet" type="number" maxlength="3"  style="color:black; " class="cls-mark-WorkSheet" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsNaturalScience.WorkSheet" type="number" maxlength="3"  style="color:black; " class="cls-mark-WorkSheet" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-aspects-natural-science-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

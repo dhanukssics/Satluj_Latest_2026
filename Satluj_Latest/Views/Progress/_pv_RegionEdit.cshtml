@@ -1,0 +1,95 @@
+﻿
+@model Satluj_Latest.Models.RegionModel
+@{
+}
+<div class="modal-dialog modal-lg" role="document">
+    @Html.HiddenFor(z => z.SchoolId)
+    @Html.HiddenFor(z => z.Id)
+
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Edit Region</h4>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                @*<div class="box-color">*@
+                @*<div class="col-sm-12" style="border-bottom: 1px solid #ccc;">
+                @*<div class="row">*@
+                <div class="col-sm-8">
+                    @Html.TextBoxFor(m => m.RegionName, new { @class = "form-control", placeholder = "Region Name", id = "edit-RegionNameId" })
+                    @Html.ValidationMessageFor(m => m.RegionName)
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group text-right">
+                        <button class="btn pay-now-btn" data-toggle="modal" id="editRegion"><i class="fa fa-save"></i> Edit </button>
+                    </div>
+                </div>
+                @*</div>*@
+            </div>
+            @*</div>*@
+
+            <div class="row" style="float: inherit;">
+                <table class="table" style="margin-left: 5%; width:25%;">
+                    <thead>
+                        <tr style="font-weight: bold;font-size:15px;">
+                            <td>Class</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var data in Model._ClassList)
+                        {
+                            <tr>
+                                <td>
+                                    <label style="margin-right: 10px;">
+                                        <input  class="checkbox-input-edit" type="checkbox" data-id="@data.ClassId" data-IsRegion="@data.IsRegion" onchange="EditAddRemoveUser(this)" />
+                                        <span class="checkbox-virtual"></span>
+                                    </label>
+                                    @data.ClassName
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+        </div>
+       
+    </div>
+
+<script>
+    $("#editRegion").click(function () {
+
+        var regionName = $("#edit-RegionNameId").val();
+        var regionId = $("#Id").val();
+
+        var selected = [];
+        $(".checkbox-input-edit:checked").each(function () {
+            selected.push($(this).data("id"));
+        });
+
+        var sendValue = regionName + "~" + selected.join(",") + "~" + regionId;
+
+        $.ajax({
+            url: '/Progress/EditRegion',
+            type: 'POST',
+            data: { id: sendValue },
+            success: function (res) {
+                if (res.status) {
+                    alert("Updated Successfully");
+                    location.reload();
+                } else {
+                    alert(res.msg);
+                }
+            }
+        });
+    });
+
+    function EditAddRemoveUser(obj) {
+        // If required later
+    }
+</script>

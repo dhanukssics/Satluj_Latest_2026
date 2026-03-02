@@ -1,0 +1,279 @@
+﻿@model Satluj_Latest.Models.StudentModel
+@{
+
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>Fee Remittance</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 17px;
+            font-weight: normal;
+        }
+
+        input {
+            font-size: 16px;
+        }
+
+            input:focus {
+                outline: none;
+            }
+
+        .wrapper {
+            width: 800px;
+            margin: auto;
+            padding: 20px 0px;
+        }
+
+        .date {
+            width: 900px;
+            float: left;
+        }
+
+            .date > div {
+                float: right;
+            }
+
+            .date input {
+                border: none;
+                border-bottom: 1px solid #000;
+                padding: 4px 6px;
+                width: 20px;
+            }
+
+                .date input:last-child {
+                    width: 40px;
+                }
+
+        .wrapper_body h3 {
+            text-align: center;
+            margin-top: 100px;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+            font-weight: normal;
+            font-size: 24px;
+        }
+
+        .wrapper_body p {
+            line-height: 36px;
+        }
+
+        .txt_fld {
+            border: none;
+            border-bottom: 1px solid #000;
+            padding: 4px 6px;
+        }
+
+        .sign {
+            font-size: 22px;
+            margin-top: 120px;
+        }
+
+        .wrapper_body table > thead > tr {
+            text-align: left;
+        }
+
+        .wrapper_body table > tbody > tr {
+        }
+        .btn-style{
+            margin-top:20px;
+            float:right;
+            margin-right:10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <button type="button" class="btn btn-success btn-style" id="btn-print" onclick="myFunction()">Print</button>
+    </div>
+    <div class="wrapper">
+
+        <div class="wrapper_body">
+            <h3>Fee  Remittance  Certificate</h3>
+
+            <p>This is to certify that the following details regarding the Annual tuition fee collected from <input type="text" style="text-align:center"  value="@Model.studentName" class="txt_fld" /> Son/Daughter/Children of  <input type="text" style="text-align:center"  value="@Model.parentName" class="txt_fld" /> who is studying in Grade <input type="text" value="@Model.className " class="txt_fld" style="width:70px; text-align:center;" /> during the Academic Year <input type="text" value="@Model.AcademinYear" class="txt_fld" style="width:25%;" />.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th width="150">Class</th>
+                        <th width="250">Amount</th>
+                        <th width="400">Year <input type="text" value="@Model.AcademinYear" class="txt_fld" style="width:25%" /></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" value="@Model.className "  class="txt_fld" style="width:60%;" /></td>
+                        <td>Rs <input type="text" id="txt-first" class="txt_fld" style="width:140px;" /></td>
+                        <td><input type="text" id="amount-first" class="txt_fld" style="width:85%;" /> </td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" value="@Model.className "  class="txt_fld" style="width:60%;" /></td>
+                        <td>Rs <input type="text" id="txt-second" class="txt_fld" style="width:140px;" /></td>
+                        <td><input type="text" id="amount-second" class="txt_fld" style="width:85%;" /> </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>This Certificate is issued on request of the parent for Income Tax purpose.</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
+<script>
+    function myFunction() {
+        var printButton = document.getElementById("btn-print");
+        printButton.style.visibility = 'hidden';
+        window.print();
+        printButton.style.visibility = 'visible';
+    }
+
+    $("#txt-first").blur(function () {
+        //debugger;
+        var amount = $(this).val();
+        var amountData = test_skill(amount)
+        $('#amount-first').val(amountData);
+    });
+
+    $("#txt-second").blur(function () {
+        //debugger;
+        var amount = $(this).val();
+        var amountData = test_skill(amount)
+        $('#amount-second').val(amountData);
+    });
+
+
+    function test_skill(amountt) {
+        //debugger
+        var amount = "";
+        var junkVal = amountt;
+        junkVal=Math.floor(junkVal);
+        var obStr=new String(junkVal);
+        numReversed=obStr.split("");
+        actnumber=numReversed.reverse();
+
+        if(Number(junkVal) >=0){
+        }
+        else{
+            alert('wrong Number cannot be converted');
+            return amount;
+        }
+        if(Number(junkVal)==0){
+            //document.getElementById('container').innerHTML=obStr+''+'Rupees Zero Only';
+            //return amount;
+        }
+        if(actnumber.length>9){
+            alert('Oops!!!! the Number is too big to covertes');
+            return amount;
+        }
+
+    var iWords = ["Zero", " One", " Two", " Three", " Four", " Five", " Six", " Seven", " Eight", " Nine"];
+    var ePlace = ['Ten', ' Eleven', ' Twelve', ' Thirteen', ' Fourteen', ' Fifteen', ' Sixteen', ' Seventeen', ' Eighteen', ' Nineteen'];
+    var tensPlace = ['dummy', ' Ten', ' Twenty', ' Thirty', ' Forty', ' Fifty', ' Sixty', ' Seventy', ' Eighty', ' Ninety'];
+
+    var iWordsLength = numReversed.length;
+    var totalWords = "";
+    var inWords = new Array();
+    var finalWord = "";
+    j = 0;
+    for (i = 0; i < iWordsLength; i++) {
+        switch (i) {
+            case 0:
+                if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
+                    inWords[j] = '';
+                }
+                else {
+                    inWords[j] = iWords[actnumber[i]];
+                }
+                inWords[j] = inWords[j] + ' Only';
+                break;
+            case 1:
+                tens_complication();
+                break;
+            case 2:
+                if (actnumber[i] == 0) {
+                    inWords[j] = '';
+                }
+                else if (actnumber[i - 1] != 0 && actnumber[i - 2] != 0) {
+                    inWords[j] = iWords[actnumber[i]] + ' Hundred and';
+                }
+                else {
+                    inWords[j] = iWords[actnumber[i]] + ' Hundred';
+                }
+                break;
+            case 3:
+                if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
+                    inWords[j] = '';
+                }
+                else {
+                    inWords[j] = iWords[actnumber[i]];
+                }
+                if (actnumber[i + 1] != 0 || actnumber[i] > 0) {
+                    inWords[j] = inWords[j] + " Thousand";
+                }
+                break;
+            case 4:
+                tens_complication();
+                break;
+            case 5:
+                if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
+                    inWords[j] = '';
+                }
+                else {
+                    inWords[j] = iWords[actnumber[i]];
+                }
+                if (actnumber[i + 1] != 0 || actnumber[i] > 0) {
+                    inWords[j] = inWords[j] + " Lakh";
+                }
+                break;
+            case 6:
+                tens_complication();
+                break;
+            case 7:
+                if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
+                    inWords[j] = '';
+                }
+                else {
+                    inWords[j] = iWords[actnumber[i]];
+                }
+                inWords[j] = inWords[j] + " Crore";
+                break;
+            case 8:
+                tens_complication();
+                break;
+            default:
+                break;
+        }
+        j++;
+    }
+
+    function tens_complication() {
+        if (actnumber[i] == 0) {
+            inWords[j] = '';
+        }
+        else if (actnumber[i] == 1) {
+            inWords[j] = ePlace[actnumber[i - 1]];
+        }
+        else {
+            inWords[j] = tensPlace[actnumber[i]];
+        }
+    }
+    inWords.reverse();
+    for (i = 0; i < inWords.length; i++) {
+        finalWord += inWords[i];
+    }
+    amount =  finalWord;
+    return amount;
+}
+
+
+</script>

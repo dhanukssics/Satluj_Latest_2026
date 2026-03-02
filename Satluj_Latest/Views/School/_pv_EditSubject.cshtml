@@ -1,0 +1,135 @@
+﻿@model Satluj_Latest.Models.ExamSubjectDetailsModel
+@{
+    var dd = new Satluj_Latest.Data.DropdownData();
+}
+
+<style>
+    .border-design {
+        border: solid 1px black !important;
+    }
+
+    .same-height {
+        height: 46px;
+    }
+</style>
+
+<form asp-action="SubmitEditSubject"
+      asp-controller="School"
+      method="post"
+      id="form-add-exam">
+
+    <input type="hidden" asp-for="ExamId" />
+    <input type="hidden" asp-for="ExamSubjectId" />
+
+    <div class="col-lg-6 col-lg-offset-4" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Subjects</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+                    <!-- Subject -->
+                    <div class="form-group col-lg-6">
+                        <label>Subject</label>
+                        <select asp-for="SubjectId"
+                                class="form-control border-design same-height"
+                                asp-items="@(dd.GetSubjectss(Model.SchoolId))">
+                            <option value="">--Choose--</option>
+                        </select>
+                        <span asp-validation-for="SubjectId" class="text-danger"></span>
+                    </div>
+
+                    <!-- Exam Date -->
+                    <div class="form-group col-lg-6">
+                        <label>Exam Date</label>
+                        <input asp-for="ExamDate"
+                               class="form-control border-design exam-date-id"
+                               placeholder="Select Date" />
+                        <span asp-validation-for="ExamDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Exam time -->
+                    <div class="form-group col-lg-6">
+                        <label>Exam Time</label>
+                        <input asp-for="ExamTime"
+                               class="form-control border-design"
+                               placeholder="Select Time" />
+                        <span asp-validation-for="ExamTime" class="text-danger"></span>
+                    </div>
+
+                    <!-- Theory -->
+                    <div class="form-group col-lg-6">
+                        <label>Theory Mark</label>
+                        <input asp-for="Internal"
+                               id="id-internal"
+                               class="form-control border-design"
+                               placeholder="Theory"
+                               type="number" />
+                        <span asp-validation-for="Internal" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row" style="display:none;">
+                    <!-- Practical -->
+                    <div class="form-group col-lg-6">
+                        <label>Practical Mark</label>
+                        <input asp-for="External"
+                               id="id-external"
+                               class="form-control border-design"
+                               placeholder="Practical"
+                               type="number" />
+                        <span asp-validation-for="External" class="text-danger"></span>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="form-group col-lg-6">
+                        <label>Total</label>
+                        <input asp-for="Total"
+                               id="id-sum-sub"
+                               readonly
+                               class="form-control border-design same-height"
+                               placeholder="Total"
+                               type="number" />
+                        <span asp-validation-for="Total" class="text-danger"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn pay-now-btn">Save</button>
+            </div>
+
+        </div>
+    </div>
+
+</form>
+
+<script>
+    // Auto-sum of marks
+    function calcTotal() {
+        var internal = parseFloat($("#id-internal").val()) || 0;
+        var external = parseFloat($("#id-external").val()) || 0;
+        $("#id-sum-sub").val(internal + external);
+    }
+
+    $("#id-internal").on('keyup', calcTotal);
+    $("#id-external").on('keyup', calcTotal);
+
+    // Datepicker
+    $('.exam-date-id').datepicker({
+        format: 'mm-dd-yyyy',
+        autoclose: true,
+        todayHighlight: true,
+        startDate: 'd'
+    });
+</script>

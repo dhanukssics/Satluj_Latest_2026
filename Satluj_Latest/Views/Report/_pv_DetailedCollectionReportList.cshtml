@@ -1,0 +1,129 @@
+﻿@model Satluj_Latest.Models.FeeModel
+@{
+    DateTime startDate = Model.StartDate;
+    DateTime endDate = Model.EndDate;
+    long schoolId = Model.SchoolId;
+    var data = new Satluj_Latest.Data.School(schoolId).GetDetailedCollectionReportDate(startDate, endDate).OrderBy(z=>z.BillNo);
+    decimal total = data.Sum(x => x.Amount);
+}
+
+<thead>
+    <tr>
+        <th style="text-align: center;">
+            Slno
+        </th>
+        <th>
+            Bill No
+        </th>
+        <th>
+            Date
+        </th>
+        <th>
+            Student Name
+        </th>
+        <th>
+            Class / Div
+        </th>
+
+        <th>
+            Particulars
+        </th>
+        <th>
+            Amount
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        long BillNo = 0;
+        int i = 1;
+        foreach (var one in data)
+        {
+            <tr>
+                @if (BillNo != one.BillNo)
+                {
+                    <td  style="text-align: center;">
+                        @i
+                    </td>
+                    <td>
+                        @one.BillNo.ToString()
+                    </td>
+                    <td>
+                        @Convert.ToDateTime(one.TimeStamp).ToString("dd-MM-yyyy")
+                    </td>
+                    <td>
+                        @one.StudentName
+                    </td>
+                    <td>
+                        @one.Class.Class / @one.DivisionName
+                    </td>
+                    i = i + 1;
+                }
+                else
+                {
+                    <td class="tableTopBor"></td>
+                    <td class="tableTopBor"></td>
+                    <td class="tableTopBor"></td>
+                    <td class="tableTopBor"></td>
+                    <td class="tableTopBor"></td>
+                }
+                @try
+                {
+                    if (one.FeeClass.DueDate != null)
+                    {
+                        <td style="padding-left: 10px; ">@one.Fee.FeesName @String.Format("{0:y}", one.FeeClass.DueDate)</td>
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    var student = new Satluj_Latest.Data.Student(one.StudentId);
+                    bool isThere = student.IsDueBill(@one.FeeGuid);
+                    if (isThere)
+                    {
+                        <td style="padding-left: 10px; ">@one.Fee.FeesName Due</td>
+                    }
+                    else
+                    {
+                        if (one.BillType == 2)
+                        {
+                            <td style="padding-left: 10px; ">@one.Fee.FeesName Fine</td>
+                        }
+                        else
+                        {
+                            <td style="padding-left: 10px; ">@one.Fee.FeesName</td>
+                        }
+                    }
+                }
+                <td>
+                    @String.Format("{0:0.00}", one.Amount)
+                </td>
+            </tr>
+
+            BillNo = one.BillNo ?? 0;
+
+        }
+    }
+</tbody>
+<tfoot>
+    <tr>
+        @*<td style="padding: 5px; font-weight: bold;" colspan="2">
+            Total Amount
+        </td>
+        <td style="padding: 5px; text-align: right;  padding-right: 7%; font-weight: bold;" colspan="5">
+            @String.Format("{0:0.00}", total)
+        </td>*@
+        <td style="padding: 5px; font-weight: bold;">
+            Total Amount
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="font-weight: bold;" >
+            @String.Format("{0:0.00}", total)
+        </td>
+
+    </tr>
+</tfoot>

@@ -1,0 +1,33 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    ViewBag.Title = "My Time Table";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(z => z.schoolId, new { Value = @Model.schoolId })
+<div class="ndiv page-holder">
+    <div class="ndiv Content-section">
+        <div class="ndiv stb-time-table-holder" id="time-table">
+        <h3 style="margin-top: 5px; text-align:center;">My Time Table</h3>
+            <div class="table-responsive">
+                <table class="table custome-table" id="timetable-list-space">
+                    @Html.Partial("~/Views/Teacher/_pv_MyTimeTableView.cshtml", @Model)
+                </table>
+            </div>
+        </div>
+        <div>
+            <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('time-table')"><i class="fa fa-print"></i> Print</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        //$('#btn-Print-bill').addClass('IsHidden');
+        window.print();
+        document.body.innerHTML = restorepage;
+        //$('#btn-Print-bill').removeClass('IsHidden');
+    };
+</script>

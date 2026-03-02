@@ -1,0 +1,177 @@
+﻿@model Satluj_Latest.Models.UserModuleModel
+
+<style>
+    .popup-btn {
+        margin-top: 10px;
+        margin: auto;
+        display: block;
+    }
+
+    .toggleable-div {
+        margin-bottom: 10px;
+    }
+
+    .toggle-heading {
+        background: #03a9f4;
+        color: #fff;
+        padding: 5px 15px;
+        border: 1px solid #f9f9f9;
+    }
+
+        .toggle-heading i {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+    .toggle-body {
+        background: #ccc;
+        padding: 15px;
+        display: none;
+        float: left;
+        width: 100%;
+    }
+
+        .toggle-body ul {
+            padding: 0;
+        }
+
+            .toggle-body ul li {
+                display: block;
+                float: left;
+                margin-right: 30px;
+                width: 22%;
+                margin-bottom: 10px;
+            }
+
+    .sub-menu ul li > a > i {
+        font-size: 9px !important;
+    }
+
+    .toggle-body ul li input[type=checkbox] {
+        margin-right: 5px;
+        margin-top: 7px;
+        float: left;
+    }
+
+    .toggle-body ul li span {
+        float: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: calc(100% - 25px);
+        overflow: hidden;
+    }
+
+    .toggle-class-width {
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+</style>
+<div class="row toggle-class-width">
+    @foreach (var main in Model.mainList)
+            {
+        <div class="maindiv">
+            <div class="toggle-heading">
+                @if (main.IsExistsMain == true)
+                {
+                    <input type="checkbox" class="checklist-sub" checked="@main.IsExistsMain" onclick="return false;" data-sub-id-list="@main.subIdListString" data-main-id="@main.Id" />
+                }
+                else
+                {
+                    <input type="checkbox" class="checklist-sub" checked="@main.IsExistsMain" data-sub-id-list="@main.subIdListString" data-main-id="@main.Id" />
+                }
+                <span>
+                    @main.ModuleName
+                </span>
+                <i class="fa fa-caret-down pull-right"></i>
+            </div>
+            <div class="toggle-body">
+                <ul>
+                    @foreach (var sub in main.subList)
+                    {
+                        if (sub.IsExists == true)
+                        {
+                            <li>
+                                <input type="checkbox" class="chk" checked="@sub.IsExists" onclick="return false;" value="@sub.SubMosule" name="chkphone" data-id="@sub.Id"  /><span>@sub.SubMosule</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <input type="checkbox" class="chk" checked="@sub.IsExists" value="@sub.SubMosule" name="chkphone" data-id="@sub.Id" data-main-id="@main.Id" onchange="AddRemoveUser(this)" /><span>@sub.SubMosule</span>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="row">
+    <div class="form-group">
+        <button class="btn pay-now-btn" data-toggle="modal" id="editUserType-data-id" style="margin-left:1.5%;"><i class="fa fa-save"></i> Edit </button>
+    </div>
+</div>
+
+<script>
+    $(".check-all").change(function () {
+        $("[type=checkbox]").prop('checked', $(this).prop("checked"));
+    });
+
+    $(".checklist-sub").change(function () {
+        debugger;
+        var source = $(this).parent();
+        source.parent().children().eq(1).find('.chk').prop('checked', true);
+        if (false == $(this).prop("checked")) {
+            source.parent().children().eq(1).find('.chk').prop('checked', false);
+
+            var subListString = $(this).attr("data-sub-id-list");
+            var subArray = subListString.split(",");
+            $.each(subArray, function (key, value) {
+                for (var i = array.length - 1; i >= 0; i--) {
+                    if (array[i] === value) {
+                        array.splice(i, 1);
+                    }
+                }
+            });
+
+        }
+        else {
+            var subListString = $(this).attr("data-sub-id-list");
+            var subArray = subListString.split(",");
+            $.each(subArray, function (key, value) {
+                var isExits = false;
+                for (var i = array.length - 1; i >= 0; i--) {
+                    if (array[i] === value) {
+                        isExits = true;
+                    }
+                }
+                if (isExits == false) {
+                    array.push(value);
+                }
+            });
+        }
+    });
+
+    $(".chk").change(function () {
+        if (false == $(this).prop("checked")) {
+            console.log($(this).parent().parent().parent().parent().find('.checklist-sub'))
+            var source = $(this).parent().parent().parent().parent();
+            source.find('.checklist-sub').prop('checked', false);
+        }
+    });
+
+    $('[type=checkbox]').change(function () {
+        if (false == $(this).prop("checked")) {
+            $(".check-all").prop('checked', false);
+            chkArray = [];
+        }
+        if ($('[type=checkbox]:checked').length == $('[type=checkbox]').length) {
+            $(".check-all").prop('checked', true);
+        }
+    });
+
+    $('.toggle-heading i').click(function () {
+        $(this).parent().siblings().toggle();
+    });
+</script>

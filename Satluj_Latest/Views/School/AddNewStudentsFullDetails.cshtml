@@ -1,0 +1,534 @@
+﻿@model Satluj_Latest.Models.StudentModel
+@{
+    ViewBag.Title = "AddNewStudents";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    bool isSavePersonalInfo = false;
+}
+
+<style>
+    .timetable-menu {
+        padding: 0px;
+        margin: 0px;
+        border-top: 1px solid #dedede;
+        border-bottom: 1px solid #dedede;
+    }
+
+    .main-content {
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+        background: #fff;
+        padding: 15px 0px;
+        box-shadow: 1px 5px 5px #ccc;
+    }
+
+    .timetable-menu li {
+        display: inline-block;
+        text-align: center;
+        background: #fff;
+        padding: 6px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border-right: 1px solid #dedede;
+    }
+
+        .timetable-menu li > a > img {
+            display: block;
+            margin: auto;
+            padding: 2px 0px;
+        }
+
+        .timetable-menu li.active {
+            background: #00a7ee;
+        }
+
+            .timetable-menu li.active > a {
+                color: #fff;
+            }
+    /*--------------------------------------------------*/
+    .student-msg-span.msg-active {
+        /*background: #61bfbf;*/
+        background: #264C73;
+    }
+
+        .student-msg-span.msg-active:after {
+            content: "";
+            width: 0;
+            height: 0;
+            border-bottom: 26px solid transparent;
+            border-top: 25px solid transparent;
+            /*border-left: 15px solid #61bfbf;*/
+            /*border-left: 15px solid #0394d1;*/
+            border-left: 15px solid #264C73;
+            font-size: 0;
+            line-height: 0;
+            position: absolute;
+            right: -15px;
+            top: 0px;
+        }
+
+    .student-msg-span {
+        /*background: #0394d1;*/
+        background: #264C73;
+        display: block;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+        .student-msg-span:last-child {
+            margin-bottom: 0px;
+        }
+
+        .student-msg-span p {
+            margin-bottom: 0px !important;
+        }
+
+    .noMsg {
+        text-align: center !important;
+        font-weight: bold;
+        font-size: 30px;
+        color: white;
+    }
+
+    .msgMain {
+        padding: 30px;
+        /*background: #ffffff26;*/
+        background: #73b3ce;
+        color: #000;
+        max-height: 450px;
+        overflow-y: auto;
+        margin-bottom: 4px;
+        padding: 1%;
+    }
+
+    #btn-load-more {
+        text-align: center;
+        padding: 10px 15px;
+        margin: auto;
+        display: table;
+        margin-bottom: 20px;
+        background: #ccc;
+    }
+
+    .chatMain {
+        width: 100%;
+        float: left;
+        position: relative;
+    }
+
+    .chatSngl {
+        padding: 10px 15px;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+        color: #000;
+        margin-bottom: 12px;
+        border-radius: 6px;
+        min-width: 32%;
+        max-width: 70%;
+    }
+
+        .chatSngl span {
+            /*width:100%;*/
+            display: block;
+        }
+
+    .tchrNme {
+        font-weight: bold;
+        font-size: 17px;
+    }
+
+    .timeCht {
+        font-size: 12px;
+        color: #545454;
+        margin-top: 5px;
+        padding-top: 6px;
+        border-top: 1px solid #c3c3c3;
+    }
+
+    .chatMain > .pull-left:after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-bottom: 15px solid transparent; /* left arrow slant */
+        border-top: 15px solid transparent; /* right arrow slant */
+        border-right: 15px solid #e6e6e6; /* bottom, add background color here */
+        font-size: 0;
+        line-height: 0;
+        position: absolute;
+        left: -15px;
+        top: 15px;
+    }
+
+    .chatMain > .pull-right:after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-bottom: 15px solid transparent; /* left arrow slant */
+        border-top: 15px solid transparent; /* right arrow slant */
+        border-left: 15px solid #fff6b8; /* bottom, add background color here */
+        font-size: 0;
+        line-height: 0;
+        position: absolute;
+        right: -15px;
+        top: 15px;
+    }
+
+    .chatRight .chatSngl {
+        background: #fff6b8;
+    }
+
+    .chatLeft .chatSngl {
+        background: #e6e6e6;
+    }
+
+    .msg-sty-dev {
+        display: block;
+        float: left;
+        width: 100%;
+    }
+</style>
+@Html.HiddenFor(m => m.studentId, new { @value = 0 })
+@Html.HiddenFor(m => m.ClassIdForParent, new { @value = 0 })
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="text-align:center;">  Add Student</h3>
+        <label class="mobile-label"></label>
+        <ul class="timetable-menu">
+            <li class="active" style="width:49%; font-size: large; height:5%;" id="personalIfo_id"><a> Personal Info</a></li>
+            <li id="peranseIfo_id" style="width:49%;  font-size: large; height:5%;"><a>Parents Info</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="ndiv page-holder">
+    <div class="ndiv Content-section">
+        <div class="ndiv stb-time-table-holder">
+            <div id="add-info-view-space">
+                @Html.Partial("~/Views/School/_pv_AddStudentPersonalInfo.cshtml", Model)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addChild">
+</div>
+<div class="modal fade" id="enterSmsOtpModel" style="z-index: 1055;">
+
+</div>
+<script>
+    $(document).ready(function () {
+        $('#DOBstring').datepicker({
+            format: "dd-mm-yyyy",
+            autoclose: true,
+            todayHighlight: true,
+            endDate: '+d'
+        });
+        $('#DateOfJoiningString').datepicker({
+            format: "dd-mm-yyyy",
+            autoclose: true,
+            todayHighlight: true,
+            endDate: '+d'
+        });
+        $('select[class^="pv_bus-drop-down"] option[Text="--Select Bus--"]').attr("selected", "selected");
+        $('#BusId').val($(".slct-class-dropdwn option:selected").val());
+        $('#DOBstring').val('');
+        $('#DateOfJoiningString').val('');
+        $.validator.unobtrusive.parse($("#add-info-view-space"));
+    });
+
+    $(document).on('change', '#default-pic-browse', function () {
+        var source = $(this);
+        var selectedFile = this.files[0];
+        var input = this;
+        if (input.files && input.files[0]) {
+            var url = input.value;
+            var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+            if (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg" || ext == "bmp") {
+                selectedFile.convertToBase64(function (base64) {
+                    var h = $(document).find('#file_preview_grid').html();
+                    $(document).find('#file_preview_grid').remove();
+                    $(document).find('#dummyId').html("<div class='upload-box'style='background-image:url(" + base64 + ");'id='file_preview_grid'>" + h + "</div>");
+                    $('#profilePic').val(base64);
+                });
+                var reader = new FileReader();
+            }
+            else {
+                $(source).val('');
+                toastrWarning('Invalid Filetype');
+            }
+        }
+    });
+
+    $(document).on('change', '#default-editpic-browse', function () {
+        var source = $(this);
+        var selectedFile = this.files[0];
+        var input = this;
+        if (input.files && input.files[0]) {
+            var url = input.value;
+            var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+            if (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg" || ext == "bmp") {
+                selectedFile.convertToBase64(function (base64) {
+                    var h = $(document).find('#file_preview_grid_edit').html();
+                    $(document).find('#file_preview_grid_edit').remove();
+                    $(document).find('#dummyId').html("<div class='upload-box'style='background-image:url(" + base64 + ");'id='file_preview_grid'>" + h + "</div>");
+                    $('#profilePic').val(base64);
+                });
+                var reader = new FileReader();
+            }
+            else {
+                $(source).val('');
+                toastrWarning('Invalid Filetype');
+            }
+        }
+    });
+
+    File.prototype.convertToBase64 = function (callback) {
+        var FR = new FileReader();
+        FR.onload = function (e) {
+            callback(e.target.result)
+        };
+        FR.readAsDataURL(this);
+    }
+
+    $('#DOBstring').datepicker({
+        format: "dd-mm-yyyy",
+        autoclose: true,
+        todayHighlight: true,
+        endDate: '+d'
+    });
+
+    $('#DateOfJoiningString').datepicker({
+        format: "dd-mm-yyyy",
+        autoclose: true,
+        todayHighlight: true,
+        endDate: '+d'
+    });
+
+    $(document).on('change', '.pv_class-drop-down', function () {
+        var id = $(this).val();
+        $('#classId').val(id);
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#divisionId").html("");
+                        $("#divisionId").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#divisionId").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#divisionId").prop("disabled", false);
+                    }
+                    else {
+                        $("#divisionId").html("");
+                        $("#divisionId").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#divisionId").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+
+        }
+    });
+
+    (function ($) {
+        $.fn.delayKeyup = function (callback, ms) {
+            var timer = 0;
+            $(this).keyup(function () {
+                clearTimeout(timer);
+                timer = setTimeout(callback, ms);
+            });
+            return $(this);
+        };
+    })(jQuery);
+
+    function StudentAddSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#studentStudentAdd').hide();
+            CheckingForSiblings(result);
+            //var divisionId = result.division;
+            //var classId = result.classId;
+            //var studentId = result.studentId;
+            //$('#studentId').val(studentId);
+            //ParentInfoView(classId);
+        }
+        else {
+            toastrError(result.msg);
+        }
+    }
+
+    function ParentInfoView(classId) {
+        var studId = $('#studentId').val();
+        var classId = classId;
+        var DivisionId = $('#divisionId').val();
+        if (studId != '0') {
+            var id = studId + '~' + classId + '~' + DivisionId;
+            $.ajax({
+                url: '/School/StudentsParentsInfoPage/' + id,
+                dataType: 'html',
+                success: function (data) {
+                    $('#peranseIfo_id').addClass('active');
+                    $('#personalIfo_id').removeClass('active');
+                    $('#add-info-view-space').html('');
+                    $('#add-info-view-space').html(data);
+                    $.validator.unobtrusive.parse($("#add-info-view-space"));
+                },
+            });
+        }
+    }
+
+    function StudentAddFailed(result) {
+        toastrError(result.msg);
+    }
+
+    function StudentParentsAddSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            var divisionId = result.division;
+            var classId = result.classId;
+            window.location.href = '/School/Student/';
+        }
+        else {
+            toastrError(result.msg);
+        }
+    }
+
+    function CheckingForSiblings(result) {
+        var divisionId = result.division;
+        var classId = result.classId;
+        var studentId = result.studentId;
+        $('#studentId').val(studentId);
+        //ParentInfoView(classId);
+        $('#ClassIdForParent').val(classId);
+        var source = $(this);
+        swal({
+            title: "Does your siblings study in the institution?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, my siblings are here!",
+            cancelButtonText: "No, Please continue !",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+      function (isConfirm) {
+          if (isConfirm) {
+              $.ajax({
+                  url: '/School/SelectSiblings/' + studentId,
+                  type: "GET",
+                  dataType: 'html',
+                  success: function (data) {
+                      $('#addChild').html('');
+                      $('#addChild').html(data);
+                      $('#addChild').modal('show');
+                      
+                  }
+              });
+          }
+          else {
+              ParentInfoView(classId);
+          }
+      });
+    }
+
+    $(document).on('click', '#student-button-cancelId', function () {
+        window.location.href = '/School/AddNewStudentsFullDetails/';
+    });
+
+    function ClearSuggestion() {
+        //$('#admission').val('');
+    }
+
+    $(document).on('click', '#proceed-otp', function () {
+        var studentId = $(this).attr('data-studentId');
+        var otp = $("#OTP-value").val();
+
+        if (otp != "") {
+            $.ajax({
+                url: '/Parent/OtpSubmit/' + studentId + '~' + otp,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status) {
+
+                        toastrSuccess(data.msg);
+                        $('#addChild').modal('hide');
+                        $('#enterSmsOtpModel').modal('hide');
+
+                        window.location.reload();
+                    }
+                    else {
+                        toastrError(data.msg);
+                    }
+
+                }
+            });
+        }
+        else {
+            toastrWarning("Please enter OTP");
+        }
+    });
+
+    $(document).on('click', '#proceed-detail', function () {
+        $(this).addClass('isHidden');
+        var studentId = $(this).attr('data-studentId');
+        var currentStudent = $('#CurrentStudentId').val();
+        var id = studentId + '~' + currentStudent;
+        $.ajax({
+            url: '/School/AddParentToKid/' + id,
+            type: "GET",
+            success: function (result) {
+                if (result.status) {
+                    $('#addChild').modal('hide');
+                    ParentOnlyView(result);
+                }
+                else {
+                    toastrError(result.msg);
+                    $('#admission').val('');
+                }
+            }
+        });
+    });
+
+    function ParentOnlyView(result) {
+        var studId = result.studentId;
+        if (studId != '0') {
+            $.ajax({
+                url: '/School/StudentsParentsInfoPageView/' + studId,
+                dataType: 'html',
+                success: function (data) {
+                    $('#peranseIfo_id').addClass('active');
+                    $('#personalIfo_id').removeClass('active');
+                    $('#add-info-view-space').html('');
+                    $('#add-info-view-space').html(data);
+                    $.validator.unobtrusive.parse($("#add-info-view-space"));
+                },
+            });
+        }
+    }
+
+    $(document).on('click', '#proceed-detail-cancel', function () {
+        var classId = $('#ClassIdForParent').val();
+        $('#addChild').modal('hide');
+        ParentInfoView(classId);
+    });
+
+
+    $(document).on('click', '#parentViewPageCompleteBtnId', function () {
+        window.location.href = '/School/AddNewStudentsFullDetails/';
+    });
+
+
+
+
+
+
+
+
+
+
+</script>

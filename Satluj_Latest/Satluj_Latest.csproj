@@ -1,0 +1,247 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\Student\InstallationInstruction.cshtml" />
+    <Content Remove="Views\Student\_AddTimeTable.cshtml" />
+    <Content Remove="Views\Teacher\Message.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\Content\bootstrap\css\bootstrap-theme.css" />
+    <None Include="wwwroot\Content\bootstrap\css\bootstrap-theme.css.map" />
+    <None Include="wwwroot\Content\bootstrap\css\bootstrap-theme.min.css" />
+    <None Include="wwwroot\Content\bootstrap\css\bootstrap-theme.min.css.map" />
+    <None Include="wwwroot\Content\bootstrap\css\bootstrap.css" />
+    <None Include="wwwroot\Content\bootstrap\css\bootstrap.css.map" />
+    <None Include="wwwroot\Content\bootstrap\css\bootstrap.min.css" />
+    <None Include="wwwroot\Content\bootstrap\css\bootstrap.min.css.map" />
+    <None Include="wwwroot\Content\bootstrap\css\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\bootstrap\fonts\glyphicons-halflings-regular.eot" />
+    <None Include="wwwroot\Content\bootstrap\fonts\glyphicons-halflings-regular.svg" />
+    <None Include="wwwroot\Content\bootstrap\fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="wwwroot\Content\bootstrap\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="wwwroot\Content\bootstrap\fonts\glyphicons-halflings-regular.woff2" />
+    <None Include="wwwroot\Content\bootstrap\fonts\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\bootstrap\js\bootstrap.js" />
+    <None Include="wwwroot\Content\bootstrap\js\bootstrap.min.js" />
+    <None Include="wwwroot\Content\bootstrap\js\npm.js" />
+    <None Include="wwwroot\Content\bootstrap\js\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\bootstrap\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\css\accountStyles.css" />
+    <None Include="wwwroot\Content\css\bootstrap.css" />
+    <None Include="wwwroot\Content\css\bootstrap.min.css" />
+    <None Include="wwwroot\Content\css\font-awesome.css" />
+    <None Include="wwwroot\Content\css\font-awesome.min.css" />
+    <None Include="wwwroot\Content\css\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\css\style.css" />
+    <None Include="wwwroot\Content\css\styles.css" />
+    <None Include="wwwroot\Content\css\stylesSutluj.css" />
+    <None Include="wwwroot\Content\disclaimer.html" />
+    <None Include="wwwroot\Content\dist\css\AdminLTE.min.css" />
+    <None Include="wwwroot\Content\dist\css\common.css" />
+    <None Include="wwwroot\Content\dist\css\custom-styles.css" />
+    <None Include="wwwroot\Content\dist\css\dcalendar.picker.css" />
+    <None Include="wwwroot\Content\dist\css\jquery.dataTables.min.css" />
+    <None Include="wwwroot\Content\dist\css\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\dist\css\skin-blue.min.css" />
+    <None Include="wwwroot\Content\dist\js\app.js" />
+    <None Include="wwwroot\Content\dist\js\app.min.js" />
+    <None Include="wwwroot\Content\dist\js\dcalendar.picker.js" />
+    <None Include="wwwroot\Content\dist\js\demo.js" />
+    <None Include="wwwroot\Content\dist\js\jquery.js" />
+    <None Include="wwwroot\Content\dist\js\jquery.min.js" />
+    <None Include="wwwroot\Content\dist\js\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\dist\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\email\ContactAdmin.html" />
+    <None Include="wwwroot\Content\email\FeePayment.html" />
+    <None Include="wwwroot\Content\email\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\fonts\glyphicons-halflings-regular.eot" />
+    <None Include="wwwroot\Content\fonts\glyphicons-halflings-regular.svg" />
+    <None Include="wwwroot\Content\fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="wwwroot\Content\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="wwwroot\Content\fonts\glyphicons-halflings-regular.woff2" />
+    <None Include="wwwroot\Content\fonts\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\fonts\schoolman\demo-files\demo.css" />
+    <None Include="wwwroot\Content\fonts\schoolman\demo-files\demo.js" />
+    <None Include="wwwroot\Content\fonts\schoolman\demo-files\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\fonts\schoolman\demo.html" />
+    <None Include="wwwroot\Content\fonts\schoolman\fonts\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\fonts\schoolman\fonts\schoolman.eot" />
+    <None Include="wwwroot\Content\fonts\schoolman\fonts\schoolman.svg" />
+    <None Include="wwwroot\Content\fonts\schoolman\fonts\schoolman.ttf" />
+    <None Include="wwwroot\Content\fonts\schoolman\fonts\schoolman.woff" />
+    <None Include="wwwroot\Content\fonts\schoolman\ie7\ie7.css" />
+    <None Include="wwwroot\Content\fonts\schoolman\ie7\ie7.js" />
+    <None Include="wwwroot\Content\fonts\schoolman\ie7\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\fonts\schoolman\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\fonts\schoolman\Read Me.txt" />
+    <None Include="wwwroot\Content\fonts\schoolman\style.css" />
+    <None Include="wwwroot\Content\img\248347_SMALL_PROFILE_IMAGE_Fanta-Conde.jpg" />
+    <None Include="wwwroot\Content\img\absent.png" />
+    <None Include="wwwroot\Content\img\add.png" />
+    <None Include="wwwroot\Content\img\alerts.png" />
+    <None Include="wwwroot\Content\img\attendence.png" />
+    <None Include="wwwroot\Content\img\bell.png" />
+    <None Include="wwwroot\Content\img\boy.png" />
+    <None Include="wwwroot\Content\img\card.png" />
+    <None Include="wwwroot\Content\img\checkbox.png" />
+    <None Include="wwwroot\Content\img\checkbox_un.png" />
+    <None Include="wwwroot\Content\img\child.png" />
+    <None Include="wwwroot\Content\img\children-1.gif" />
+    <None Include="wwwroot\Content\img\chilImg.png" />
+    <None Include="wwwroot\Content\img\default-placeholder-1024x1024-960x960.png" />
+    <None Include="wwwroot\Content\img\error.png" />
+    <None Include="wwwroot\Content\img\favicon.ico" />
+    <None Include="wwwroot\Content\img\favicon.png" />
+    <None Include="wwwroot\Content\img\footer-logo.png" />
+    <None Include="wwwroot\Content\img\footer-logoOld.png" />
+    <None Include="wwwroot\Content\img\girl.png" />
+    <None Include="wwwroot\Content\img\grbg.png" />
+    <None Include="wwwroot\Content\img\highquality_pictures_face_paint_children_167990.jpg" />
+    <None Include="wwwroot\Content\img\images %281%29.jpg" />
+    <None Include="wwwroot\Content\img\img.jpg" />
+    <None Include="wwwroot\Content\img\login-bg.png" />
+    <None Include="wwwroot\Content\img\logo.png" />
+    <None Include="wwwroot\Content\img\logoOld.png" />
+    <None Include="wwwroot\Content\img\logo_index.png" />
+    <None Include="wwwroot\Content\img\Master.png" />
+    <None Include="wwwroot\Content\img\menu.png" />
+    <None Include="wwwroot\Content\img\menu_bg.gif" />
+    <None Include="wwwroot\Content\img\mob1.png" />
+    <None Include="wwwroot\Content\img\msgLoader.gif" />
+    <None Include="wwwroot\Content\img\nursery.png" />
+    <None Include="wwwroot\Content\img\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\img\par-Registration.jpg" />
+    <None Include="wwwroot\Content\img\parent.png" />
+    <None Include="wwwroot\Content\img\parentPic.png" />
+    <None Include="wwwroot\Content\img\pay.png" />
+    <None Include="wwwroot\Content\img\placeholderSchool.jpg" />
+    <None Include="wwwroot\Content\img\preloader.gif" />
+    <None Include="wwwroot\Content\img\present.png" />
+    <None Include="wwwroot\Content\img\price-btm.png" />
+    <None Include="wwwroot\Content\img\prnt.png" />
+    <None Include="wwwroot\Content\img\register-bg.png" />
+    <None Include="wwwroot\Content\img\school-boy.png" />
+    <None Include="wwwroot\Content\img\school.png" />
+    <None Include="wwwroot\Content\img\staff.png" />
+    <None Include="wwwroot\Content\img\success-icon-2.png" />
+    <None Include="wwwroot\Content\img\withoutbg.jpg" />
+    <None Include="wwwroot\Content\img\yelStrip.png" />
+    <None Include="wwwroot\Content\js\bootstrap.js" />
+    <None Include="wwwroot\Content\js\canvasjs.min.js" />
+    <None Include="wwwroot\Content\js\jquery.min.js" />
+    <None Include="wwwroot\Content\js\MultipleSeletion.js" />
+    <None Include="wwwroot\Content\js\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\js\regSchool.js" />
+    <None Include="wwwroot\Content\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\pattern.png" />
+    <None Include="wwwroot\Content\Plugins\Autocomplete\easy-autocomplete.css" />
+    <None Include="wwwroot\Content\Plugins\Autocomplete\easy-autocomplete.min.css" />
+    <None Include="wwwroot\Content\Plugins\Autocomplete\easy-autocomplete.themes.css" />
+    <None Include="wwwroot\Content\Plugins\Autocomplete\easy-autocomplete.themes.min.css" />
+    <None Include="wwwroot\Content\Plugins\Autocomplete\jquery.easy-autocomplete.js" />
+    <None Include="wwwroot\Content\Plugins\Autocomplete\jquery.easy-autocomplete.min.js" />
+    <None Include="wwwroot\Content\Plugins\Autocomplete\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\Plugins\Datepicker\bootstrap-datepicker.min.css" />
+    <None Include="wwwroot\Content\Plugins\Datepicker\bootstrap-datepicker.min.js" />
+    <None Include="wwwroot\Content\Plugins\Datepicker\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\Plugins\jquery.table2excel.min.js" />
+    <None Include="wwwroot\Content\Plugins\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\Plugins\SweetAlert\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\Plugins\SweetAlert\sweetalert-dev.js" />
+    <None Include="wwwroot\Content\Plugins\SweetAlert\sweetalert.css" />
+    <None Include="wwwroot\Content\Plugins\SweetAlert\sweetalert.min.js" />
+    <None Include="wwwroot\Content\Plugins\toastr\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\Plugins\toastr\toastr.css" />
+    <None Include="wwwroot\Content\Plugins\toastr\toastr.js.map" />
+    <None Include="wwwroot\Content\Plugins\toastr\toastr.min.css" />
+    <None Include="wwwroot\Content\Plugins\toastr\toastr.min.js" />
+    <None Include="wwwroot\Content\Plugins\toastr\toastrConfig.js" />
+    <None Include="wwwroot\Content\policies.html" />
+    <None Include="wwwroot\Content\Site.css" />
+    <None Include="wwwroot\Content\template\BirthdayWishesEmail.html" />
+    <None Include="wwwroot\Content\template\CircularNotification.html" />
+    <None Include="wwwroot\Content\template\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\template\ResetPassword.html" />
+    <None Include="wwwroot\Content\template\WebResetPassword.html" />
+    <None Include="wwwroot\Content\terms-of-use.html" />
+    <None Include="wwwroot\Content\themes\base\images\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <None Include="wwwroot\Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <None Include="wwwroot\Content\themes\base\jquery-ui.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.accordion.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.all.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.autocomplete.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.base.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.button.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.core.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.datepicker.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.dialog.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.progressbar.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.resizable.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.selectable.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.slider.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.tabs.css" />
+    <None Include="wwwroot\Content\themes\base\jquery.ui.theme.css" />
+    <None Include="wwwroot\Content\themes\base\minified\images\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-bg_glass_75_dadada_1x400.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-icons_222222_256x240.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-icons_2e83ff_256x240.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-icons_454545_256x240.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-icons_888888_256x240.png" />
+    <None Include="wwwroot\Content\themes\base\minified\images\ui-icons_cd0a0a_256x240.png" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery-ui.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.accordion.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.autocomplete.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.button.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.core.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.datepicker.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.dialog.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.progressbar.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.resizable.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.selectable.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.slider.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.tabs.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\jquery.ui.theme.min.css" />
+    <None Include="wwwroot\Content\themes\base\minified\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\themes\base\Open Notebook.onetoc2" />
+    <None Include="wwwroot\Content\themes\Open Notebook.onetoc2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="6.2.3" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Nancy" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,55 @@
+﻿@model Satluj_Latest.Models.FeeclassList
+@{
+    var data = new Satluj_Latest.Data.WebsiteService().getAllFeeClassByFeeId(Model.schoolId, Model.feeId);
+}
+
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            ClassName
+        </th>
+        <th>Due Date</th>
+        <th>
+            Amount
+        </th>
+        <th>
+
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        if (data.Count > 0)
+        {
+            int i = 1;
+            foreach (var item in data)
+            {
+                <tr class="ng-click-feeclass">
+                    <td>
+                        @i
+                    </td>
+                    <td>
+                        @item.ClassDetail.ClassName
+                    </td>
+               
+                    <td>@String.Format("{0:y}", item.DueDate) </td>
+                    <td>
+                        @string.Format("{0:0.00}", item.Amount)
+                    </td>
+                    <td>
+                        <button class="delete-feeclass-tr btn-peek" data-feeid="@item.FeeId" data-feeclassid="@item.FeeClassId"><i class="fa fa-trash "></i></button>
+                        <button class="edit-feeclass-tr pay-now-btn" data-feeid="@item.FeeId" data-feeclassid="@item.FeeClassId"><i class="fa fa-edit "></i></button>
+                    </td>
+                </tr>
+                i++;
+            }
+        }
+        else
+        {
+
+        }
+    }
+</tbody>

@@ -1,0 +1,90 @@
+﻿@model Satluj_Latest.Models.FilterModel
+@{
+    var school = new Satluj_Latest.Data.School(Model.schoolId);
+    bool IsAdmin = ViewBag.IsAdmin ?? false;
+}
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Class
+        </th>
+        <th>
+            Division
+        </th>
+        <th>
+            Academic Year
+        </th>
+        @if (IsAdmin == true)
+        {
+            <th>
+
+            </th>
+        }
+    </tr>
+</thead>
+<tbody>
+    @{
+        if (school != null)
+        {
+            int i = 1;
+            var getClass = new List<Satluj_Latest.Data.Class>();
+            if (Model.classId != null && Model.classId > 0)
+            {
+                getClass = school.Class
+                .Where(z => z.ClassId == Model.classId)
+                .OrderBy(z => z.ClassOrder)
+                .ToList();
+            }
+            else
+            {
+               
+                getClass = school.Class
+                .OrderBy(z => z.ClassOrder)
+                .ToList();
+            }
+
+            if (getClass.Count > 0)
+            {
+                foreach (var item in getClass)
+                {
+                    foreach (var div in school.Divisions.Where(z => z.ClassId == item.ClassId && z.IsActive && z.Class.PublishStatus).ToList().OrderBy(z => z.DivisionName).ToList())
+                    {
+                        <tr data-classid="@item.ClassId" data-divid="@div.DivisionId">
+                            <td class="ng-click" data-classid="@item.ClassId" data-divid="@div.DivisionId">
+                                @i
+                            </td>
+                            <td class="ng-click" data-classid="@item.ClassId" data-divid="@div.DivisionId">
+                                @item.ClassName
+                            </td>
+                            <td class="ng-click" data-classid="@item.ClassId" data-divid="@div.DivisionId">
+                                @div.DivisionName
+                            </td>
+                            <td class="ng-click" data-classid="@item.ClassId" data-divid="@div.DivisionId">
+                                @div.Class.AccademicYearName
+                            </td>
+                            @if (IsAdmin == true)
+                            {
+                                <td>
+                                    <button class="delete-class-tr btn btn-peek" data-classid="@item.ClassId" data-divid="@div.DivisionId"><i class="fa fa-trash"></i></button>
+                                    <button class="edit-class-tr btn btn-peek" data-classid="@item.ClassId" data-divid="@div.DivisionId"><i class="fa fa-edit"></i></button>
+                                </td>
+                            }
+                        </tr>
+                        i++;
+                    }
+                }
+            }
+            else
+            {
+
+            }
+        }
+        else
+        {
+
+        }
+    }
+</tbody>

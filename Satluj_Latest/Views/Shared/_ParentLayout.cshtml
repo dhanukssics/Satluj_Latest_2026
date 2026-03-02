@@ -1,0 +1,166 @@
+﻿@using Newtonsoft.Json
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Schoolman</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+
+    <!-- Bootstrap -->
+    <link href="~/Content/css/bootstrap.css" rel="stylesheet" />
+    @*<link href="~/Content/css/styles.css" rel="stylesheet" />*@
+    <!-- Custom Style -->
+    <link href="~/Content/css/accountStyles.css" rel="stylesheet" />
+    <!-- Font awesome icons css -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet">
+    <!-- Font awesome css -->
+    <link href="~/Content/css/font-awesome.min.css" rel="stylesheet" />
+    <!-- Favicon -->
+    <link href="~/Content/img/favicon.png" rel="shortcut icon" />
+
+    <link href="~/Content/plugins/Datepicker/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <script src="~/Content/plugins/Datepicker/bootstrap-datepicker.min.js"></script>
+
+    <link href="~/Content/Plugins/toastr/toastr.min.css" rel="stylesheet" />
+    <script src="~/Content/Plugins/toastr/toastrConfig.js"></script>
+    <script src="~/Content/Plugins/toastr/toastr.min.js"></script>
+
+    <style>
+        .menu li.active a {
+            color: #fa6e83;
+        }
+
+        .full-loader-dev {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 19999;
+            background: url(/Content/img/preloader.gif) center no-repeat rgb(255, 255, 255) !important;
+            background-size: 350px;
+            background-position: center;
+            content: '';
+        }
+        .dropdown.user-name .dropdown-toggle  {
+            margin-top: 15px; 
+        }
+        @@media screen and (max-width:768px) {
+            .dropdown.user-name .dropdown-toggle {
+                margin-top: 0;
+            }
+            .ftrFromMobile {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    @{
+        var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+        var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+        TbParent parent = null;
+        var parentJson = Context.Session.GetString("Parent");
+        if (!string.IsNullOrEmpty(parentJson))
+        {
+            parent = JsonConvert.DeserializeObject<TbParent>(parentJson);
+        }
+    }
+    <div class="se-pre-con"></div>
+    <div class="full-loader-dev"></div>
+    <section class="header">
+        <input type="checkbox" id="toggle" />
+        <nav id="site-nav" class="site-nav">
+            <div class="container">
+                @*<div class="logo"><a href="/Parent/Home"><img class="img-responsive" src="~/Content/img/logo.png" style="width: 211px;" /></a></div>*@
+                <div class="logo"><a href="/Parent/ParentHome"><img class="img-responsive" src="~/Content/img/logo.png" style="width: 211px;" /></a></div>
+                <label class="navBars" for="toggle"> <i class="fa fa-bars"></i> </label>
+
+                <div class="dropdown pull-right user-name">
+                    <button class="dropdown-toggle" type="button" data-toggle="dropdown" style="background:#0394d1; border:none; padding:10px 15px; color:#fff; border-radius:26px;">
+                        Welcome, <strong>@parent.ParentName</strong>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Logout/ParentLogout">Logout</a></li>
+                    </ul>
+                </div>
+                <ul id="menu" class="menu">
+                    @*<li class="@(((controller == "parent" && action == "home")) ? "active" : "")"><a href="/Parent/Home">Home</a></li>*@
+                    <li class="@(((controller == "parent" && action == "parenthome")) ? "active" : "")"><a href="/Parent/ParentHome">Home</a></li>
+                    <li style="display:none;" class="@(((controller == "parent" && action == "messages")) ? "active" : "")"><a href="/Parent/Messages">Message</a></li>
+                    <li class="@(((controller == "parent" && action == "notifications")) ? "active" : "")"><a href="/Parent/Notifications">Notifications</a></li>
+                    @*<li><a href="#">About us</a></li>
+                    <li><a href="#">Contact us</a></li>*@
+                </ul>
+            </div>
+        </nav>
+    </section>
+
+    @RenderBody()
+
+    <section class="footer-reg ftrFromMobile">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="copyright"><i class="fa fa-copyright"></i> 2017. All rights reserved</span>
+                </div>
+                <div class="col-md-4">
+                    <img class="img-responsive center-block" src="~/Content/img/footer-logo.png" width="200" />
+                </div>
+                <div class="col-md-4">
+                    <ul class="text-right foot-menu">
+                        <li><a href="~/Content/terms-of-use.html">Terms & Conditions</a></li>
+                        <li><a href="~/Content/policies.html">Privacy policy</a></li>
+                        <li><a href="~/Content/disclaimer.html">Disclaimer</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="~/Content/js/bootstrap.js"></script>
+
+</body>
+</html>
+
+<script>
+    $(window).load(function () {
+        // Animate loader off screen
+        $(".se-pre-con").fadeOut("slow");
+        $(".full-loader-dev").hide();
+    });
+    //Loader
+    $(document).ajaxStart(function () {
+        $(":submit").attr("disabled", true);
+        //$('body').pleaseWait();
+        ajaxLoaderStart();
+    });
+    $(document).ajaxComplete(function () {
+        $(":submit").attr("disabled", false);
+        //$('body').pleaseWait('stop');
+        ajaxLoaderStop();
+    });
+
+    function ajaxLoaderStart() {
+        $(".se-pre-con").show();
+    }
+
+    function ajaxLoaderStop() {
+        $(".se-pre-con").hide()
+
+    }
+
+</script>
+

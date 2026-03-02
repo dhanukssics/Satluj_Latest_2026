@@ -1,0 +1,362 @@
+﻿@model Satluj_Latest.Models.FeeModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    string allowedsms = ViewBag.Allowedsms;
+    string extraSms = ViewBag.ExtraSms;
+    string extraCost = ViewBag.ExtraCost;
+}
+
+<div class="main-content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="main-title">
+                <h3>Billed Report</h3>
+                <hr>
+            </div>
+        </div>
+    </div><!-- end of row -->
+
+    <div class="row">
+        <div class="col-md-1">
+            <label class="to-from">From</label>
+        </div>
+        <div class="col-md-3">
+            <div class="with-icon">
+                <input type="text" class="form-control user-collection-start-date" data-date-end-date="0d" value="@Model.StartDate.ToString("dd-MM-yyyy")">
+                <i class="fa fa-calendar"></i>
+            </div>
+        </div>
+        <div class="col-md-1">
+            <label class="to to-from">To</label>
+        </div>
+        <div class="col-md-3">
+            <div class="with-icon">
+                <input type="text" class="form-control user-collection-end-date" data-date-end-date="0d" value="@Model.StartDate.ToString("dd-MM-yyyy")">
+                <i class="fa fa-calendar"></i>
+            </div>
+        </div>
+        <div class="col-sm-1 col-md-1">
+            <button type="button" class="btn btn-sm btn-info btn-search">Search</button>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-sm btn-info" id="btn-Print-bill" onclick="printContent('collection-list-view')"><i class="fa fa-print"></i> Print</button>
+            <button type="button" class="btn btn-sm btn-info btn-csv">Export</button>
+        </div>
+        @*<div class="col-md-1">
+                <input class="print-btn" type="button" value="Print" />
+            </div>*@
+    </div><!-- end of row -->
+    <div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive custom-table" id="collection-list-view">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div id="history-table-bill">
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal fade" id="history-model" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
+    </div>
+</div>
+<div class="modal fade" id="returnPaymentMode-model" z-index="99999" role="dialog" aria-labelledby="myModalLabel6">
+
+</div>
+<script>
+    $(document).ready(function () {
+        $('.user-collection-start-date').datepicker({
+            format: 'dd-mm-yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+        $('.user-collection-end-date').datepicker({
+            format: 'dd-mm-yyyy',
+            autoclose: true,
+            todayHighlight: true,
+        });
+        var sDate = $('.user-collection-start-date').val();
+        var eDate = $('.user-collection-end-date').val();
+
+        var res = sDate.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        sDate = mm + '-' + dd + '-' + yyyy;
+
+        var zres = eDate.split("-");
+        var zdd = zres[0];
+        var zmm = zres[1];
+        var zyyyy = zres[2];
+        eDate = zmm + '-' + zdd + '-' + zyyyy;
+        $.ajax({
+            url: '/SuperAdmin/SmsAllHistoryByDate/' + sDate + '~' + eDate,
+            type: "GET",
+            // dataType: 'html',
+            success: function (data) {
+                $('#collection-list-view').html(data);
+                //IntializeDataTable();
+
+            }
+        })
+    })
+
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+    }
+
+    $('.btn-search').click(function () {
+        var sDate = $('.user-collection-start-date').val();
+        var eDate = $('.user-collection-end-date').val();
+
+        var res = sDate.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        sDate = mm + '-' + dd + '-' + yyyy;
+
+        var zres = eDate.split("-");
+        var zdd = zres[0];
+        var zmm = zres[1];
+        var zyyyy = zres[2];
+        eDate = zmm + '-' + zdd + '-' + zyyyy;
+
+        console.log(sDate, eDate);
+        $.ajax({
+            url: '/SuperAdmin/SmsAllHistoryByDate/' + sDate + '~' + eDate,
+            type: "GET",
+            // dataType: 'html',
+            success: function (data) {
+                $('#collection-list-view').html(data);
+                //IntializeDataTable();
+            }
+        })
+    })
+    $('.btn-csv').click(function () {
+        setTimeout(function () {
+            $("#collection-grid").table2excel({
+                name: "Table2Excel",
+                filename: "CollectionReport",
+                fileext: ".xls"
+            });
+        }, 2000);
+
+    })
+
+    $(document).on('click', '.bill-click', function () {
+        //debugger;
+        var id = $(this).attr('data-id');
+        var studId = $(this).attr('data-studId');
+        //window.location.href = '/School/CollectionReportDetail/' + id + '~' + studId;
+        $.ajax({
+            url: '/School/LoadTableForBillingNew/' + id + '~' + studId,
+            dataType: 'html',
+            success: function (data) {
+                $('#history-model').html('');
+                $('#history-model').html(data);
+                $('#history-model').modal('show');
+            },
+        });
+    });
+
+
+    $(document).on('click', '#cancelBill', function () {
+        //debugger;
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Cancel Bill!",
+            cancelButtonText: "No, Leave it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        //cancel = 1;
+        //$.ajax({
+        //    url: '/School/CancelBill/' + $(source).attr('data-billNo') + '~' + $(source).attr('data-studentId'),
+        //    type: "GET",
+        //    dataType: 'json',
+        //    success: function (data) {
+        //        if (data.status) {
+        //            $('#history-model').html('');
+        //            toastrSuccess('Successful');
+        //            $('#history-model').modal('hide');
+        //            $('.btn-search').trigger('click');
+        //        }
+        //        else {
+        //            toastrError(data.msg);
+        //        }
+        //    }
+        //});
+        var id = $(source).attr('data-billNo') + '~' + $(source).attr('data-studentId');
+        $.ajax({
+            url: '/School/LoadReturnPaymentMode/' + id,
+            dataType: 'html',
+            success: function (data) {
+                $('#returnPaymentMode-model').html('');
+                $('#returnPaymentMode-model').html(data);
+                $('#returnPaymentMode-model').modal('show');
+
+                $('#chk-date-return').datepicker({
+                    format: 'dd-mm-yyyy',
+                    autoclose: true,
+                    todayHighlight: true
+                });
+
+
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                var today = dd + '-' + mm + '-' + yyyy;
+                $('#chk-date-return').val(today);
+            },
+        });
+    }
+});
+    });
+
+    //********************************************
+    $(document).on('change', '#ReturnPaymentType', function () {
+        var type = $(this).val();
+        if (type == 1) {
+            $('#div-bankdetails').addClass('isHidden');
+            $('.div-chequeDetails').addClass('isHidden');
+        }
+        else if (type == 2) {
+            $('#div-bankdetails').removeClass('isHidden');
+            $('.div-chequeDetails').removeClass('isHidden');
+        }
+
+        else if (type == 3) {
+            $('#div-bankdetails').removeClass('isHidden');
+            $('.div-chequeDetails').addClass('isHidden');
+        }
+    })
+
+    $(document).on('click', '#btn-bill-cancel', function () {
+        var chkDate = '';
+        var bankId = 0;
+        var chequeNo = $('#chk-no-return').val();
+        var chequeDate = $('#chk-date-return').val();
+        var mode = $('#ReturnPaymentType').val();
+        var studentId = $('#hfstudentId').val();
+        var billNo = $('#hfbillno').val();
+        var ok = 0;
+        if (mode == 2) {// Cheque
+            if (chequeNo == '') {
+                $('#cheque-no-required').show();
+                $('#btn-bill-cancel').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                ok = 0;
+            }
+            else if (chequeDate != '') {
+                bankId = $('#BankId').val();
+                var res = chequeDate.split("-");
+                var dd = res[0];
+                var mm = res[1];
+                var yyyy = res[2];
+                chkDate = mm + '-' + dd + '-' + yyyy + " 11:00:00.000";
+                $('#cheque-date-required').hide();
+                $('#cheque-no-required').hide();
+                $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+                ok = 1;
+            }
+            else {
+                $('#cheque-date-required').show();
+                $('#btn-bill-cancel').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                ok = 0;
+            }
+        }
+        else if (mode == 3) {
+            bankId = $('#BankId').val();
+            $('#cheque-date-required').hide();
+            $('#cheque-no-required').hide();
+            $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+            ok = 1;
+        }
+        else {
+            $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+            ok = 1;
+        }
+        if (ok == 1) {
+            var id = billNo + '~' + studentId + '~' + mode + '~' + bankId + '~' + chequeNo + '~' + chequeDate;
+            cancel = 1;
+            $.ajax({
+                url: '/School/CancelBill/' + id,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status) {
+                        toastrSuccess(data.msg);
+                        var studentId = $('#hfStudentId').val();
+                        $.ajax({
+                            url: '/School/AddStudentBillPartialView/' + studentId,
+                            type: "GET",
+                            dataType: 'html',
+                            success: function (data) {
+                                //event.preventDefault();
+                                //$('#returnPaymentMode-model').html('');
+                                //$('#history-model').html('');
+                                //$('#history-model').html(data);
+                                //$('#history-model').modal('show');
+                                //$("#li-data").focus();
+                                location.reload();
+                            }
+                        });
+                    }
+                    else {
+                        toastrError(data.msg);
+                    }
+                }
+            });
+
+
+        }
+
+    });
+
+    $(document).on('keyup', '#chk-no-return', function () {
+        if ($('#chk-no-return').val() != '') {
+            $('#cheque-no-required').hide();
+            $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+        }
+        else {
+            $('#cheque-no-required').show();
+            $('#btn-bill-cancel').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+    });
+
+    $('.date-cheque').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).on('click', '#btn-cancel-in-billCancel', function () {
+        location.reload();
+    });
+
+
+</script>

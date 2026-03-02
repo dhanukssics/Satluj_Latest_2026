@@ -1,0 +1,329 @@
+﻿@model Satluj_Latest.Models.StudentModel
+@{
+    ViewBag.Title = "Premote Student";
+
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+
+
+}
+
+<style>
+    .ng-click-studentDiscount-details {
+        cursor: pointer;
+    }
+
+    .box-color {
+        background-color: #fff;
+        display: block;
+        position: relative;
+        float: left;
+        width: 100%;
+        margin-bottom: 15px;
+        /*padding-top: 15px;*/
+    }
+
+    .head-box {
+        margin-top: 0px;
+        background-color: #03a9f4;
+        padding: 15px;
+        margin-left: -15px;
+        margin-right: -15px;
+        color: #fff;
+        font-weight: 700;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-bottom: 0px;">Promote Student</h3>
+        <div class="box-color">
+            <div class="col-sm-12" style="border-bottom: 1px solid #ccc;">
+                <h5 class="head-box">Select State</h5>
+                <div class="row">
+                    <div class="form-group col-sm-4 ">
+                        <label>Class</label>
+                        <select asp-for="classId"
+                                asp-items="ViewBag.Classlist"
+                                class="form-control class-drop-down"
+                                data-live-search="true">
+                            <option value="">--Choose--</option>
+                        </select>
+
+                    </div>
+                    <div class="form-group col-sm-4 ">
+                        <label>Division</label>
+                        <select id="division-drop-down" class="form-control" disabled>
+                            <option value="">-- Please select division --</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group text-right">
+                            @*<button class="btn pay-now-btn" data-toggle="modal" data-target="#modalStudent"><i class="fa fa-plus"></i> Add Student</button>*@
+                            <button class="btn pay-now-btn" data-toggle="modal" id="btn-proceed"><i class="fa fa-save"></i> Proceed </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div>
+            <div  id="pv-table" class="">
+            </div>
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+<div class="modal fade" id="addPromoteClass">
+
+    <div class="modal-dialog modal-sm" role="document">
+
+        <style>
+            span {
+                color: red;
+            }
+        </style>
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add Class</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Class</label>
+                    <br />
+                    @*<input class="form-control" placeholder="Class" type="text" />*@
+                    <select asp-for="className"
+                            asp-items="ViewBag.unpublishedclass"
+                            class="form-control slct-class-dropdwn-2"
+                            data-live-search="true">
+                        <option value="0">--Choose--</option>
+                    </select>
+
+
+                </div>
+                <div class="form-group">
+                    <label>Division</label>
+                    <select id="division-drop-down-2" class="form-control" disabled>
+                        <option value="0">-- Select Division --</option>
+                    </select>
+                    @*<input class="form-control" placeholder="Division" type="text" />*@
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn pay-now-btn" id="promote-student">Save</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+
+    //$(document).on('click', '.ng-click-studentDiscount-details', function () {
+    //    window.location.href = "/School/DiscountDetails/" + $(this).val();
+    //});
+    $(function () {
+        $("#stud-list-table").dataTable();
+    })
+
+
+    $(document).on('change', '.class-drop-down', function () {
+        var id = $(this).val();
+        if (id != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+
+    $(document).on('change', '#division-drop-down', function () {
+        array = null;
+        var id = $(this).val();
+        if (id != '' || id != 0) {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/School/GetToPromotionStudentsByDivGrid/' + id,
+                dataType: 'html',
+                success: function (data) {
+                    $('#pv-table').html('');
+                    $('#pv-table').html(data);
+                    $("#stud-list-table").dataTable();
+                    //IntializeDataTable();
+                },
+            });
+        }
+        else {
+            //   resetDropDown('Class');
+        }
+    });
+
+    $(document).on('change', '.slct-class-dropdwn-2', function () {
+        var id = $(this).val();
+        if (id != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down-2").html(""); // clear before appending new list
+                        $("#division-drop-down-2").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down-2").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down-2").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down-2").html(""); // clear before appending new list
+                        $("#division-drop-down-2").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down-2").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+
+
+    var array = [];
+
+    $("#btn-proceed").click(function () {
+        //alert($('#Amount').val());
+        array = [];
+
+        $("input:checked").each(function () {
+
+            var userId = $(this).attr('data-id');
+            if (userId != "xxx") {
+            console.log(userId);
+            array.push(userId);
+            }
+        });
+
+        if (array.length == 0) {
+            toastrWarning("Please select Students");
+        }
+        else {
+            $('#addPromoteClass').modal('show');
+        }
+        console.log(JSON.stringify(array));
+
+
+
+
+
+
+
+        //if ($('#FeeId').val() != '') {
+        //    $("#val_fee").addClass('isHidden');
+
+        //    if ($('#Amount').val() != '' && $('#Amount').val() != 0) {
+        //        $("#val_amount").addClass('isHidden');
+        //        if (array.length > 0) {
+        //            var item = new Object();
+        //            item.FeeId = $("#FeeId").val();
+        //            item.Amount = $("#Amount").val();
+        //            item.FeeStudentId = array.toString();
+        //            $.post("/School/AssignDiscount/", item, function (result) {
+        //                console.log(JSON.stringify(result))
+        //                if (result.status) {
+        //                    if (result.status) {
+        //                        toastrSuccess(result.msg);
+        //                        window.location.href = '/School/FeeDiscount/';
+        //                        //location.reload();
+        //                        // window.location.href = '/TeacherAdmin/HomeworkList';
+        //                    }
+        //                    else {
+        //                        toastrError(result.msg);
+        //                    }
+        //                }
+        //            });
+        //        }
+        //        else {
+        //            toastrWarning("Please select student");
+        //        }
+        //    }
+        //    else {
+        //        $("#val_amount").removeClass('isHidden');
+
+        //    }
+        //}
+        //else {
+        //    $("#val_fee").removeClass('isHidden');
+        //}
+
+
+    });
+
+
+    $("#promote-student").click(function () {
+        var toDivisionId = parseInt($('#division-drop-down-2').val());
+        var classId = parseInt($('.slct-class-dropdwn-2').val());
+        var divisionId = parseInt($('#division-drop-down').val());
+        console.log(divisionId, classId);
+        //alert(divisionId);
+        if (classId > 0) {
+            if (divisionId > 0) {
+                var item = new Object();
+                item.divisionId = divisionId;
+                item.toDivisionId = toDivisionId;
+                item.classId = classId;
+                item.stringStudentId = array.toString();
+                $.post("/School/PremoteStudentClass/", item, function (result) {
+                    //console.log(JSON.stringify(result))
+                    if (result.status) {
+                        toastrSuccess(result.msg);
+                        $('#addPromoteClass').modal('hide');
+                        //       window.location.href = '/School/FeeDiscount/';
+                        location.reload();
+                        // window.location.href = '/TeacherAdmin/HomeworkList';
+                    }
+                    else {
+                        toastrError(result.msg);
+                    }
+                });
+            }
+            else {
+                toastrWarning("Please select Division");
+            }
+        }
+        else {
+            toastrWarning("Please select Class");
+        }
+    });
+
+    $(document).on('change', '#chkBox-chkAll', function () {
+        if ($(this).is(":checked")) {
+            $(".chk-stud").prop('checked', true);
+        }
+        else {
+            $(".chk-stud").prop('checked', false);
+        }
+      
+    });
+</script>

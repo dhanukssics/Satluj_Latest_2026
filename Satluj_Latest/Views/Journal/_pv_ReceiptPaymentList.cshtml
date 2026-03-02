@@ -1,0 +1,73 @@
+﻿@model Satluj_Latest.Models.ReceiptPaymentModel
+@{
+    var receiptPayment = new Satluj_Latest.Data.School(Model.SchoolId).GetReceiptPayment(Model.StartDate, Model.EndDate);
+
+}
+<div class="row">
+    @Html.HiddenFor(m => m.StartDate, new { Value = Model.StartDate })
+    @Html.HiddenFor(m => m.EndDate, new { Value = Model.EndDate })
+    <div class="col-md-12" id="print-trial-bal">
+        <table class="table custome-table table-bordered" id="table-trial-balance">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">
+                        Receipt
+                    </th>
+                    @*<th style="text-align: left;">
+                        Narration
+                    </th>*@
+                    <th style="text-align: center;">
+                        Amount
+                    </th>
+                    <th style="text-align: left;">
+                        Payment
+                    </th>
+                    @*<th style="text-align: left;">
+                        Narration
+                    </th>*@
+                    <th style="text-align: center;">
+                        Amount
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var item in receiptPayment)
+                    {
+                        <tr>
+                            <td>
+                                @item.Receipt
+                            </td>
+                            @*<td>
+                                @item.ReceiptNarration
+                            </td>*@
+                            <td style="text-align: center;">
+                                @if (item.ReceiptAmount != 0)
+                                {
+                                    @String.Format("{0:0.00}", item.ReceiptAmount)
+                                }
+                            </td>
+                            <td>
+                                @item.Payment
+                            </td>
+                            @*<td>
+                                @item.PaymentNarration
+                            </td>*@
+                            <td style="text-align: center;">
+                                @if (item.PaymentAmount != 0)
+                                {
+                                    @String.Format("{0:0.00}", item.PaymentAmount)
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+
+
+
+        </table>
+    </div>
+
+
+</div>

@@ -1,0 +1,79 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+    ViewData["Title"] = "Student Detail";
+}
+
+<section class="login-without" style="min-height:555px;">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-5">
+                <div class="login">
+                    <div class="login-form fullWid">
+                        <h3>Student Detail</h3>
+
+                        <div class="form-group">
+                            <select asp-for="classId"
+                                    asp-items="ViewBag.SchoolList"
+                                    class="newDes"
+                                    data-live-search="true"
+                                    style="background-color:#2f7e86;">
+                                <option value="">-- School Name --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <input id="admission"
+                                   class="newDes"
+                                   style="height:47px;"
+                                   placeholder="Admission Number" />
+                        </div>
+
+                        <p>Please contact school for admission number</p>
+
+                        <div id="std-detail-3"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function ($) {
+            $.fn.delayKeyup = function (callback, ms) {
+                var timer = 0;
+                $(this).keyup(function () {
+                    clearTimeout(timer);
+                    timer = setTimeout(callback, ms);
+                });
+                return this;
+            };
+        })(jQuery);
+
+        $('#admission').delayKeyup(function () {
+
+            var searchText = $('#admission').val();
+            var schoolId = $('#classId').val();
+
+            if (searchText.length > 2 && schoolId) {
+
+                $.ajax({
+                    url: '/Account/SearchAdmission/' + searchText + '~' + schoolId,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#std-detail-3').html(data);
+                    }
+                });
+            }
+            else {
+                $('#std-detail-3').html('');
+            }
+
+        }, 500);
+    </script>
+}

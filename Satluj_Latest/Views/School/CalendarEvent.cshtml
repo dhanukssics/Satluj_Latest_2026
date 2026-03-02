@@ -1,0 +1,235 @@
+﻿@model Satluj_Latest.Models.CalendarEventModels
+@{
+    ViewBag.Title = "Callendar List";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Calendar Event</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+                <div class="form-group text-right">
+                    <button class="btn pay-now-btn" id="btn-add-Category"><i class="fa fa-plus"></i> Add Calendar Event</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div>
+                <div class="form-group col-sm-3">
+                    <label>From</label>
+                    <div class="with-icon">
+                        <input type="text" id="startDate" class="form-control attendance-date" value="@Model.startDate.ToString("dd-MM-yyyy")">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3">
+                    <label>To</label>
+                    <div class="with-icon">
+                        <input type="text" id="endDate" class="form-control attendance-date"  value="@Model.endDate.ToString("dd-MM-yyyy")">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+                    <button type="button" class="btn btn-sm btn-info btn-search" id="searchEvent">Search</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-category-list">
+                @Html.Partial("~/Views/School/_pv_CalendarEvent_list.cshtml", Model)
+            </table>
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+<div class="modal fade" id="modalEventAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+<div class="modal fade" id="modalEventEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+
+
+
+<script>
+
+    //$(document).on('click', '.ng-teacherDetails-click', function () {
+
+    //    window.location = '/School/TeacherDetails/' + $(this).attr('data-teacherid');
+    //});
+
+
+
+    $('#startDate').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    }); $('#endDate').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+    $(function () {
+        $("#table-category-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $("#table-category-list").dataTable().fnDestroy()
+        $("#table-category-list").dataTable();
+    }
+    $(document).on('click', '#searchEvent', function () {
+        var startDate = $('#startDate').val();
+        var endDate = $('#endDate').val();
+
+        var res = startDate.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        startDate = mm + '-' + dd + '-' + yyyy;
+
+        var zres = endDate.split("-");
+        var zdd = zres[0];
+        var zmm = zres[1];
+        var zyyyy = zres[2];
+        endDate = zmm + '-' + zdd + '-' + zyyyy;
+        $.ajax({
+            url: '/School/SearchCalendarEvent/' + startDate + '~' + endDate,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#table-category-list').html('');
+                $('#table-category-list').html(data);
+                IntializeDataTable();
+            }
+        });
+
+    });
+    $(document).on('click', '#btn-add-Category', function () {
+
+        $.ajax({
+            url: '/School/AddCalendarEventView',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalEventAdd').html(data);
+                $.validator.unobtrusive.parse($("#modalEventAdd"));
+                $('#modalEventAdd').modal('show');
+
+            }
+        });
+    });
+
+    function RefreshCategoryGrid() {
+        $.ajax({
+            url: '/School/CalendarEventListPartial',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#table-category-list').html('');
+                $('#table-category-list').html(data);
+                IntializeDataTable();
+            }
+        });
+    }
+
+
+
+
+    function AddEventSuccess(result) {
+
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalEventAdd').modal('hide');
+            RefreshCategoryGrid();
+        }
+        else {
+            $('#modalEventAdd').modal('hide');
+            toastrError(result.msg);
+        }
+
+    }
+
+    function EditEventSuccess(result) {
+
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalEventEdit').modal('hide');
+            RefreshCategoryGrid();
+
+        }
+        else {
+            $('#modalEventEdit').modal('hide');
+            toastrError(result.msg);
+        }
+
+    }
+
+        $(document).on('click', '.delete-category-tr', function () {
+            var id = $(this).attr('data-id');
+
+            swal({
+                title: "Are you sure?",
+                text: "You will not be able to undo this !",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+    function (isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: '/School/DeleteCalendarEvent/' + id,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status) {
+                        toastrSuccess(data.msg);
+                        RefreshCategoryGrid();
+                    }
+                    else {
+                        toastrError(data.msg);
+                    }
+                }
+            });
+        }
+    });
+
+        });
+
+
+    $(document).on('click', '.edit-staff-tr', function () {
+
+        var id = $(this).attr('data-id');
+
+        $.ajax({
+            url: '/School/EditCalendarEventView/' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalEventEdit').html(data);
+                $.validator.unobtrusive.parse($("#modalEventEdit"));
+                $('#modalEventEdit').modal('show');
+            }
+        });
+
+    });
+
+  
+</script>

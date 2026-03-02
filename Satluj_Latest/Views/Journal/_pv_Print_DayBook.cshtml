@@ -1,0 +1,107 @@
+﻿@model Satluj_Latest.Models.AddDayBookModel
+@{
+    DateTime date = Model.EntryDate;
+    var balanceHead = new Satluj_Latest.Data.School(Model.SchoolId).CurrentStatus();
+    var schoolDetails = new Satluj_Latest.Data.School(Model.SchoolId);
+    var filePath = "http://sutluj.schoolman.in" + schoolDetails.FilePath;
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Cash Voucher</title>
+
+</head>
+
+<body>
+    <div class="modal-dialog modal-lg" id="printPopUp" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Print Data</h4>
+            </div>
+            <div class="modal-body" id="printCashBook">
+                <div class="main_wrapper" style="width: 800px; height: auto; margin: auto; background: #f1f1f1; padding: 20px 50px;">
+                    <div class="vouchHead">
+                        <div class="logoHead" style="text-align: center; margin-bottom: 30px; margin: auto; display: table; margin-bottom: 50px;">
+                            @if(filePath== "http://sutluj.schoolman.in")
+                            {
+
+                            }
+                            else
+                            {
+                            <img src="@filePath" width="110" style="float:left;" />
+                            }
+                            <div class="logoTxt" style="padding-top: 20px; float:left;">
+                                <h2>@schoolDetails.SchoolName</h2>
+                                <h4>@schoolDetails.Address</h4>
+                            </div>
+                        </div>
+
+                        <ul style="padding: 0; margin: 0; display: inline-block; width: 100%; margin-bottom: 30px;">
+                            <li style="display: block; width:33.3%; float:left;">No: @Model.VoucherNo</li>
+                            <li class="centerTxt" style="width:33.3%; float:left; text-align: center; text-transform: uppercase; font-weight: bold; display: block;">Cash Voucher</li>
+                            <li class="date" style="width:33.3%; float: right; display: block;    padding-left: 120px;">Date: @date.ToString("dd-MM-yyyy")</li>
+                        </ul>
+                    </div>
+                    <div class="vouchBdy">
+                        <div class="first" style="margin-bottom: 15px;display: inline-block; width: 100%;">
+                            <span style="float: left; margin-right: 10px;">Name of Payee</span>
+                            @*<input value="@Model.TypeData" type="text" style="width: 85%; border: none; border-bottom: 2px dotted #000; outline: none; padding-bottom: 3px; font-size: 18px; background: none;" />*@
+                            <input value="@Model.Narration" type="text" style="width: 85%; border: none; border-bottom: 2px dotted #000; outline: none; padding-bottom: 3px; font-size: 18px; background: none;" />
+                        </div>
+                        <div class="second" style="margin-bottom: 15px;display: inline-block; width: 100%;">
+                            <span style="float: left; margin-right: 10px;">Amount paid</span>
+                            <input value="@Model.Amount" type="text" style="width: 70%; border: none; border-bottom: 2px dotted #000; outline: none; padding-bottom: 3px; font-size: 18px; background: none;" />
+                            <span style="margin-right: 10px; margin-right: 0px; margin-left: 10px;">by Cash/Cheque</span>
+                        </div>
+                        <div class="first" style="margin-bottom: 15px;display: inline-block; width: 100%;">
+                            <span style="float: left; margin-right: 10px;">on account of </span>
+                            <span style="width:calc(100% - 100px); border: none; border-bottom: 2px dotted #000; outline: none; padding-bottom: 3px; font-size: 18px; background: none; float:left;"> <input type="text" value="@Model.HeadName" style="width:100%; background:none;border:none; outline:none;" /></span>
+                        </div>
+                        <div class="first" style="margin-bottom: 15px;display: inline-block; width: 100%;">
+                            <input  value="@Model.SubLedger" type="text" style="width:100%; border: none; border-bottom: 2px dotted #000; outline: none; padding-bottom: 3px; font-size: 18px; background: none;" />
+                        </div>
+                        <div class="first" style="margin-bottom: 15px;display: inline-block; width: 100%;">
+                            @*<input value="@Model.Narration" type="text" style="width:100%; border: none; border-bottom: 2px dotted #000; outline: none; padding-bottom: 3px; font-size: 18px; background: none;" />*@
+                            <input   type="text" style="width:100%; border: none; border-bottom: 2px dotted #000; outline: none; padding-bottom: 3px; font-size: 18px; background: none;" />
+                        </div>
+                        <div class="first" style="margin-bottom: 15px;display: inline-block; width: 100%;">
+                            <input type="text" style="width:100%; border: none; border-bottom: 2px dotted #000; outline: none; padding-bottom: 3px; font-size: 20px; font-weight: bold;background: none;" />
+                        </div>
+                    </div>
+                    <div class="vouchFoot">
+                        <div class="price">
+                            <span style="font-size: 26px; font-weight: bold;">Rs.</span>
+                            <input type="text" value="@Model.Amount" style="border: none; border-bottom: 2px solid #000;  height: 17px; padding: 10px 5px;  font-size: 20px;  font-weight: normal; outline: none; width: 200px; background: none;" />
+                        </div>
+
+                        <div class="footTwo" style="margin-top: 15px;">
+                            <span>Approved/NotApproved</span>
+                            <span style="float: right;font-weight: bold;">Signature of Payee,</span>
+                        </div>
+
+                        <div class="footThree" style="margin-top: 70px;">
+                            <span style="font-weight: bold;">Principal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group text-center">
+                <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('printCashBook')"><i class="fa fa-print"></i> Print</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Journal/DayBook';
+    }
+    </script>
+</body>
+</html>

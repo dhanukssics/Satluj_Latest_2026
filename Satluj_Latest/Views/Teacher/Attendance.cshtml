@@ -1,0 +1,332 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    // int userType1 = Convert.ToInt16(Session["UserType
+    int userType1 = Context.Session.GetInt32("UserType") ?? 0;
+
+    int teacherType1 = Convert.ToInt16(UserRole.Teacher);
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12 pull-left">
+                <h3>Attendance <span id="strength-atnd" style="float:right"></span></h3>
+                <button class="btn pay-now-btn" id="btn-print-summary" style="display:none; float:right;"><i class="fa fa-print"></i> Summary</button>
+            </div>
+        </div>
+
+        <div class="row">
+
+            @if (userType1 == teacherType1)
+            {
+                <div class="form-group col-sm-2">
+                    <label>Class</label>
+                    <select asp-for="classId"
+                            asp-items="ViewBag.TeacherClassList"
+                            class="form-control class-teacher-drop-down"
+                            data-live-search="true">
+                        <option value="">--Choose Class--</option>
+                    </select>
+
+                    <span asp-validation-for="classId" class="text-danger"></span>
+
+                </div>
+            }
+            else
+            {
+                <div class="form-group col-sm-2">
+                    <label>Class</label>
+                    <select asp-for="classId"
+                            asp-items="ViewBag.Classlist"
+                            class="form-control class-drop-down"
+                            data-live-search="true">
+                        <option value="">--Choose Class--</option>
+                    </select>
+
+
+                </div>
+            }
+
+            <input type="hidden" id="hfClassId" value="" />
+            <input type="hidden" id="hfDivisionId" value="" />
+            <input type="hidden" id="hfAttendanceDate" value="@Model.attendanceDate" />
+            <input type="hidden" id="hfShiftStatus" value="" />
+            <input type="hidden" id="hfUserId" value="@Model.userId" />
+
+            <div class="form-group col-sm-2">
+                <label>Division</label>
+                <select id="division-drop-down" class="form-control" disabled>
+                    <option>--Select Division --</option>
+                </select>
+                <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+            </div>
+
+            <div class="form-group col-sm-2">
+                <label>Date</label>
+                <div class="with-icon">
+                    <input type="text" class="form-control attendance-date" data-date-end-date="0d" value="@Model.Selecteddate.ToString("dd-MM-yyyy")">
+                    <i class="fa fa-calendar"></i>
+                </div>
+            </div>
+
+            <div class="form-group col-sm-4 ">
+                <label>Session</label>
+                <select id="section-drop-down" class="form-control">
+                    @*<option value="">-- Please select Session --</option>*@
+                    <option value="0">Morning</option>
+                    @*<option value="1">Afternoon</option>*@
+                </select>
+                <span id="spn-error-Section" data-val="0" data-myval="10" style="color:red;"></span>
+            </div>
+
+            <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+                <button type="button" class="btn btn-sm btn-info btn-search" id="searchAttendance">Search</button>
+            </div>
+        </div>
+        <div class="table-responsive" id="attendance-list-view">
+
+        </div>
+        <input type="hidden" value="" id="studentList" />
+    </div><!-- end of col md 8 -->
+</div>
+<button type="button" class="btn btn-sm btn-info isHidden" id="btn-save-attendance" style="margin-top: 20px;width: 200px;">Save</button>
+<script>
+    $('.attendance-date').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+    $(document).on('click', '#searchAttendance', function () {
+        $('#btn-print-summary').show();
+        var date = $('.attendance-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var today = mm + '-' + dd + '-' + yyyy;
+        var section = $('#section-drop-down').val();
+        var classId = $('#classId').val();
+        var divisionId = $('#division-drop-down').val();
+        if (divisionId == "") {
+            $('#spn-error-Division').text("Select Division");
+            $('#spn-error-Division').show();
+        }
+        else {
+            $('#spn-error-Division').hide();
+            if (section == "") {
+                $('#spn-error-Section').text("Select Session");
+                $('#spn-error-Section').show();
+            }
+            else {
+                $('#spn-error-Section').hide();
+                $("#hfClassId").val(classId);
+                $("#hfDivisionId").val(divisionId);
+                $("#hfAttendanceDate").val(today);
+                $("#hfShiftStatus").val(section);
+                $.ajax({
+                    url: '/Teacher/AttendanceMarking/' + today + '~' + section + '~' + classId + '~' + divisionId,
+                    type: "GET",
+                    dataType: 'html',
+                    success: function (data) {
+                        $('#attendance-list-view').html(data);
+
+                    }
+                });
+            }
+        }
+    });
+    $(document).on('change', '.class-drop-down', function () {
+        $('#btn-print-summary').hide();
+        var id = $(this).val();
+        if (id != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+    $(document).on('change', '.class-teacher-drop-down', function () {
+        $('#btn-print-summary').hide();
+        var classId = $(this).val();
+        var userId = $('#hfUserId').val();
+        if (classId != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadTeacherDivision?id=' + classId + '&userid=' + userId,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+
+    $(document).on('click', '#btn-save-attendance', function () {
+        var id = $(this).attr('data-id');  //THE FOLLOWING COMMENDED LINES ARE FOR THE CONFIRMATION FOR SENT SMS TO PARENT. NOW SATLUJ NOT WANTS THIS, IN FUTURE THEY MAY NEED THIS ,SO DON'T DELETE THESE COMMENDED LINES
+        //        swal({
+        //            title: "Are you sure?",
+        //            text: "SMS will sent to parents of absent students!",
+        //            type: "warning",
+        //            showCancelButton: true,
+        //            confirmButtonColor: "#DD6B55",
+        //            confirmButtonText: "Yes",
+        //            cancelButtonText: "No",
+        //            closeOnConfirm: true,
+        //            closeOnCancel: true
+        //        },
+        //function (isConfirm) {
+        //    var confirm = false;
+        //    if (isConfirm) {
+        //        confirm = true;
+        //    }
+        var item = new Object();
+        item.classId = $("#hfClassId").val();
+        item.divisionId = $("#hfDivisionId").val();
+        item.attendanceDate = $('#hfAttendanceDate').val();
+        item.shiftStatus = $("#hfShiftStatus").val();
+        //item.IsSendSMS = confirm;
+        item.IsSendSMS = false;
+        item.studentList = [];
+        $(".checkboxAttendance").each(function () {
+            var studentObj = new Object();
+            studentObj.studentId = $(this).attr('data-studentId');
+            studentObj.attendaneStatus = $(this).attr('data-status');
+            item.studentList.push(studentObj);
+        });
+        console.log(JSON.stringify(item));
+        $.post("/Teacher/Attendance/", item, function (result) {
+            console.log(JSON.stringify(result))
+            if (result.status) {
+                if (result.status) {
+                    $('#btn-save-attendance').addClass('isHidden');
+                    $('.select-box-all').addClass('isDisabled');
+                    toastrSuccess(result.msg);
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+        //});
+    });
+
+    $("#btn-sa00000000000000ve-attendance").click(function () {
+        var item = new Object();
+        item.classId = $("#hfClassId").val();
+        item.divisionId = $("#hfDivisionId").val();
+        item.attendanceDate = $('#hfAttendanceDate').val();
+        item.shiftStatus = $("#hfShiftStatus").val();
+        //item.FeeDetails = saveArray.toString();
+        item.studentList = [];
+        $(".checkboxAttendance").each(function () {
+            var studentObj = new Object();
+            studentObj.studentId = $(this).attr('data-studentId');
+            studentObj.attendaneStatus = $(this).attr('data-status');
+            item.studentList.push(studentObj);
+        });
+        console.log(JSON.stringify(item));
+        $.post("/Teacher/Attendance/", item, function (result) {
+            console.log(JSON.stringify(result))
+            if (result.status) {
+                if (result.status) {
+                    //toastrSuccess(result.msg);
+                    //location.reload();
+                    //printViewData();
+                    $('#btn-save-attendance').addClass('isHidden');
+                    $('.select-box-all').addClass('isDisabled');
+                    toastrSuccess(result.msg);
+                    //showNewPageForPrint(result.serialNo);
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+    });
+
+
+    function sumTotal() {
+        //alert($(this).html());
+        var stdCount = $('#hfStdCount').val();
+        var tot = 0;
+        $('.checkboxAttendance').each(function () {
+            if ($(this).prop("checked")) {
+                tot++;
+            }
+        });
+        console.log(tot);
+        var pres = parseFloat(stdCount) - parseFloat(tot);
+        $('#strength-atnd').html(pres + '/' + stdCount);
+    }
+
+
+
+    $(document).on('change', '#division-drop-down', function () {
+        $('#spn-error-Division').hide();
+    });
+    $(document).on('change', '#section-drop-down', function () {
+        $('#spn-error-Section').hide();
+    });
+
+
+
+    $(document).on('click', '#btn-print-summary', function () {
+        var date = $('.attendance-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var today = mm + '-' + dd + '-' + yyyy;
+        var section = $('#section-drop-down').val();
+        var classId = $('#classId').val();
+        var divisionId = $('#division-drop-down').val();
+        if (divisionId != "") {
+            var id = today + '~' + section + '~' + classId + '~' + divisionId;
+            var link = '/Teacher/AttandanceSummaryReport/' + id;
+            window.open(link, '_blank');
+        }
+    });
+
+
+
+
+</script>

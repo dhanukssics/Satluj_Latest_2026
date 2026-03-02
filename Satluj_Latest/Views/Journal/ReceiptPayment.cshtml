@@ -1,0 +1,165 @@
+﻿@model Satluj_Latest.Models.ReceiptPaymentModel
+@{
+    ViewBag.Title = "ReceiptPayment";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var cashInHand = new Satluj_Latest.Data.School(Model.SchoolId).GetCashBookStatus(Model.StartDate, Model.EndDate);
+}
+
+<style>
+    .slash {
+        content: '/';
+    }
+
+    table, td {
+        border: 1px solid #03a9f4;
+    }
+     table, th {
+        border: 1px solid white;
+    }
+
+</style>
+<div class="row">
+    <div class="form-group col-sm-2">
+        <label>Start</label>
+        <div class="with-icon">
+            <input type="text" class="form-control receipt-payment-start-date date-receipt-payment" data-date-end-date="0d" value="@Model.StartDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+
+    <div class="form-group col-sm-2">
+        <label>End</label>
+        <div class="with-icon">
+            <input type="text" class="form-control receipt-payment-end-date date-receipt-payment" data-date-end-date="0d" value="@Model.EndDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+    <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+        <button type="button" class="btn btn-sm btn-info btn-search" id="searchReceiptPaymentData">Search</button>
+    </div>
+</div>
+<div class="row">
+    <div class="form-group text-center">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+        <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+    </div>
+</div>
+
+<div id="print-trial-bal">
+    <h3 style="text-align:center;">Receipt & Payment</h3><h5 style="text-align:center;" id="datecheck"></h5>
+    <table class="table custome-table" id="receipt-payment-table-id"></table>
+
+    @*<div id="space-ReceiptPaymentAmout">
+    </div>*@
+   <div style="text-align:right;">
+    <div class="table custome-table" id="receipt-payment-bank-table-id"></div>
+</div>
+</div>
+
+<script>
+    $('.date-receipt-payment').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).on('click', '#searchReceiptPaymentData', function () {
+        BankStatementWithDate();
+        BankAmounts();
+    });
+    $(document).ready(function () {
+        BankStatementWithDate();
+        BankAmounts();
+    });
+    function BankStatementWithDate() {
+        //debugger;
+        var date = $('.receipt-payment-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+        date = $('.receipt-payment-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        $.ajax({
+            url: '/Journal/SearchReceiptPaymentData/' + start + '~' + end,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#receipt-payment-table-id').html('');
+                $('#receipt-payment-table-id').html(data);
+                var ss = $('.receipt-payment-start-date').val() + " to " + $('.receipt-payment-end-date').val();
+                $('#datecheck').text(ss);
+                //ReceiptPaymentAmout();
+            }
+        });
+    }
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Journal/ReceiptPayment';
+    }
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var head = "Receipt and Payment as on " + $('#StartDate').val() + " to " + $('#EndDate').val();
+        $("#receipt-payment-table-id").table2excel({
+            name: "Table2Excel",
+            filename: head,
+            fileext: ".xls"
+        });
+    });
+
+    function BankAmounts() {
+        var date = $('.receipt-payment-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+        date = $('.receipt-payment-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        $.ajax({
+            url: '/Journal/SearchReceiptPaymentBankData/' + start + '~' + end,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#receipt-payment-bank-table-id').html('');
+                $('#receipt-payment-bank-table-id').html(data);
+            }
+        });
+    }
+    function ReceiptPaymentAmout() {
+        var date = $('.receipt-payment-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+        date = $('.receipt-payment-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        $.ajax({
+            url: '/Journal/ReceiptPaymentAmount/' + start + '~' + end,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#space-ReceiptPaymentAmout').html('');
+                $('#space-ReceiptPaymentAmout').html(data);
+            }
+        });
+    }
+</script>

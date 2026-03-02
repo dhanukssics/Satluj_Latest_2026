@@ -1,0 +1,59 @@
+﻿
+
+@model Satluj_Latest.Models.VProgressCardList
+@{
+    // var studentList = new Satluj_Latest.Data.School(Model.SchoolId).Listing_V_ClassStudents(Model.DivisionId).ToList();
+    var data = Model.TempMo1;
+
+}
+<div class="table-responsive">
+    <table class="table custome-table">
+        <thead>
+            <tr>
+                <th style="width:100%;">
+                    Students
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @if (data.Count > 0)
+            {
+                foreach (var a1 in data)
+                {
+                    // var studentId = a1.StudentId.ToString();
+                    <tr>
+                        <td data-id="@a1.studentId" style="width:75%;">
+                            @a1.studentName
+                        </td>
+                        @*<td>
+                                <input type="text" id="@a1.studentId" value="" style="height:30px;"/>
+                            </td>*@
+                        <td>
+                            @*<a href="/SpecialClass/VProgressCard_others/@a1.studentId" target="_blank" class="btn pay-now-btn " data-toggle="model" style="margin-left: 63px;" id="btn-student-Generate">Generate</a>*@
+                            <a href="" target="_blank" class="btn pay-now-btn Generate-Report" data-toggle="model" style="margin-left: 63px;" id="@a1.studentId">Generate</a>
+
+                        </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+<script>
+    // $(".Generate-Report").click(function () {
+    $(document).on('click', '.Generate-Report', function () {
+
+        //StartDateString
+        //var Id_St = $("#StartDateString").attr("id");
+        var Id_St = $(this).attr("id");
+        var dates = $("#StartDateString").val();
+        var ids = Id_St + '~' + dates;
+        window.open("/SpecialClass/VProgressCard_ONE_FOUR?ids=" + ids);
+
+    })
+</script>

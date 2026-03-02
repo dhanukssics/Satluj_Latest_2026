@@ -1,0 +1,222 @@
+﻿@model Satluj_Latest.Models.BankEntryModel
+
+<style>
+    .dev_design {
+        float: left;
+        width: 100%;
+        padding-bottom: 0 !important;
+    }
+</style>
+
+<form id="form-login"
+      asp-controller="SchoolAccount"
+      asp-action="EditBankEntry"
+      method="post">
+
+    <input type="hidden" asp-for="BankDataId" id="edit-bankData-id" />
+
+    <div class="col-md-6">
+
+        <!-- Bank Name -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Bank Name</label>
+            </div>
+            <div class="col-md-9">
+                <select asp-for="BankId"
+                        asp-items="ViewBag.Banklist"
+                        class="form-control accHead-drop-down"
+                        id="day-bank-Name-id"
+                        disabled>
+                </select>
+
+                <input type="hidden" asp-for="BankId" />
+
+                <span asp-validation-for="BankId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Type -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Type</label>
+            </div>
+            <div class="col-md-5">
+                <select asp-for="TypeId"
+                        asp-items="Html.GetEnumSelectList<AccountType>()"
+                        class="form-control pv_bank-type"
+                        id="book-entry-type-id"
+                        disabled>
+                </select>
+
+                <input type="hidden" asp-for="TypeId" />
+
+                <span asp-validation-for="TypeId" class="text-danger"></span>
+            </div>
+            <div class="col-md-4" id="chkDiv">
+                @Html.CheckBoxFor(
+                                m => m.CashTransaction,
+                                new { id = "cash-check-id", @disabled = "disabled" })
+                <span>Cash</span>
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Date</label>
+            </div>
+            <div class="col-md-9 calendar-inp pos_icon_adj">
+                <input asp-for="EntryDateString"
+                       class="form-control date-bankEntry-add-date display-currentDate"
+                       readonly />
+                @Html.ValidationMessageFor(m => m.EntryDateString)
+            </div>
+        </div>
+
+        <!-- Voucher No -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Voucher No</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="VoucherNo"
+                       class="form-control"
+                       readonly
+                       autocomplete="off"
+                       placeholder="Voucher No" />
+                @Html.ValidationMessageFor(m => m.VoucherNo)
+            </div>
+        </div>
+
+        <!-- Account Head -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Account Head</label>
+            </div>
+            <div class="col-md-9">
+                <select asp-for="HeadId"
+                        asp-items="ViewBag.Accountheadlist"
+                        class="form-control accHead-drop-down_Edit"
+                        id="day-book-head-id">
+                    <option value="">--Choose--</option>
+                </select>
+
+                <span asp-validation-for="HeadId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Sub Ledger -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>SubLedger</label>
+            </div>
+
+            <div class="col-md-9 isHidden" id="sub-view-through-head">
+                <select asp-for="SubLedgerId"
+                        asp-items="@(new SelectList(
+                                    new[] { new { value = 0, text = "--select division--" } },
+                                    "value",
+                                    "text"))"
+                        class="form-control"
+                        id="SubLedgerId_Edit"
+                        disabled>
+                </select>
+
+                <input type="hidden" asp-for="SubLedgerId" />
+
+                <span asp-validation-for="SubLedgerId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-9" id="sub-view-through-search">
+                <input asp-for="SubLedgerData"
+                       class="form-control"
+                       readonly
+                       id="default-selected-subledger" />
+            </div>
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Amount</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="Amount"
+                       class="form-control"
+                       readonly
+                       id="bank-book-current-balance-check" />
+                <span id="spn-error-current-balance-check" style="color:red;"></span>
+                @Html.ValidationMessageFor(m => m.Amount)
+            </div>
+        </div>
+
+        <!-- Narration -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Narration</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="Narration"
+                       class="form-control"
+                       autocomplete="off"
+                       placeholder="Narration" />
+            </div>
+        </div>
+
+        <!-- Cheque -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Cheque No</label>
+            </div>
+            <div class="col-md-5">
+                <input asp-for="ChequeNo"
+                       class="form-control"
+                       id="book-entry-ChequeNo-id"
+                       placeholder="Cheque No" />
+                <span id="spn-error-ChequeNo" style="color:red;"></span>
+            </div>
+            <div class="col-md-4">
+                <select asp-for="PaymentModeId"
+                        asp-items="Html.GetEnumSelectList<PaymentMode>()"
+                        class="form-control pv_bank-type"
+                        id="book-entry-mode-id"
+                        disabled>
+                </select>
+
+                <input type="hidden" asp-for="PaymentModeId" />
+
+                <span asp-validation-for="PaymentModeId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Cheque Date -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Cheque Date</label>
+            </div>
+            <div class="col-md-9 calendar-inp pos_icon_adj">
+                <input asp-for="ChequeDateString"
+                       class="form-control date-bankEntry-add-date display-currentDate"
+                       readonly />
+                @Html.ValidationMessageFor(m => m.ChequeDateString)
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="modal-footer">
+                <button type="button" id="btn-edit-cancel-bankbook" class="btn pay-now-btn">
+                    Cancel
+                </button>
+                <button type="submit" id="btn-edit-save-bankbook" class="btn pay-now-btn">
+                    Edit
+                </button>
+                <button type="button" id="btn-bankbook-Clear-Feild" class="btn" style="background:#898e98;">
+                    Clear
+                </button>
+            </div>
+        </div>
+
+    </div>
+</form>

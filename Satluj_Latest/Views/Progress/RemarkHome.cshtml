@@ -1,0 +1,155 @@
+﻿@model Satluj_Latest.Models.RemarkModel
+
+@{
+    ViewData["Title"] = "Remark";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    .dev-adj-style {
+        padding: 3%;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h4>Remark</h4>
+
+        <div id="div-account-head">
+            <form id="form-add-exam"
+                  asp-action="SubmitAddRemark"
+                  asp-controller="Progress"
+                  method="post">
+
+                <div class="row">
+                    <div id="new-account-div">
+                        <div class="form-group">
+                            <div class="col-lg-12">
+                                <br />
+
+                                <input asp-for="Remark"
+                                       class="form-control"
+                                       placeholder="Remark"
+                                       autocomplete="off" />
+
+                                <span asp-validation-for="Remark" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn pay-now-btn" id="btn-Subject">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Remark List</h4>
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-remark-list">
+                <partial name="~/Views/Progress/_pv_RemarkList.cshtml" model="Model" />
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalRemarkEdit" tabindex="-1" role="dialog"></div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $("#form-add-exam").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: "POST",
+                data: $(this).serialize(),
+                success: AddRemarkSuccess,
+                error: AddRemarkFailed
+            });
+        });
+
+        function AddRemarkSuccess(result) {
+            if (result.status === true) {
+                toastrSuccess(result.msg);
+                $('#Remark').val('');
+                RefreshList();
+            } else {
+                toastrError(result.msg);
+                $('#Remark').val('');
+            }
+        }
+
+        function AddRemarkFailed() {
+            toastrError('Failed!');
+            $('#Remark').val('');
+        }
+
+        function RefreshList() {
+            $('#modalRemarkEdit').modal('hide');
+
+            $.ajax({
+                url: '/Progress/GetRemarkList',
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $("#table-remark-list").DataTable().destroy();
+                    $('#table-remark-list').html(data);
+                    $("#table-remark-list").DataTable();
+                }
+            });
+        }
+
+        $(function () {
+            $("#table-remark-list").DataTable();
+        });
+
+        $(document).on('click', '.delete-remark-tr', function () {
+            var source = $(this);
+
+            swal({
+                title: "Are you sure?",
+                text: "You will not be able to undo this!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: '/Progress/DeleteRemark/' + $(source).data('remarkid'),
+                        type: "GET",
+                        success: function (data) {
+                            if (data.status) {
+                                toastrSuccess(data.msg);
+                                RefreshList();
+                            } else {
+                                toastrError(data.msg);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        $(document).on('click', '.edit-remark-tr', function () {
+            var source = $(this);
+
+            $.ajax({
+                url: '/Progress/RemarkEditPartial/' + $(source).data('remarkid'),
+                type: "GET",
+                success: function (data) {
+                    $('#modalRemarkEdit').html(data);
+                    $.validator.unobtrusive.parse("#modalRemarkEdit");
+                    $('#modalRemarkEdit').modal('show');
+                }
+            });
+        });
+    </script>
+}

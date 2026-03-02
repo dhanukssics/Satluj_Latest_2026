@@ -1,0 +1,385 @@
+﻿@model Satluj_Latest.Models.SchoolModelForId
+@{
+    ViewBag.Title = "Messages";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var schoolDataModel = new Satluj_Latest.PostModel.SchoolClassListPostModel();
+    schoolDataModel.schoolId = Convert.ToString(Model.SchoolId);
+    var DataResult = new Satluj_Latest.Repository.SchoolRepository().GetAllStaffData(schoolDataModel);
+
+}
+<style>
+    .popup-btn {
+        margin-top: 10px;
+        margin: auto;
+        display: block;
+    }
+
+    .toggleable-div {
+        margin-bottom: 10px;
+    }
+
+    .toggle-heading {
+        background: #03a9f4;
+        color: #fff;
+        padding: 5px 15px;
+    }
+
+        .toggle-heading i {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+    .toggle-body {
+        background: #ccc;
+        padding: 15px;
+        display: none;
+        float: left;
+        width: 100%;
+    }
+
+        .toggle-body ul {
+            padding: 0;
+        }
+
+            .toggle-body ul li {
+                display: block;
+                float: left;
+                margin-right: 30px;
+                width: 22%;
+                margin-bottom: 10px;
+            }
+
+    .sub-menu ul li > a > i {
+        font-size: 9px !important;
+    }
+
+    .toggle-body ul li input[type=checkbox] {
+        margin-right: 5px;
+        margin-top: 7px;
+        float: left;
+    }
+
+    .toggle-body ul li span {
+        float: left;
+    }
+</style>
+<h1>SEND STAFF SMS</h1>
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="toggleable-div">
+            <div class="toggle-heading">
+                <input type="checkbox" class="check-all" />
+                <span>Select all</span>
+            </div><!-- ./toggle-heading -->
+        </div><!-- ./toggleable-div -->
+        @foreach (var div in DataResult.Item3)
+        {
+            <div class="toggleable-div">
+                <div class="maindiv">
+                    <div class="toggle-heading">
+                        <input type="checkbox" class="checklist-sub" />
+                        <span>
+                            @div.TypeName
+                        </span>
+                        <i class="fa fa-caret-down pull-right"></i>
+                    </div>
+                    <!-- ./toggle-heading -->
+                    <div class="toggle-body">
+                        <ul>
+                            @if (div.MemberList.Count > 0)
+                            {
+                                foreach (var member in div.MemberList)
+                                {
+                                    if (member.ContactNumber != null)
+                                    {
+                                        <li><input type="checkbox" class="chk" value="@member.ContactNumber" name="chkphone" data-id="@member.MemberId" data-typeData="@div.MemberType"/><span>@member.MemmberName</span></li>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <li><span>No data found</span></li>
+                            }
+                        </ul>
+                    </div><!-- ./toggle-body -->
+                </div>
+            </div><!-- ./toggleable-div -->
+        }
+    </div>
+</div><!-- ./row -->
+<!-- Trigger the modal with a button -->
+<button type="button" class="btn btn-info btn-lg" id="btn-send">SEND MESSAGE</button>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Message</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-dev"
+                      asp-controller="School"
+                      asp-action="SMSStaff"
+                      method="post">
+
+                    <input type="hidden" asp-for="Data" />
+                    <input type="hidden" asp-for="MessageSentPerStudent" />
+
+                    <div class="form-group">
+                        <textarea rows="4"
+                                  cols="50"
+                                  class="form-control"
+                                  style="margin-bottom:15px;"
+                                  id="txt-message"></textarea>
+
+                        <h4>Character Count</h4>
+                        <span class="spn-char-count"></span>
+
+                        <h4>Message Count</h4>
+                        <span class="spn-msg-count"></span>
+
+                        <button type="button"
+                                class="btn btn-primary popup-btn"
+                                id="btn-submit-msg">
+                            Send
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary popup-btn"
+                                id="btn-submit-msg-dummy"
+                                style="display:none">
+                        </button>
+                    </div>
+                </form>
+
+        </div>
+
+    </div>
+</div>
+<script>
+
+        $('#btn-submit-msg').on('click', function () {
+            $('#btn-submit-msg-dummy').click();
+        });
+
+        $('#form-dev').on('submit', function (e) {
+            e.preventDefault();
+
+            // set message value if required
+            // $('#Data').val($('#txt-message').val());
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (result) {
+                    AddMsgSuccess(result);
+                },
+                error: function () {
+                    ajaxFailure();
+                }
+            });
+        });
+    
+
+    var chkArray = [];
+    var staffArray = [];
+    var item = new Object();
+    var list = [];
+    var newitem = new Object();
+    newitem.List = [];
+
+    $(document).on('keyup', '#txt-mesage', function () {
+        $("#btn-submit-msg").removeClass('isDisabled');
+        var messagecount = 0;
+        var charcount = $("#txt-mesage").val().length;
+        var s = charcount / 160;
+        $('.spn-char-count').text(charcount)
+        var dec = (s - Math.floor(s));
+        if (dec > 0) {
+            if (charcount != 0) {
+                messagecount = parseInt(s) + 1;
+                $('.spn-msg-count').text(messagecount)
+            }
+            else {
+                $('.spn-msg-count').text('');
+            }
+        }
+        $('#MessageSentPerStudent').val(messagecount)
+    });
+
+    function AddMsgSuccess(result) {
+
+        if (result.statusFail == "0") {
+            //console.log(result.list)
+            chkArray = [];
+            newitem.List = [];
+            staffArray = [];
+            list = [];
+            toastrSuccess("Success");
+            $('#myModal').modal('hide');
+        }
+        else if (result.statusFail == "1")
+        {
+            toastrError(result.message);
+            swal({
+                title: "Please Note",
+                text: result.message,
+                type: "warning",
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Ok",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            });
+            chkArray = [];
+            newitem.List = [];
+            staffArray = [];
+            list = [];
+            $('#myModal').modal('hide');
+        }
+        else if (result.statusFail == "2") {
+            toastrError(result.message);
+            swal({
+                title: "Please Note",
+                text: result.message,
+                type: "warning",
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Ok",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            });
+            chkArray = [];
+            newitem.List = [];
+            staffArray = [];
+            list = [];
+            $('#myModal').modal('hide');
+        }
+        else if (result.statusFail == "3") {
+            toastrError(result.message);
+            swal({
+                title: "Please Note",
+                text: result.message,
+                type: "warning",
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Ok",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            });
+            chkArray = [];
+            newitem.List = [];
+            staffArray = [];
+            list = [];
+            $('#myModal').modal('hide');
+        }
+        else {
+            toastrError(result.msg);
+        }
+
+    }
+    $(document).on('click', '#btn-send', function () {
+        newitem.List = [];
+        list = [];
+        chkArray = [];
+        $('.spn-char-count').text('');
+        $('.spn-msg-count').text('');
+        $('#txt-mesage').val('');
+        $(".chk:checked").each(function () {
+            var ob = new Object();
+            var StaffId = $(this).attr('data-id');
+            staffArray.push(StaffId);
+            chkArray.push(($(this).val()));
+            ob.Number = $(this).val();
+            ob.StaffId = StaffId;
+            ob.Type = $(this).attr('data-typeData');
+            newitem.List.push(ob);
+            console.log($(this).val())
+        });
+        list.push(newitem)
+
+        if (chkArray.length > 0) {
+            $('#myModal').modal('show');
+            $('#txt-mesage').val('');
+            $('.spn-char-count').text('')
+            $('.spn-msg-count').text('')
+        }
+        else {
+            toastr.warning("Please select")
+        }
+    });
+
+    $('.toggle-heading i').click(function () {
+        $(this).parent().siblings().toggle();
+    });
+    $(document).on('click', '#btn-submit-msg', function () {
+    $("#btn-submit-msg").addClass('isDisabled');
+        var message = $('#txt-mesage').val();
+        newitem.Description = $('#txt-mesage').val();
+        if (chkArray.length > 0) {
+            item.Description = $('#txt-mesage').val();
+            item.Numbers = chkArray.toString();
+            item.StaffId = staffArray.toString();
+            newitem.Phone = chkArray.toString();
+            $('#Data').val(JSON.stringify(list));
+            console.log($('#Data').val());
+            $("#btn-submit-msg-dummy").trigger('click');
+            //$.post("/School/SMS/", newitem, function (result) {
+            //    if (result.message = "success") {
+            //        $('#myModal').modal('hide');
+            //        toastrSuccess("Success");
+            //    }
+            //    else {
+            //        toastrError(result.msg);
+            //    }
+            //});
+        }
+    });
+
+    //select all checkboxes
+    $(".check-all").change(function () {  //"select all" change
+        $("[type=checkbox]").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
+    });
+    //checklist-sub selection
+
+    $(".checklist-sub").change(function () {
+
+        var source = $(this).parent();
+        source.parent().children().eq(1).find('.chk').prop('checked', true);
+
+
+
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            source.parent().children().eq(1).find('.chk').prop('checked', false); //change "select all" checked status to false
+        }
+        ////check "select all" if all checkbox items are checked
+        //if ($('[type=checkbox]:checked').length == $('[type=checkbox]').length) {
+        //    $(".check-all").prop('checked', true);
+        //}
+    });
+    $(".chk").change(function () {
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            console.log($(this).parent().parent().parent().parent().find('.checklist-sub'))
+            var source = $(this).parent().parent().parent().parent();
+            source.find('.checklist-sub').prop('checked', false); //change "select all" checked status to false
+        }
+    });
+    //".checkbox" change
+    $('[type=checkbox]').change(function () {
+        //uncheck "select all", if one of the listed checkbox item is unchecked
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            $(".check-all").prop('checked', false); //change "select all" checked status to false
+            chkArray = [];
+        }
+        //check "select all" if all checkbox items are checked
+        if ($('[type=checkbox]:checked').length == $('[type=checkbox]').length) {
+            $(".check-all").prop('checked', true);
+        }
+    });
+</script>

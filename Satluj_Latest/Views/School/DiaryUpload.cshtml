@@ -1,0 +1,309 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    ViewBag.Title = "Staff List";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var school = new Satluj_Latest.Data.School(Model.schoolId);
+    var logo = school.FilePath;
+    var diary = school.GetSchoolDiaryLink();
+}
+
+
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="col-md-12" style="margin-bottom: 55px;">
+        <h3>Diary</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+
+            </div>
+        </div>
+
+
+        @if (diary == null)
+        {
+            <div class="add-file">
+
+                <div class="form-group">
+                    <span class="col-md-12">
+                        <label class="cust-label">upload</label>
+                        <input type="file" id="fileData" class="upload-file upload-clean-Formats-dev" />
+
+                    </span>
+                </div>
+                <div class="form-group">
+                    <span class="col-md-12" style="float: left; margin-top:15px;">
+                        @*  <input type="button" class="add-form-btn" value="Send Test Mail" />*@
+                        <button type="button" class="btn pay-now-btn bt-upload">Add </button>
+                    </span>
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="content-diary">
+                <a href="..@diary.FilePath" target="_blank" id="link-upload" style="margin-right:20px">Click Here To View Pdf</a>
+                <button class="btn-edit-file pay-now-btn"><i class="fa fa-edit"></i></button>
+            </div>
+            <div class="edit-file isHidden">
+                <div class="form-group">
+                    <span class="col-md-12">
+                        <label class="cust-label">upload</label>
+                        <input type="file" id="fileData" class="upload-file upload-clean-Formats-dev" />
+                    </span>
+                </div>
+                <div class="form-group">
+                    <span class="col-md-12" style="float: left; margin-top:15px;">
+                        @*  <input type="button" class="add-form-btn" value="Send Test Mail" />*@
+                        <button type="button" class="btn btn-default btn-cancel" style="margin-right:10px">Cancel </button>
+
+                        <button type="button" class="btn pay-now-btn bt-edit-upload">Edit </button>
+
+                    </span>
+                </div>
+
+            </div>
+        }
+  
+
+        <div class="table-responsive">
+
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Logo</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+
+            </div>
+        </div>
+
+
+        @if (logo == null)
+        {
+            <div class="add-file">
+
+                <div class="form-group">
+                    <span class="col-md-12">
+                        <label class="cust-label">upload</label>
+                        <input type="file" id="fileDataLogo" class="upload-file upload-clean-Formats-dev-Logo" />
+
+                    </span>
+                </div>
+                <div class="form-group">
+                    <span class="col-md-12" style="float: left; margin-top:15px;">
+                        @*  <input type="button" class="add-form-btn" value="Send Test Mail" />*@
+                        <button type="button" class="btn pay-now-btn bt-upload-Logo">Add </button>
+                    </span>
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="content-logo">
+                <a href="..@logo" target="_blank" id="link-upload-logo" style="margin-right:20px">Click Here To View Logo</a>
+                <button class="btn-edit-file-logo pay-now-btn"><i class="fa fa-edit"></i></button>
+            </div>
+            <div class="edit-file-logo isHidden">
+                <div class="form-group">
+                    <span class="col-md-12">
+                        <label class="cust-label">upload</label>
+                        <input type="file" id="fileData" class="upload-file upload-clean-Formats-dev" />
+                    </span>
+                </div>
+                <div class="form-group">
+                    <span class="col-md-12" style="float: left; margin-top:15px;">
+                        @*  <input type="button" class="add-form-btn" value="Send Test Mail" />*@
+                        <button type="button" class="btn btn-default btn-cancel-logo" style="margin-right:10px">Cancel </button>
+
+                        <button type="button" class="btn pay-now-btn bt-edit-upload-logo">Edit </button>
+
+                    </span>
+                </div>
+
+            </div>
+        }
+        <div class="table-responsive">
+
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+
+
+<script>
+
+    //$(document).on('click', '.ng-teacherDetails-click', function () {
+
+    //    window.location = '/School/TeacherDetails/' + $(this).attr('data-teacherid');
+    //});
+
+    $(function () {
+        $("#table-staff-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $("#table-staff-list").dataTable().fnDestroy()
+        $("#table-staff-list").dataTable();
+    }
+    var dataaa = "";
+    var dataLogo = "";
+    $(document).on('change', '.upload-clean-Formats-dev', function () {
+        //debugger;
+        var source = $(this);
+        var userId = $('#UserId').val();
+        var formData = new FormData();
+        dataaa = this.files[0];
+    });
+    $(document).on('change', '.upload-clean-Formats-dev-Logo', function () {
+        //debugger;
+        var source = $(this);
+        var userId = $('#UserId').val();
+        var formData = new FormData();
+        dataLogo = this.files[0];
+    });
+    $(document).on('click', '.bt-upload', function () {
+        var formData = new FormData();
+        formData.append("documentFile", dataaa);
+        $.ajax({
+            type: "POST",
+            url: "/School/DiaryUploadPDF",
+            dataType: 'json',
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function (xhr) {
+            },
+            success: function (response) {
+                if (response.status) {
+                    var data = response.UserData;
+                    location.reload();
+                }
+                else {
+                    toastrError('No such Files!');
+                }
+            },
+            error: function (data) {
+            }
+        });
+    });
+    $(document).on('click', '.bt-upload-Logo', function () {
+        var formData = new FormData();
+        formData.append("documentFile", dataLogo);
+        $.ajax({
+            type: "POST",
+            url: "/School/LogoUpload",
+            dataType: 'json',
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function (xhr) {
+            },
+            success: function (response) {
+                if (response.status) {
+                    var data = response.UserData;
+                    location.reload();
+                }
+                else {
+                    toastrError('No such Files!');
+                }
+            },
+            error: function (data) {
+            }
+        });
+    });
+    $(document).on('click', '.bt-edit-upload', function () {
+        var formData = new FormData();
+        formData.append("documentFile", dataaa);
+        $.ajax({
+            type: "POST",
+            url: "/School/DiaryUploadPDFEdit",
+            dataType: 'json',
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function (xhr) {
+            },
+            success: function (response) {
+                if (response.status) {
+                    var url = ".."+response.url;
+                    $('#link-upload').attr("href", url);
+                    $('.edit-file').addClass('isHidden');
+                    $('.content-diary').removeClass('isHidden');
+                }
+                else {
+                    toastrError('No such Files!');
+                }
+            },
+            error: function (data) {
+            }
+        });
+
+    });
+
+    $(document).on('click', '.bt-edit-upload-logo', function () {
+        var formData = new FormData();
+        formData.append("documentFile", dataaa);
+        $.ajax({
+            type: "POST",
+            url: "/School/LogoUploadEdit",
+            dataType: 'json',
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function (xhr) {
+            },
+            success: function (response) {
+                if (response.status) {
+                    var url = ".." + response.url;
+                    $('#link-upload-logo').attr("href", url);
+                    $('.edit-file-logo').addClass('isHidden');
+                    $('.content-logo').removeClass('isHidden');
+                }
+                else {
+                    toastrError('No such Files!');
+                }
+            },
+            error: function (data) {
+            }
+        });
+
+    });
+    $(document).on('click', '.btn-edit-file', function () {
+        $('.content-diary').addClass('isHidden');
+        $('.edit-file').removeClass('isHidden');
+    });
+
+    $(document).on('click', '.btn-edit-file-logo', function () {
+        $('.content-logo').addClass('isHidden');
+        $('.edit-file-logo').removeClass('isHidden');
+    });
+
+    $(document).on('click', '.btn-cancel', function () {
+        $('.edit-file').addClass('isHidden');
+        $('.content-diary').removeClass('isHidden');
+    });
+    $(document).on('click', '.btn-cancel-logo', function () {
+        $('.edit-file-logo').addClass('isHidden');
+        $('.content-logo').removeClass('isHidden');
+    });
+
+</script>

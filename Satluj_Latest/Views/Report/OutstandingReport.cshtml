@@ -1,0 +1,230 @@
+﻿@model Satluj_Latest.Models.OutstandingReportModel
+@{
+    ViewBag.Title = "StudentMarks";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+@Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Class : </label>
+                    <br />
+                    <select asp-for="ClassId"
+                            asp-items="ViewBag.getclasses"
+                            class="form-control slct-mark-dropdwn1"
+                            data-live-search="true"
+                            style="display:inline-block; width:100%;min-width:180px;">
+                        <option value="">All</option>
+                    </select>
+
+                    <span asp-validation-for="ClassId" class="text-danger"></span>
+
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Division :</label>
+                    <select class="form-control slct-free-div-dropdown" disabled></select>
+                    <span id="division-required-exam-add" style="display:none; color:red;"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Fees : </label>
+                    <br />
+                    <select asp-for="FeeId"
+                            asp-items="ViewBag.fees"
+                            class="form-control slct-fee-dropdwn1"
+                            data-live-search="true"
+                            style="display:inline-block; width:100%;min-width:180px;">
+                        <option value="">All</option>
+                    </select>
+
+                    <span asp-validation-for="FeeId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3" style="margin-top: 26px;">
+                <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+                <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+             </div>
+        </div>
+        <div class="table-responsive">
+            <div class="col-md-12" id="print-trial-bal">
+                <h3 style="text-align:center;">Outstanding Report</h3><h5 style="text-align:center;"></h5>
+                <table class="table custome-table" id="outstanding-report-list">
+                 
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+        <script>
+           
+
+            $(document).ready(function () {
+                start();
+            });
+
+            $(document).on('change', '.slct-mark-dropdwn1', function () {
+                //debugger;
+                $('#ClassId').val($(this).val());
+                var id = $(this).val();
+                if (id != '') {
+                    $.ajax({
+                        url: '/Data/LoadAllSchoolDivision?id=' + id + '&schoolid=' + $('#SchoolId').val(),
+                        type: "GET",
+                        success: function (result) {
+                            //debugger;
+                            if (result.list.length > 0) {
+                                $(".slct-free-div-dropdown").html("");
+                                $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                                $.each(result.list, function (i, item) {
+                                    $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                                });
+                                $(".slct-free-div-dropdown").prop("disabled", false);
+                                    ListAllData();
+                            }
+                            else {
+                                $(".slct-free-div-dropdown").html("");
+                                $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- No Division Found --'));
+                                $(".slct-free-div-dropdown").prop("disabled", true);
+                                $('#DivisionId').val("0");
+                                ListAllData();
+                            }
+                        }
+                    });
+                }
+                else {
+                    $(".slct-free-div-dropdown").html("");
+                    $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                    $(".slct-free-div-dropdown").prop("disabled", true);
+                    start();
+                }
+            });
+
+            //--------------------------------------------------------------------
+
+            $(document).on('change', '.slct-free-div-dropdown', function () {
+                //debugger;
+                var classId = $('#ClassId').val();
+                $('#DivisionId').val($(this).val());
+                var divisionId = $(this).val();
+                var feeId = $(".slct-fee-dropdwn1 option:selected").val();
+                if (feeId == "")
+                    feeId = 0;
+                if (classId != '' && divisionId != '') {
+                    var dataId = classId + '~' + divisionId + '~' + feeId;
+                    $.ajax({
+                        url: '/Report/DatatableOutStandingReport/' + dataId,
+                        type: "GET",
+                        dataType: 'html',
+                        success: function (data) {
+                            $('#outstanding-report-list').html(data);
+                            //$("#outstanding-report-list").dataTable();
+                        }
+                    });
+                }
+                else {
+                    var dataId = 0 + '~' + 0 + '~' + feeId;
+                    $.ajax({
+                        url: '/Report/DatatableOutStandingReport/' + dataId,
+                        type: "GET",
+                        dataType: 'html',
+                        success: function (data) {
+                            $('#outstanding-report-list').html(data);
+                            //$("#outstanding-report-list").dataTable();
+                        }
+                    });
+                }
+            });
+
+            function ListAllData() {
+                //debugger;
+                var classId = $('#ClassId').val();
+                var feeId = $(".slct-fee-dropdwn1 option:selected").val();
+                if (feeId == "")
+                    feeId = 0;
+                var dataId = classId + '~' + 0 + '~' + feeId;
+                $.ajax({
+                    url: '/Report/DatatableOutStandingReport/' + dataId,
+                    type: "GET",
+                    dataType: 'html',
+                    success: function (data) {
+                        //$("#outstanding-report-list").dataTable().fnDestroy()
+                        $('#outstanding-report-list').html(data);
+                        //$("#outstanding-report-list").dataTable();
+                    }
+                });
+            }
+             
+            function start() {
+                var dataId = 0 + '~' + 0+'~'+0;
+                $.ajax({
+                    url: '/Report/DatatableOutStandingReport/' + dataId,
+                    type: "GET",
+                    dataType: 'html',
+                    success: function (data) {
+                        $('#outstanding-report-list').html(data);
+                    }
+                });
+            }
+
+            $(document).on('change', '.slct-fee-dropdwn1', function () {
+                //debugger;
+                var classId = $('#ClassId').val();
+                $('#FeeId').val($(this).val());
+                var feeId = $(this).val();
+                var divisionId = $(".slct-free-div-dropdown option:selected").val();
+                if (divisionId == "")
+                    divisionId = 0;
+                if (classId != '' && divisionId != '') {
+                    var dataId = classId + '~' + divisionId + '~' + feeId;
+                    $.ajax({
+                        url: '/Report/DatatableOutStandingReport/' + dataId,
+                        type: "GET",
+                        dataType: 'html',
+                        success: function (data) {
+                            $('#outstanding-report-list').html(data);
+                            //$("#outstanding-report-list").dataTable();
+                        }
+                    });
+                }
+                else {
+
+                    var dataId = 0 + '~' + 0 + '~' + feeId;
+                    $.ajax({
+                        url: '/Report/DatatableOutStandingReport/' + dataId,
+                        type: "GET",
+                        dataType: 'html',
+                        success: function (data) {
+                            $('#outstanding-report-list').html(data);
+                            //$("#outstanding-report-list").dataTable();
+                        }
+                    });
+                }
+            });
+
+
+
+            function printContent(el) {
+                var restorepage = document.body.innerHTML;
+                var printcontent = document.getElementById(el).innerHTML;
+                document.body.innerHTML = printcontent;
+                window.print();
+                document.body.innerHTML = restorepage;
+                window.location.href = '/Report/OutstandingReport';
+            }
+
+            $(document).on('click', '#btn-excel-trial-bal', function () {
+                $("#outstanding-report-list").table2excel({
+                    name: "Table2Excel",
+                    filename: "Outstanding Report" ,
+                    fileext: ".xls"
+                });
+            });
+        </script>

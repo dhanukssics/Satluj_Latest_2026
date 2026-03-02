@@ -1,0 +1,93 @@
+﻿
+@model Satluj_Latest.Models.AssessmentModel
+
+
+
+
+
+
+
+
+<thead>
+    <tr>
+        <th>
+            Date
+        </th>
+
+
+        <th>
+            Subject
+        </th>
+
+        <th>
+            Teacher
+        </th>
+
+
+        <th>
+            Description
+        </th>
+
+        <th>
+            FileName
+        </th>
+
+
+
+    </tr>
+</thead>
+<tbody>
+    @{
+
+
+        int i = 1;
+        foreach (var data in new Satluj_Latest.Data.Admin().GetAssessmentMonthlyByDiv(Model.classId, Model.month, Model.year, Model.divisionId))
+        {
+
+            <tr>
+                <td>
+                    @Convert.ToDateTime(data.AttendanceDate).ToString("dddd, dd MMMM yyyy")
+                </td>
+
+                <td id="subjectId">
+                    @data.SubjectName
+                </td>
+
+                <td id="teachername">
+                    @data.TeacherName
+                </td>
+
+                <td>
+                    @data.Description
+                </td>
+
+                <td>
+                    @data.Filename &nbsp;&nbsp;&nbsp;
+
+                    @if (!String.IsNullOrEmpty(@data.Filename))
+                    {
+                        @Html.ActionLink("View", "DownloadFiles", "Parent", new { Filename = @data.Filename }, null)
+
+                       
+                        @Html.ActionLink("Upload Answer", "Uploaded_Answer", "Parent", new { id = Model.studentId }, null)
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Upload Answer", "Uploaded_Answer", "Parent", new { id = Model.studentId }, null)
+                    }
+
+
+
+                </td>
+
+
+            </tr>
+            i = i + 1;
+
+        }
+    }
+</tbody>
+
+
+
+

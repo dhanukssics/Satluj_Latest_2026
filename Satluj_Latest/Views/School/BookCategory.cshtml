@@ -1,0 +1,178 @@
+﻿@model Satluj_Latest.Models.LibraryModels
+@{
+    ViewBag.Title = "Staff List";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Book Category</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+                <div class="form-group text-right">
+                    <button class="btn pay-now-btn" id="btn-add-Category"><i class="fa fa-plus"></i> Add Category</button>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-category-list">
+                @Html.Partial("~/Views/School/_pv_BookCategory_list.cshtml", Model)
+            </table>
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+<div class="modal fade" id="modalCategoryAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+<div class="modal fade" id="modalCategoryEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+
+
+
+<script>
+
+    //$(document).on('click', '.ng-teacherDetails-click', function () {
+
+    //    window.location = '/School/TeacherDetails/' + $(this).attr('data-teacherid');
+    //});
+
+    $(function () {
+        $("#table-category-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $("#table-category-list").dataTable().fnDestroy()
+        $("#table-category-list").dataTable();
+    }
+
+    $(document).on('click', '#btn-add-Category', function () {
+
+        $.ajax({
+            url: '/School/AddCategoryView',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalCategoryAdd').html(data);
+                $.validator.unobtrusive.parse($("#modalCategoryAdd"));
+                $('#modalCategoryAdd').modal('show');
+
+            }
+        });
+
+    });
+    function RefreshCategoryGrid() {
+        $.ajax({
+            url: '/School/BookCategoryListPartial',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#table-category-list').html('');
+                $('#table-category-list').html(data);
+                IntializeDataTable();
+            }
+        });
+    }
+
+
+
+
+    function AddCategorySuccess(result) {
+
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalCategoryAdd').modal('hide');
+            RefreshCategoryGrid();
+        }
+        else {
+            $('#modalCategoryAdd').modal('hide');
+            toastrError(result.msg);
+        }
+
+    }
+
+    function EditCategorySuccess(result) {
+
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalCategoryEdit').modal('hide');
+            RefreshCategoryGrid();
+
+        }
+        else {
+            $('#modalCategoryEdit').modal('hide');
+            toastrError(result.msg);
+        }
+
+    }
+
+    $(document).on('click', '.delete-category-tr', function () {
+        var id = $(this).attr('data-id');
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/School/DeleteBookCategory/' + id,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    RefreshCategoryGrid();
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+
+    });
+
+
+    $(document).on('click', '.edit-staff-tr', function () {
+
+        var id = $(this).attr('data-id');
+
+        $.ajax({
+            url: '/School/EditCategoryView/' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalCategoryEdit').html(data);
+                $.validator.unobtrusive.parse($("#modalCategoryEdit"));
+                $('#modalCategoryEdit').modal('show');
+            }
+        });
+
+    });
+
+
+</script>

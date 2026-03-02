@@ -1,0 +1,72 @@
+﻿@{
+    var school = new Satluj_Latest.Data.Admin().GetSchoolList();
+}
+
+
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            School Name
+        </th>
+        <th>
+            Email
+        </th>
+        <th>
+            Password
+        </th>
+        <th>
+            Created On
+        </th>
+      
+        <th>
+Payment Gateway
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @if (school != null)
+    {
+        int i = 1;
+        foreach (var item in school)
+        {
+            <tr>
+                <td class="ng-teacherDetails-click">
+                    @i
+                </td>
+                <td class="ng-teacherDetails-click">
+                    @item.Name
+                </td>
+                <td class="ng-teacherDetails-click">
+                    @item.Username
+                </td>
+                <td class="ng-teacherDetails-click">
+                    @item.Password
+                </td>
+                <td class="ng-teacherDetails-click">
+                    @item.TimeStamp
+                </td>
+             
+                <td >
+                    @if (item.School.PaymentOption == true)
+                    {
+                        <button class="btn-success" id="btn-paymentoption" data-schoolId="@item.SchoolId" data-paymentStatus="1">Activated</button>
+
+                    }
+                    else
+                    {
+                        <button class="btn-danger" id="btn-paymentoption" data-schoolId="@item.SchoolId" data-paymentStatus="0">Deactivated</button>
+
+                    }
+                  
+               
+                    <button style="margin-left:10px" class="btn-success" id="btn-view-smspackage" data-schoolId="@item.SchoolId" >Sms Package</button>
+
+                </td>
+            </tr>
+            i++;
+        }
+    }
+</tbody>

@@ -1,0 +1,130 @@
+﻿@model Satluj_Latest.Models.ParentRegisterModel
+
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+    ViewData["Title"] = "Parent Registration";
+}
+
+<section class="login-body parentReg">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="login">
+
+                    <form id="login-form">
+                        <div class="login-form">
+                            <h3>Parent Registration</h3>
+
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <input asp-for="parentName"
+                                           class="form-control"
+                                           placeholder="Parent Name"
+                                           maxlength="60" />
+                                    <span asp-validation-for="parentName" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <input asp-for="email"
+                                           class="form-control"
+                                           placeholder="Email"
+                                           maxlength="60" />
+                                    <span asp-validation-for="email" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <input asp-for="password"
+                                           class="form-control"
+                                           type="password"
+                                           placeholder="Password"
+                                           maxlength="60" />
+                                    <span asp-validation-for="password" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <input asp-for="contactNo"
+                                           class="form-control"
+                                           placeholder="Contact Number"
+                                           maxlength="60" />
+                                    <span asp-validation-for="contactNo" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <input asp-for="address"
+                                           class="form-control"
+                                           placeholder="Address"
+                                           maxlength="60" />
+                                    <span asp-validation-for="address" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <input asp-for="city"
+                                           class="form-control"
+                                           placeholder="City"
+                                           maxlength="60" />
+                                    <span asp-validation-for="city" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <input asp-for="state"
+                                           class="form-control"
+                                           placeholder="State"
+                                           maxlength="60" />
+                                    <span asp-validation-for="state" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <input asp-for="postalCode"
+                                           class="form-control"
+                                           placeholder="Postal Code"
+                                           maxlength="60" />
+                                    <span asp-validation-for="postalCode" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="submit">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $('#login-form').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '@Url.Action("ParentRegister", "Account")',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (result) {
+                    RegistrationSuccess(result);
+                },
+                error: function () {
+                    toastrError("Registration failed.");
+                }
+            });
+        });
+
+        function RegistrationSuccess(result) {
+            if (result.status) {
+                toastrSuccess(result.message);
+                window.location.href = "/Parent/ParentHome";
+            } else {
+                toastrError(result.message);
+            }
+        }
+    </script>
+}

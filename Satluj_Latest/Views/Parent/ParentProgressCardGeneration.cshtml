@@ -1,0 +1,518 @@
+﻿@model Satluj_Latest.Models.StudentTerm2ProgressCardModel
+@{
+    var logo = "http://satluj.edumanonline.com" + Model.SchoolLogo;
+    var ScholasticList = new List<Satluj_Latest.Models.ScolasticAreaList>();
+    var SubjectList = new List<Satluj_Latest.Models.SubjectDetails>();
+    var CoScholasticArea = new List<Satluj_Latest.Models.CoscholasticAreaList>();
+    if (Model.IsIssued == false)
+    {
+        ScholasticList = Model.TermDataList[0].scholasticList.ToList();
+        SubjectList = ScholasticList[0].subjectList.ToList();
+        CoScholasticArea = Model.TermDataList[0].ColasticAreaResult.ToList();
+    }
+    int totalScore = 0;
+    List<int> TotalScoreOfTerms = new List<int>();
+    var count = 0;
+
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    @*<title>St Kabir Public School</title>*@
+    <title>@Model.SchoolName</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6, a, p, i, b, ul, ol, li, span, strong {
+            margin: 0;
+            padding: 0;
+        }
+
+        th, td {
+            padding: 7px 2px;
+            box-sizing: border-box;
+        }
+
+        table, thead, tbody, tr {
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    @if (Model.IsIssued == false)
+    {
+        <div style="height:30px;">
+            <button type="button" class="btn btn-success btn-style" id="btn-print" style="margin-top:20px;float:right;height: 100%; width: 6%;background-color: #7c89ad; margin-right:10px;" onclick="myFunction()">Print</button>
+        </div>
+        if (Model.IsOneTerm == true)
+        {
+            <div style="width:900px; height:auto;  margin:auto; padding:15px 0px;">
+                <!-- header -->
+                <div style="width:100%; display:flex; justify-content:space-between;">
+                    <div style="width:33.33%;">
+                        <img src="@logo" width="200" />
+                    </div>
+
+                    <div style="width:33.33%; text-align:center; margin-bottom:30px;">
+                        <h2 style="margin-bottom:12px;">@Model.SchoolName</h2>
+                        @*<h4>@Model.ReportName @Model.RegionName </h4>*@
+                        <h4>REPORT CARD </h4>
+                        <h4 style="margin-bottom:6px;">@Model.AccademicSession</h4>
+                    </div>
+
+                    <div style="width:33.33%;"></div>
+                </div>
+                <!-- ./header -->
+                <!-- Student Detail-->
+                <div style="width:100%; font-size:14px; line-height:22px;">
+                    <p><strong>Roll No.</strong> : <span>@Model.RollNo</span></p>
+                    <p><strong>Student's Name</strong> : <span>@Model.StudentName</span></p>
+                    <p><strong>Mother's/Father's/Guardian's Name</strong> : <span>@Model.FathersName / @Model.MothersName</span></p>
+                    <p><strong>Date of Birth</strong> : <span>@Model.DateOfBirth</span></p>
+                    <p><strong>Class/Section</strong> : <span>@Model.ClassDivision</span></p>
+                </div>
+                <!-- ./Student Detail-->
+                <!-- Table One -->
+                <div style="width:100%; margin-top:10px;">
+                    <table border="1" cellspacing="0" cellpadding="0" style="width:100%; border:1px solid black; border-collapse:collapse;">
+                        <thead style="text-transform:uppercase; font-size:15px;">
+                            <tr>
+                                <th rowspan="2">Subjects</th>
+                                <th colspan="6">Term I</th>
+                            </tr>
+                            <tr>
+                                @foreach (var terms in Model.TermDataList)
+                                {
+
+                                    totalScore = 0;
+                                    foreach (var item in ScholasticList)
+                                    {
+                                        if (item.TotalScore != string.Empty && item.TotalScore != "")
+                                        {
+                                            totalScore = totalScore + Convert.ToInt32(item.TotalScore);
+                                        }
+                                        <th>@item.ScolasticArea (@item.TotalScore)</th>
+                                    }
+                                    <th>Marks Obt. (@totalScore)</th>
+                                    <th>Grade</th>
+                                    TotalScoreOfTerms.Add(totalScore);
+                                }
+                            </tr>
+                        </thead>
+                        <tbody style="text-align:center; text-transform:uppercase; font-size:15px;">
+                            @foreach (var subjects in SubjectList)
+                            {
+                                count = 0;
+                                <tr>
+                                    <td align="left">@subjects.SubjectName</td>
+                                    @foreach (var terms in Model.TermDataList)
+                                    {
+                                        //---------------Mark obtained
+                                        var data = terms.scholasticList.ToList();
+                                        decimal tot = 0;
+                                        var grade = "";
+                                        foreach (var result in data)
+                                        {
+                                            var areaName = result.ScolasticArea;
+                                            var areaviseData = ((IEnumerable<dynamic>)result.subjectList).Where(X => X.SubjectName == subjects.SubjectName).FirstOrDefault();
+                                            //tot = tot + Convert.ToInt32(areaviseData.Mark);
+                                            decimal zz = Convert.ToDecimal(areaviseData.Mark);
+                                            tot = tot + zz;
+                                            <td>@areaviseData.Mark</td>
+                                        }
+                                        //-------------------------------
+                                        //-------------------Total------------
+                                        <td>@tot</td>
+                                        //-------------------Total------------
+                                        //-------------------Grade------------
+                                        var persentage = (tot / TotalScoreOfTerms[count]) * 100;
+                                        if (persentage > 90)
+                                        {
+                                            grade = "A1";
+                                        }
+                                        else if (80 < persentage && persentage < 91)
+                                        {
+                                            grade = "A2";
+                                        }
+                                        else if (70 < persentage && persentage < 81)
+                                        {
+                                            grade = "B1";
+                                        }
+                                        else if (60 < persentage && persentage < 71)
+                                        {
+                                            grade = "B2";
+                                        }
+                                        else if (50 < persentage && persentage < 61)
+                                        {
+                                            grade = "C1";
+                                        }
+                                        else if (40 < persentage && persentage < 51)
+                                        {
+                                            grade = "C2";
+                                        }
+                                        else if (32 < persentage && persentage < 41)
+                                        {
+                                            grade = "D";
+                                        }
+                                        else
+                                        {
+                                            grade = "E";
+                                        }
+                                        <td>@grade</td>
+                                        //-------------------Grade------------
+                                        count = count + 1;
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- ./Table One -->
+                <!-- Table Two -->
+                <div style="width:100%; margin-top:8px; margin-bottom:15px;">
+                    <table border="1" cellspacing="0" cellpadding="0" style="width:100%; border:1px solid black; border-collapse:collapse;  font-size:15px; table-layout: fixed;">
+                        <thead>
+                            <tr>
+                                <th align="left">Co-Scholastic Areas</th>
+                                <th>TERM I</th>
+                            </tr>
+                        </thead>
+                        <tbody style="text-align:center;">
+                            @foreach (var co in CoScholasticArea)
+                            {
+                                <tr>
+                                    <td align="left">@co.CoScholasticData</td>
+                                    @foreach (var terms in Model.TermDataList)
+                                    {
+                                        var coData = terms.ColasticAreaResult;
+                                        var results = ((IEnumerable<dynamic>)coData).Where(x => x.CoScholasticData == co.CoScholasticData).Select(x => x.CoScholasticResult).FirstOrDefault();
+                                        <td>@results</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- ./Table Two -->
+
+                <div style="width:100%; margin-top:25px;">
+                    <p style="font-size:15px; line-height:20px;"><strong>Class Teacher's remarks : </strong> <span>@Model.Remark</span></p>
+                </div>
+
+                <!-- Signature section -->
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="width:33.33%; line-height:24px;">
+                        <strong>Place:@Model.SchoolAdddress</strong>
+                        <br />
+                        <strong>Date:@Model.Today</strong>
+                    </div>
+
+                    <div style="width:33.33%; text-align:center;">
+                        <p>Signature of Class Teacher</p>
+                    </div>
+
+                    <div style="width:33.33%; text-align:right;">
+                        <p>Signature of Class Principal</p>
+                    </div>
+                </div>
+                <!-- ./Signature section -->
+                <!-- Footer table -->
+                <div style="width:100%; margin-top:20px;">
+                    <table border="1" cellspacing="0" cellpadding="0" style="width:100%; border:1px solid black; border-collapse:collapse;  font-size:15px; table-layout: fixed;">
+                        <thead>
+                            <tr style="text-transform:uppercase;">
+                                <th colspan="9">Grading System</th>
+                            </tr>
+                        </thead>
+                        <tbody style="text-align:center;">
+                            <tr>
+                                <td>GRADE</td>
+                                <td>A1</td>
+                                <td>A2</td>
+                                <td>B1</td>
+                                <td>B2</td>
+                                <td>C1</td>
+                                <td>C2</td>
+                                <td>D</td>
+                                <td>E (Needs Improvments)</td>
+                            </tr>
+                            <tr>
+                                <td>Marks Range</td>
+                                <td>(91-100)</td>
+                                <td>(81-90)</td>
+                                <td>(71-80)</td>
+                                <td>(61-70)</td>
+                                <td>(51-60)</td>
+                                <td>(41-50)</td>
+                                <td>(33-40)</td>
+                                <td>(32 & Below)</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">ABSENT(AB)</td>
+                                <td colspan="3">LATE ADMISSION(LA)</td>
+                                <td colspan="3">MEDICAL(ML)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- ./Footer table -->
+
+
+            </div>
+        }
+        else
+        {
+            <div style="width:900px; height:auto;  margin:auto; padding:15px 0px;">
+
+                <!-- header -->
+                <div style="width:100%; display:flex; justify-content:space-between;">
+                    <div style="width:33.33%;">
+                        <img src="@logo" width="200" />
+                    </div>
+
+                    <div style="width:33.33%; text-align:center; margin-bottom:30px;">
+                        <h2 style="margin-bottom:12px;">@Model.SchoolName</h2>
+                        @*<h4>@Model.ReportName @Model.RegionName </h4>*@
+                        <h4>REPORT CARD </h4>
+                        <h4 style="margin-bottom:6px;">@Model.AccademicSession</h4>
+                    </div>
+
+                    <div style="width:33.33%;"></div>
+                </div>
+                <!-- ./header -->
+                <!-- Student Detail-->
+                <div style="width:100%; font-size:14px; line-height:22px;">
+                    <p><strong>Roll No.</strong> : <span>@Model.RollNo</span></p>
+                    <p><strong>Student's Name</strong> : <span>@Model.StudentName</span></p>
+                    <p><strong>Mother's/Father's/Guardian's Name</strong> : <span>@Model.FathersName / @Model.MothersName</span></p>
+                    <p><strong>Date of Birth</strong> : <span>@Model.DateOfBirth</span></p>
+                    <p><strong>Class/Section</strong> : <span>@Model.ClassDivision</span></p>
+                </div>
+                <!-- ./Student Detail-->
+                <!-- Table One -->
+                <div style="width:100%; margin-top:10px;">
+                    <table border="1" cellspacing="0" cellpadding="0" style="width:100%; border:1px solid black; border-collapse:collapse;">
+                        <thead style="text-transform:uppercase; font-size:15px;">
+                            <tr>
+                                <th rowspan="2">Subjects</th>
+                                <th colspan="6">Term I</th>
+                                <th colspan="6">Term II</th>
+                            </tr>
+                            <tr>
+                                @foreach (var terms in Model.TermDataList)
+                                {
+
+                                    totalScore = 0;
+                                    foreach (var item in ScholasticList)
+                                    {
+                                        if (item.TotalScore != string.Empty && item.TotalScore != "")
+                                        {
+                                            totalScore = totalScore + Convert.ToInt32(item.TotalScore);
+                                        }
+                                        <th>@item.ScolasticArea (@item.TotalScore)</th>
+                                    }
+                                    <th>Marks Obt. (@totalScore)</th>
+                                    <th>Grade</th>
+                                    TotalScoreOfTerms.Add(totalScore);
+                                }
+                            </tr>
+                        </thead>
+                        <tbody style="text-align:center; text-transform:uppercase; font-size:15px;">
+                            @foreach (var subjects in SubjectList)
+                            {
+                                count = 0;
+                                <tr>
+                                    <td align="left">@subjects.SubjectName</td>
+                                    @foreach (var terms in Model.TermDataList)
+                                    {
+                                        var data = terms.scholasticList.ToList();
+                                        decimal tot = 0;
+                                        var grade = "";
+                                        foreach (var result in data)
+                                        {
+                                            var areaName = result.ScolasticArea;
+                                            var areaviseData = ((IEnumerable<dynamic>)result.subjectList).Where(X => X.SubjectName == subjects.SubjectName).FirstOrDefault();
+                                            //tot = tot + Convert.ToInt32(areaviseData.Mark);
+                                            decimal zz = Convert.ToDecimal(areaviseData.Mark);
+                                            tot = tot + zz;
+                                            <td>@areaviseData.Mark</td>
+
+                                        }
+                                        <td>@tot</td>
+                                        var persentage = (tot / TotalScoreOfTerms[count]) * 100;
+                                        if (persentage > 90)
+                                        {
+                                            grade = "A1";
+                                        }
+                                        else if (80 < persentage && persentage < 91)
+                                        {
+                                            grade = "A2";
+                                        }
+                                        else if (70 < persentage && persentage < 81)
+                                        {
+                                            grade = "B1";
+                                        }
+                                        else if (60 < persentage && persentage < 71)
+                                        {
+                                            grade = "B2";
+                                        }
+                                        else if (50 < persentage && persentage < 61)
+                                        {
+                                            grade = "C1";
+                                        }
+                                        else if (40 < persentage && persentage < 51)
+                                        {
+                                            grade = "C2";
+                                        }
+                                        else if (32 < persentage && persentage < 41)
+                                        {
+                                            grade = "D";
+                                        }
+                                        else
+                                        {
+                                            grade = "E";
+                                        }
+                                        <td>@grade</td>
+                                        count = count + 1;
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- ./Table One -->
+                <!-- Table Two -->
+                <div style="width:100%; margin-top:8px; margin-bottom:15px;">
+                    <table border="1" cellspacing="0" cellpadding="0" style="width:100%; border:1px solid black; border-collapse:collapse;  font-size:15px; table-layout: fixed;">
+                        <thead>
+                            <tr>
+                                <th align="left">Co-Scholastic Areas</th>
+                                <th>TERM I</th>
+                                <th>TERM II</th>
+                            </tr>
+                        </thead>
+                        <tbody style="text-align:center;">
+                            @foreach (var co in CoScholasticArea)
+                            {
+                                <tr>
+                                    <td align="left">@co.CoScholasticData</td>
+                                    @foreach (var terms in Model.TermDataList)
+                                    {
+                                        var coData = terms.ColasticAreaResult;
+                                        var results = ((IEnumerable<dynamic>)coData).Where(x => x.CoScholasticData == co.CoScholasticData).Select(x => x.CoScholasticResult).FirstOrDefault();
+                                        <td>@results</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- ./Table Two -->
+
+                <div style="width:100%; margin-top:25px;">
+                    <p style="font-size:15px; line-height:20px;"><strong>Class Teacher's remarks : </strong> <span>@Model.Remark</span></p>
+                </div>
+
+                <!-- Signature section -->
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="width:33.33%; line-height:24px;">
+                        <strong>Place:@Model.Today</strong>
+                        <br />
+                        <strong>Date:@Model.SchoolAdddress</strong>
+                    </div>
+
+                    <div style="width:33.33%; text-align:center;">
+                        <p>Signature of Class Teacher</p>
+                    </div>
+
+                    <div style="width:33.33%; text-align:right;">
+                        <p>Signature of Class Principal</p>
+                    </div>
+                </div>
+                <!-- ./Signature section -->
+                <!-- Footer table -->
+                <div style="width:100%; margin-top:20px;">
+                    <table border="1" cellspacing="0" cellpadding="0" style="width:100%; border:1px solid black; border-collapse:collapse;  font-size:15px; table-layout: fixed;">
+                        <thead>
+                            <tr style="text-transform:uppercase;">
+                                <th colspan="9">Grading System</th>
+                            </tr>
+                        </thead>
+                        <tbody style="text-align:center;">
+                            <tr>
+                                <td>GRADE</td>
+                                <td>A1</td>
+                                <td>A2</td>
+                                <td>B1</td>
+                                <td>B2</td>
+                                <td>C1</td>
+                                <td>C2</td>
+                                <td>D</td>
+                                <td>E (Needs Improvments)</td>
+                            </tr>
+                            <tr>
+                                <td>Marks Range</td>
+                                <td>(91-100)</td>
+                                <td>(81-90)</td>
+                                <td>(71-80)</td>
+                                <td>(61-70)</td>
+                                <td>(51-60)</td>
+                                <td>(41-50)</td>
+                                <td>(33-40)</td>
+                                <td>(32 & Below)</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">ABSENT(AB)</td>
+                                <td colspan="3">LATE ADMISSION(LA)</td>
+                                <td colspan="3">MEDICAL(ML)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- ./Footer table -->
+
+
+            </div>
+        }
+    }
+    else
+    {
+        <div style="width:100%; display:flex; justify-content:space-between;">
+            <div style="width:33.33%;">
+                <img src="@logo" width="200" />
+            </div>
+
+            <div style="width:33.33%; text-align:center; margin-bottom:30px;">
+                <h2 style="margin-bottom:12px;">@Model.SchoolName</h2>
+                @*<h4>@Model.ReportName @Model.RegionName </h4>*@
+                <h4>REPORT CARD </h4>
+                <h4 style="margin-bottom:6px;">@Model.AccademicSession</h4>
+            </div>
+
+            <div style="width:33.33%;"></div>
+        </div>
+        <div style="width:100%; text-align:center;">
+            <h2 style="color:red;">Full data for the progress card is not entered !</h2>
+        </div>
+    }
+</body>
+</html>
+
+
+
+
+<script>
+    function myFunction() {
+        var printButton = document.getElementById("btn-print");
+        printButton.style.visibility = 'hidden';
+        window.print();
+        printButton.style.visibility = 'visible';
+    }
+</script>

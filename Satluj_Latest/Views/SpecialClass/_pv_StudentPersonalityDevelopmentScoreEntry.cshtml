@@ -1,0 +1,258 @@
+﻿
+@model Satluj_Latest.Models.StudentNonSubjectSkillMarks
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<style>
+    .input_width{
+        width: 90px;
+    max-width: 100%;
+    }
+
+
+</style>
+
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                COURTEOUSNESS
+            </th>
+            <th style="color: black;">
+                CONFIDENCE
+            </th>
+            <th style="color: black;">
+                CARE OF <br />BELONGINGS
+            </th>
+            <th style="color: black;">
+                NEATNESS
+            </th>
+            <th style="color: black;">
+                PUNCTUALITY
+            </th>
+            <th style="color: black;">
+                INITIATIVE
+            </th>
+            <th style="color: black;">
+                SHARING <br /> & CARING
+            </th>
+            @*<th style="color: black;">
+                PROPERTY
+            </th>*@
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td style="width:10%;">
+                        @count
+                    </td>
+                    <td style="width:30%;">
+                        @item.StudentName
+                    </td>
+                    <td>
+                        @if (item._Personality_Development.Courteousness.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._Personality_Development.Courteousness" style="color:black;" maxlength="2" class="cls-mark-Courteousness input_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._Personality_Development.Courteousness" style="color:black;"  maxlength="2" class="cls-mark-Courteousness input_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._Personality_Development.Courteousness" style="color:black; "  maxlength="2" class="cls-mark-Courteousness input_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._Personality_Development.Confident.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._Personality_Development.Confident" style="color:black; "  maxlength="2" class="cls-mark-Confident input_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._Personality_Development.Confident" style="color:black; " maxlength="2" class="cls-mark-Confident input_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._Personality_Development.Confident" style="color:black; "  maxlength="2" class="cls-mark-Confident input_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._Personality_Development.CareOfBelongings.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._Personality_Development.CareOfBelongings" style="color:black;"  maxlength="2" class="cls-mark-CareOfBelongings input_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._Personality_Development.CareOfBelongings" style="color:black;"  maxlength="2" class="cls-mark-CareOfBelongings input_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._Personality_Development.CareOfBelongings" style="color:black; "  maxlength="2" class="cls-mark-CareOfBelongings input_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._Personality_Development.Neatness.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._Personality_Development.Neatness" style="color:black;" maxlength="2" class="cls-mark-Neatness input_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._Personality_Development.Neatness" style="color:black;"  maxlength="2" class="cls-mark-Neatness input_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._Personality_Development.Neatness" style="color:black; "  maxlength="2" class="cls-mark-Neatness input_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._Personality_Development.Punctuality.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._Personality_Development.Punctuality" style="color:black;" maxlength="2" class="cls-mark-Punctuality input_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._Personality_Development.Punctuality" style="color:black;"  maxlength="2" class="cls-mark-Punctuality input_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._Personality_Development.Punctuality" style="color:black; " maxlength="2" class="cls-mark-Punctuality input_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._Personality_Development.Initiative.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._Personality_Development.Initiative" style="color:black;"  maxlength="2" class="cls-mark-Initiative input_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._Personality_Development.Initiative" style="color:black;"  maxlength="2" class="cls-mark-Initiative input_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._Personality_Development.Initiative" style="color:black; "  maxlength="2" class="cls-mark-Initiative input_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._Personality_Development.SharingCaring.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._Personality_Development.SharingCaring" style="color:black;"  maxlength="2" class="cls-mark-SharingCaring input_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._Personality_Development.SharingCaring" style="color:black;"  maxlength="2" class="cls-mark-SharingCaring input_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._Personality_Development.SharingCaring" style="color:black; " maxlength="2" class="cls-mark-SharingCaring input_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td style="display:none;">
+                        @if (item._Personality_Development.Property.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._Personality_Development.Property" style="color:black;"  maxlength="2" class="cls-mark-Property input_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._Personality_Development.Property" style="color:black;"  maxlength="2" class="cls-mark-Property input_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._Personality_Development.Property" style="color:black; "  maxlength="2" class="cls-mark-Property input_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-personality-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

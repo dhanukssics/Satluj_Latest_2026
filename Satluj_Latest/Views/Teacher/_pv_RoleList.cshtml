@@ -1,0 +1,35 @@
+﻿@model Satluj_Latest.Models.RoleDetailsModel
+@{
+    var data = Model.RolesList;   
+    int x = 1;
+    bool IsAdmin = Model.IsAdmin;
+}
+<table class="table custome-table role-list">
+    <thead>
+        <tr>
+            <th>Sl No</th>
+            <th>Designation Name</th>
+            @if (IsAdmin)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in data)
+        {
+            <tr>
+                <td>@x</td>
+                <td>@item.Text</td>
+                @if (IsAdmin)
+                {
+                    <td>
+                        <button class="delete-class-tr btn btn-peek" data-roleId="@item.Value"><i class="fa fa-trash"></i></button>
+                        <button class="edit-class-tr btn btn-peek" data-roleId="@item.Value"><i class="fa fa-edit"></i></button>
+                    </td>
+                }
+            </tr>
+            x++;
+        }
+    </tbody>
+</table>

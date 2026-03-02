@@ -1,0 +1,82 @@
+﻿@model Satluj_Latest.Models.StockUpdateModel
+@{
+    var stockList = new Satluj_Latest.Data.School(Model.SchoolId).GetCurrentStock();
+}
+<div class="table-responsive">
+    <table class="table custome-table table-student-list">
+        <thead>
+            <tr>
+                <th>
+                    Slno
+                </th>
+                <th>
+                    Category
+                </th>
+                <th>
+                    Item
+                </th>
+                <th>
+                    Price
+                </th>
+                <th>
+                    Purchase Id
+                </th>
+                <th>
+                    Supplier Name
+                </th>
+                <th>
+                    Status
+                </th>
+                <th width="15%">
+                    #
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if (stockList != null)
+                {
+                    int i = 1;
+                    foreach (var item in stockList)
+                    {
+                        <tr style="cursor: pointer !important;">
+                            <td>
+                                @i
+                            </td>
+                            <td>
+                                @item.LabName
+                            </td>
+                            <td>
+                                @item.Item
+                            </td>
+                            <td>
+                                @item.Price
+                            </td>
+                            <td>
+                                @item.PurchaseId
+                            </td>
+                            <td>
+                                @item.SupplierName
+                            </td>
+                            <td>
+                                @item.Status
+                            </td>
+
+                            <td width="15%">
+                                <button class="delete-exam-tr btn btn-peek delete-stock-data" data-id="@item.StockId"><i class="fa fa-trash "></i></button>
+                                <button class="edit-exam-tr btn pay-now-btn edit-stock-data" data-id="@item.StockId"><i class="fa fa-edit "></i></button>
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                }
+                else
+                {
+
+                }
+            }
+        </tbody>
+        </table>
+        </div>
+

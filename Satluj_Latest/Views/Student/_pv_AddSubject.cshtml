@@ -1,0 +1,71 @@
+﻿@model Satluj_Latest.Models.SubjectsModel
+
+<form id="form-add-exam"
+      asp-action="SubmitAddSubject"
+      asp-controller="Student"
+      method="post">
+
+    <div class="row">
+        <div id="new-account-div">
+            <div class="form-group">
+
+                <div class="col-lg-4">
+                    <label>Subject</label><span style="color:red;"> *</span><br />
+                    <input asp-for="SubjectName"
+                           class="form-control"
+                           placeholder="Subject"
+                           autocomplete="off" />
+                    <span asp-validation-for="SubjectName"></span>
+                </div>
+
+                <div class="col-lg-3">
+                    <label>Abbreviation</label><br />
+                    <input asp-for="Abbreviation"
+                           class="form-control"
+                           placeholder="Abbreviation"
+                           autocomplete="off" />
+                    <span asp-validation-for="Abbreviation"></span>
+                </div>
+
+                <div class="col-lg-3">
+                    <label>Code</label><br />
+                    <input asp-for="Code"
+                           class="form-control"
+                           placeholder="Code"
+                           autocomplete="off" />
+                    <span asp-validation-for="Code"></span>
+                </div>
+
+                <div class="col-lg-2">
+                    <label></label><br />
+                    <input asp-for="IsOptional"
+                           type="checkbox"
+                           id="option-check-id" />
+                    <span> Optional Subject</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit"
+                class="btn pay-now-btn"
+                id="btn-Subject">
+            Save
+        </button>
+    </div>
+</form>
+<script>
+    $("#form-add-exam").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: this.action,
+            type: "POST",
+            data: $(this).serialize(),
+            success: AddSubjectSuccess,
+            error: AddSubjectFailed
+        });
+    });
+</script>

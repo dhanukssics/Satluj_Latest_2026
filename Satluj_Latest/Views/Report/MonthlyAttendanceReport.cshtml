@@ -1,0 +1,231 @@
+﻿@model Satluj_Latest.Models.MonthlyAttandanceModel
+@{
+    ViewBag.Title = "MonthlyAttendanceReport";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+@Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Class : </label>
+                    <br />
+                    <select asp-for="ClassId"
+                            asp-items="ViewBag.Classlist"
+                            class="form-control slct-mark-dropdwn1"
+                            id="classId-dropdown"
+                            data-live-search="true"
+                            style="display:inline-block; width:100%;min-width:180px;">
+
+                        <option value="">All</option>
+                    </select>
+
+                    <span asp-validation-for="ClassId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Division :</label>
+                    <select class="form-control slct-free-div-dropdown division-changes" disabled></select>
+                    <span id="division-required-exam-add" style="display:none; color:red;"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Session :</label>
+                    <select asp-for="ShiftId"
+                            asp-items="Html.GetEnumSelectList<AttendanceShift>()"
+                            class="form-control shift-changes"
+                            id="attendance-shift-id">
+
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="ShiftId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Start</label>
+                    <div class="with-icon">
+                        <input type="text" class="form-control date-detailed" id="calender-attandance" data-date-end-date="0d" value="@Model.AttandanceDate.ToString("MMM-yyyy")">
+                        <i class="fa fa-calendar"></i>
+                        <span id="calendar-required" style="display:none; color:red;"></span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-12" style="margin-top: -2%;margin-left: 2%;margin-bottom: -2%;">
+                    <div class="row">
+                        <div class="form-group col-sm-3">
+                            <button class="btn pay-now-btn" type="button" id="searchMonthlyAttendanceBtn">Search</button>
+                            <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+                            <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <div class="col-md-12" id="print-trial-bal">
+                    <h3 style="text-align:center;">Monthly Attendance</h3>
+                    <h5 style="text-align:center;" id="monthly-report-head"></h5>
+                    <table class="table " id="monthly-report-list" style="border: 0.5px solid #d2cece;border-collapse: inherit;"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).on('change', '.slct-mark-dropdwn1', function () {
+        $('#classId-required').hide();
+        $('#ClassId').val($(this).val());
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadAllSchoolDivision?id=' + id + '&schoolid=' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-free-div-dropdown").html("");
+                        $.each(result.list, function (i, item) {
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-free-div-dropdown").prop("disabled", false);
+                    }
+                    else {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- No Division Found --'));
+                        $(".slct-free-div-dropdown").prop("disabled", true);
+                        $('#DivisionId').val("0");
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-free-div-dropdown").html("");
+            $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+            $(".slct-free-div-dropdown").prop("disabled", true);
+        }
+    });
+
+    //$('.date-detailed').datepicker({
+    //    format: 'dd-mm-yyyy',
+    //    autoclose: true,
+    //    todayHighlight: true
+    //});
+
+
+
+    $('.date-detailed').datepicker({
+        format: 'MM-yy',
+        viewMode: "months",
+        minViewMode: "months",
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).on('click', '#searchMonthlyAttendanceBtn', function () {
+        //debugger;
+        var date = $('#calender-attandance').val();
+        if (date != "") {
+
+            $('#calendar-required').hide();
+
+            var res = date.split("-");
+            //var dd = res[0];
+            var dd = 1;
+            var mm = res[0];
+            var yyyy = res[1];
+            var start = mm + '-' + dd + '-' + yyyy;
+
+            var ClassId = $("#classId-dropdown option:selected").val();
+            if (ClassId != 0) {
+                $('#classId-required').hide();
+                var DivisionId = $(".slct-free-div-dropdown option:selected").val();
+                if (DivisionId != 0) {
+                    $('#division-required-exam-add').hide();
+                    var ShiftId = $("#attendance-shift-id option:selected").val();
+                    if (ShiftId != "") {
+                        $('#shiftId-required').hide();
+                        //----------------------------------------------------------------------------------
+                        var id = ClassId + '~' + DivisionId + '~' + ShiftId + '~' + start;
+                        var head = ' Class ' + $("#classId-dropdown option:selected").text() + ' ' + $(".slct-free-div-dropdown option:selected").text() + '( ' + mm + ' - ' + yyyy + ' ) ';
+                        $('#monthly-report-head').text(head);
+                        $.ajax({
+                            url: '/Report/DatatableMonthlyAttendanceReport/' + id,
+                            type: "GET",
+                            dataType: 'html',
+                            success: function (data) {
+                                $('#monthly-report-list').html(data);
+                            }
+                        });
+                        //----------------------------------------------------------------------------------
+                    }
+                    else {
+                        $('#monthly-report-head').text('');
+                        $('#shiftId-required').text("Required");
+                        $('#shiftId-required').show();
+                    }
+                }
+                else {
+                    $('#monthly-report-head').text('');
+                    $('#division-required-exam-add').text("Required");
+                    $('#division-required-exam-add').show();
+                }
+            }
+            else {
+                $('#monthly-report-head').text('');
+                $('#classId-required').text("Required");
+                $('#classId-required').show();
+            }
+        }
+        else {
+            $('#monthly-report-head').text('');
+            $('#calendar-required').text("Required");
+            $('#calendar-required').show();
+        }
+    });
+
+    $(document).on('change', '.shift-changes', function () {
+        $('#shiftId-required').hide();
+        $('#monthly-report-head').text('');
+    });
+
+    $(document).on('change', '.division-changes', function () {
+        $('#division-required-exam-add').hide();
+        $('#monthly-report-head').text('');
+    });
+
+    function printContent(el) {
+        //debugger;
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Report/MonthlyAttendanceReport';
+    }
+
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        //debugger;
+        var date = $('#calender-attandance').val();
+        var res = date.split("-");
+        var mm = res[1];
+        var yyyy = res[2];
+        var ClassId = $("#classId-dropdown option:selected").text();
+        var DivisionId = $(".slct-free-div-dropdown option:selected").text();
+        var head = ClassId + ' / ' + DivisionId + '( ' + mm + ' - ' + yyyy + ' ) ';
+        $("#monthly-report-list").table2excel({
+            name: "Table2Excel",
+            filename: "ATTENDANCE REPORT as on " + head,
+            fileext: ".xls"
+        });
+    });
+</script>

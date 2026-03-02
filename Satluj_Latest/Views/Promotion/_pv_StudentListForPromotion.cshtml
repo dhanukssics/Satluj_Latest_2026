@@ -1,0 +1,51 @@
+﻿
+@model Satluj_Latest.Models.PromoteStudents
+@{
+
+}
+<table class="table custome-table table-class-list">
+    <thead>
+        <tr>
+            <th>
+                <input type="checkbox" class="check-all" />
+                Sl No
+            </th>
+            <th>
+                Student Name
+            </th>
+            <th>
+                Special Id
+            </th>
+            <th>
+                Contact
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.StudentList)
+        {
+            <tr>
+                <td>
+                    <label style="margin-right: 10px;">
+                        <input id="chkBox-user" class="checkbox-input" type="checkbox" data-id="@item.StudentId" onchange="AddRemoveUser(this)" />
+                        <span class="checkbox-virtual"></span>
+                    </label>
+                    @item.SlNo
+                </td>
+                <td>@item.StudentName </td>
+                <td>@item.SpecialId </td>
+                <td>@item.ContactNumber </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="2">
+                <button class="btn pay-now-btn" id="btn-students-promotion">Promote</button>
+            </td>
+            <td colspan="2">
+                <button class="btn pay-now-btn" id="btn-students-demote">Demote</button>
+            </td>
+        </tr>
+    </tfoot>
+</table>

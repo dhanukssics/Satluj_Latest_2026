@@ -1,0 +1,434 @@
+﻿@model Satluj_Latest.Models.ExamResultMainModel
+
+@{
+    ViewBag.Title = "Upload_Assignments";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+@Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
+@Html.HiddenFor(z => z.SubjectId, new { Value = 0 })
+@Html.HiddenFor(z => z.TeacherId, new { Value = @Model.TeacherId })
+
+@*<style type="text/css">
+
+
+            #temp {
+
+              background-color: lawngreen;
+
+              max-width: 500px;
+              margin: auto;
+              border: 3px solid #73AD21;
+       }
+    </style>*@
+
+
+
+
+@using (Html.BeginForm())
+
+{
+    @Html.HiddenFor(z => z.ClassId, new { Value = @Model.SchoolId, id = "schoolid" })
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <h3 style="margin-top: 5px;"> Assign Assessment</h3>
+
+
+
+            <div class="row">
+
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Teachers: </label>
+                        <br />
+
+                        <select asp-for="TeacherId"
+                                asp-items="ViewBag.Teacherlist"
+                                class="form-control pv_class-drop-down class-drop-down1"
+                                id="teacherId"
+                                data-live-search="true">
+                            <option value="">--Choose--</option>
+                        </select>
+
+                        <span asp-validation-for="TeacherId" class="text-danger"></span>
+
+                    </div>
+                </div>
+
+
+
+
+
+                @*<div class="form-group col-sm-3">
+                        <div class="form-group">
+                            <label>Subjects : </label>
+                            <br />
+
+                            @Html.DropDownListFor(m => m.SubjectId, Satluj_Latest.Data.DropdownData.GetSubjectss(Model.SchoolId), new { @class = "form-control ", @data_live_search = "true", name = "classDropdown", id = "subjectId" })
+                            @Html.ValidationMessageFor(m => m.SubjectId)
+
+                        </div>
+                    </div>*@
+
+                <div class="form-group col-sm-3">
+                    <label>Subjects</label>
+                    <br />
+                    <select id="subject-drop-down" class="form-control slct-free-div-dropdown1" disabled>
+                        <option>--Select Subject --</option>
+                    </select>
+                    <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+                </div>
+
+                @*<div class="form-group col-sm-3">
+                        <div class="form-group">
+                            <label>Class : </label>
+                            <br />
+                            @Html.DropDownListFor(m => m.ClassId, Satluj_Latest.Data.DropdownData.GetClasses(Model.SchoolId), "--Choose--", new { @class = "form-control pv_class-drop-down class-drop-down", @data_live_search = "true", name = "classDropdown", id = "classDataDropdown" })
+                            @Html.ValidationMessageFor(m => m.ClassId)
+                        </div>
+                    </div>*@
+                <div class="form-group col-sm-3">
+                    <label>Classs</label>
+                    <br />
+                    <select id="clas-drop-down" class="form-control slct-free-div-dropdown2" disabled required>
+                        <option>--Select classes --</option>
+                    </select>
+                    <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+                </div>
+
+                <div class="form-group col-sm-3">
+                    <label>Division</label>
+                    <br />
+                    <select id="division-drop-down" class="form-control slct-free-div-dropdown" disabled required>
+                        <option>--Select Division --</option>
+                    </select>
+                    <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+                </div>
+
+
+
+
+                <div class="form-group col-sm-3" style=" margin-left:-275px;">
+                    <div class="form-group">
+                        <br />
+
+                        @Html.TextArea("description", "", new { @class = "form-control date-add", placeholder = "Description", id = "description" })
+
+                    </div>
+                </div>
+
+
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <br />
+
+                        <input id="fileInput" type="file" multiple>
+
+                    </div>
+
+
+                </div>
+
+                <div class="form-group col-sm-3">
+                    <div>
+                        <br />
+                        <button class="btn pay-now-btn " data-toggle="modal" id="saveSubject"><i class="fa fa-save"></i> Save</button>
+                    </div>
+                </div>
+                <div class="btn fa-pull-right " id="temp">
+                    <hi>     @TempData["alertMessage"]</hi>
+                </div>
+
+
+
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="table-responsive">
+
+                        <table class="table custome-table table-bordered table-hover" id="divtest"></table>
+                    </div>
+
+
+                </div>
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+
+        $(document).on('change', '#teacherId', function () {
+            array = [];
+            var id = $(this).val();
+            $('#teacherId').val($(this).val());
+
+            if (id != '') {
+                $.ajax({
+                    url: '/Data/Assessment_LoadSubject?id=' + id,
+                    type: "GET",
+                    success: function (result) {
+                        if (result.list.length > 0) {
+                            $("#subject-drop-down").html("");
+                            $("#subject-drop-down").append($('<option></option>').val("").html('-- Select Subject--'));
+                            $.each(result.list, function (i, item) {
+
+                                $("#subject-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+
+
+                            });
+
+                            var seen = {};
+                            jQuery('#subject-drop-down').children().each(function () {
+                                var txt = jQuery(this).attr('value');
+                                if (seen[txt]) {
+                                    jQuery(this).remove();
+                                } else {
+                                    seen[txt] = true;
+                                }
+                            });
+
+
+
+
+                            $("#subject-drop-down").prop("disabled", false);
+                            $('#optional-subjects-student-mark-list').html('');
+
+
+
+
+                        }
+                        else {
+                            $(".slct-free-div-dropdown1").html(""); // Division
+                            $(".slct-free-div-dropdown1").append($('<option></option>').val("").html('---'));
+                            $(".slct-free-div-dropdown1").prop("disabled", true);
+                            $('#optional-subjects-student-mark-list').html('');
+                        }
+                    }
+                });
+            }
+            else {
+                $(".slct-free-div-dropdown").html(""); // Division
+                $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
+                $(".slct-free-div-dropdown").prop("disabled", true);
+                $('#optional-subjects-student-mark-list').html('');
+            }
+        });
+
+        $(document).on('change', '#teacherId', function () {
+            array = [];
+            var id = $(this).val();
+            $('#teacherId').val($(this).val());
+
+            var scid = $('#schoolid').val();
+
+            if (id != '') {
+                $.ajax({
+
+                    url: '/Data/LoadAllClassesTeacherWise?id=' + id,
+                    type: "GET",
+                    data: { 'TeacherId': id, 'SchoolId': scid },
+                    success: function (result) {
+
+                        if (result.list.length > 0) {
+                            $("#clas-drop-down").html("");
+                            $("#clas-drop-down").append($('<option></option>').val("").html('-- Select Classes--'));
+                            $.each(result.list, function (i, item) {
+                                $("#clas-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                            });
+                            $("#clas-drop-down").prop("disabled", false);
+                            $('#optional-subjects-student-mark-list').html('');
+                        }
+                        else {
+                            $(".slct-free-div-dropdown2").html(""); // Division
+                            $(".slct-free-div-dropdown2").append($('<option></option>').val("").html('---'));
+                            $(".slct-free-div-dropdown2").prop("disabled", true);
+                            $('#optional-subjects-student-mark-list').html('');
+                        }
+                    }
+                });
+            }
+            else {
+                $(".slct-free-div-dropdown").html(""); // Division
+                $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
+                $(".slct-free-div-dropdown").prop("disabled", true);
+                $('#optional-subjects-student-mark-list').html('');
+            }
+        });
+
+
+
+
+
+        $(document).on('change', '#division-drop-down', function (e) {
+
+            array = [];
+            $('#divtest').html('');
+            classId = $('#clas-drop-down').val();
+
+            if (classId != '') {
+                $.ajax({
+                    url: '/Student/ListAssessmentadm/' + classId,
+                    type: "POST",
+
+                    dataType: 'html',
+                    success: function (data) {
+
+                        $('#divtest').html(data);
+                    }
+                });
+
+            }
+            else {
+                toastrError('Please select all details!');
+                $('#divtest').html('');
+            }
+        });
+
+        $(document).on('change', '#clas-drop-down', function () {
+            array = [];
+            var id = $(this).val();
+            $('#ClassId').val($(this).val());
+            if (id != '') {
+                $.ajax({
+                    url: '/Data/LoadDivision?id=' + id,
+                    type: "GET",
+                    success: function (result) {
+                        if (result.list.length > 0) {
+                            $("#division-drop-down").html("");
+                            $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                            $.each(result.list, function (i, item) {
+                                $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                            });
+                            $("#division-drop-down").prop("disabled", false);
+                            $('#optional-subjects-student-mark-list').html('');
+                        }
+                        else {
+                            $(".slct-free-div-dropdown").html(""); // Division
+                            $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
+                            $(".slct-free-div-dropdown").prop("disabled", true);
+                            $('#optional-subjects-student-mark-list').html('');
+                        }
+                    }
+                });
+            }
+            else {
+                $(".slct-free-div-dropdown").html(""); // Division
+                $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
+                $(".slct-free-div-dropdown").prop("disabled", true);
+                $('#optional-subjects-student-mark-list').html('');
+            }
+        });
+
+
+
+
+
+        function Refresh() {
+
+            array = [];
+            $('#divtest').html('');
+
+            classId = $('#clas-drop-down').val();
+
+            if (classId != '') {
+                $.ajax({
+                    url: '/Student/ListAssessmentadm/' + classId,
+                    type: "POST",
+                    dataType: 'html',
+                    success: function (data) {
+
+                        $('#divtest').html(data);
+                    }
+                });
+            }
+            else {
+                toastrError('Please select all details!');
+                $('#divtest').html('');
+            }
+        }
+
+
+
+
+        $(document).ready(function () {
+            $("#saveSubject").click(function () {
+                var formData = new FormData();
+                var totalFiles = document.getElementById("fileInput").files.length;
+
+                if (totalFiles != 0) {
+
+                    for (var i = 0; i < totalFiles; i++) {
+                        var file = document.getElementById("fileInput").files[i];
+                        var subid = $('#subject-drop-down').val().trim();
+                        var clsid = $('#clas-drop-down').val().trim();
+                        var division = $('#division-drop-down').val().trim();
+                        var des = $('#description').val().trim();
+                        var teacher = $("#teacherId option:selected").text().trim();
+
+                        formData.append("FileUpload", file);
+                        formData.append("subjectId", subid);
+                        formData.append("classid", clsid);
+                        formData.append("division", division);
+                        formData.append("Description", des);
+                        formData.append("TeacherName", teacher);
+
+                    }
+                }
+
+                else
+                {
+                    var subid = $('#subject-drop-down').val().trim();
+                    var clsid = $('#clas-drop-down').val().trim();
+                    var division = $('#division-drop-down').val().trim();
+                    var des = $('#description').val().trim();
+                    var teacher = $("#teacherId option:selected").text().trim();
+
+
+                    formData.append("subjectId", subid);
+                    formData.append("classid", clsid);
+                    formData.append("division", division);
+                    formData.append("Description", des);
+                    formData.append("TeacherName", teacher);
+
+                }
+                $.ajax({
+                    type: "POST",
+                    url: '/Student/UploadFileadm',
+                    data: formData,
+                    dataType: 'json',
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+
+
+                        $("#temp").load(" #temp");
+
+
+                    },
+                    error: function (error) {
+
+                    }
+                });
+            });
+        });
+
+
+    </script>
+
+
+
+}
+
+

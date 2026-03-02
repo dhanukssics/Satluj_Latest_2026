@@ -1,0 +1,28 @@
+﻿
+@model Satluj_Latest.Models.AddDayBookModel
+@{
+    var data = new Satluj_Latest.Data.School(Model.SchoolId).GetCashBookStatus(Model.startDate, Model.endDate);
+}
+<div class="row">
+    @if (data.Count > 0)
+    {
+        <span>
+            <label style="margin-right:50px;">Opening Balance: @data[0].OpeningBalance /- </label>
+            <label style="margin-right:50px;"> Closing Balance: @data[0].ClosingBalance  /- </label>
+            <label style="margin-right:50px;"> Total Debit : @data[0].TotalDebit /- </label>
+            <label style="margin-right:50px;"> Total Credit : @data[0].TotalCredit /- </label>
+        </span>
+        @*<br />*@
+        @*<span>
+                <label style="margin-right:50px;"> Total Debit : @data[0].TotalDebit /- </label>
+                <label style="margin-right:50px;"> Total Credit : @data[0].TotalCredit /- </label>
+            </span>*@
+    }
+    else
+    {
+
+    }
+</div>
+<script>
+
+</script>

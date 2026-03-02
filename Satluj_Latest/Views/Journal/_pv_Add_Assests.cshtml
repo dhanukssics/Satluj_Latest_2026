@@ -1,0 +1,138 @@
+﻿@model Satluj_Latest.Models.AssetsLiabilityModel
+
+<form id="form-login"
+      asp-action="AddAssests"
+      asp-controller="Journal"
+      method="post">
+
+    <div class="col-md-6">
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Type</label>
+            </div>
+            <div class="col-md-9">
+                <select asp-for="TypeId"
+                        asp-items="Html.GetEnumSelectList<AssetsLiabilityType>()"
+                        class="form-control pv_assests-type"
+                        id="assets-type-id">
+                    <option value="">--Choose--</option>
+                </select>
+                <span asp-validation-for="TypeId"></span>
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Date</label>
+            </div>
+            <div class="col-md-9 calendar-inp pos_icon_adj">
+                <input asp-for="EntryDateString"
+                       class="form-control date-assests-add-date display-currentDate"
+                       placeholder="" />
+                <i class="fa"></i>
+                <span asp-validation-for="EntryDateString"></span>
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Invoice No</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="InviceNumber"
+                       class="form-control"
+                       readonly />
+                <span asp-validation-for="InviceNumber"></span>
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Account Head</label>
+            </div>
+            <div class="col-md-9">
+                <select asp-for="HeadId"
+                        asp-items="ViewBag.Accounthead"
+                        class="form-control"
+                        id="assests-head-id">
+                    <option value="">--Choose--</option>
+                </select>
+                <span asp-validation-for="HeadId"></span>
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Amount</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="Amount"
+                       class="form-control"
+                       id="amount-assets-id"
+                       placeholder="Amount" />
+                <span asp-validation-for="Amount"></span>
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Add Amount</label>
+            </div>
+            <div class="col-md-1">
+                <input asp-for="AddStatus"
+                       type="checkbox"
+                       class="cust-inp"
+                       id="addstatus-id-check" />
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Narration</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="Narration"
+                       class="form-control"
+                       placeholder="Narration" />
+                <span asp-validation-for="Narration"></span>
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="modal-footer">
+                <button type="button"
+                        id="btn-edit-assests"
+                        class="btn pay-now-btn">
+                    Edit
+                </button>
+
+                <button type="submit"
+                        id="btn-save-bankbook"
+                        class="btn pay-now-btn">
+                    Save
+                </button>
+
+                <button type="button"
+                        id="btn-print-assets-add"
+                        class="btn pay-now-btn">
+                    Print
+                </button>
+            </div>
+        </div>
+
+    </div>
+</form>
+<script>
+    $("#form-login").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: this.action,
+            type: "POST",
+            data: $(this).serialize(),
+            success: AddAssetsSuccess,
+            error: AddAssetsFailed
+        });
+    });
+</script>

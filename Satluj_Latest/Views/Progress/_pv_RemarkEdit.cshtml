@@ -1,0 +1,76 @@
+﻿@model Satluj_Latest.Models.RemarkModel
+@{
+
+}
+
+
+  
+<div class="modal-dialog modal-lg" role="document">
+
+    <form id="form-teacher-edit"
+          asp-action="EditRemark"
+          asp-controller="Progress"
+          method="post">
+
+        <input type="hidden" asp-for="RemarkId" />
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <h4 class="modal-title" id="myModalLabel">
+                    Edit Remark
+                </h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Remark :</label><br />
+
+                            <input asp-for="Remark"
+                                   class="form-control"
+                                   placeholder="Remark" />
+
+                            <span asp-validation-for="Remark"
+                                  class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        id="btn-editteacher"
+                        class="btn pay-now-btn">
+                    Edit
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+    <script>
+        $("#form-teacher-edit").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: "POST",
+                data: $(this).serialize(),
+                success: AddRemarkSuccess,
+                error: AddRemarkFailed
+            });
+        });
+    </script>

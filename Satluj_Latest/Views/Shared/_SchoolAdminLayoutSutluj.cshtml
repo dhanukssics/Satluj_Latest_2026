@@ -1,0 +1,643 @@
+﻿@using Newtonsoft.Json
+@using Microsoft.AspNetCore.Http
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+@*<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>*@
+
+<script src="~/Content/Plugins/Autocomplete/jquery.easy-autocomplete.min.js"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    @*<meta name="viewport" content="width=device-width, initial-scale=1">*@
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>SchoolMan | Online School Management Systems </title>
+    <!--Meta-->
+    <meta name="description" content="SchoolMan is a complete management application for school administration, teachers and parents, it provides a web as well as mobile application which can be downloaded from Google Play store. The mobile application will be customized to the particular school with school name. SchoolMan handles all your school activities by integrating the functionalities of school administration, teachers and communication with parents. It is also associated with a real time GPS tracking system for school bus which ensures safety and timely transit of students.">
+    <meta name="keywords" content="Schoolman, class management software, school management software, class software, School software, web based school management system, online school management systems, school management software, school management system, Online School Tutorial, Online school payment, school fee payment, timetable, schedule, timetable software, school scheduling">
+    <meta name="author" content="SchoolMan">
+    <!--Meta-->
+    <!-- Bootstrap -->
+    <link href="~/Content/css/bootstrap.css" rel="stylesheet" />
+    <!-- Custom style -->
+    <link href="~/Content/css/styles.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/Datepicker/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <!-- Google font Droid sans-->
+    <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
+    <!-- Font awesome icons css -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+
+
+    <link href="~/Content/fonts/schoolman/style.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/toastr/toastr.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/toastr/toastr.min.css" rel="stylesheet" />
+
+    <link href="~/Content/Plugins/Autocomplete/easy-autocomplete.min.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/Autocomplete/easy-autocomplete.themes.min.css" rel="stylesheet" />
+
+
+    <script src="~/Content/Plugins/toastr/toastr.min.js"></script>
+    <script src="~/Content/Plugins/toastr/toastrConfig.js"></script>
+    <link href="~/Content/plugins/Datepicker/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <script src="~/Content/plugins/Datepicker/bootstrap-datepicker.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">*@
+    @*<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">*@
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+
+    <!-- Favicon -->
+    <link href="~/Content/img/favicon.png" rel="shortcut icon" />
+
+
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link href="/Content/Plugins/SweetAlert/sweetalert.css" rel="stylesheet" />
+    <script src="/Content/Plugins/SweetAlert/sweetalert.min.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-133342861-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-133342861-1');
+    </script>
+</head>
+<body>
+    <style>
+        li.sub-menu li {
+            font-size: 13px;
+        }
+    </style>
+    <div class="se-pre-con"></div>
+    <div class="main-section">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="header-main">
+
+                    </div><!-- end of header main -->
+                </div>
+            </div><!-- end of row -->
+            @{
+                var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+                var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+                // int userType = Convert.ToInt16(Session["UserType"]);
+                int userType = Context.Session.GetInt32("UserType") ?? 0;
+                int teacherType = Convert.ToInt16(UserRole.Teacher);
+                int schoolType = Convert.ToInt16(UserRole.School);
+                int staffType = Convert.ToInt16(UserRole.Staff);
+
+            }
+            <div class="">
+
+                @{
+                    var userJson = Context.Session.GetString("User");
+                    TbLogin user = null;
+                    if (!string.IsNullOrEmpty(userJson))
+                    {
+                        user = JsonConvert.DeserializeObject<TbLogin>(userJson);
+                    }
+                    var userData = new Satluj_Latest.Data.Login(user);
+                    var allotedMenu = userData.GetUserMenuList();
+                }
+                <div class="body-container">
+                    @if (allotedMenu.Count() > 0)
+                    {
+                        <div class="sidemenu-box">
+                            <div class="sidebar-menu">
+                                <div class="logo">
+                                    <img class="img-responsive" src="/Content/img/logo.png" alt="Peekabu" style="padding: 19px;" />
+                                </div><!-- end of logo -->
+                                <div class="side-menu">
+                                    <label class="mobile-label">Menu</label>
+                                    <ul class="responsive-menu">
+                                        @foreach (var data in allotedMenu)
+                                        {
+                                            long caseSwitch = data.MenuId ?? 0;
+                                            switch (caseSwitch)
+                                            {
+                                                case 1:
+                                        <a href="/School/Home"><li class="@(((controller == "school" && action == "home")) ? "active" : "")"><i class="icon-home"></i> Home</li></a>
+                                                    break;
+                                                case 2:
+                                        <li class="sub-menu @(((controller == "school" && action == "class") || (controller == "school" && action == "student")|| (controller == "school" && action == "teacherlist") || (controller == "school" && action == "stafflist")) ? " open" : "")">
+                                            <span><i class="icon-user-config"></i>  Management</span>
+                                            <ul>
+                                                <a href="/School/Class"><li class="@(((controller == "school" && action == "class")) ? "active" : "")"><i class="icon-blackboard"></i> Class</li></a>
+                                                <a href="/School/Student"><li class="@(((controller == "school" && action == "student")) ? "active" : "")"><i class="icon-student"></i> Student</li></a>
+                                                <a href="/School/TeacherList"><li class="@(((controller == "school" && action == "teacherlist")) ? "active" : "")"><i class="icon-professor"></i> Teacher</li></a>
+                                                <a href="/School/StaffList"><li class="@(((controller == "school" && action == "stafflist")) ? "active" : "")"><i class="icon-user-config"></i> Staff</li></a>
+                                                <a href="/School/ClassNotPublished"><li class="@(((controller == "school" && action == "classunpublished")) ? "active" : "")"><i class="icon-blackboard"></i> Promote Class</li></a>
+                                                <a href="/School/PromoteStudent"><li class="@(((controller == "school" && action == "promotestudent")) ? "active" : "")"><i class="icon-blackboard"></i> Promote Student</li></a>
+
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 3:
+                                        <li class="sub-menu @(((controller == "school" && action == "fee") || (controller == "school" && action == "feelist") || (controller == "school" && action == "feediscount")) ? " open" : "")">
+                                            <span><i class="fa fa-rupee"></i>  Fees</span>
+                                            <ul>
+                                                <a href="/School/Fee"><li class="@(((controller == "school" && action == "fee")) ? "active" : "")"><i class="icon-currency"></i> Add Fee</li></a>
+                                                <a href="/School/FeeList"><li class="@(((controller == "school" && action == "feelist")) ? "active" : "")"><i class="icon-list"></i> Fee List</li></a>
+                                                <a href="/School/FeeDiscount"><li class="@(((controller == "school" && action == "feediscount")) ? "active" : "")"><i class="icon-discount"></i> Fee Discount</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 4:
+                                        <li class="sub-menu @(((controller == "journal" && action == "bankstatement") ||(controller == "school" && action == "balancesheet") || (controller == "journal" && action == "daybook")|| (controller == "journal" && action == "trialbalance")|| (controller == "journal" && action == "BalanceSheet") ||(controller == "journal" && action == "ledger") ||(controller == "journal" && action == "assets") ||(controller == "journal" && action == "cashbook")||(controller == "journal" && action == "bankbook") ||(controller == "school" && action == "trialbalance") || (controller == "school" && action == "incomeandexpenditure")|| (controller == "school" && action == "report") || (controller == "journal" && action == "cashbookdailyreport")) ? " open" : "")">
+                                            <span><i class="fa fa-copy"></i>  Accounts</span>
+                                            <ul>
+                                                <a href="/SchoolAccount/CashHome"><li class="@(((controller == "schoolaccount" && action == "cashhome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Cash Entry **</li></a>
+                                                <a href="/SchoolAccount/BankHome"><li class="@(((controller == "schoolaccount" && action == "bankhome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Bank Entry **</li></a>
+                                                <a href="/SchoolAccount/DayBookReportHome"><li class="@(((controller == "schoolaccount" && action == "daybookreporthome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Day Book Report **</li></a>
+                                                <a href="/SchoolAccount/CashEntryReportHome"><li class="@(((controller == "schoolaccount" && action == "cashentryreporthome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Day Book Report **</li></a>
+                                                <a href="/SchoolAccount/BankEntryReportHome"><li class="@(((controller == "schoolaccount" && action == "bankentryreporthome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Bank Book Report **</li></a>
+                                                <a href="/SchoolAccount/ReceiptAndPaymentHome"><li class="@(((controller == "schoolaccount" && action == "receiptandpaymenthome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Receipt & Payment **</li></a>
+                                                <a href="/SchoolAccount/LedgerHome"><li class="@(((controller == "schoolaccount" && action == "ledgerhome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Ledger **</li></a>
+                                                <a href="/Journal/DayBook"><li class="isHidden @(((controller == "journal" && action == "daybook")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Day Book</li></a>
+                                                <a href="/Journal/CashBook"><li class="isHidden @(((controller == "journal" && action == "cashbook")) ? "active" : "")"><i class="icon-list"></i>Cash Book</li></a>
+                                                <a href="/Journal/CashBookDailyReport"><li class="isHidden @(((controller == "journal" && action == "cashbookdailyreport")) ? "active" : "")"><i class="icon-list"></i>Cash Book Daily Report</li></a>
+                                                <a href="/Journal/BankBook"><li class="isHidden @(((controller == "journal" && action == "bankbook")) ? "active" : "")"><i class="icon-currency"></i>Bank Book</li></a>
+                                                <a href="/Journal/Ledger"><li class="isHidden @(((controller == "journal" && action == "ledger")) ? "active" : "")"><i class="fa fa-compass"></i>Ledger</li></a>
+                                                <a href="/Journal/Assets"><li class="isHidden @(((controller == "journal" && action == "assets")) ? "active" : "")"><i class="fa fa-arrows-alt"></i>Assets & Liabilities</li></a>
+                                                <a href="/Journal/TrialBalance"><li class="isHidden @(((controller == "journal" && action == "trialbalance")) ? "active" : "")"><i class="fa fa-briefcase"></i>Trial Balance</li></a>
+                                                <a href="/Journal/BalanceSheet"><li class="isHidden @(((controller == "journal" && action == "balancesheet")) ? "active" : "")"><i class="fa fa-certificate"></i>Balance Sheet</li></a>
+                                                <a href="/Journal/BankStatement"><li class="isHidden @(((controller == "journal" && action == "bankstatement")) ? "active" : "")"><i class="fa fa-book"></i>Bank Statement</li></a>
+                                                <a href="/Journal/ReceiptPayment"><li class="isHidden @(((controller == "journal" && action == "receiptpayment")) ? "active" : "")"><i class="fa fa-pencil-square"></i>Receipt & Payment</li></a>
+                                                <a href="/School/Report"><li class="isHidden @(((controller == "school" && action == "report")) ? "active" : "")"><i class="fa fa-file-text-o"></i> Day Book</li></a>
+                                                <a href="/School/TrialBalance"><li class="isHidden @(((controller == "school" && action == "trialbalance")) ? "active" : "")"><i class="icon-list"></i> Trial Balance</li></a>
+                                                <a href="/School/BalanceSheet"><li class="isHidden @(((controller == "school" && action == "balancesheet")) ? "active" : "")"><i class="icon-currency"></i> Balance Sheet</li></a>
+                                                <a href="/School/IncomeAndExpenditure"><li class="isHidden @(((controller == "school" && action == "incomeandexpenditure")) ? "active" : "")"><i class="icon-discount"></i> Income & Expenditure</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 5:
+                                        <a href="/School/Billing"><li class="@(((controller == "school" && action == "billing" || (controller == "school" && action == "billingdetails"))) ? "active" : "")"><i class="icon-printer"></i> Billing</li></a>
+                                                    break;
+                                                case 6:
+                                        <li class="sub-menu @(((controller == "school" && action == "smtpdetails") ||(controller == "school" && action == "settingshome")||(controller == "journal" && action == "accountsettings") ||( controller == "journal" && action == "bankdetails")) ? " open" : "")">
+                                            <span><i class="fa fa-cogs"></i>  Settings</span>
+                                            <ul>
+                                                <a href="/School/SMTPDetails"><li class="@(((controller == "school" && action == "smtpdetails")) ? "active" : "")"><i class="fa fa-envelope"></i> Email Settings</li></a>
+                                                <a href="/School/SettingsHome"><li class="@(((controller == "school" && action == "settingshome")) ? "active" : "")"><i class="fa fa-wrench"></i> Settings</li></a>
+                                                <a href="/Journal/AccountSettings"><li class="@(((controller == "journal" && action == "accountsettings")) ? "active" : "")"><i class="fa fa-wrench"></i> Account Settings</li></a>
+                                                <a href="/Journal/BankDetails"><li class="@(((controller == "journal" && action == "bankdetails")) ? "active" : "")"><i class="fa fa-wrench"></i> Bank Details</li></a>
+                                                <a href="/School/AttendanceDivisionApp"><li class="@(((controller == "school" && action == "attendancedivisionapp")) ? "active" : "")"><i class="fa fa-wrench"></i> Biometric Division</li></a>
+                                                @*basheer on 24/01/2019 change password*@
+                                                <a href="/School/ChangePassword"><li class="@(((controller == "school" && action == "ChangePassword")) ? "active" : "")"><i class="fa fa-wrench"></i> Change Password</li></a>
+
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 7:
+                                        <li class="sub-menu @(((controller == "school" && action == "navigationhistory")) ? " open" : "")">
+                                            <span><i class="fa fa-map-pin"></i>  Navigation</span>
+                                            <ul>
+                                                <a href="/School/NavigationHistory"><li class="@(((controller == "school" && action == "navigationhistory")) ? "active" : "")"><i class="fa fa-envelope"></i> Navigation History</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 8:
+                                        <li class="sub-menu @(((controller == "school" && action == "bookcategory") || (controller == "school" && action == "librarybook")|| (controller == "school" && action == "librarybookdue"))? " open" : "")">
+                                            <span><i class="fa fa-university"></i>  Library</span>
+                                            <ul>
+                                                <a href="/School/BookCategory"><li class="@(((controller == "school" && action == "bookcategory")) ? "active" : "")"><i class="fa fa-server"></i> Category</li></a>
+                                                <a href="/School/LibraryBook"><li class="@(((controller == "school" && action == "librarybook")) ? "active" : "")"><i class="fa fa-Book"></i>Books</li></a>
+                                                <a href="/School/LibraryBookDue"><li class="@(((controller == "school" && action == "librarybookdue")) ? "active" : "")"><i class="fa fa-braille"></i>Dues</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 9:
+                                        <a href="/Teacher/Attendance"><li class="@(((controller == "teacher" && action == "attendance")) ? "active" : "")"><i class="fa fa-check-square-o"></i> Attendance</li></a>
+                                                    break;
+                                                case 10:
+                                        <li class="sub-menu @(((controller == "school" && action == "messages") || (controller == "school" && action == "staffmessages")|| (controller == "student" && action == "installationinstruction")||  (controller == "school" && action == "smshistory")) ? " open" : "")">
+                                            <span><i class="fa fa-envelope"></i>  Message</span>
+                                            <ul>
+                                                <a href="/School/HomeworkSms"><li class="@(((controller == "school" && action == "hmeworksms")) ? "active" : "")"><i class="fa fa-paper-plane"></i> Student Homework</li></a>
+                                                <a href="/School/Messages"><li class="@(((controller == "school" && action == "messages")) ? "active" : "")"><i class="fa fa-paper-plane"></i> Student Message</li></a>
+                                                <a href="/School/StaffMessages"><li class="@(((controller == "school" && action == "staffmessages")) ? "active" : "")"><i class="fa fa-paper-plane"></i> Staff Message</li></a>
+                                                <a href="/Student/InstallationInstruction"><li class="@(((controller == "student" && action == "installationinstruction")) ? "active" : "")"><i class="fa fa-paper-plane"></i> Installation Instruction</li></a>
+                                                <a href="/School/SmsHistory"><li class="@(((controller == "school" && action == "smshistory")) ? "active" : "")"><i class="fa fa-history"></i> History</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 11:
+                                        <li class="sub-menu @(((controller == "school" && action == "collectionreport" )||( controller == "report" && action == "outstandingreport")|| (controller == "report" && action == "detailedcollectionreport")|| (controller == "report" && action == "monthlyattendancereport")|| (controller == "report" && action == "studentlist")) ? " open" : "")">
+                                            <span><i class="fa fa-list"></i> Reports  </span>
+                                            <ul>
+                                                <a href="/Report/BilledReport"><li class="@(((controller == "report" && action == "billedreport")) ? "active" : "")"><i class="fa fa-list-alt"></i> Billed Report</li></a>
+                                                <a href="/Report/OutstandingReport"><li class="@(((controller == "report" && action == "outstandingreport")) ? "active" : "")"><i class="fa fa-list-alt"></i> Outstanding Report</li></a>
+                                                <a href="/School/CollectionReport"><li class="@(((controller == "school" && action == "collectionreport") ) ? "active" : "")"><i class="fa fa-money"></i> Collection Reports</li></a>
+                                                <a href="/Report/DetailedCollectionReport"><li class="@(((controller == "report" && action == "detailedcollectionreport") ) ? "active" : "")"><i class="fa fa-address-card"></i> Detailed Collection</li></a>
+                                                <a href="/Report/MonthlyAttendanceReport"><li class="@(((controller == "report" && action == "monthlyattendancereport") ) ? "active" : "")"><i class="fa fa-adjust"></i> Monthly Attendance</li></a>
+                                                <a href="/Report/StudentList"><li class="@(((controller == "report" && action == "studentlist") ) ? "active" : "")"><i class="fa fa-safari"></i> Student List</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 12:
+                                        <li class="sub-menu @(((controller == "school" && action == "circularNotification") || (controller == "school" && action == "calenderevent")) ? " open" : "")">
+                                            <span><i class="fa fa-calendar"></i> Events  </span>
+                                            <ul>
+                                                <a href="/School/CircularNotification"><li class="@(((controller == "school" && action == "circularNotification")) ? "active" : "")"><i class="fa fa-bell"></i> Circular Notifications</li></a>
+                                                <a href="/School/CalendarEvent"><li class="@(((controller == "school" && action == "calenderevent")) ? "active" : "")"><i class="fa fa-calendar "></i> Calendar </li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 13:
+                                        <li class="sub-menu @(((controller == "school" && action == "curriculumDetails") ||( controller == "school" && action == "studentMarks")|| (controller == "student" && action == "subjects") ||( controller == "student" && action == "timetable")|| (controller == "teacher" && action == "mytimetable")) ? " open" : "")">
+                                            <span><i class="fa fa-book"></i> Curriculum  </span>
+                                            <ul>
+                                                <a href="/School/CurriculumDetails"><li class="@(((controller == "school" && action == "curriculumDetails")) ? "active" : "")"><i class="fa fa-line-chart"></i>Exam </li></a>
+                                                <a href="/School/StudentMarks"><li class="@(((controller == "school" && action == "studentMarks")) ? "active" : "")"><i class="fa fa-university"></i>Marks </li></a>
+                                                <a href="/Student/Subjects"><li class="@(((controller == "student" && action == "subjects")) ? "active" : "")"><i class="fa fa-bookmark"></i> Subjects</li></a>
+                                                <a href="/Student/TimeTable"><li class="@(((controller == "student" && action == "timetable")) ? "active" : "")"><i class="fa fa-times-circle"></i> Time Table</li></a>
+                                                @if (userType == teacherType)
+                                                            {
+                                                            <a href="/Teacher/MyTimeTable"><li class="@(((controller == "teacher" && action == "mytimetable")) ? "active" : "")"><i class="fa fa-tasks"></i>My Time Table</li></a>
+                                                            }
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 14:
+                                        <li class="sub-menu @(((controller == "school" && action == "diaryupload") ) ? " open" : "")">
+                                            <span><i class="fa fa-upload"></i> Uploads  </span>
+                                            <ul>
+                                                <a href="/School/DiaryUpload"><li class="@(((controller == "school" && action == "diaryupload")) ? "active" : "")"><i class="fa fa-book"></i>Diary & Logo</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 15:
+                                        <li class="sub-menu @(((controller == "school" && action == "laboratorycategory") ||( controller == "laboratory" && action == "stockupdate") ||( controller == "laboratory" && action == "labInventoryreport")) ? " open" : "")">
+                                            <span><i class="fa fa-flask"></i> Laboratory  </span>
+                                            <ul>
+                                                <a href="/School/LaboratoryCategory"><li class="@(((controller == "school" && action == "laboratorycategory")) ? "active" : "")"><i class="fa fa-cart-plus"></i> Laboratory</li></a>
+                                                <a href="/Laboratory/StockUpdate"><li class="@(((controller == "laboratory" && action == "stockupdate")) ? "active" : "")"><i class="fa fa-stop-circle"></i> Stock Update</li></a>
+                                                <a href="/Laboratory/LabInventoryReport"><li class="@(((controller == "laboratory" && action == "labInventoryreport") ) ? "active" : "")"><i class="fa fa-language"></i> Inventory Report</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 16:
+                                        <li class="sub-menu @(((controller == "progress" && action == "certificatename") ||(controller == "progress" && action == "region") ||( controller == "progress" && action == "scholasticarea")||( controller == "progress" && action == "coscholasticarea")||( controller == "progress" && action == "optionalsubjects")||( controller == "progress" && action == "optionalsubjectslist")) ? " open" : "")">
+                                            <span><i class="fa fa-cogs"></i> Exam Settings  </span>
+                                            <ul>
+                                                <a href="/Progress/CertificateName"><li class="@(((controller == "progress" && action == "certificatename")) ? "active" : "")"><i class="fa fa-certificate"></i>Certificate Name</li></a>
+                                                <a href="/Progress/Region"><li class="@(((controller == "progress" && action == "region")) ? "active" : "")"><i class="fa fa-registered"></i>Region</li></a>
+                                                <a href="/Progress/ScholasticArea"><li class="@(((controller == "progress" && action == "scholasticarea")) ? "active" : "")"><i class="fa fa-arrows-alt"></i>Scholastic Area</li></a>
+                                                <a href="/Progress/CoScholasticArea"><li class="@(((controller == "progress" && action == "coscholasticarea")) ? "active" : "")"><i class="fa fa-adjust"></i>Co ScholasticArea</li></a>
+                                                <a href="/Progress/OptionalSubjects"><li class="@(((controller == "progress" && action == "optionalsubjects")) ? "active" : "")"><i class="fa fa-optin-monster"></i>Optional Subjects</li></a>
+                                                <a href="/Progress/OptionalSubjectsList"><li class="@(((controller == "progress" && action == "optionalsubjectslist")) ? "active" : "")"><i class="fa fa-male"></i>Optional Subjects Students</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 17:
+                                        <li class="sub-menu @(((controller == "progress" && action == "examdeclaration") ) ? " open" : "")">
+                                            <span><i class="fa fa-calendar"></i> Exams  </span>
+                                            <ul>
+                                                <a href="/Progress/ExamDeclaration"><li class="@(((controller == "progress" && action == "examdeclaration")) ? "active" : "")"><i class="fa fa-check"></i>Declare Exam</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 18:
+                                        <li class="sub-menu @(((controller == "progress" && action == "examresult") ||(controller == "progress" && action == "scholasticarearesult")||(controller == "progress" && action == "coscholasticarearesult")||(controller == "progress" && action == "studentremark") ) ? " open" : "")">
+                                            <span><i class="fa fa-window-restore"></i> Result  </span>
+                                            <ul>
+                                                <a href="/Progress/ExamResult"><li class="@(((controller == "progress" && action == "examresult")) ? "active" : "")"><i class="fa fa-adjust"></i>Exam Result</li></a>
+                                                <a href="/Progress/ScholasticAreaResult"><li class="@(((controller == "progress" && action == "scholasticarearesult")) ? "active" : "")"><i class="fa fa-adjust"></i>Scholastic Area Result</li></a>
+                                                <a href="/Progress/CoScholasticAreaResult"><li class="@(((controller == "progress" && action == "coscholasticarearesult")) ? "active" : "")"><i class="fa fa-adjust"></i>Co-Scholastic Area Result</li></a>
+                                                <a href="/Progress/StudentRemark"><li class="@(((controller == "progress" && action == "studentremark")) ? "active" : "")"><i class="fa fa-adjust"></i>Student Remark</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                                case 19:
+                                        <li class="sub-menu @(((controller == "progress" && action == "generatecertificate") ) ? " open" : "")">
+                                            <span><i class="fa fa-product-hunt"></i> Education Progress  </span>
+                                            <ul>
+                                                <a href="/Progress/GenerateCertificate"><li class="@(((controller == "progress" && action == "generatecertificate")) ? "active" : "")"><i class="fa fa-id-card"></i>Progress Card</li></a>
+                                            </ul>
+                                        </li>
+                                                    break;
+                                            }
+                                        }
+                                    </ul>
+
+                                </div>
+                            </div><!-- end of sidebar-menu-->
+                        </div><!-- end of col md 3 -->
+                    }
+                    else
+                    {
+                        <div class="sidemenu-box">
+                            <div class="sidebar-menu">
+                                <div class="logo">
+                                    <img class="img-responsive" src="/Content/img/logo.png" alt="Peekabu" style="padding: 19px;" />
+                                </div><!-- end of logo -->
+                                <div class="side-menu">
+                                    <label class="mobile-label">Menu</label>
+                                    <ul class="responsive-menu">
+                                        @if (userType == teacherType || userType == schoolType || userType == staffType)
+                                        {
+                                            <a href="/School/Home"><li class="@(((controller == "school" && action == "home")) ? "active" : "")"><i class="icon-home"></i> HOME</li></a>
+                                            <a href="/AllHome/ManageHome"><li class="@(((controller == "allhome" && action == "managehome")) ? "active" : "")"><i class="icon-user-config"></i> MANAGEMENT</li></a>
+                                            <a href="/AllHome/AcademicsHome"><li class="@(((controller == "allhome" && action == "academicshome")) ? "active" : "")"><i class="fa fa-book"></i> ACADEMICS</li></a>
+                                            <a href="/AllHome/CurriculumHome"><li class="@(((controller == "allhome" && action == "curriculumhome")) ? "active" : "")"><i class="fa fa-book"></i> CURRICULUM </li></a>
+                                            <a href="/AllHome/ExamHome"><li class="@(((controller == "allhome" && action == "examhome")) ? "active" : "")"><i class="fa fa-book"></i> EXAM </li></a>
+                                            <a href="/AllHome/ExamResultHome"><li class="@(((controller == "allhome" && action == "examresulthome")) ? "active" : "")"><i class="fa fa-book"></i> EXAM RESULT  </li></a>
+                                            <a href="/AllHome/NotificationHome"><li class="@(((controller == "allhome" && action == "notificationhome")) ? "active" : "")"><i class="fa fa-book"></i> NOTIFICATIONS  </li></a>
+                                            <a href="/AllHome/MessageHome"><li class="@(((controller == "allhome" && action == "messagehome")) ? "active" : "")"><i class="fa fa-book"></i> MESSAGES   </li></a>
+                                            <a href="/AllHome/LaborotoryHome"><li class="@(((controller == "allhome" && action == "laborotoryhome")) ? "active" : "")"><i class="fa fa-book"></i> LABOROTORY    </li></a>
+                                            <a href="/AllHome/LibraryHome"><li class="@(((controller == "allhome" && action == "libraryhome")) ? "active" : "")"><i class="fa fa-book"></i> LIBRARY     </li></a>
+                                        }
+                                        @*@if (userType == schoolType)
+                                        {
+                                            <li class="sub-menu @(((controller == "school" && action == "class") || (controller == "school" && action == "student")|| (controller == "school" && action == "teacherlist") || (controller == "school" && action == "stafflist")) ? " open" : "")">
+                                                <span><i class="icon-user-config"></i>  Management</span>
+                                                <ul>
+                                                    <a href="/School/Class"><li class="@(((controller == "school" && action == "class")) ? "active" : "")"><i class="icon-blackboard"></i> Class</li></a>
+                                                    <a href="/School/Student"><li class="@(((controller == "school" && action == "student")) ? "active" : "")"><i class="icon-student"></i> Student</li></a>
+                                                    <a href="/School/TeacherList"><li class="@(((controller == "school" && action == "teacherlist")) ? "active" : "")"><i class="icon-professor"></i> Teacher</li></a>
+                                                    <a href="/School/StaffList"><li class="@(((controller == "school" && action == "stafflist")) ? "active" : "")"><i class="icon-user-config"></i> Staff</li></a>
+                                                    <a href="/School/ClassNotPublished"><li class="@(((controller == "school" && action == "classunpublished")) ? "active" : "")"><i class="icon-blackboard"></i> Promote Class</li></a>
+                                                    <a href="/School/PromoteStudent"><li class="@(((controller == "school" && action == "promotestudent")) ? "active" : "")"><i class="icon-blackboard"></i> Promote Student</li></a>
+                                                </ul>
+                                            </li>
+                                        }*@
+                                        @*@if (userType == schoolType || userType == staffType)
+                                        {
+                                            <li class="sub-menu @(((controller == "school" && action == "fee") || (controller == "school" && action == "feelist") || (controller == "school" && action == "feediscount")) ? " open" : "")">
+                                                <span><i class="fa fa-rupee"></i>  Fees</span>
+                                                <ul>
+                                                    <a href="/School/Fee"><li class="@(((controller == "school" && action == "fee")) ? "active" : "")"><i class="icon-currency"></i> Add Fee</li></a>
+                                                    <a href="/School/FeeList"><li class="@(((controller == "school" && action == "feelist")) ? "active" : "")"><i class="icon-list"></i> Fee List</li></a>
+                                                    <a href="/School/FeeDiscount"><li class="@(((controller == "school" && action == "feediscount")) ? "active" : "")"><i class="icon-discount"></i> Fee Discount</li></a>
+                                                </ul>
+                                            </li>
+                                            <li class="sub-menu @(((controller == "journal" && action == "bankstatement") ||(controller == "school" && action == "balancesheet") || (controller == "journal" && action == "daybook")|| (controller == "journal" && action == "trialbalance")|| (controller == "journal" && action == "BalanceSheet") ||(controller == "journal" && action == "ledger") ||(controller == "journal" && action == "assets") ||(controller == "journal" && action == "cashbook")||(controller == "journal" && action == "bankbook") ||(controller == "school" && action == "trialbalance") || (controller == "school" && action == "incomeandexpenditure")|| (controller == "school" && action == "report") || (controller == "journal" && action == "cashbookdailyreport")) ? " open" : "")">
+                                                <span><i class="fa fa-copy"></i>  Accounts</span>
+                                                <ul>
+                                                    <a href="/SchoolAccount/CashHome"><li class="@(((controller == "schoolaccount" && action == "cashHome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Cash Entry **</li></a>
+                                                    <a href="/SchoolAccount/BankHome"><li class="@(((controller == "schoolaccount" && action == "bankhome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Bank Entry **</li></a>
+                                                    <a href="/SchoolAccount/DayBookReportHome"><li class="@(((controller == "schoolaccount" && action == "daybookreporthome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Day Book Report **</li></a>
+                                                    <a href="/SchoolAccount/CashEntryReportHome"><li class="@(((controller == "schoolaccount" && action == "cashentryreporthome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Cash Book Report **</li></a>
+                                                    <a href="/SchoolAccount/BankEntryReportHome"><li class="@(((controller == "schoolaccount" && action == "bankentryreporthome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Bank Book Report **</li></a>
+                                                    <a href="/SchoolAccount/ReceiptAndPaymentHome"><li class="@(((controller == "schoolaccount" && action == "receiptandpaymenthome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Receipt & Payment **</li></a>
+                                                    <a href="/SchoolAccount/LedgerHome"><li class="@(((controller == "schoolaccount" && action == "ledgerhome")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Ledger **</li></a>
+                                                    <a href="/Journal/DayBook"><li class="isHidden @(((controller == "journal" && action == "daybook")) ? "active" : "")"><i class="fa fa-file-text-o"></i>Day Book</li></a>
+                                                    <a href="/Journal/CashBook"><li class="isHidden @(((controller == "journal" && action == "cashbook")) ? "active" : "")"><i class="icon-list"></i>Detailed Cash Book</li></a>
+                                                    <a href="/Journal/CashBookDailyReport"><li class="isHidden @(((controller == "journal" && action == "cashbookdailyreport")) ? "active" : "")"><i class="icon-list"></i>Cash Book Daily Report</li></a>
+                                                    <a href="/Journal/CashBookSummary"><li class="isHidden @(((controller == "journal" && action == "cashbooksummary")) ? "active" : "")"><i class="icon-list"></i>Cash Book</li></a>
+                                                    <a href="/Journal/BankBook"><li class="isHidden @(((controller == "journal" && action == "bankbook")) ? "active" : "")"><i class="icon-currency"></i>Bank Book</li></a>
+                                                    <a href="/Journal/Ledger"><li class="isHidden @(((controller == "journal" && action == "ledger")) ? "active" : "")"><i class="fa fa-compass"></i>Ledger</li></a>
+                                                    <a href="/Journal/Assets"><li class="isHidden @(((controller == "journal" && action == "assets")) ? "active" : "")"><i class="fa fa-arrows-alt"></i>Assets & Liabilities</li></a>
+                                                    <a href="/Journal/TrialBalance"><li class="isHidden @(((controller == "journal" && action == "trialbalance")) ? "active" : "")"><i class="fa fa-briefcase"></i>Trial Balance</li></a>
+                                                    <a href="/Journal/BalanceSheet"><li class="isHidden @(((controller == "journal" && action == "balancesheet")) ? "active" : "")"><i class="fa fa-certificate"></i>Balance Sheet</li></a>
+                                                    <a href="/Journal/BankStatement"><li class="isHidden @(((controller == "journal" && action == "bankstatement")) ? "active" : "")"><i class="fa fa-book"></i>Bank Statement</li></a>
+                                                    <a href="/Journal/ReceiptPayment"><li class="isHidden @(((controller == "journal" && action == "receiptpayment")) ? "active" : "")"><i class="fa fa-pencil-square"></i>Receipt & Payment</li></a>
+                                                    <a href="/School/Report"><li class="isHidden @(((controller == "school" && action == "report")) ? "active" : "")"><i class="fa fa-file-text-o"></i> Day Book</li></a>
+                                                    <a href="/School/TrialBalance"><li class="isHidden @(((controller == "school" && action == "trialbalance")) ? "active" : "")"><i class="icon-list"></i> Trial Balance</li></a>
+                                                    <a href="/School/BalanceSheet"><li class="isHidden @(((controller == "school" && action == "balancesheet")) ? "active" : "")"><i class="icon-currency"></i> Balance Sheet</li></a>
+                                                    <a href="/School/IncomeAndExpenditure"><li class="isHidden @(((controller == "school" && action == "incomeandexpenditure")) ? "active" : "")"><i class="icon-discount"></i> Income & Expenditure</li></a>
+                                                </ul>
+                                            </li>
+                                            <a href="/School/Billing"><li class="@(((controller == "school" && action == "billing" || (controller == "school" && action == "billingdetails"))) ? "active" : "")"><i class="icon-printer"></i> Billing</li></a>
+                                        }*@
+                                        @*@if (userType == schoolType)
+                                        {
+                                            <li class="sub-menu @(((controller == "school" && action == "smtpdetails") ||(controller == "school" && action == "settingshome")||(controller == "journal" && action == "accountsettings" )||( controller == "journal" && action == "bankdetails")) ? " open" : "")">
+                                                <span><i class="fa fa-cogs"></i>  Settings</span>
+                                                <ul>
+                                                    <a href="/School/SMTPDetails"><li class="@(((controller == "school" && action == "smtpdetails")) ? "active" : "")"><i class="fa fa-envelope"></i> Email Settings</li></a>
+                                                    <a href="/School/SettingsHome"><li class="@(((controller == "school" && action == "settingshome")) ? "active" : "")"><i class="fa fa-wrench"></i> Settings</li></a>
+                                                    <a href="/Journal/AccountSettings"><li class="@(((controller == "journal" && action == "accountsettings")) ? "active" : "")"><i class="fa fa-wrench"></i> Account Settings</li></a>
+                                                    <a href="/Journal/BankDetails"><li class="@(((controller == "journal" && action == "bankdetails")) ? "active" : "")"><i class="fa fa-wrench"></i> Bank Details</li></a>
+                                                    <a href="/School/AttendanceDivisionApp"><li class="@(((controller == "school" && action == "attendancedivisionapp")) ? "active" : "")"><i class="fa fa-wrench"></i> Biometric Division</li></a>
+                                                    <a href="/School/ChangePassword"><li class="@(((controller == "school" && action == "ChangePassword")) ? "active" : "")"><i class="fa fa-wrench"></i> Change Password</li></a>
+                                                </ul>
+                                            </li>
+                                            <li class="sub-menu @(((controller == "school" && action == "navigationhistory")) ? " open" : "")">
+                                                <span><i class="fa fa-map-pin"></i>  Navigation</span>
+                                                <ul>
+                                                    <a href="/School/NavigationHistory"><li class="@(((controller == "school" && action == "navigationhistory")) ? "active" : "")"><i class="fa fa-envelope"></i> Navigation History</li></a>
+                                                </ul>
+                                            </li>
+                                        }*@
+                                        @*<li class="sub-menu @(((controller == "school" && action == "bookcategory") || (controller == "school" && action == "librarybook")|| (controller == "school" && action == "librarybookdue")) ? " open" : "")">
+                                            <span><i class="fa fa-university"></i>  Library</span>
+                                            <ul>
+                                                <a href="/School/BookCategory"><li class="@(((controller == "school" && action == "bookcategory")) ? "active" : "")"><i class="fa fa-server"></i> Category</li></a>
+                                                <a href="/School/LibraryBook"><li class="@(((controller == "school" && action == "librarybook")) ? "active" : "")"><i class="fa fa-Book"></i>Books</li></a>
+                                                <a href="/School/LibraryBookDue"><li class="@(((controller == "school" && action == "librarybookdue")) ? "active" : "")"><i class="fa fa-braille"></i>Dues</li></a>
+                                            </ul>
+                                        </li>*@
+                                        @*@if (userType == teacherType || userType == schoolType)
+                                        {
+                                            <a href="/Teacher/Attendance"><li class="@(((controller == "teacher" && action == "attendance")) ? "active" : "")"><i class="fa fa-check-square-o"></i> Attendance</li></a>
+                                            <li class="sub-menu @(((controller == "school" && action == "messages") || (controller == "student" && action == "installationinstruction")|| (controller == "school" && action == "staffmessages")|| (controller == "school" && action == "smshistory")) ? " open" : "")">
+                                                <span><i class="fa fa-envelope"></i>  Message</span>
+                                                <ul>
+                                                    <a href="/School/HomeworkSms"><li class="@(((controller == "school" && action == "hmeworksms")) ? "active" : "")"><i class="fa fa-paper-plane"></i> Student Homework</li></a>
+                                                    <a href="/School/Messages"><li class="@(((controller == "school" && action == "messages")) ? "active" : "")"><i class="fa fa-paper-plane"></i> Student Message</li></a>
+                                                    <a href="/School/StaffMessages"><li class="@(((controller == "school" && action == "staffmessages")) ? "active" : "")"><i class="fa fa-paper-plane"></i> Staff Message</li></a>
+                                                    <a href="/Student/InstallationInstruction"><li class="@(((controller == "student" && action == "installationinstruction")) ? "active" : "")"><i class="fa fa-paper-plane"></i> Installation Instruction</li></a>
+                                                    <a href="/School/SmsHistory"><li class="@(((controller == "school" && action == "smshistory")) ? "active" : "")"><i class="fa fa-history"></i> History</li></a>
+                                                </ul>
+                                            </li>
+                                            <li class="sub-menu @(((controller == "school" && action == "collectionreport") ||( controller == "report" && action == "outstandingreport")|| (controller == "report" && action == "detailedcollectionreport")|| (controller == "report" && action == "monthlyattendancereport")|| (controller == "report" && action == "studentlist")) ? " open" : "")">
+                                                <span><i class="fa fa-list"></i> Reports  </span>
+                                                <ul>
+                                                    <a href="/Report/OutstandingReport"><li class="@(((controller == "report" && action == "outstandingreport")) ? "active" : "")"><i class="fa fa-list-alt"></i> Outstanding Report</li></a>
+                                                    <a href="/School/CollectionReport"><li class="@(((controller == "school" && action == "collectionreport") ) ? "active" : "")"><i class="fa fa-money"></i> Collection Reports</li></a>
+                                                    <a href="/Report/DetailedCollectionReport"><li class="@(((controller == "report" && action == "detailedcollectionreport") ) ? "active" : "")"><i class="fa fa-address-card"></i> Detailed Collection</li></a>
+                                                    <a href="/Report/MonthlyAttendanceReport"><li class="@(((controller == "report" && action == "monthlyattendancereport") ) ? "active" : "")"><i class="fa fa-adjust"></i> Monthly Attendance</li></a>
+                                                    <a href="/Report/StudentList"><li class="@(((controller == "report" && action == "studentlist") ) ? "active" : "")"><i class="fa fa-safari"></i> Student List</li></a>
+                                                </ul>
+                                            </li>
+                                        }*@
+                                        @*@if (userType == schoolType)
+                                        {
+                                            <li class="sub-menu @(((controller == "school" && action == "circularNotification") || (controller == "school" && action == "calenderevent")) ? " open" : "")">
+                                                <span><i class="fa fa-calendar"></i> Events  </span>
+                                                <ul>
+                                                    <a href="/School/CircularNotification"><li class="@(((controller == "school" && action == "circularNotification")) ? "active" : "")"><i class="fa fa-bell"></i> Circular Notifications</li></a>
+                                                    <a href="/School/CalendarEvent"><li class="@(((controller == "school" && action == "calenderevent")) ? "active" : "")"><i class="fa fa-calendar "></i> Calendar </li></a>
+                                                </ul>
+                                            </li>
+                                        }*@
+                                        @*@if (userType == teacherType || userType == schoolType)
+                                        {
+                                            <li class="sub-menu @(((controller == "school" && action == "diaryupload") ) ? " open" : "")">
+                                                <span><i class="fa fa-upload"></i> Uploads  </span>
+                                                <ul>
+                                                    <a href="/School/DiaryUpload"><li class="@(((controller == "school" && action == "diaryupload")) ? "active" : "")"><i class="fa fa-book"></i>Diary & Logo</li></a>
+                                                </ul>
+                                            </li>
+                                            <li class="sub-menu @(((controller == "school" && action == "laboratorycategory") || (controller == "laboratory" && action == "stockupdate")|| (controller == "laboratory" && action == "labInventoryreport")  ) ? " open" : "")">
+                                                <span><i class="fa fa-flask"></i> Laboratory  </span>
+                                                <ul>
+                                                    <a href="/School/LaboratoryCategory"><li class="@(((controller == "school" && action == "laboratorycategory")) ? "active" : "")"><i class="fa fa-cart-plus"></i>Lab Category</li></a>
+                                                    <a href="/Laboratory/StockUpdate"><li class="@(((controller == "laboratory" && action == "stockupdate")) ? "active" : "")"><i class="fa fa-stop-circle"></i> Stock Update</li></a>
+                                                    <a href="/Laboratory/LabInventoryReport"><li class="@(((controller == "laboratory" && action == "labInventoryreport") ) ? "active" : "")"><i class="fa fa-language"></i>  Inventory Report</li></a>
+                                                </ul>
+                                            </li>
+                                            <li class="sub-menu @(((controller == "school" && action == "curriculumDetails") || (controller == "school" && action == "studentMarks")||( controller == "student" && action == "subjects") ||( controller == "student" && action == "timetable")) ? " open" : "")">
+                                                <span><i class="fa fa-book"></i> Curriculum  </span>
+                                                <ul>
+                                                    <a href="/School/CurriculumDetails"><li class="@(((controller == "school" && action == "curriculumDetails")) ? "active" : "")"><i class="fa fa-line-chart"></i>Exam </li></a>
+                                                    <a href="/School/StudentMarks"><li class="@(((controller == "school" && action == "studentMarks")) ? "active" : "")"><i class="fa fa-university"></i>Marks </li></a>
+                                                    <a href="/Student/Subjects"><li class="@(((controller == "student" && action == "subjects")) ? "active" : "")"><i class="fa fa-bookmark"></i> Subjects</li></a>
+                                                    <a href="/Student/TimeTable"><li class="@(((controller == "student" && action == "timetable")) ? "active" : "")"><i class="fa fa-times-circle"></i> Time Table</li></a>
+                                                    @if (userType == teacherType)
+                                                    {
+                                                        <a href="/Teacher/MyTimeTable"><li class="@(((controller == "teacher" && action == "mytimetable")) ? "active" : "")"><i class="fa fa-tasks"></i>My Time Table</li></a>
+                                                    }
+                                                </ul>
+                                            </li>
+                                            <li class="sub-menu @(((controller == "progress" && action == "certificatename") ||(controller == "progress" && action == "region") ||( controller == "progress" && action == "scholasticarea")||( controller == "progress" && action == "coscholasticarea")||( controller == "progress" && action == "optionalsubjects") || (controller == "progress" && action == "optionalsubjectslist")) ? " open" : "")">
+                                                <span><i class="fa fa-cogs"></i> Exam Settings  </span>
+                                                <ul>
+                                                    <a href="/Progress/CertificateName"><li class="@(((controller == "progress" && action == "certificatename")) ? "active" : "")"><i class="fa fa-certificate"></i>Certificate Name</li></a>
+                                                    <a href="/Progress/Region"><li class="@(((controller == "progress" && action == "region")) ? "active" : "")"><i class="fa fa-registered"></i>Region</li></a>
+                                                    <a href="/Progress/ScholasticArea"><li class="@(((controller == "progress" && action == "scholasticarea")) ? "active" : "")"><i class="fa fa-arrows-alt"></i>Scholastic Area</li></a>
+                                                    <a href="/Progress/CoScholasticArea"><li class="@(((controller == "progress" && action == "coscholasticarea")) ? "active" : "")"><i class="fa fa-adjust"></i>Co ScholasticArea</li></a>
+                                                    <a href="/Progress/OptionalSubjects"><li class="@(((controller == "progress" && action == "optionalsubjects")) ? "active" : "")"><i class="fa fa-optin-monster"></i>Optional Subjects</li></a>
+                                                    <a href="/Progress/OptionalSubjectsList"><li class="@(((controller == "progress" && action == "optionalsubjectslist")) ? "active" : "")"><i class="fa fa-male"></i>Optional Subjects Students</li></a>
+                                                </ul>
+                                            </li>
+                                            <li class="sub-menu @(((controller == "progress" && action == "examdeclaration") ) ? " open" : "")">
+                                                <span><i class="fa fa-calendar"></i> Exams  </span>
+                                                <ul>
+                                                    <a href="/Progress/ExamDeclaration"><li class="@(((controller == "progress" && action == "examdeclaration")) ? "active" : "")"><i class="fa fa-check"></i>Declare Exam</li></a>
+                                                </ul>
+                                            </li>
+                                            <li class="sub-menu @(((controller == "progress" && action == "examresult")||(controller == "progress" && action == "scholasticarearesult")||(controller == "progress" && action == "coscholasticarearesult")||(controller == "progress" && action == "studentremark") ) ? " open" : "")">
+                                                <span><i class="fa fa-window-restore"></i> Result  </span>
+                                                <ul>
+                                                    <a href="/Progress/ExamResult"><li class="@(((controller == "progress" && action == "examresult")) ? "active" : "")"><i class="fa fa-adjust"></i>Exam Result</li></a>
+                                                    <a href="/Progress/ScholasticAreaResult"><li class="@(((controller == "progress" && action == "scholasticarearesult")) ? "active" : "")"><i class="fa fa-adjust"></i>Scholastic Area Result</li></a>
+                                                    <a href="/Progress/CoScholasticAreaResult"><li class="@(((controller == "progress" && action == "coscholasticarearesult")) ? "active" : "")"><i class="fa fa-adjust"></i>Co-Scholastic Area Result</li></a>
+                                                    <a href="/Progress/StudentRemark"><li class="@(((controller == "progress" && action == "studentremark")) ? "active" : "")"><i class="fa fa-adjust"></i>Student Remark</li></a>
+                                                </ul>
+                                            </li>
+                                            <li class="sub-menu @(((controller == "progress" && action == "generatecertificate") ) ? " open" : "")">
+                                                <span><i class="fa fa-product-hunt"></i> Education Progress  </span>
+                                                <ul>
+                                                    <a href="/Progress/GenerateCertificate"><li class="@(((controller == "progress" && action == "generatecertificate")) ? "active" : "")"><i class="fa fa-id-card"></i>Progress Card</li></a>
+                                                </ul>
+                                            </li>
+                                        }*@
+
+                                    </ul>
+                                </div>
+                            </div><!-- end of sidebar-menu-->
+                        </div><!-- end of col md 3 -->
+                    }
+
+                    <div class="content-body" style="min-height:150%;">
+                        <div class="main-section-header">
+                            <ul>
+                                @*<li><img class="img-responsive" src="/Content/img/school-logo.png" /></li>*@
+                                <li>@userData.Name</li>
+                                <li>|</li>
+                                @if (userType == teacherType || userType == staffType)
+                                {
+                                    <li><a href="/Logout/StaffLogout"><i class="fa  fa-power-off"></i></a></li>
+                                }
+                                else if (userType == schoolType)
+                                {
+                                    <li><a href="/Logout/SchoolLogout"><i class="fa  fa-power-off"></i></a></li>
+                                }
+
+                            </ul>
+                        </div>
+
+                        @RenderBody()
+                    </div>
+                </div>
+
+            </div><!-- end of row -->
+        </div><!-- end of container fluid -->
+    </div><!-- end of main section -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    @*<script src="https://code.jquery.com/jquery-2.1.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>*@
+    <!-- jQuery -->
+    @*<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>*@
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="~/Content/js/bootstrap.js"></script>
+    <script src="~/Content/Plugins/Datepicker/bootstrap-datepicker.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.dpicker').datepicker();
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.6/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $('.mobile-label').click(function () {
+            $('.responsive-menu').slideToggle();
+        });
+        $(document).on('click', '.sub-menu > span', function () {
+            //alert();
+            $(document).find('.sub-menu.open').removeClass('open');
+            $(this).parent().toggleClass('open');
+        });
+        $(document).on('click', '.sub-menu.open > span', function () {
+            $(this).parent().removeClass('open');
+        });
+
+        $(window).load(function () {
+            // Animate loader off screen
+            $(".se-pre-con").fadeOut("slow");
+        });
+
+    </script>
+    @*<script src="~/Scripts/jquery.validate.min.js"></script>
+        <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+
+    @*  <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>*@
+    @*<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>*@
+
+
+
+
+    <!-- DataTables -->
+    <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+    <script src="~/Content/Plugins/jquery.table2excel.min.js"></script>
+
+</body>
+</html>
+<script>
+    //Loader
+    $(document).ajaxStart(function () {
+        $(":submit").attr("disabled", true);
+        //$('body').pleaseWait();
+        ajaxLoaderStart();
+    });
+    $(document).ajaxComplete(function () {
+        $(":submit").attr("disabled", false);
+        //$('body').pleaseWait('stop');
+        ajaxLoaderStop();
+    });
+
+    function ajaxLoaderStart() {
+        $(".se-pre-con").show();
+
+    }
+
+    function ajaxLoaderStop() {
+        $(".se-pre-con").hide()
+
+    }
+
+</script>

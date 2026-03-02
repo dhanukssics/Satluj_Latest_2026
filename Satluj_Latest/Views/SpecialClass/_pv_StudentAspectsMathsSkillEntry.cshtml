@@ -1,0 +1,253 @@
+﻿
+@model Satluj_Latest.Models.StudentSkillMarks
+@{
+    <style>
+        .input_Size {
+            width: 110px;
+            max-width: 100%;
+        }
+    </style>
+
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+    var scoreDetails = new Satluj_Latest.Data.School(Model.SchoolId).Get_V_TotalScores(15);
+    var Concept = "";
+    //var Activity = "";
+    //var Tables = "";
+    //var MentalAbility = "";
+    var WrittenWork = "";
+    var WeeklyAssesment = "";
+    if (scoreDetails != null && scoreDetails.Count > 0)
+    {
+        if (scoreDetails.Any(x => x.SubTitle == "Concept Clarity/Activity"))
+        {
+            Concept = scoreDetails.Where(x => x.SubTitle == "Concept Clarity/Activity").FirstOrDefault().Mark.ToString();
+        }
+        //if (scoreDetails.Any(x => x.SubTitle == "Activity"))
+        //{
+        //    Activity = scoreDetails.Where(x => x.SubTitle == "Activity").FirstOrDefault().Mark.ToString();
+        //}
+        //if (scoreDetails.Any(x => x.SubTitle == "Tables"))
+        //{
+        //    Tables = scoreDetails.Where(x => x.SubTitle == "Tables").FirstOrDefault().Mark.ToString();
+        //}
+        //if (scoreDetails.Any(x => x.SubTitle == "MentalAbility"))
+        //{
+        //    MentalAbility = scoreDetails.Where(x => x.SubTitle == "MentalAbility").FirstOrDefault().Mark.ToString();
+        //}
+        if (scoreDetails.Any(x => x.SubTitle == "Written Work"))
+        {
+            WrittenWork = scoreDetails.Where(x => x.SubTitle == "Written Work").FirstOrDefault().Mark.ToString();
+        }
+        if (scoreDetails.Any(x => x.SubTitle == "Weekly Assessment"))
+        {
+            WeeklyAssesment = scoreDetails.Where(x => x.SubTitle == "Weekly Assessment").FirstOrDefault().Mark.ToString();
+        }
+    }
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                CONCEPTS CLARITY/ <br />ACTIVITY (@Concept)
+            </th>
+            @*<th style="color: black;">
+            CONCEPTS <br /> (@Concept)
+        </th>
+        <th style="color: black;">
+            ACTIVITY <br />(@Activity)
+        </th>
+        <th style="color: black;">
+            TABLES <br /> (@Tables)
+        </th>
+        <th style="color: black;">
+            MENTAL <br /> ABILITY <br />(@MentalAbility)
+        </th>*@
+            <th style="color: black;">
+                WRITTEN <br /> WORK (@WrittenWork)
+            </th>
+            <th style="color: black;">
+                WEEKLY <br /> ASSESMENT <br />(@WeeklyAssesment)
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+            <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                <td style="width:10%;">
+                    @count
+                </td>
+                <td style="width:50%;">
+                    @item.StudentName
+                </td>
+              
+                <td style="width:40%;">
+                    @if (item._AspectsMaths.Concepts == "" || item._AspectsMaths.Concepts !=null)
+                    {
+                        <div>
+                            <input value="@item._AspectsMaths.Concepts" type="number" maxlength="3" style="color:black; " class="cls-mark-Concepts input_Size" id="@count" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            @if (IsAdmin == true)
+                            {
+                                <input value="@item._AspectsMaths.Concepts" type="number" maxlength="3" style="color:black; " class="cls-mark-Concepts input_Size" id="@count" />
+                            }
+                            else
+                            {
+                                <input value="@item._AspectsMaths.Concepts" type="number" maxlength="3" style="color:black; " class="cls-mark-Concepts input_Size" readonly id="@count" />
+                            }
+                        </div>
+                    }
+                </td>
+                @*@if (item._AspectsMaths.Concepts.Trim() == "")
+            {
+                <div>
+                    <input value="@item._AspectsMaths.Concepts" type="number" maxlength="3" style="color:black; " class="cls-mark-Concepts input_Size" id="@count" />
+                </div>
+            }
+            else
+            {
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._AspectsMaths.Concepts" type="number" maxlength="3" style="color:black; " class="cls-mark-Concepts input_Size" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._AspectsMaths.Concepts" type="number" maxlength="3" style="color:black; " class="cls-mark-Concepts input_Size" readonly id="@count" />
+                    }
+                </div>
+            }
+        </td>
+
+        <td>
+            @if (item._AspectsMaths.Activity.Trim() == "")
+            {
+                <div>
+                    <input value="@item._AspectsMaths.Activity" type="number" maxlength="3" style="color:black; " class="cls-mark-Activity input_Size" id="@count" />
+                </div>
+            }
+            else
+            {
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._AspectsMaths.Activity" type="number" maxlength="3" style="color:black; " class="cls-mark-Activity input_Size" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._AspectsMaths.Activity" type="number" maxlength="3" style="color:black; " class="cls-mark-Activity input_Size" readonly id="@count" />
+                    }
+                </div>
+            }
+        </td>
+        <td>
+            @if (item._AspectsMaths.Tables.Trim() == "")
+            {
+                <div>
+                    <input value="@item._AspectsMaths.Tables" type="number" maxlength="3" style="color:black; " class="cls-mark-Tables input_Size" id="@count" />
+                </div>
+            }
+            else
+            {
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._AspectsMaths.Tables" type="number" maxlength="3" style="color:black; " class="cls-mark-Tables input_Size" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._AspectsMaths.Tables" type="number" maxlength="3" style="color:black; " class="cls-mark-Tables input_Size" readonly id="@count" />
+                    }
+                </div>
+            }
+        </td>
+        <td>
+            @if (item._AspectsMaths.MentalAbility.Trim() == "")
+            {
+                <div>
+                    <input value="@item._AspectsMaths.MentalAbility" type="number" maxlength="3" style="color:black; " class="cls-mark-MentalAbility input_Size" id="@count" />
+                </div>
+            }
+            else
+            {
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._AspectsMaths.MentalAbility" type="number" maxlength="3" style="color:black; " class="cls-mark-MentalAbility input_Size" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._AspectsMaths.MentalAbility" type="number" maxlength="3" style="color:black; " class="cls-mark-MentalAbility input_Size" readonly id="@count" />
+                    }
+                </div>
+            }
+        </td>*@
+                <td>
+                    @if (item._AspectsMaths.WrittenWork.Trim() == "")
+                    {
+                        <div>
+                            <input value="@item._AspectsMaths.WrittenWork" type="number" maxlength="3" style="color:black; " class="cls-mark-WrittenWork input_Size" id="@count" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            @if (IsAdmin == true)
+                            {
+                                <input value="@item._AspectsMaths.WrittenWork" type="number" maxlength="3" style="color:black; " class="cls-mark-WrittenWork input_Size" id="@count" />
+                            }
+                            else
+                            {
+                                <input value="@item._AspectsMaths.WrittenWork" type="number" maxlength="3" style="color:black; " class="cls-mark-WrittenWork input_Size" readonly id="@count" />
+                            }
+                        </div>
+                    }
+                </td>
+                <td>
+                    @if (item._AspectsMaths.WorkSheet.Trim() == "")
+                    {
+                        <div>
+                            <input value="@item._AspectsMaths.WorkSheet" type="number" maxlength="3" style="color:black; " class="cls-mark-WorkSheet input_Size" id="@count" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            @if (IsAdmin == true)
+                            {
+                                <input value="@item._AspectsMaths.WorkSheet" maxlength="1" style="color:black; " class="cls-mark-WorkSheet input_Size" id="@count" />
+                            }
+                            else
+                            {
+                                <input value="@item._AspectsMaths.WorkSheet" type="number" maxlength="3" style="color:black; " class="cls-mark-WorkSheet input_Size" readonly id="@count" />
+                            }
+                        </div>
+                    }
+                </td>
+
+            </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-Aspect-maths_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

@@ -1,0 +1,104 @@
+﻿@model Satluj_Latest.Models.SchoolValue
+@{
+    ViewBag.Title = "ClassDetails";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var school = new Satluj_Latest.Data.School(Model.schoolId);
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <a href="/School/Class" class="btn btn-peek"><i class="fa fa-arrow-left"></i> Back</a>
+        </div>
+        <h3>Class Details </h3>
+
+        <div class="table-responsive">
+            <table class="table custome-table">
+                <tr>
+                    <th>
+                        Slno
+                    </th>
+                    <th>
+                        Class
+                    </th>
+                    <th>
+                        Division
+                    </th>
+                    <th>
+                        Teacher in charge
+                    </th>
+                    <th>
+                        Total Students
+                    </th>
+                </tr>
+                <tr>
+                    @if (school != null)
+                    {
+                        var classDetails = school.Class.FirstOrDefault(z => z.ClassId == Model.classId);
+                        if (classDetails != null)
+                        {
+                            var division = school.Divisions.FirstOrDefault(z => z.DivisionId == Model.divId);
+                            <td>
+                                1
+                            </td>
+                            <td>
+                                @classDetails.ClassName
+                            </td>
+                            <td>
+                                @division.DivisionName
+                            </td>
+                            <td>
+                                @division.getTeacherClass()
+                            </td>
+                            <td>
+                                @division.GetStudentDetails().Count
+                            </td>
+                        }
+                    }
+                </tr>
+            </table>
+        </div>
+        <h4>Students Details</h4>
+        <div class="table-responsive">
+            <table class="table account-table"id="table-studentlist-class">
+                @{
+                    var obj = new Satluj_Latest.Models.SchoolData();
+                    obj.value = new Satluj_Latest.Models.ClassDivisionValue();
+                    obj.Data = school;
+                    obj.value.classId = Model.classId;
+                    obj.value.divId = Model.divId;
+                    obj.value.schoolid = Model.schoolId;
+                }
+                @Html.Partial("~/Views/School/_pv_DivisionStudentList.cshtml", obj)
+            </table>
+        </div>
+        @*<div class="form-group text-right">
+            <button class="btn pay-now-btn"><i class="fa fa-save"></i> Save</button>
+            <button class="btn pay-now-btn"><i class="fa fa-print"></i> Print</button>
+        </div>*@
+
+    </div><!-- end of col md 8 -->
+</div>
+
+
+<script>
+    //$('.mobile-label').click(function () {
+    //    $('.responsive-menu').slideToggle();
+    //});
+    //$(document).on('click', '.sub-menu > span', function () {
+    //    //alert();
+    //    $(document).find('.sub-menu.open').removeClass('open');
+    //    $(this).parent().toggleClass('open');
+    //});
+    //$(document).on('click', '.sub-menu.open > span', function () {
+    //    $(this).parent().removeClass('open');
+    //});
+
+
+
+    $(function () {
+        $("#table-studentlist-class").dataTable();
+    })
+
+</script>
+

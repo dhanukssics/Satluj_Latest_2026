@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>SchoolMan | Online School Management Systems </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <!--Meta-->
+    <meta name="description" content="SchoolMan is a complete management application for school administration, teachers and parents, it provides a web as well as mobile application which can be downloaded from Google Play store.">
+    <meta name="keywords" content="Schoolman, class management software, school management software, class software, School software, web based school management system, online school management systems, school management software, school management system, Online School Tutorial, Online school payment, school fee payment, timetable, schedule, timetable software, school scheduling">
+    <meta name="author" content="SchoolMan">
+    <!--Meta-->
+    @* @Scripts.Render("~/bundles/jqueryval") *@
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/Content/Plugins/toastr/toastr.min.css" />
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/Plugins/toastr/toastr.min.js"></script>
+
+
+    <!-- Bootstrap -->
+    <link href="~/Content/css/bootstrap.css" rel="stylesheet" />
+    <!-- Custom Style -->
+    <link href="~/Content/css/accountStyles.css" rel="stylesheet" />
+    @*<!-- Font awesome icons css -->*@
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet">
+    <!-- Font awesome css -->
+    <link href="~/Content/css/font-awesome.min.css" rel="stylesheet" />
+    <!-- Favicon -->
+    <link href="~/Content/img/favicon.png" rel="shortcut icon" />
+
+
+
+    <link href="~/Content/Plugins/toastr/toastr.min.css" rel="stylesheet" />
+    <script src="~/Content/Plugins/toastr/toastr.min.js"></script>
+    <script src="~/Content/Plugins/toastr/toastrConfig.js"></script>
+   
+
+</head>
+<body>
+
+    <style>
+        .menu li.active a {
+            color: #fa6e83;
+        }
+          .full-loader-dev {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 19999;
+            background: url(/Content/img/preloader.gif) center no-repeat rgb(255, 255, 255) !important;
+            background-size: 350px;
+            background-position: center;
+            content: '';
+        }
+        /* Styles for validation helpers
+-----------------------------------------------------------*/
+#contactForm .field-validation-error{
+    position: absolute;
+    bottom: 0px;
+    left: 15px;
+}
+
+.field-validation-error {
+    color: #f00;
+}
+.field-validation-valid {
+    display: none;
+}
+.input-validation-error {
+    border: 1px solid #f00;
+    background-color: #fee;
+}
+.validation-summary-errors {
+    font-weight: bold;
+    color: #f00;
+}
+.validation-summary-valid {
+    display: none;
+}
+    </style>
+
+    @{
+        var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+        var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+    }
+    <div class="se-pre-con"></div>
+    <div class="full-loader-dev"></div>
+    <section class="header">
+        <input type="checkbox" id="toggle" />
+        <nav id="site-nav" class="site-nav">
+            <div class="container">
+                <div class="logo"><a href="/Account/Home"><img class="img-responsive" src="~/Content/img/logo.png" style="width: 211px;" /></a></div>
+                <label class="navBars" for="toggle"> <i class="fa fa-bars"></i> </label>
+                <ul id="menu" class="menu">
+                    <li class="@(((controller == "account" && action == "home")) ? "active" : "")"><a href="/Account/Home">Home</a></li>
+                    <li class="@(((controller == "account" && action == "aboutus")) ? "active" : "")"><a href="/Account/AboutUs">About us</a></li>
+                    <li class="@(((controller == "account" && action == "contactus")) ? "active" : "")"><a href="/Account/ContactUs">Contact us</a></li>
+                </ul>
+            </div>
+        </nav>
+    </section>
+
+    @RenderBody()
+
+    <section class="footer-reg">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="copyright"><i class="fa fa-copyright"></i> 2017. All rights reserved</span>
+                </div>
+                <div class="col-md-4">
+                    <img class="img-responsive center-block" src="~/Content/img/footer-logo.png" style="width: 175px;"/>
+                </div>
+                <div class="col-md-4">
+                    <ul class="text-right foot-menu">
+                        <li><a href="/Account/TermsConditions">Terms & Conditions</a></li>
+                        <li><a href="/Account/Privacypolicy">Privacy policy</a></li>
+                        <li><a href="/Account/Disclaimer">Disclaimer</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="~/Content/js/bootstrap.js"></script>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>
+<script>
+    $(window).load(function () {
+        // Animate loader off screen
+        $(".se-pre-con").fadeOut("slow");
+        $(".full-loader-dev").hide();
+
+    });
+    //Loader
+    $(document).ajaxStart(function () {
+        $(":submit").attr("disabled", true);
+        //$('body').pleaseWait();
+        ajaxLoaderStart();
+    });
+    $(document).ajaxComplete(function () {
+        $(":submit").attr("disabled", false);
+        //$('body').pleaseWait('stop');
+        ajaxLoaderStop();
+    });
+
+    function ajaxLoaderStart() {
+        $(".se-pre-con").show();
+    }
+
+    function ajaxLoaderStop() {
+        $(".se-pre-con").hide()
+
+    }
+
+ 
+
+</script>
+

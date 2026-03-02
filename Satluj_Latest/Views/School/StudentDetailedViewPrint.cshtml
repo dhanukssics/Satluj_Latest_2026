@@ -1,0 +1,299 @@
+﻿@model Satluj_Latest.Models.StudentModel
+@{
+    //var logo = "http://www.schoolman.in" + Model.SchoolLogo;
+    var profile = "";
+    if (Model.profilePic != "")
+    {
+        profile = "http://satluj.schoolman.in" + Model.profilePic;
+    }
+    else
+    {
+        profile = "http://satluj.schoolman.in" + "/Content/img/children-1.gif";
+    }
+    var schoolLogo = "http://satluj.schoolman.in" + Model.SchoolLogo;
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>School</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6, a, p, i, b, ul, ol, li, span, strong {
+            margin: 0;
+            padding: 0;
+        }
+
+        div {
+            box-sizing: border-box;
+        }
+
+        .schoolPrint {
+            width: 900px;
+            height: auto;
+            margin: 30px auto;
+        }
+
+        .schoolname {
+            width: 100%;
+            padding: 12px 0px;
+            text-align: center;
+            margin-bottom: 35px;
+            border-bottom: 1px solid #000;
+        }
+
+        .school_img {
+            float: left;
+            margin-right: -150px;
+        }
+
+        .schoolname * {
+            padding: 3px 0px;
+        }
+
+        .stduentInfo {
+            width: 100%;
+            display: grid;
+            grid-gap: 8px 5px;
+            margin-bottom: 10px;
+            padding-bottom: 15px;
+            padding-top: 6px;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+            .stduentInfo > div {
+                padding: 5px;
+                border: 1px solid #000;
+            }
+
+        .stduentInfo_one {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+            .stduentInfo_one > div:nth-child(2) * {
+                padding: 0px 12px 12px 12px;
+            }
+
+        .stduentInfo_first > div {
+            padding: 5px;
+            border: 1px solid #000;
+        }
+
+        .photo_img {
+            width: 150px;
+            height: 160px;
+            padding: 5px;
+            margin-right: 5px;
+            border: 1px solid #000;
+        }
+
+            .photo_img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .parent_info h2 {
+            font-size: 21px;
+            margin-top: 30px;
+            margin-bottom: 12px;
+        }
+
+        .signFoot {
+            width: 100%;
+            margin-top: 60px;
+        }
+
+        .pay-now-btn {
+            background: #369;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            float: right;
+            padding: 8px 20px;
+        }
+
+        .schoolInfo {
+            padding: 10px 0px;
+            text-align: center;
+            margin: 0 0 15px;
+            border-bottom: 1px solid #000;
+            float: left;
+            width: 100%;
+        }
+
+            .schoolInfo .schoolname {
+                border: 0;
+                width: auto;
+                margin: 0 auto;
+                /* float: left; */
+                display: inline-block;
+            }
+
+            .schoolInfo .school_img img {
+                max-width: 200px;
+            }
+    </style>
+</head>
+<body>
+    <span>
+        <button type="button" id="btn-print" class="btn pay-now-btn" onclick="myFunction()"><i class="fa fa-edit"></i>Print </button>
+    </span>
+    <div class="schoolPrint">
+        <div class="schoolInfo">
+            <div class="school_img">
+                <img src="@schoolLogo " />
+            </div>
+            <div class="schoolname">
+                <h2>@Model.SchoolName</h2>
+                <h5>@Model.SchoolAddress</h5>
+            </div>
+        </div>
+
+        <div class="stduentInfo_one">
+            <div class="photo_img">
+                <img src="@profile" />
+            </div>
+            <div>
+                <h2>@Model.studentName</h2>
+                <h4>Class   :@Model.className  </h4>
+                <h4>Div     :@Model.division</h4>
+                <h4>Admission No : @Model.admissionNo </h4>
+                <h4>Roll No : @Model.RollNo1</h4>
+            </div>
+        </div>
+
+        <div class="stduentInfo">
+            <div>
+                <strong>Gender :</strong>
+                <span>@Model.gender</span>
+            </div>
+            <div>
+                <strong>Date of Birth :</strong>
+                <span>@Model.DOBstring</span>
+            </div>
+            <div>
+                <strong>Date of Joining :</strong>
+                <span>@Model.DateOfJoiningString</span>
+            </div>
+            <div>
+                <strong>Contact :</strong>
+                <span>04723 - 456786</span>
+            </div>
+            <div>
+                <strong>Mobile :</strong>
+                <span>@Model.contactNo</span>
+            </div>
+            <div>
+                <strong>Email :</strong>
+                <span>@Model.parentEmail</span>
+            </div>
+            <div>
+                <strong>Category :</strong>
+                <span>@Model.Category</span>
+            </div>
+            <div>
+                <strong>Mother Tongue :</strong>
+                <span>@Model.MotherTongue</span>
+            </div>
+            <div>
+                <strong>Place of Birth :</strong>
+                <span>@Model.PlaceOfBirth</span>
+            </div>
+            <div>
+                <strong>Country :</strong>
+                <span>@Model.Country</span>
+            </div>
+            <div>
+                <strong>Nationality :</strong>
+                <span>@Model.Nationality</span>
+            </div>
+            <div>
+                <strong>Address :</strong>
+                <span>@Model.address</span>
+            </div>
+            <div>
+                <strong>State :</strong>
+                <span>@Model.state</span>
+            </div>
+            <div>
+                <strong>City :</strong>
+                <span>@Model.city</span>
+            </div>
+            <div>
+                <strong>Pin :</strong>
+                <span>@Model.Pincode</span>
+            </div>
+        </div>
+
+        <div class="parent_info">
+            <h2>Parents Informations</h2>
+            <table border="1" cellspacing="0" cellpadding="9" width="100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Father</th>
+                        <th>Mother</th>
+                        <th>Guardian</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Name</td>
+                        <td>@Model.FatherName</td>
+                        <td>@Model.MotherName</td>
+                        <td>@Model.GuardianName</td>
+                    </tr>
+                    <tr>
+                        <td>Education</td>
+                        <td>@Model.FatherEducation</td>
+                        <td>@Model.MotherEducaton</td>
+                        <td>@Model.GuardianEduation</td>
+                    </tr>
+                    <tr>
+                        <td>Occupation</td>
+                        <td>@Model.FatherOccupation</td>
+                        <td>@Model.MotherOccupation</td>
+                        <td>@Model.GuardianOccupation</td>
+                    </tr>
+                    <tr>
+                        <td>Contact No</td>
+                        <td>@Model.FatherContact</td>
+                        <td>@Model.MotherContact</td>
+                        <td>@Model.GuardianContact</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>@Model.FatherEmail</td>
+                        <td>@Model.MotherEmail</td>
+                        <td>@Model.GuardianEmail</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="signFoot">
+            <h3>Place :@Model.SchoolAddress</h3>
+            <br />
+            <h3>Date :@Model.CurrentDate</h3>
+        </div>
+    </div>
+
+</body>
+</html>
+<script>
+    function myFunction() {
+        var printButton = document.getElementById("btn-print");
+        printButton.style.visibility = 'hidden';
+        window.print();
+        printButton.style.visibility = 'visible';
+    }
+</script>

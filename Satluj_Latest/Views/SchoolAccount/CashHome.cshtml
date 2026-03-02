@@ -1,0 +1,285 @@
+﻿@model Satluj_Latest.Models.CashEntryModel
+@{
+    ViewBag.Title = "CashHome";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    .gap_bottom {
+        padding-bottom: 35px;
+    }
+
+        .gap_bottom label {
+            padding-top: 8px;
+        }
+</style>
+<h2>Cash Entry</h2>
+<div class="parent-div">
+    <div id="add-cash-enry-Id">
+        @Html.Partial("~/Views/SchoolAccount/_pv_AddCashEntryData.cshtml", Model)
+    </div>
+    <div col-lg-12 id="edit-cancel-cash-entry-Id">
+
+    </div>
+    <div class="modal" id="search-cash-entry-Id" z-index="99999" role="dialog" aria-labelledby="myModalLabel6">
+
+    </div>
+</div>
+
+<script>
+    $('.date-cashentry-add').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).ready(function () {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var today = dd + '-' + mm + '-' + yyyy;
+        $('.date-cashentry-add').val(today);
+        GetVoucherNumber();
+    });
+
+    function GetVoucherNumber() {
+        var id = $('.pv_account-type').val();
+        if (id == '') {
+            id = 0;
+        }
+        $.ajax({
+            url: '/SchoolAccount/GetVoucherNo?id=' + id,
+            type: "GET",
+            success: function (response) {
+                if (response.status > 0) {
+                    $("#VoucherNo").val('');
+                    $("#VoucherNo").val(response.result);
+                }
+                else {
+                    $("#VoucherNo").val('');
+                }
+            }
+        });
+    }
+
+    $(document).on('change', '.accHead-drop-down', function () {
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadSubLedgerList?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#SubLedgerId").html("");
+                        $.each(result.list, function (i, item) {
+                            $("#SubLedgerId").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#SubLedgerId").prop("disabled", false);
+                    }
+                    else {
+                        $("#SubLedgerId").html("");
+                        $("#SubLedgerId").append($('<option></option>').val("").html('-- No SubLedger Found --'));
+                        $("#SubLedgerId").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+        }
+    });
+
+    $(document).on('change', '.pv_account-type', function () {
+        GetVoucherNumber();
+    });
+
+    function AddCashEntrySuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.msg);
+            RefreshPage();
+        }
+        else {
+            toastrError(result.msg)
+        }
+    }
+
+    function AddCashEntryFailed() {
+        RefreshPage();
+        toastrError(result.msg);
+    }
+
+    function RefreshPage() {
+        setTimeout(function () {
+            window.location.href = "/SchoolAccount/CashHome/";
+        }, 250);
+    }
+
+    $(document).on('change', '#cash-entry-type-idd', function () {
+        var x = $(this).val();
+        if (x == "0") {
+            $('#chkDiv').removeClass('isHidden');
+        }
+        else {
+            $('#chkDiv').addClass('isHidden');
+            $("#cash-check-advance-id").prop("checked", false);
+        }
+    });
+
+    //***********************************************SEARCH STARTED*******************************************8
+
+    $(document).on('click', '#btn-search-cashbook', function () {
+        $.ajax({
+            url: '/SchoolAccount/LoadCashEntrySearchView/',
+            dataType: 'html',
+            success: function (data) {
+                $('#search-cash-entry-Id').html('');
+                $('#search-cash-entry-Id').html(data);
+                $('#search-cash-entry-Id').modal('show');
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-cancel-cashbook', function () {
+        window.location.href = "/SchoolAccount/CashHome/";
+    });
+
+    $(document).on('keyup', '#cash-search-voucher-bank-id', function () {
+        if ($('#cash-search-voucher-bank-id').val() != 0) {
+            var voucherNo = $('#cash-search-voucher-bank-id').val();
+            var type = $('#cash-entry-type-serarch-id').val();
+            var item = new Object();
+            item.cashTypeId = type;
+            item.voucher = voucherNo.toString();
+            $.post("/SchoolAccount/SearchCashVoucherExistance/", item, function (result) {
+                if (result.status) {
+                    $('#spn-error-serach-voucher').text("");
+                    $('#spn-error-serach-voucher').hide();
+                    $('#btn-Search-cashbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                }
+                else {
+                    $('#spn-error-serach-voucher').text(result.msg);
+                    $('#spn-error-serach-voucher').show();
+                    $('#btn-Search-cashbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                }
+            });
+        }
+        else {
+            $('#spn-error-serach-voucher').text("Please enter the Voucher Number!");
+            $('#spn-error-serach-voucher').show();
+            $('#btn-Search-cashbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+    });
+
+    $(document).on('click', '#btn-Search-cashbook', function () {
+        var voucherNo = $('#cash-search-voucher-bank-id').val();
+        if (voucherNo == 0) {
+            $('#spn-error-serach-voucher').text("Please enter the Voucher Number!");
+            $('#spn-error-serach-voucher').show();
+            $('#btn-Search-cashbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+        else {
+            $('#spn-error-serach-voucher').text("");
+            $('#spn-error-serach-voucher').hide();
+            $('#btn-Search-cashbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+            var type = $('#cash-entry-type-serarch-id').val();
+            var id = type + '~' + voucherNo;
+            $.ajax({
+                url: '/SchoolAccount/LoadCashEntryEditView/' + id,
+                dataType: 'html',
+                success: function (data) {
+                    $('#search-cash-entry-Id').modal('hide')
+                    $('#add-cash-enry-Id').html('');
+                    $('#edit-cancel-cash-entry-Id').html('');
+                    $('#edit-cancel-cash-entry-Id').html(data);
+                    $('#add-cash-enry-Id').modal('hide');
+                    $('#search-cash-entry-Id').modal('hide');
+                }
+            });
+        }
+    });
+
+    $(document).on('change', '#cash-entry-type-serarch-id', function () {
+        $('#cash-search-voucher-bank-id').val('');
+    });
+
+    $(document).on('change', '.edit-accHead-drop-down', function () {
+        var id = $(this).val();
+        if (id != '') {
+            $('#sub-view-through-head').removeClass('isHidden');
+            $('#sub-view-through-search').addClass('isHidden');
+            $.ajax({
+                url: '/Data/LoadSubLedgerList?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#SubLedgerId_Edit").html("");
+                        $.each(result.list, function (i, item) {
+                            $("#SubLedgerId_Edit").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#SubLedgerId_Edit").prop("disabled", false);
+                    }
+                    else {
+                        $("#SubLedgerId_Edit").html("");
+                        $("#SubLedgerId_Edit").append($('<option></option>').val("").html('-- No SubLedger Found --'));
+                        $("#SubLedgerId_Edit").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+        }
+    });
+
+    $(document).on('click', '#btn-cashbook-Clear-Feild', function () {
+        window.location.href = "/SchoolAccount/CashHome/";
+    });
+
+    $(document).on('click', '#btn-edit-cancel-cashbook', function () {
+        var id = $('#edit-cashData-id').val();
+        if (id != 0) {
+            var source = $(this);
+            swal({
+                title: "Are you sure?",
+                text: "You will not be able to undo this !",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Cancel The Cash Voucher!",
+                cancelButtonText: "No, Leave it!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+    function (isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: '/SchoolAccount/CancelCashEntry/' + id,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status) {
+                        toastrSuccess(data.msg);
+                        window.location.href = "/SchoolAccount/CashHome/";
+                    }
+                    else {
+                        toastrError(data.msg);
+                        window.location.href = "/SchoolAccount/CashHome/";
+                    }
+                }
+            });
+
+        }
+    });
+        }
+        else {
+            toastrError("You can't be edit this data !");
+        }
+    });
+
+
+</script>

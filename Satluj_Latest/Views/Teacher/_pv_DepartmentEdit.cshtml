@@ -1,0 +1,63 @@
+﻿@model Satluj_Latest.Models.DepartmentsModel
+
+<div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+
+        <form id="form-teacher-edit"
+              asp-controller="Teacher"
+              asp-action="EditDepartment"
+              method="post">
+
+            <input type="hidden" asp-for="DepartmentId" />
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Department</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label asp-for="DepartmentName">Department :</label>
+                    <input asp-for="DepartmentName"
+                           class="form-control"
+                           placeholder="Department Name" />
+                    <span asp-validation-for="DepartmentName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="submit"
+                        id="btn-editteacher"
+                        class="btn pay-now-btn">
+                    Edit
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+<script>
+    $(document).on("submit", "#form-teacher-edit", function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                EditDepartmentSuccess(response);
+            },
+            error: function (xhr) {
+                ajaxFailure(xhr);
+            }
+        });
+    });
+</script>

@@ -1,0 +1,80 @@
+﻿@model Satluj_Latest.Models.LoginModel
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<form id="login-form" method="post" asp-controller="Account" asp-action="CheckLogin" style="display:block;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="login-main">
+                    <img class="img-responsive" src="/Content/img/logo.png" width="200" />
+                    <h3 class="main-title">Login</h3>
+                    <hr />
+
+                    @Html.HiddenFor(m => m.userType, new { value = 1 })
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Username" })
+                        @Html.ValidationMessageFor(m => m.Email)
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
+                        @Html.ValidationMessageFor(m => m.Password)
+                    </div>
+
+                    <div class="form-group">
+                        <a asp-controller="Account" asp-action="ForgotPassword">Forgot password?</a>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="custom-btn">Signin</button>
+                    </div>
+
+                    <div class="form-group text-center">
+                        New User? <a asp-controller="Account" asp-action="SchoolRegistration">Register</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $("#login-form").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: "POST",
+                data: $(this).serialize(),
+                success: function (result) {
+                    CheckLoginSuccess(result);
+                },
+                error: function () {
+                    toastrError("Login failed");
+                }
+            });
+        });
+
+        function CheckLoginSuccess(result) {
+            if (result.status) {
+                if (result.userType === 1) {
+                    window.location.href = "/School/Home";
+                } else if (result.userType === 2) {
+                    window.location.href = "/Parent/ParentHome";
+                }
+            } else {
+                toastrError(result.msg);
+            }
+        }
+
+        $(document).on('keypress', '#password', function (e) {
+            if (e.which === 32) return false;
+        });
+    </script>
+}

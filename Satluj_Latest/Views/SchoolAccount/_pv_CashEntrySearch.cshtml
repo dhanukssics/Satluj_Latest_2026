@@ -1,0 +1,48 @@
+﻿
+@model Satluj_Latest.Models.CashEntryModel
+@{
+
+
+}
+<div class="modal-dialog modal-sm" style="width:35%; margin:auto;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel6">Search Cash Entry Details</h4>
+        </div>
+        <div class="modal-body" style="height:40%;">
+            <div class="col-md-12">
+
+                <div class="form-group gap_bottom dev_design">
+                    <div class="col-md-4">
+                        <label>Type</label>
+                    </div>
+                    <div class="col-md-8">
+                        <select asp-for="TypeId"
+                                asp-items="Html.GetEnumSelectList<AccountType>()"
+                                class="form-control"
+                                id="cash-entry-type-serarch-id">
+                        </select>
+
+                    </div>
+                </div>
+                <div class="form-group gap_bottom dev_design">
+                    <div class="col-md-4">
+                        <label>Voucher No</label>
+                    </div>
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(m => m.VoucherNo, new { autocomplete = "off", placeholder = "Voucher No", Type = "number", @class = "form-control", id = "cash-search-voucher-bank-id" })
+                        <span id="spn-error-serach-voucher" data-val="0" data-myval="10" style="color:red;"></span>
+                    </div>
+                </div>
+
+                <div class="form-group gap_bottom dev_design">
+                    <div class="modal-footer">
+                        <button type="button" id="btn-cancel-cashbook" class="btn">Cancel</button>
+                        <button type="submit" id="btn-Search-cashbook" class="btn pay-now-btn">Search</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

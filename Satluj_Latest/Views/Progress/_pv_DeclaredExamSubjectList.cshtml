@@ -1,0 +1,53 @@
+﻿@model Satluj_Latest.Models.DeclaredExamSubjectModel
+@{
+    long schoolId = Model.SchoolId;
+    long ExamId = Model.ExamId;
+    var data = new Satluj_Latest.Data.School(schoolId).GetAllDeclaredExamSubjectList(ExamId);
+    int x = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<table class="table custome-table declared-exam-list">
+    <thead>
+        <tr>
+            <th>
+                Sl No
+            </th>
+            <th>
+                Subject
+            </th>
+            <th>
+                Exam Date
+            </th>
+            <th>
+                Total Score
+            </th>
+            <th>
+                Remark
+            </th>
+            @if (IsAdmin == true)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in data)
+        {
+            <tr>
+                <td>@x</td>
+                <td>@item.Subject</td>
+                <td>@item.ExamDate.ToShortDateString()</td>
+                <td>@item.TotalScore</td>
+                <td>@item.Remark</td>
+                @if (IsAdmin == true)
+                {
+                    <td>
+                        <button class="delete-class-tr btn btn-peek" data-id="@item.Id" data-examId="@item.DeclaredExamId" data-subId="@item.SubjectId"><i class="fa fa-trash"></i></button>
+                        <button class="edit-class-tr btn btn-peek" data-id="@item.Id" data-examId="@item.DeclaredExamId" data-subId="@item.SubjectId"><i class="fa fa-edit"></i></button>
+                    </td>
+                }
+            </tr>
+            x = x + 1;
+        }
+    </tbody>
+</table>

@@ -1,0 +1,254 @@
+﻿@model Satluj_Latest.Models.SchoolRegisterModel
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+@*<script src="~/Content/js/jquery.min.js"></script>*@
+@*@using (Ajax.BeginForm("SchoolRegistrationSubmit", "Account", null, new AjaxOptions
+{
+    HttpMethod = "POST",
+    OnSuccess = "RegitrationSuccess",
+    OnFailure = "NewUserAddFailed"
+}, new { id = "login-form" }))
+{*@
+
+    <section class="register-body">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <img src="~/Content/img/school-boy.png" class="img-responsive visible-lg visible-md school-boy-img" />
+                </div>
+
+                <div class="col-md-4">
+                    <div class="register">
+                        <h3>School Registration</h3>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.schoolName, new { @class = "form-control", id = "schoolName", placeholder = "School Name", type = "text" })
+                            <span class="isHidden isRed nameMsg">Field required</span>
+
+                        </div>
+                        <div class="form-group">
+                            @Html.TextAreaFor(m => m.address, new { @class = "form-control", id = "address", placeholder = "Address", rows = "5" })
+                            <span class="isHidden isRed addressMsg">Field required</span>
+
+                        </div>
+                        @Html.TextBoxFor(m => m.state, new { @type = "hidden" })
+                        <span class="isHidden isRed stateMsg">Field required</span>
+
+                        <div class="form-group">
+                            <select id="state-dropdown" class="form-control">
+                                <option value="Select State">Select State</option>
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                <option value="Assam">Assam</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Chhattisgarh">Chhattisgarh</option>
+                                <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
+                                <option value="Daman and Diu">Daman and Diu</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Goa">Goa</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Haryana">Haryana</option>
+                                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Manipur">Manipur</option>
+                                <option value="Meghalaya">Meghalaya</option>
+                                <option value="Mizoram">Mizoram</option>
+                                <option value="Nagaland">Nagaland</option>
+                                <option value="Orissa">Orissa</option>
+                                <option value="Puducherry">Puducherry</option>
+                                <option value="Punjab">Punjab</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Sikkim">Sikkim</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Tripura">Tripura</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="Uttarakhand">Uttarakhand</option>
+                                <option value="West Bengal">West Bengal</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.city, new { @class = "form-control", id = "city", placeholder = "City", type = "text" })
+                            <span class="isHidden isRed cityMsg">Field required</span>
+
+                        </div>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.contactNumber, new { @class = "form-control", id = "contactNumber", placeholder = "Contact Number", type = "text" })
+                            <span class="isHidden isRed phonedMsg">Field required</span>
+
+                        </div>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.emailaddress, new { @class = "form-control", id = "emailaddress", placeholder = "Enter your E-mail", type = "text" })
+                            <input type="hidden" id="hfEmailValid" value="" />
+                            <span class="isGreen isHidden " id="EmailAvail">This e-mail is available as your username!</span>
+                            <span class="isRed isHidden " id="EmailExist">User name already in use</span>
+                            <span class="isRed isHidden " id="EmailNotValid">E-mail not valid</span>
+
+                        </div>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.password, new { @class = "form-control", id = "password", placeholder = "Password", type = "password" })
+                            <span class="isHidden isRed passwordMsg">Field required</span>
+
+                        </div>
+                        @*<div class="form-group">
+                                @Html.TextBoxFor(m => m.confirmpassword, new { @class = "form-control", id = "confirmpassword", placeholder = "Confirm Password", type = "password" })
+                                <span class="isHidden isRed CnpasswordMsg">Field required</span>
+
+                            </div>*@
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.website, new { @class = "form-control", id = "website", placeholder = "Website", type = "text" })
+                        </div>
+                        @*<div class="form-group">
+                                <div class="terms-conditions">
+                                    <span class="checkbox-css" id="foo"></span>
+                                    <span>I accept the <a href="#">terms & conditions</a></span>
+                                </div>
+                            </div>*@
+                        <div class="form-group">
+                            <input type="submit" id="btn-Signup" style="display:none;" value="Signup" />
+                            <input type="button" id="btn-dummy-Signup" class="submit" value="Signup" />
+                        </div>
+                    </div>
+                </div><!-- /col-md-4 -->
+            </div><!-- /row -->
+        </div><!-- /container -->
+    </section>
+@*}*@
+<script src="~/Content/js/regSchool.js"></script>
+
+<script>
+    //$('.checkbox-css').click(function () {
+    //    $(this).toggleClass('active fa fa-check');
+
+    //    if ($(this).siblings('.hidden-checkbox').prop('checked')) {
+    //        $(this).siblings('.hidden-checkbox').prop('checked', false);
+    //    }
+    //    else { $(this).siblings('.hidden-checkbox').prop('checked', true); }
+    //});
+
+    $(document).on('change', '#state-dropdown', function () {
+        var state = $(this).val();
+        $('#state').val(state);
+    });
+
+    function SubmitAllData() {
+        $(".se-pre-con").show();
+        var item = new Object();
+
+        item.schoolName = $('#schoolName').val();
+        item.password = $('#password').val();
+        item.address = $('#address').val();
+        item.state = $('#state').val();
+        item.city = $('#city').val();
+        item.contactNumber = $('#contactNumber').val();
+        item.emailaddress = $('#emailaddress').val();
+        item.website = $('#website').val();
+      
+
+        $.post("/Account/SchoolRegistrationSubmit/", item, function (result) {
+            // console.log(JSON.stringify(result))
+            if (result.Status) {
+                toastrSuccess(result.Message);
+                $(".se-pre-con").show();
+                window.location.href = "/School/Home";
+            }
+            else {
+                toastrError(result.Message);
+            }
+        });
+    
+    }
+    $(window).load(function () {
+        // Animate loader off screen
+        $(".se-pre-con").fadeOut("slow");;
+    });
+
+    //$(document).on('keypress', '#confirmpassword', function (e) {
+    //    if (e.which === 32)
+    //        return false;
+    //});
+
+    //$(document).on('keypress', '#password', function (e) {
+    //    if (e.which === 32)
+    //        return false;
+    //});
+
+
+    //$(document).on('blur', '#emailaddress', function () {
+
+    //    var source = $(this);
+    //    $.ajax({
+    //        url: '/Account/CheckEmail?text=' + $(source).val(),
+    //        type: "GET",
+    //        dataType: 'json',
+    //        success: function (data) {
+    //            if (data.Status) {
+    //                $('#spn-error-email').text(data.Message);
+    //                $('#ValidateForm').val(true);
+    //                $('#spn-error-email').show();
+    //                $('#btn-dummy-Signup').prop("disabled", true);
+    //            }
+    //            else {
+    //                $('#ValidateForm').val(false);
+    //                $('#spn-error-email').hide();
+    //                $('#btn-dummy-Signup').prop("disabled", false);
+    //            }
+    //        }
+    //    });
+
+    //});
+
+    $(document).on('click', '#btn-dummy-Signup', function () {
+        checkAllFields();
+    });
+    //    var status = true;
+    //    //var form_data = $("#schoolRegitration-form input[type=text]").serializeArray();
+    //    //$(form_data).each(function () {
+    //    //    if (this.name != "website" && this.name != "city" && this.name != "state") {
+    //    //        if (this.value == "" || this.value == null) {
+    //    //            status = false;
+    //    //        }
+    //    //    }
+    //    //});
+
+    //    if (status) {
+    //        if ($('#ValidateForm').val() == "false") {
+    //            alert("ValidateForm");
+    //            $('#btn-Signup').trigger('click');
+    //        }
+    //        else {
+    //            alert("else");
+    //            $('#btn-Signup').trigger('click');
+
+    //        }
+    //    }
+    //    else {
+    //        alert("else2");
+
+    //        // $('#btn-Signup').trigger('click');
+    //    }
+
+
+
+    //    //$('#confirmpassword').keypress(function( e ) {
+    //    //    if(e.which === 32)
+    //    //        return false;
+    //    //})
+
+    //});
+    ////$('#city').keypress(function (e) {
+    ////    if ((e.which > 96 && e.which < 123) || (e.which > 64 && e.which < 91))
+    ////        return true;
+
+    ////    else
+    ////        return false;
+    ////});
+
+</script>
+

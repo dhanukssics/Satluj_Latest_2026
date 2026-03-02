@@ -1,0 +1,55 @@
+﻿@model Satluj_Latest.Models.FeeAlertDataModel
+
+<div class="col-md-12 col-md-offset-1" style="margin-bottom:70%; margin-top:3%;">
+    <div class="email-setup-main">
+
+        <form id="form-edit-fee-head"
+              asp-action="EditFeeAccountHeadData"
+              asp-controller="School"
+              method="post">
+
+            <div class="form-group">
+                <label asp-for="FeeIncomeHead.AccountHead">Fee Income Head Name</label>
+                <span>
+                    @Html.TextBoxFor(
+                        m => m.FeeIncomeHead.AccountHead,
+                        new {
+                            autocomplete = "off",
+                            id = "feeIncomeHeadId",
+                            placeholder = "Head",
+                            @class = "form-control",
+                            style = "width:50%;"
+                        })
+                    @Html.ValidationMessageFor(z => z.FeeIncomeHead.AccountHead)
+                </span>
+            </div>
+
+            <div class="form-group">
+                <span class="col-md-12" style="float:left; margin-top:15px;">
+                    <button type="submit" class="btn pay-now-btn">Edit</button>
+                </span>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+    // jQuery AJAX submit for ASP.NET Core
+    $("#form-edit-fee-head").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                AddFeeIncomeHeadSuccess(response);
+            },
+            error: function (xhr) {
+                AddFeeIncomeHeadFailed(xhr);
+            }
+        });
+    });
+</script>

@@ -1,0 +1,143 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Admin | Payment List";
+}
+
+@*<style>
+        .ng-teacherDetails-click {
+            cursor: pointer;
+        }
+    </style>*@
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3>School List</h3>
+        <div class="row">
+            <div class="form-group col-sm-4">
+                <label>Payment List</label>
+                <select asp-for="schoolId"
+                        asp-items=" ViewBag.getschool"
+                        class="form-control"
+                        data-live-search="true">
+                    <option value="">--List All School--</option>
+                </select>
+
+            </div>
+
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Select Month</label>
+                    <div class="with-icon">
+                        <input type="text" class="form-control date-detailed" id="calender-paymentList" data-date-end-date="0d">
+                        <i class="fa fa-calendar"></i>
+                        <span id="calendar-required" style="display:none; color:red;"></span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+                <button type="button" class="btn btn-sm btn-info btn-search" id="searchPaymentList">Search</button>
+            </div>
+            <div class="form-group col-sm-2" style="margin-top: 26px;">
+                <button class="btn pay-now-btn" id="btn-Print" onclick="printContent('payment-list-div')"><i class="fa fa-print"></i> Print</button>
+                <button class="btn pay-now-btn" id="btn-excel"><i class="fa fa-table"></i> Excel</button>
+
+            </div>
+        </div>
+        <div>
+            <div class="table-responsive" id="payment-list-div">
+             
+            </div>
+        </div><!-- end of col md 12 -->
+    </div>
+
+    <div class="modal fade" id="modalTeacherAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+    </div>
+    <div class="modal fade" id="modalTeacherEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+    </div>
+
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/SuperAdmin/GetPaymentGatewayListBySchool/' + 0,
+                dataType: 'html',
+                success: function (data) {
+                    $(".se-pre-con").fadeOut("slow");
+                    $('#table-payment-list').html('');
+                    $('#table-payment-list').html(data);
+                    $("#table-payment-list").dataTable();
+                },
+            });
+        });
+
+        $('.date-detailed').datepicker({
+            format: 'MM-yyyy',
+            viewMode: "months",
+            minViewMode: "months",
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        $(document).on('click', '#searchPaymentList', function () {
+
+            var schoolId = $('#hfStudentId').val();
+            var schoolId = $(this).val();
+            if (schoolId == '' || schoolId == 0) {
+                schoolId = 0;
+            }
+            var mm = 0;
+            var yyyy = 0;
+            var date = $('#calender-paymentList').val();
+            if (date != "") {
+                var res = date.split("-");
+                mm = res[0];
+                yyyy = res[1];
+            }
+
+
+            $.ajax({
+                url: '/SuperAdmin/GetPaymentGatewayListBySchool/' + schoolId + '~' + mm + '~' + yyyy,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+
+                    $('#payment-list-div').html('');
+                    $('#payment-list-div').html(data);
+                }
+            });
+        });
+        $(document).on('change', '#schoolId', function () {
+         
+
+        });
+
+        function printContent(el) {
+            var restorepage = document.body.innerHTML;
+            var printcontent = document.getElementById(el).innerHTML;
+            document.body.innerHTML = printcontent;
+            window.print();
+            document.body.innerHTML = restorepage;
+        }
+
+
+        $(document).on('click', '#btn-excel', function () {
+            //var date = $('#calender-paymentList').val();
+            $("#table-student-list").table2excel({
+                name: "Table2Excel",
+                filename: "Payment List",
+                fileext: ".xls"
+            });
+        });
+    </script>

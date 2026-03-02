@@ -1,0 +1,328 @@
+﻿@model Satluj_Latest.Models.RegionModel
+@{
+    ViewBag.Title = "Region";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var OtherRegionClassList = new Satluj_Latest.Data.School(Model.SchoolId).NotRegionAssignedClass();
+}
+<style>
+    .ng-click-studentDiscount-details {
+        cursor: pointer;
+    }
+
+    .box-color {
+        background-color: #fff;
+        display: block;
+        position: relative;
+        float: left;
+        width: 100%;
+        margin-bottom: 15px;
+        /*padding-top: 15px;*/
+    }
+
+    .head-box {
+        margin-top: 0px;
+        background-color: #03a9f4;
+        padding: 15px;
+        margin-left: -15px;
+        margin-right: -15px;
+        color: #fff;
+        font-weight: 700;
+    }
+</style>
+
+<h2>Region</h2>
+<div class="row">
+    <div class="col-md-12">
+        <div class="box-color">
+            <div class="col-sm-12" style="border-bottom: 1px solid #ccc;">
+                <h5 class="head-box">Save Region</h5>
+                <div class="row" style="margin-top:10px;">
+                    <div class="col-sm-8">
+                        @Html.TextBoxFor(m => m.RegionName, new { @class = "form-control", placeholder = "Region Name" })
+                        @Html.ValidationMessageFor(m => m.RegionName)
+                    </div>
+
+                    <div class="col-sm-4">
+                        <div class="form-group text-right">
+                            <button class="btn pay-now-btn" data-toggle="modal" id="saveRegion"><i class="fa fa-save"></i> Save </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pv-table">
+            <div class="">
+                <table class="table custome-table table-class-list">
+                    <thead>
+                        <tr style="font-weight: bold;font-size: 15;">
+                            <td>Class</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var data in OtherRegionClassList)
+                        {
+                            <tr class="ng-click-studentDiscount-details">
+                                <td>
+                                    <label style="margin-right: 10px;">
+                                        <input id="chkBox-user" class="checkbox-input" type="checkbox" data-id="@data.ClassId" onchange="AddRemoveUser(this)" />
+                                        <span class="checkbox-virtual"></span>
+                                    </label>
+                                    @data.ClassName
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div col-lg-12 id="list-regions-Id" style="padding-top: 5%;">
+            @Html.Partial("~/Views/Progress/_pv_RegionList.cshtml", Model)
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalRegionEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+<script>
+    var array = [];
+    $(function () {
+        $(".table-class-list").dataTable();
+    })
+
+    function AddRemoveUser(source) {
+        var btnStatus = $('#hfBtnStatus').val();
+        if (array != null) {
+            $("#btn-homework").removeClass('isDisabled');
+        }
+        else {
+            $("#btn-homework").addClass('isDisabled');
+        }
+        var userId = $(source).attr("data-id");
+        console.log(userId);
+        if ($(source).is(":checked")) {
+            array.push(userId);
+            $('#btn-homework').attr('disabled', false);
+            console.log(JSON.stringify(array));
+        }
+        else {
+            for (var i = array.length - 1; i >= 0; i--) {
+                if (array[i] === userId) {
+                    array.splice(i, 1);
+                }
+            }
+            if (array.length == 0) {
+                $('#btn-homework').attr('disabled', true);
+            }
+            console.log(JSON.stringify(array));
+        }
+    }
+
+    $("#saveRegion").click(function () {
+        if ($('#RegionName').val() != '') {
+            if (array.length > 0) {
+                var classes = array.join(",");
+                var regionName = $('#RegionName').val();
+                var data = regionName + "~" + classes;
+                $.ajax({
+                    url: '/Progress/AddRegion/' + data,
+                    type: "GET",
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.status == true) {
+
+                            toastrSuccess(data.msg);
+                            //setInterval(function () {
+                                window.location.href = '/Progress/Region/';
+                            //}, 400);
+
+                            
+
+
+                        } else {
+
+                            toastrError(data.msg);
+
+                            //setInterval(function () {
+                                window.location.href = '/Progress/Region/';
+                            //}, 400);
+
+                            
+
+                        }
+
+
+                        //if (result.status) {
+                            //    toastrSuccess(result.msg);
+                            //    window.location.href = '/Progress/Region/';
+                            //}
+                            //else {
+                            //    toastrError(result.msg);
+                            //    window.location.href = '/Progress/Region/';
+                            //}
+
+                    }
+                });
+            }
+            else {
+                toastrWarning("Please select Classes");
+            }
+        }
+        else {
+            toastrWarning("No data to save !");
+        }
+    });
+
+    $(document).on('click', '.delete-class-tr', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Progress/DeleteRegion/' + $(source).attr('data-regionid'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    setTimeout(function () {
+                        window.location.href = '/Progress/Region/';
+                    }, 250);
+                }
+                else {
+                    YesDelete($(source).attr('data-regionid'));
+                }
+            }
+        });
+    }
+});
+    });
+
+    function YesDelete(regionId) {
+        var id = regionId;
+        swal({
+            title: "Many Scholastic and Co-Scholastic areas have  added in this region,Are you sure? ",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Progress/DeleteResultEnteredRegions/' + id,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    setTimeout(function () {
+                        window.location.href = '/Progress/Region/';
+                    }, 250);
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+    }
+
+    $(document).on('click', '.edit-class-tr', function () {
+        var source = $(this);
+        $.ajax({
+            url: '/Progress/RegionEditPartial/' + $(source).attr('data-regionid'),
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalRegionEdit').html(data);
+                $.validator.unobtrusive.parse($("#modalRegionEdit"));
+                $('#modalRegionEdit').modal('show');
+                $(".table-class-list").dataTable();
+                storeAllOdRegionClassestoArray()
+            }
+        });
+    });
+
+    var arrayEdit = [];
+
+    function EditAddRemoveUser(source) {
+        var userId = $(source).attr("data-id");
+        console.log(userId);
+        if ($(source).is(":checked")) {
+            arrayEdit.push(userId);
+        }
+        else {
+            for (var i = arrayEdit.length - 1; i >= 0; i--) {
+                if (arrayEdit[i] === userId) {
+                    arrayEdit.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    $(document).on('click', '#editRegion', function () {
+        if ($('#edit-RegionNameId').val() != '') {
+            var regionId = $('#Id').val();
+            if (arrayEdit.length > 0) {
+                var classes = arrayEdit.join(",");
+                var regionName = $('#edit-RegionNameId').val();
+                var data = regionName + '~' + classes + '~' + regionId;
+                $.ajax({
+                    url: '/Progress/EditRegion/' + data,
+                    type: "GET",
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.status) {
+                            if (result.status) {
+                                toastrSuccess(result.msg);
+                                window.location.href = '/Progress/Region/';
+                            }
+                            else {
+                                toastrError(result.msg);
+                                window.location.href = '/Progress/Region/';
+                            }
+                        }
+                    }
+                });
+            }
+            else {
+                toastrWarning("Please select Classes");
+            }
+        }
+        else {
+            toastrWarning("Please enter the Region Name!");
+        }
+    });
+
+
+    function storeAllOdRegionClassestoArray() {
+
+        $('.checkbox-input-edit').each(function () {
+            var userId = $(this).attr("data-id");
+            if ($(this).is(":checked")) {
+                arrayEdit.push(userId);
+            }
+        });
+    }
+
+
+
+
+
+</script>

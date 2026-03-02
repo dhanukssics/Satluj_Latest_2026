@@ -1,0 +1,483 @@
+﻿@model Satluj_Latest.Models.ParentRegisterModel
+@{
+    ViewBag.Title = "ParentHome";
+    Layout = "~/Views/Shared/_ParentLayout.cshtml";
+    var children = new Satluj_Latest.Data.Parent(Model.parentId).GetChildren();
+    List<string> list = new List<string> { "VI", "VII", "VIII", "IX", "XI", "XII", "XI-CS1", "XI-BS", "XI-CC", "XII-CS", "XII-BS", "XII-CC", "XI SCIENCE", "XI COMMERCE", "XI HUMANITIES", "XII SCIENCE", "XII COMMERCE", "XII HUMANITIES" };
+}
+
+<style>
+    .student-msg-span.msg-active {
+        /*background: #61bfbf;*/
+        background:#264C73;
+    }
+
+        .student-msg-span.msg-active:after {
+            content: "";
+            width: 0;
+            height: 0;
+            border-bottom: 26px solid transparent;
+            border-top: 25px solid transparent;
+            /*border-left: 15px solid #61bfbf;*/
+            /*border-left: 15px solid #0394d1;*/
+            border-left: 15px solid #264C73;
+            font-size: 0;
+            line-height: 0;
+            position: absolute;
+            right: -15px;
+            top: 0px;
+        }
+
+    .student-msg-span {
+        /*background: #0394d1;*/
+        background: #264C73;
+        display: block;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+        .student-msg-span:last-child {
+            margin-bottom: 0px;
+        }
+
+        .student-msg-span p {
+            margin-bottom: 0px !important;
+        }
+
+    .noMsg {
+        text-align: center !important;
+        font-weight: bold;
+        font-size: 30px;
+        color: white;
+    }
+
+    .msgMain {
+        padding: 30px;
+        /*background: #ffffff26;*/
+        background: #73b3ce;
+        color: #000;
+        max-height: 450px;
+        overflow-y: auto;
+        margin-bottom: 4px;
+        padding:1%;
+        float:left;
+    }
+
+    #btn-load-more {
+        text-align: center;
+        padding: 10px 15px;
+        margin: auto;
+        display: table;
+        margin-bottom: 20px;
+        background: #ccc;
+    }
+
+    .chatMain {
+        width: 100%;
+        float: left;
+        position: relative;
+    }
+
+    .chatSngl {
+        padding: 10px 15px;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+        color: #000;
+        margin-bottom: 12px;
+        border-radius: 6px;
+        min-width: 32%;
+        max-width: 70%;
+    }
+
+        .chatSngl span {
+            /*width:100%;*/
+            display: block;
+        }
+
+    .tchrNme {
+        font-weight: bold;
+        font-size: 17px;
+    }
+
+    .timeCht {
+        font-size: 12px;
+        color: #545454;
+        margin-top: 5px;
+        padding-top: 6px;
+        border-top: 1px solid #c3c3c3;
+    }
+
+    .chatMain > .pull-left:after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-bottom: 15px solid transparent; /* left arrow slant */
+        border-top: 15px solid transparent; /* right arrow slant */
+        border-right: 15px solid #e6e6e6; /* bottom, add background color here */
+        font-size: 0;
+        line-height: 0;
+        position: absolute;
+        left: -15px;
+        top: 15px;
+    }
+
+    .chatMain > .pull-right:after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-bottom: 15px solid transparent; /* left arrow slant */
+        border-top: 15px solid transparent; /* right arrow slant */
+        border-left: 15px solid #fff6b8; /* bottom, add background color here */
+        font-size: 0;
+        line-height: 0;
+        position: absolute;
+        right: -15px;
+        top: 15px;
+    }
+
+    .chatRight .chatSngl {
+        background: #fff6b8;
+    }
+
+    .chatLeft .chatSngl {
+        background: #e6e6e6;
+    }
+
+    .msg-sty-dev {
+        display: block;
+        float: left;
+        width: 100%;
+    }
+    .parentLogin .login.contSpc{
+        padding: 45px 0px 30px;
+    }
+    .loginHeight{min-height: 525px;}
+
+    @@media screen and (max-width:768px){
+        .parentLogin .login { padding: 60px 0 25px; }
+        div#student-msg-name-maindiv { padding: 0; }
+        .msgMain {
+            margin-bottom: 20px;
+        }
+        .loginHeight {
+            min-height: 400px;
+        }
+    }
+
+</style>
+
+<section class="login-body parentLogin loginHeight">
+    <div class="parentbottom">
+        <div class="container">
+             <!--<div class="row">-->
+
+                <div class="col-md-12">
+                    <div class="login contSpc">
+                        <div class="parent-home fullWid">
+                            <div class="row" style="width:100%;">
+
+                                @foreach (var child in children)
+                                {
+                                    <div style="float: left; width: 100%;">
+                                        <div class="col-md-3" id="student-msg-name-maindiv">
+                                            <span style="cursor: pointer;" class="student-msg-span msg-active" data-id="@child.StudentId"><p class=""><i class="fa fa-graduation-cap" aria-hidden="true"></i> @child.StundentName</p></span>
+                                        </div>
+
+                                        <div id="message-view-div" class="msgMain">
+                                            <ul class="listhome">
+                                                <li><a class="prtvbtn" data-childId="@child.StudentId" data-admission="@child.StudentSpecialId" href="/Parent/Attendance/@child.StudentId"><span><i class="fa fa-user-times" aria-hidden="true"></i></span> Attendence</a></li>
+                                                <li><a id="btn-progressCard" class="prtvbtn" data-childId="@child.StudentId" data-className="@child.ClassName" data-admission="@child.StudentSpecialId" href="/Parent/ProgressCard/@child.StudentId"><span><i class="fa fa-line-chart" aria-hidden="true"></i></span>  Progress Card</a></li>
+                                                @*<li><a id="btn-progressCard" class="prtvbtn" data-childId="@child.StudentId" data-className="@child.ClassName" data-admission="@child.StudentSpecialId" href="/Parent/Uploaded_Assignments/@child.ClassId"><span><i class="fa fa-line-chart" aria-hidden="true"></i></span> Assignments</a></li>*@
+                                            
+                                            <li><a id="btn-progressCard" class="prtvbtn" data-childId="@child.StudentId" data-className="@child.ClassName" data-admission="@child.StudentSpecialId" href="/Parent/Uploaded_Assignments/@child.StudentId"><span><i class="fa fa-line-chart" aria-hidden="true"></i></span> Assignments</a></li>
+                                            
+                                            </ul>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fullWid" style="margin:15px 0 25px;" >
+                        <a id="btn-addChild" class="addStdnts" style="margin-right:20px;"><img src="~/Content/img/add.png"> ADD YOUR CHILD</a>
+                        @*<a id="btn-payChild" class="addStdnts" href="/Parent/ChildAcademyPayment" style="margin-right:20px;"> CHILD ACADEMY</a>*@
+                        @*<a id="btn-payChild" class="addStdnts" href="/Parent/CoursesOffered"> COURSES OFFERED</a>*@
+                    </div>
+
+
+                </div><!-- /col-md-4 -->
+           <!-- </div>  -->
+        </div><!-- /container -->
+    </div>
+</section>
+
+<div class="modal fade" id="addChild">
+</div>
+<div class="modal fade" id="enterSmsOtpModel" style="z-index: 1055;">
+
+</div>
+<script>
+
+    //$(document).ready(function () {
+
+    //    $("#student-msg-name-maindiv > :first-child").removeClass('msg-active');
+    //    $("#student-msg-name-maindiv > :first-child").addClass('msg-active');
+    //    var studentId = $("#student-msg-name-maindiv > :first-child").attr('data-id');
+
+    //    $.ajax({
+    //        url: '/Parent/MessageSectionView/' + studentId,
+    //        type: "GET",
+    //        dataType: 'html',
+    //        success: function (data) {
+
+    //            $('#message-view-div').html("");
+    //            $('#message-view-div').html(data);
+
+    //            $.ajax({
+    //                url: '/Parent/MessageSectionInnerView/' + 1 + '~' + studentId,
+    //                type: "GET",
+    //                dataType: 'html',
+    //                success: function (data) {
+
+    //                    $('#inner-message-view-div').html(data);
+    //                    var isMessage = parseInt($('#hfIsMsgCount').val());
+    //                    if (isMessage > 0) {
+    //                        $('#btn-load-more').removeClass('isHidden');
+    //                    }
+    //                    else {
+    //                        $('#btn-load-more').addClass('isHidden');
+    //                    }
+    //                    $.scrollTo($('#inner-message-view-div'), 1000);
+    //                }
+    //            });
+    //        }
+    //    });
+
+    //})
+
+    //$(document).on('click', '.student-msg-span', function () {
+    //    $('.student-msg-span').removeClass('msg-active');
+    //    $(this).addClass('msg-active');
+    //    var studentId = $(this).attr('data-id');
+
+    //    $.ajax({
+    //        url: '/Parent/MessageSectionView/' + studentId,
+    //        type: "GET",
+    //        dataType: 'html',
+    //        success: function (data) {
+
+    //            $('#message-view-div').html("");
+    //            $('#message-view-div').html(data);
+
+    //            $.ajax({
+    //                url: '/Parent/MessageSectionInnerView/' + 1 + '~' + studentId,
+    //                type: "GET",
+    //                dataType: 'html',
+    //                success: function (data) {
+
+    //                    $('#inner-message-view-div').html(data);
+    //                    var isMessage = parseInt($('#hfIsMsgCount').val());
+    //                    if (isMessage > 0) {
+    //                        $('#btn-load-more').removeClass('isHidden');
+    //                    }
+    //                    else {
+    //                        $('#btn-load-more').addClass('isHidden');
+    //                    }
+
+    //                    //        $('#inner-message-view-div').scrollTop($('#inner-message-view-div')[0].scrollHeight);
+    //                    var msgDivId = $("#inner-message-view-div > :first-child").attr('id');
+    //                    $('#message-view-div').scrollTop($('#' + msgDivId)[0].scrollHeight);
+    //                    // $('#message-view-div').scrollTop($('#1-msgDiv-conver')[0].scrollHeight);
+    //                    //$('#inner-message-view-div').scrollTo($('#inner-message-view-div'), 1000);
+    //                }
+    //            });
+    //        }
+    //    });
+
+    //});
+
+    //$(document).on('click', '#btn-load-more', function () {
+    //    $('#msgLoader').removeClass('isHidden');
+    //    var index = $(this).attr('data-id');
+    //    var studentId = $('#hfStudentId').val();
+    //    index++;
+    //    $.ajax({
+    //        url: '/Parent/MessageSectionInnerView/' + index + '~' + studentId,
+    //        type: "GET",
+    //        dataType: 'html',
+    //        success: function (data) {
+    //            $('#msgLoader').addClass('isHidden');
+
+    //            $('#btn-load-more').attr('data-id', index);
+
+    //            var msgDivId = $("#inner-message-view-div > :first-child").attr('id');
+    //            //   var id = $(this).attr('id');
+    //            $('#inner-message-view-div').prepend(data);
+    //            var isMessage = parseInt($('#hfIsMsgCount').val());
+    //            if (isMessage > 0) {
+    //                $('#btn-load-more').removeClass('isHidden');
+    //            }
+    //            else {
+    //                $('#btn-load-more').addClass('isHidden');
+    //                $('#no-msg-div').addClass('isHidden');
+    //            }
+    //            var msgDivId = $("#inner-message-view-div > :first-child").attr('id');
+    //            $('#message-view-div').scrollTop($('#' + msgDivId)[0].scrollHeight);
+    //        }
+    //    });
+
+    //});
+
+
+
+    $(document).on('click', '#btn-addChild', function () {
+        $('#addChild').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+
+        $.ajax({
+            url: '/Parent/AddChildView/',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#addChild').html('');
+                $('#addChild').html(data);
+                $('#addChild').modal('show');
+            }
+        });
+
+    });
+
+    $(document).on('click', '#btn-payment', function () {
+        var studentId = $(this).attr("data-childId");
+        var admission = $(this).attr("data-admission");
+        window.location.href = '/Parent/BillingDetails/' + studentId + '~' + admission;
+    });
+
+    (function ($) {
+        $.fn.delayKeyup = function (callback, ms) {
+            var timer = 0;
+            $(this).keyup(function () {
+                clearTimeout(timer);
+                timer = setTimeout(callback, ms);
+            });
+            return $(this);
+        };
+    })(jQuery);
+
+    $('#admission').delayKeyup(function () {
+        var searchText = $('#admission').val();
+        var schoolId = $('#classId').val();
+
+        if (searchText.length > 2) {
+
+            $.ajax({
+                url: '/Parent/SearchAdmission/' + searchText + '~' + schoolId,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+
+                    $('#std-detail-3').html(data);
+                }
+            });
+        }
+        else {
+            $('#search-suggestion-no-result').hide();
+        }
+    }, 500);
+
+    //$(document).on('click', '#proceed-detail', function () {
+    //    $(this).addClass('isHidden');
+
+    //    $('#enterSmsOtpModel').modal({
+    //        backdrop: 'static',
+    //        keyboard: false
+    //    })
+    //    var studentId = $(this).attr('data-studentId');
+
+    //    $.ajax({
+    //        url: '/Parent/OtpModelView/' + studentId,
+    //        type: "GET",
+    //        dataType: 'html',
+    //        success: function (data) {
+    //            $('#enterSmsOtpModel').html(data);
+    //            $.validator.unobtrusive.parse($("#enterSmsOtpModel"));
+    //            $('#enterSmsOtpModel').modal('show');
+
+    //        }
+    //    });
+    //});
+
+    $(document).on('click', '#proceed-otp', function () {
+        var studentId = $(this).attr('data-studentId');
+        var otp = $("#OTP-value").val();
+
+        if (otp != "") {
+            $.ajax({
+                url: '/Parent/OtpSubmit/' + studentId + '~' + otp,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status) {
+
+                        toastrSuccess(data.msg);
+                        $('#addChild').modal('hide');
+                        $('#enterSmsOtpModel').modal('hide');
+
+                        window.location.reload();
+                    }
+                    else {
+                        toastrError(data.msg);
+                    }
+
+                }
+            });
+        }
+        else {
+            toastrWarning("Please enter OTP");
+        }
+    });
+
+    $(document).on('click', '#btn-progressCard', function () {
+        //var studentId = $(this).attr("data-childId");
+        //var className = $(this).attr("data-className");
+        //var isYes = $(this).attr("data-normalClass");
+        //if (className == 'V') {
+        //    toastrError('Under Process!');
+        //}
+        //else {
+        //    //if (isYes == true) {
+        //        window.location.href = '/Progress/VtoIXProgressCard/' + studentId;
+        //    //}
+        //    //else {
+        //    //}
+        //}
+        window.location.href = '/Parent/ProgressCard/' + studentId;
+    });
+
+
+
+    $(document).on('click', '#proceed-detail', function () {
+        var studentId = $(this).attr("data-studentId");
+        $.ajax({
+            url: '/Parent/AddChildToParent/' + studentId,
+            type: "GET",
+            dataType: 'json',
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    $('#addChild').modal('hide');
+                    window.location.reload();
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+    });
+
+
+</script>
+

@@ -1,0 +1,395 @@
+﻿@model Satluj_Latest.Models.ProgressCardReportModel
+@{
+    var logo = "http://sutluj.schoolman.in/" + Model.SchoolLogo;
+    //  int examtwo = Model.mar;
+    var mark = Model.Marks;
+    int markcount = mark.Count();
+    // int count = mark.count();
+
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Report Card</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6, ul, ol, p, a, strong, span {
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-wrapper {
+            width: 900px;
+            height: auto;
+            margin: auto;
+            border: 3px solid #23713d;
+            padding: 30px 50px;
+        }
+
+        .wrapper-header {
+            width: 100%;
+            display: inline-block;
+        }
+
+        .logo img {
+            float: left;
+        }
+
+        .header-txts {
+            width: calc(100% - 280px);
+            float: left;
+            text-align: center;
+            padding-top: 8px;
+        }
+
+            .header-txts h2 {
+                font-weight: 800;
+                font-size: 32px;
+            }
+
+            .header-txts h4 {
+                padding: 3px 0px;
+                font-weight: 600;
+            }
+
+        .header-txts-full {
+            width: 100% !important;
+        }
+
+        .student-info {
+            width: 50%;
+            float: left;
+            margin-top: 20px;
+        }
+
+        .s-info {
+            width: 100%;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+            .s-info span {
+                width: 162px;
+                display: inline-block;
+                font-weight: 600;
+            }
+
+            .s-info input {
+                width: calc(100% - 202px);
+                border: none;
+                border-bottom: 2px solid #000;
+                outline: none;
+                padding: 2px 4px;
+                font-size: 16px;
+                font-weight: bold;
+            }
+
+        .rollNumb {
+            border: 2px solid #000;
+            display: inline-block;
+            margin-bottom: 32px;
+        }
+
+            .rollNumb span {
+                padding: 6px 20px;
+                display: inline-block;
+                font-weight: bold;
+            }
+
+                .rollNumb span:first-child {
+                    border-right: 2px solid #000;
+                    color: #5e1e02;
+                    background: #f6fd9d;
+                }
+
+        .pad1 {
+            float: right;
+            margin-top: 5px;
+        }
+
+        .tables {
+            margin-top: 18px;
+            margin-bottom: 10px;
+        }
+
+            .tables table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .tables table, th, td {
+                border: 2px solid #000;
+                padding: 8px;
+                font-weight: bold;
+            }
+
+                .tables table tfoot td {
+                    font-weight: normal;
+                    font-style: italic;
+                }
+
+        .yellow-highlight {
+            background: #faffa1;
+        }
+
+        .blue-highlight {
+            background: #cdffff;
+        }
+
+        .grades {
+            margin-right: 20px;
+        }
+
+            .grades:last-child {
+                margin-right: 0px;
+            }
+
+            .grades span:first-child {
+                background: #fdd8bb !important;
+            }
+
+        .foot-info {
+            margin-top: 50px;
+            margin-bottom: 80px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .foot-cr {
+            width: 30%;
+            float: left;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="height:30px;">
+        <button type="button" class="btn btn-success btn-style" id="btn-print" style="margin-top:20px;float:right;height: 100%; width: 6%;background-color: #7c89ad; margin-right:10px;" onclick="myFunction()">Print</button>
+    </div>
+    <div class="main-wrapper">
+        <div class="wrapper-header logo">
+            <img src=@logo width="150" />
+            <div class="header-txts">
+                <h2>@Model.SchoolName</h2>
+                @*<h4>Affiliated to CBSE, Affiliation No.124568</h4>
+                    <h4>Hanuman Gali, Pushkar, Rajasthan</h4>*@
+                <h4>@Model.SchoolAddress</h4>
+            </div>
+        </div>
+
+        <div class="wrapper-header">
+            <div class="header-txts header-txts-full">
+                <h2>Report Card</h2>
+                <h3>Class : @Model.ClassName</h3>
+                <h3>Academic Session: @Model.AccademicSession</h3>
+            </div>
+        </div>
+
+        <div class="wrapper-header">
+            <div class="student-info">
+                <div class="s-info">
+                    <span>Student's Name</span>
+                    <input type="text" value=@Model.StudentName />
+                </div>
+                <div class="s-info">
+                    <span>Parent's Name</span>
+                    <input type="text" value=@Model.Parent />
+                </div>
+                @*<div class="s-info">
+                        <span>Mother's Name</span>
+                        <input type="text" />
+                    </div>*@
+                <div class="s-info">
+                    <span>Date of Birth</span>
+                    <input type="text" value=@Model.DateOfBirth />
+                </div>
+            </div><!-- ./student-info -->
+            <div class="student-info">
+                <div class="pad1">
+                    <div class="rollNumb">
+                        <span>Roll No.</span>
+                        <span>@Model.ClassNumber</span>
+                    </div>
+                    <div class="s-info">
+                        <span>Admission No.</span>
+                        <input type="text" value=@Model.AdmissionNumber />
+                    </div>
+                </div>
+            </div><!-- ./student-info -->
+
+            <div class="student-info" style="width:100%; margin-top:2px;">
+                <div class="s-info">
+                    <span>Address</span>
+                    <input type="text" value=@Model.StudentAddress />
+                </div>
+            </div><!-- ./student-info -->
+        </div><!-- ./wrapper-header -->
+
+        <div class="wrapper-header">
+            <div class="tables">
+                <table>
+                    <thead class="yellow-highlight">
+                        <tr>
+                            <th rowspan="2">Scholastic Area</th>
+                            @{  if (markcount > 1)
+                                {
+                                    <th rowspan="2" colspan="3">@Model.ExamOne</th>
+                                    <th rowspan="2" colspan="3">@Model.ExamTwo</th>
+                                }
+                                else
+                                {
+                                    <th rowspan="2" colspan="3">@Model.ExamOne</th>
+                                }
+                            }
+                            <th colspan="3">Overall</th>
+                        </tr>
+                        <tr>
+                            @{  if (markcount > 1)
+                                {
+                                    <th colspan="3">@Model.ExamOne+@Model.ExamTwo</th> }
+                                else
+                                {
+                                    <th colspan="3">@Model.ExamOne</th>}
+                            }
+
+                        </tr>
+                    </thead>
+                    <tbody class="blue-highlight">
+                        <tr>
+                            <th rowspan="2">Subjects</th>
+                            @{  if (markcount > 1)
+                                {
+                                    <th>Internal</th>
+                                    <th>External</th>
+                                    <th>Total</th>
+                                    <th>Internal</th>
+                                    <th>External</th>
+                                    <th>Total</th>
+                                }
+                                else
+                                {
+                                    <th>Internal</th>
+                                    <th>External</th>
+                                    <th>Total</th>
+                                }
+                            }
+                            <th>Grand Total</th>
+                            <th rowspan="2">Grade</th>
+                            @*<th rowspan="2">Rank</th>*@
+                        </tr>
+                    </tbody>
+                    <tbody>
+
+                        @foreach (var item in Model.Marks)
+                        {
+                            <tr>
+                                <td>@item.Subject                                                         </td>
+                                @{if (markcount > 1)
+                                    {
+                                        <td style="font-size:11.5px;">@item.InternalOne/@item.InternalTotalOne     </td>
+                                        <td style="font-size:11.5px;">@item.ExternalOne/@item.ExternalTotalOne     </td>
+                                        <td style="font-size:11.5px;">@item.TotalOne   /@item.GrandTotalOne        </td>
+                                        <td style="font-size:11.5px;">@item.InternalTwo/@item.InternalTotalTwo     </td>
+                                        <td style="font-size:11.5px;">@item.ExternalTwo/@item.ExternalTotalTwo     </td>
+                                        <td style="font-size:11.5px;">@item.TotalTwo   /@item.GrandTotalTwo        </td>
+                                    }
+                                    else
+                                    {
+                                        <td style="font-size:11.5px;">@item.InternalOne/@item.InternalTotalOne     </td>
+                                        <td style="font-size:11.5px;">@item.ExternalOne/@item.ExternalTotalOne     </td>
+                                        <td style="font-size:11.5px;">@item.TotalOne   /@item.GrandTotalOne        </td>
+                                    }
+
+                                }
+                                <td style="font-size:11.5px;">@item.GrandTotal /@item.GrandGrandTotal      </td>
+                                <td>@item.Grade                                                           </td>
+                                @*<td >@item.Rank                                                          </td>*@
+                            </tr>
+                                    }
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="10" align="center"><strong>8 Point Grading Scale</strong>: A1(91% - 100%), A2(81% - 90%), B1(71% - 80%), B2(61% - 70%), C1(51% - 60%), C2(41% - 50%), D(33% - 40%), E(32% & Below) *SE=Sub Enrichment</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div><!-- ./wrapper-header -->
+
+        <div class="wrapper-header">
+            <div class="rollNumb grades">
+                <span>Overall Marks</span>
+                <span>@Model.Overall</span>
+            </div>
+
+            <div class="rollNumb grades">
+                <span>Percentage</span>
+                <span>@String.Format("{0:0.00}", Model.Percentage)  </span>
+            </div>
+
+            <div class="rollNumb grades">
+                <span>Grade</span>
+                <span>@Model.Grade</span>
+            </div>
+
+            <div class="rollNumb grades">
+                <span>Rank</span>
+                <span>@Model.Rank</span>
+            </div>
+        </div><!-- ./wrapper-header -->
+
+        <div class="wrapper-header">
+            <div class="student-info" style="width:50%; margin-top:2px;">
+                <div class="s-info">
+                    <span style="width:120px;">Attendance :</span>
+                    <span style="width:120px; font-weight:bold;">@Model.Attendance </span>
+                    @*<input type="text" value=@ssss  />*@
+                </div>
+            </div><!-- ./student-info -->
+            <div class="student-info" style="width:50%; margin-top:2px;">
+                <div class="s-info">
+                    <span style="width:100px;">Remarks :</span>
+                    <input type="text" />
+                </div>
+            </div><!-- ./student-info -->
+        </div><!-- ./wrapper-header -->
+
+        <div class="wrapper-header">
+            <div class="foot-info">
+                @Model.Status
+            </div>
+        </div><!-- ./wrapper-header -->
+
+        <div class="wrapper-header">
+            <div class="foot-cr">
+                <span>Date: @Model.CurrentDate</span>
+            </div>
+            <div class="foot-cr">
+                <span>Class Teacher</span>
+            </div>
+            <div class="foot-cr">
+                <span>Principal</span>
+            </div>
+        </div><!-- ./wrapper-header -->
+
+    </div><!-- ./main-wrapper -->
+
+</body>
+</html>
+<script>
+    function myFunction() {
+        var printButton = document.getElementById("btn-print");
+        printButton.style.visibility = 'hidden';
+        window.print();
+        printButton.style.visibility = 'visible';
+    }
+</script>

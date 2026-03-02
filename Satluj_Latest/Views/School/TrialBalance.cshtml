@@ -1,0 +1,146 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    ViewBag.Title = "Trial Balence";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@{
+    var accountIncomExpe = new Satluj_Latest.Data.School(Model.schoolId).GetTrialBalance();
+}
+
+
+@*<style>
+        .ng-teacherDetails-click {
+            cursor: pointer;
+        }
+    </style>*@
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="form-group text-center">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+   
+        <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+        <input id="todatDate" type="hidden" value="@Model.curredntDateTime.ToString("dd-MMM-yyyy")" />
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12" id="print-trial-bal">
+        <h3>Trial Balance as on @Model.curredntDateTime.ToString("dd-MMM-yyyy")</h3>
+
+        <div class="table-responsive" style="padding: 0px 50px 0px 50px;">
+            <table class="table custome-table table-bordered" id="table-trial-balance">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">
+                            Slno
+                        </th>
+                        <th>
+                            Account Name
+                        </th>
+                        <th style="text-align: center;">
+                            Debit
+                        </th>
+                        <th style="text-align: center;">
+                            Credit
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @*@if (school != null)
+                        {*@
+                    @{ int i = 1;
+                        foreach (var item in accountIncomExpe)
+                        {
+                            <tr>
+                                <td>
+                                    @i
+                                </td>
+                                <td>
+                                    @item.head
+                                </td>
+                                @if (item.accountType == 1)
+                                {
+                                    <td style="text-align: right;"></td>
+                                        <td class="span-credit" data-amt="@item.amount" style="text-align: right;">
+                                            @string.Format("{0:0.00}", item.amount)
+                                        </td>
+                                }
+                                else if (item.accountType == 2)
+                                {
+                                    <td data-amt="@item.amount" class="span-debit" style="text-align: right;">@string.Format("{0:0.00}", item.amount)</td>
+                                        <td style="text-align: right;"></td>
+                                }
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td class="" style="font-weight: bold;">Total</td>
+                        <td class="text-right" style="font-weight: bold;" id="tdDebitTotal">Total</td>
+                        <td class="text-right" style="font-weight: bold;" id="tdCreditTotal">Total</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        @*<div class="row" style="padding: 0px 150px 0px 425px; margin-top: -25px;">
+                <div class="col-md-6">
+                    <h4 id="tdDebitTotal" class="text-right">Total</h4>
+                </div>
+                <div class="col-md-6">
+                    <h4 id="tdCreditTotal" class="pull-right">Total</h4>
+                </div>
+            </div>*@
+    </div><!-- end of col md 12 -->
+</div>
+
+
+
+
+
+<script>
+
+    $(document).ready(function () {
+        sumTotal();
+    });
+    function sumTotal() {
+        //alert();
+        var Aval = 0;
+        $('.span-debit').each(function () {
+            Aval = parseFloat(Aval) + parseFloat($(this).attr('data-amt'));
+        });
+        $('#tdDebitTotal').html(parseFloat(Aval));
+
+        var Lval = 0;
+        $('.span-credit').each(function () {
+            Lval = parseFloat(Lval) + parseFloat($(this).attr('data-amt'));
+            console.log(Lval);
+        });
+        $('#tdCreditTotal').html(parseFloat(Lval));
+        console.log(Lval);
+    }
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        //   var id =@Model.Selecteddate
+        //    window.location.href = '/School/Report';
+    }
+   
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var date = $('#todatDate').val();
+        $("#table-trial-balance").table2excel({
+            name: "Table2Excel",
+            filename: "TrialBalance as on " + date,
+            fileext: ".xls"
+        });
+    });
+</script>

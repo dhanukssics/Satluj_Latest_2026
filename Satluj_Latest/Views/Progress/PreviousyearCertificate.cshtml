@@ -1,0 +1,328 @@
+﻿@model Satluj_Latest.Models.ProgressCardModel
+
+@{
+    ViewBag.Title = "PreviousyearCertificate";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.RegionId, new { Value = 0 })
+@Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+@Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
+@Html.HiddenFor(z => z.ExamId, new { Value = 0 })
+<div class="row">
+    <div class="col-lg-12">
+        <h4 style="margin-top: 5px;"> Previous Year Progress Card</h4>
+
+        <span>
+            <a href="http://satluj.schoolman.in/Media/School/Logo/GradingScale_Commen.pdf" style="font-weight:bold; margin-left: 80%;" target="_blank">Progress Card Back Side</a>
+        </span>
+        <br />
+        <div class="row">
+
+            <div class="form-group col-sm-2">
+                <div class="form-group">
+                    <label>Academic Year</label>
+                    <br />
+                    <select asp-for="Academicyear"
+                            asp-items="Model.AcademicYearList"
+                            class="form-control Academicid"
+                            data-live-search="true"
+                            name="Academicyeardropdown">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="Academicyear" class="text-danger"></span>
+
+                </div>
+            </div>
+            <div class="form-group col-sm-2">
+                <div class="form-group">
+                    <label>Class : </label>
+                    <br />
+                    @*@Html.DropDownListFor(m => m.ClassId, Satluj_Latest.Data.DropdownData.GetClass_Preschool_One_Four(Model.SchoolId), "--Choose--", new { @class = "form-control ClassId-id", @data_live_search = "true", name = "classDropdown" })
+                @Html.ValidationMessageFor(m => m.DivisionId)*@
+
+                    <select class="form-control classDropdown"></select>
+                </div>
+            </div>
+            <div class="form-group col-sm-2" id="examdiv">
+                <div class="form-group">
+                    <label>Exam :</label>
+                    <select class="form-control slct-exam-dropdown1" disabled></select>
+                    <span id="exam-required-examlist-add" style="display:none; color:red;"></span>
+
+
+                </div>
+            </div>
+            <div class="form-group col-sm-3" id="divisiondiv">
+                <div class="form-group">
+                    <label>Division :</label>
+                    <select class="form-control slct-free-div-dropdown"></select>
+                    <span id="division-required-exam-add" style="display:none; color:red;"></span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="table-responsive">
+            <table class="table custome-table" id="exam-student-list" style="width:100%;"></table>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Class Dropdown selection
+    $(document).on('change', '.slct-class-dropdwn1', function () {
+        $('#ClassId').val($(this).val());
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadAllSchoolDivision?id=' + id + '&schoolid=' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-free-div-dropdown").prop("disabled", false);
+                        $('#division-required-exam-edit').hide();
+
+                        $(".slct-free-div-dropdown1").html("");
+                        $(".slct-free-div-dropdown1").append($('<option></option>').val("0").html('-- No Exam Found --'));
+                        $(".slct-free-div-dropdown1").prop("disabled", true);
+
+                    }
+                    else {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- No Division Found --'));
+                        $(".slct-free-div-dropdown").prop("disabled", true);
+                        $('#DivisionId').val("0");
+                        $('#ExamId').val("0");
+                        $('#division-required-exam-edit').hide();
+
+                        $(".slct-free-div-dropdown1").html("");
+                        $(".slct-free-div-dropdown1").append($('<option></option>').val("0").html('-- No Exam Found --'));
+                        $(".slct-free-div-dropdown1").prop("disabled", true);
+
+
+                    }
+                }
+            });
+        }
+        else {
+            $('#division-required-teacher-add').hide();
+            $(".slct-free-div-dropdown").html("");
+            $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+            $(".slct-free-div-dropdown").prop("disabled", true);
+            $('#division-required-exam-edit').hide();
+            $('.slct-free-div-dropdown1').val(0);
+            $('.slct-free-div-dropdown2').val(0);
+
+            $(".slct-free-div-dropdown1").html("");
+            $(".slct-free-div-dropdown1").append($('<option></option>').val("0").html('-- No Exam Found --'));
+            $(".slct-free-div-dropdown1").prop("disabled", true);
+        }
+    });
+
+    // Division Dropdown selection
+    $(document).on('change', '.classDropdown', function () {
+        //debugger;
+        //$('#DivisionId').val($(this).val());
+        var id = $(this).val();
+        var classId = $(".classDropdown option:selected").val();
+        var classname = $(".classDropdown option:selected").text();
+        if (classname == 'V') {
+            $('#examdiv').hide();
+            $('#divisiondiv').show();
+            $.ajax({
+                url: '/Data/LoadAllSchoolDivision?id=' + id + '&schoolid=' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-free-div-dropdown").prop("disabled", false);
+                        $('#division-required-exam-edit').hide();
+
+                        $(".slct-free-div-dropdown1").html("");
+                        $(".slct-free-div-dropdown1").append($('<option></option>').val("0").html('-- No Exam Found --'));
+                        $(".slct-free-div-dropdown1").prop("disabled", true);
+
+                    }
+                    else {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- No Division Found --'));
+                        $(".slct-free-div-dropdown").prop("disabled", true);
+                        $('#DivisionId').val("0");
+                        $('#ExamId').val("0");
+                        $('#division-required-exam-edit').hide();
+
+                        $(".slct-free-div-dropdown1").html("");
+                        $(".slct-free-div-dropdown1").append($('<option></option>').val("0").html('-- No Exam Found --'));
+                        $(".slct-free-div-dropdown1").prop("disabled", true);
+
+
+                    }
+                }
+            });
+        }
+        else {
+            var id = $(this).val();
+            $('#divisiondiv').hide();
+            $('#examdiv').show();
+            if (id != '') {
+                $.ajax({
+                    url: '/Data/LoadAllExams?id=' + id + '&schoolid=' + $('#SchoolId').val() + '&classId=' + classId,
+                    type: "GET",
+                    success: function (result) {
+                        if (result.list.length > 0) {
+                            $(".slct-exam-dropdown1").html("");
+                            $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- Select Exam --'));
+                            $.each(result.list, function (i, item) {
+                                $(".slct-exam-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            });
+                            $(".slct-exam-dropdown1").prop("disabled", false);
+                            $('#exam-required-examlist-add').hide();
+                        }
+                        else {
+                            $(".slct-exam-dropdown1").html("");
+                            $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- No Exam Found --'));
+                            $(".slct-exam-dropdown1").prop("disabled", true);
+                            $('#DivisionId').val("0");
+                            $('#ExamId').val("0");
+                            $('#exam-required-examlist-add').hide();
+
+                        }
+                    }
+                });
+            }
+            else {
+                $(".slct-free-div-dropdown").html("");
+                $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('--'));
+                $(".slct-free-div-dropdown").prop("disabled", true);
+
+
+                $('#division-required-teacher-add').hide();
+                $(".slct-exam-dropdown1").html("");
+                $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- Select Exam --'));
+                $(".slct-exam-dropdown1").prop("disabled", true);
+                $('#exam-required-examlist-add').hide();
+            }
+        }
+    });
+    $(document).ready(function () {
+        $('#divisiondiv').hide();
+        $('#examdiv').show();
+    });
+    // Exam Dropdown selection -- Listing the all students
+    $(document).on('change', '.slct-exam-dropdown1', function () {
+        var ExamId = $(this).val();
+        $('#divisiondiv').hide();
+        var RegionId = $('#RegionId').val();
+        var classId = $(".classDropdown option:selected").val();
+        var DivisionId = $('#DivisionId').val();
+        if ( classId != '' && ExamId != 0) {
+            var id = classId + '~' + ExamId + '~' + DivisionId;
+            $.ajax({
+                url: '/Progress/GetPrevious_StudentList/' + id,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    if (data != null)
+                        $('#exam-student-list').html(data);
+                    else
+                        $('#exam-student-list').html('');
+                    IntializeDataTable();
+                }
+            });
+        }
+        else {
+            toastrError('Plese select all the details !');
+            $('#exam-student-list').html('');
+        }
+
+    });
+
+    function IntializeDataTable() {
+        $("#exam-student-list").dataTable().fnDestroy()
+        $("#exam-student-list").dataTable();
+    }
+
+    $(document).on('click', '#btn-student-Generate-No-ProgressCard', function () {
+        setTimeout(function () {
+            toastrError("No Progress card!!");
+        }, 300);
+    });
+
+
+    $(document).on('change', '.Academicid', function () {
+        $('#divisiondiv').hide();
+        $('#examdiv').show();
+        var id = $(".Academicid option:selected").val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadClass_Previous_Year?id=' + id + '~' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".classDropdown").html("");
+                        $(".classDropdown").append($('<option></option>').val("0").html('-- Select Class --'));
+                        $.each(result.list, function (i, item) {
+                            $(".classDropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".classDropdown").prop("disabled", false);
+                    }
+                    else {
+
+                        $(".classDropdown").html("");
+                        $(".classDropdown").append($('<option></option>').val("").html('---'));
+                        $(".classDropdown").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            $(".classDropdown").html("");
+            $(".classDropdown").append($('<option></option>').val("").html('---'));
+            $(".classDropdown").prop("disabled", true);
+        }
+
+
+
+    });
+
+    $(document).on('change', '.slct-free-div-dropdown', function () {
+        var ExamId = $(this).val();
+        var classId = $(".classDropdown option:selected").val();
+        var DivisionId = $(".slct-free-div-dropdown option:selected").val();
+        if (classId != '' && ExamId != 0) {
+            var id = classId + '~' + ExamId + '~' + DivisionId;
+            $.ajax({
+                url: '/Progress/GetPrevious_StudentList/' + id,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    if (data != null)
+                        $('#exam-student-list').html(data);
+                    else
+                        $('#exam-student-list').html('');
+                    IntializeDataTable();
+                }
+            });
+        }
+        else {
+            toastrError('Plese select all the details !');
+            $('#exam-student-list').html('');
+        }
+
+    });
+
+</script>
+

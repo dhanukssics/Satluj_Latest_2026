@@ -1,0 +1,138 @@
+﻿@model Satluj_Latest.Models.HealthResultModel
+@{
+    int count = 1;
+    long schoolId = Model.SchoolId;
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+@Html.HiddenFor(z => z.ClassId, new { Value = @Model.ClassId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.PeriodId, new { Value = @Model.PeriodId })
+
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                Height
+            </th>
+            <th style="color: black;">
+                Weight
+            </th>
+            <th style="color: black;">
+                Working Days
+            </th>
+            <th style="color: black;">
+                Present
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._StudentListForHealth)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td style="width:10%;">
+                        @count
+                    </td>
+                    <td style="width:30%;">
+                        @item.StudentName
+                    </td>
+                    <td>
+                        @if (item.Height == 0 )
+                        {
+                            <div>
+                                <input type="number" value="@String.Format("{00}", item.Height)" style="color:black; " class="cls-Height" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.Height)" style="color:black; " class="cls-Height" id="@count" />
+                                }
+                                else
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.Height)" style="color:black; " class="cls-Height" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @if (item.Weight == 0 )
+                        {
+                            <div>
+                                <input type="number" value="@String.Format("{00}", item.Weight)" style="color:black; " class="cls-Weight" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.Weight)" style="color:black; " class="cls-Weight" id="@count" />
+                                }
+                                else
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.Weight)" style="color:black; " class="cls-Weight" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @if (item.WorkingDays == 0)
+                        {
+                            <div>
+                                <input type="number" value="@String.Format("{00}", item.WorkingDays)" style="color:black; " class="cls-WorkingDays" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.WorkingDays)" style="color:black; " class="cls-WorkingDays" id="@count" />
+                                }
+                                else
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.WorkingDays)" style="color:black; " class="cls-WorkingDays" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @if (item.PresentDays == 0)
+                        {
+                            <div>
+                                <input type="number" value="@String.Format("{00}", item.PresentDays)" style="color:black; " class="cls-PresentDays" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.PresentDays)" style="color:black; " class="cls-PresentDays" id="@count" />
+                                }
+                                else
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.PresentDays)" style="color:black; " class="cls-PresentDays" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-helth-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

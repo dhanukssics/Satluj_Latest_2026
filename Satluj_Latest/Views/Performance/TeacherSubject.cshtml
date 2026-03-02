@@ -1,0 +1,68 @@
+﻿@model Satluj_Latest.Models.TeacherSubjectRelationModel
+@{
+    ViewBag.Title = "TeacherSubject";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">TEACHERS & SUBJECTS </h3>
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <select asp-for="TeacherId"
+                            asp-items="ViewBag.Teacherlist"
+                            class="form-control teacher-dropdown"
+                            id="teacher-id"
+                            data-live-search="true"
+                            style="display:inline-block; width:100%; min-width:180px;">
+                        <option value="">All</option>
+                    </select>
+
+                    <span asp-validation-for="TeacherId" class="text-danger"></span>
+
+                </div>
+            </div>
+        </div>
+        <div id="list-out-allTeacherSubject">
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        TeacherList();
+    });
+
+    function TeacherList() {
+        var teacherId = $('#teacher-id').val();
+        if (teacherId == '') {
+            teacherId = 0;
+        }
+            $.ajax({
+                url: '/Performance/TeacherSubjectList/' + teacherId,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#list-out-allTeacherSubject').html('');
+                    $('#list-out-allTeacherSubject').html(data);
+                    //IntializeDataTable();
+                }
+            });
+      
+    }
+    $(document).on('change', '.teacher-dropdown', function () {
+        TeacherList();
+    });
+
+    //function IntializeDataTable() {
+    //    $("list-out-allTeacherSubject").dataTable().fnDestroy()
+    //    $("list-out-allTeacherSubject").dataTable();
+    //}
+
+    //$(function () {
+    //    $("list-out-allTeacherSubject").dataTable();
+    //})
+</script>

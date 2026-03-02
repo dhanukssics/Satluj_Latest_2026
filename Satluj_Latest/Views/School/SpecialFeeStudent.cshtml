@@ -1,0 +1,201 @@
+﻿@{
+    ViewBag.Title = "FeeDiscount";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    @model Satluj_Latest.Models.FeeModel
+}
+
+
+<style>
+    .ng-click-studentDiscount-details {
+        cursor: pointer;
+    }
+</style>
+<input type="hidden" value="@Model.FeeId" id="FeeId" />
+<div class="row">
+    <div class="col-md-12">
+        <h3>Special Fee</h3>
+        <div class="row">
+            <div class="form-group col-sm-4 ">
+                <label>Class</label>
+                <select asp-for="ClassId"
+                        asp-items="ViewBag.Classes"
+                        class="form-control class-drop-down"
+                        data-live-search="true">
+                    <option value="">--Choose--</option>
+                </select>
+
+
+            </div>
+            <div class="form-group col-sm-4 ">
+                <label>Division</label>
+                <select id="division-drop-down" class="form-control" disabled>
+                    <option>-- Please select division --</option>
+                </select>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group text-right" style="margin-top: 24px;">
+                    @*<button class="btn pay-now-btn" data-toggle="modal" data-target="#modalStudent"><i class="fa fa-plus"></i> Add Student</button>*@
+                    <button class="btn pay-now-btn" id="addStudent" data-feeid="@Model.FeeId"><i class="fa fa-plus"></i> Add Student</button>
+                </div>
+            </div>
+        </div>
+    @{
+        var model = new Satluj_Latest.Models.FeeModel();
+                model.SchoolId = Model.SchoolId;
+                model.FeeId = Model.FeeId;
+    }
+        <div id="pv-table">
+            @Html.Partial("~/Views/School/_pv_StudentFee_Student_Grid.cshtml", model)
+
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+<div class="modal fade" id="editStudentDiscountModel">
+</div>
+<script>
+
+    //$(document).on('click', '.ng-click-studentDiscount-details', function () {
+
+    //    window.location.href = "/School/DiscountDetails/" + $(this).parent().attr('data-studentid');
+
+    //});
+    $(function () {
+        $(".table-student-list").dataTable();
+    })
+    $(document).on('change', '.class-drop-down', function () {
+        var id = $(this).val();
+        if (id != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+    $(document).on('change', '#division-drop-down', function () {
+        var id = $(this).val();
+        var feeId = $('#FeeId').val();
+        if (id != '' || id != 0) {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/School/GetStudentFeeByDivGrid/' + id + '~' + feeId,
+                dataType: 'html',
+                success: function (data) {
+                    $('#pv-table').html('');
+                    $('#pv-table').html(data);
+                    $(".table-student-list").dataTable();
+                },
+            });
+        }
+        else {
+            //   resetDropDown('Class');
+        }
+    });
+
+    $(document).on('click', '#addStudent', function () {
+        window.location.href = "/School/SpecialFeeClassList/" + $(this).attr('data-feeid');
+    });
+
+    $(document).on('click', '.delete-fee-tr', function () {
+        var studentFeeId = $(this).attr('data-Studfeeid');
+        var studentId = $(this).attr('data-id');
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+
+        $.ajax({
+            url: '/School/DeleteStudentFee/' + studentId + "~" + studentFeeId,
+            type: "GET",
+            dataType: 'json',
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    RefreshFeeStudentGrid();
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+
+        //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+    }
+    //else {
+    //    swal("Cancelled", "Your imaginary file is safe :)", "error");
+    //}
+});
+
+
+
+
+    });
+    $(document).on('click', '.edit-fee-tr', function () {
+        var studentId = $(this).attr('data-id');
+        var studentFeeId = $(this).attr('data-studfeeid');
+        $.ajax({
+            url: '/School/EditFeeStudAmountView/' + studentId + "~" + studentFeeId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#editStudentDiscountModel').html(data);
+                $('#editStudentDiscountModel').modal('show');
+            }
+        });
+    });
+    function RefreshFeeStudentGrid() {
+        var feeId = $('#FeeId').val();
+        $.ajax({
+            url: '/School/RefreshFeeStudentGrid/' + feeId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#pv-table').html(data);
+                $(".table-student-list").dataTable();
+            }
+        });
+    }
+    function EditSpecialFeeAmtSuccess(result) {
+        if (result.status) {
+            //console.log(result.list)
+            toastrSuccess(result.msg);
+            $('#editStudentDiscountModel').modal('hide');
+            RefreshFeeStudentGrid();
+        }
+        else {
+            $('#editStudentDiscountModel').modal('hide');
+            toastrError(result.msg);
+        }
+    }
+</script>

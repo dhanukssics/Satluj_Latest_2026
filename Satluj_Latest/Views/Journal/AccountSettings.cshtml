@@ -1,0 +1,163 @@
+﻿@model Satluj_Latest.Models.AddAccountHeadModel
+@{
+    ViewBag.Title = "AccountSettings";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<style>
+    .dev-adj-style {
+        padding: 3%;
+    }
+</style>
+<div class="row">
+    <div class="col-md-6">
+        <h4>Account Head</h4>
+        <div id="div-account-head">
+            @Html.Partial("~/Views/Journal/_pv_Add_AccountHead.cshtml", Model)
+        </div>
+    </div>
+    @*------------------------------------------------------ First half -----------------------------------------*@
+    <div class="col-md-6">
+        <h4>Sub Ledger</h4>
+        <div id="div-sub-ledger">
+            @*@Html.Partial("~/Views/Journal/_pv_Add_SubLedger.cshtml", Model)*@
+        </div>
+       
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h4>Account Head Details</h4>
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-accoundhead-list">
+                @Html.Partial("~/Views/Journal/_pv_AcchountHeadList.cshtml", Model)
+            </table>
+        </div>
+    </div>
+
+</div>
+<script>
+    $(document).ready(function () {
+        RefreshSubLedger();
+        });
+    $(function () {
+        $("#table-accoundhead-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $("#table-accoundhead-list").dataTable().fnDestroy()
+        $("#table-accoundhead-list").dataTable();
+    }
+
+    function AddAccountHeadSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.message);
+            RefreshSubLedger();
+            RefreshList();
+            $('#AccountHeadName').val('');
+        }
+        else {
+            toastrError(result.messag)
+        }
+    }
+    function AddAccountHeadFailed() {
+        toastrError('Failed!');
+    }
+
+    function RefreshSubLedger() {
+       // debugger;
+        $.ajax({
+            url: '/Journal/GetSubLedgerListList',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                //$("#div-sub-ledger").dataTable().fnDestroy()
+                $('#div-sub-ledger').html(data);
+                $.validator.unobtrusive.parse($('#div-sub-ledger'));
+                //$("#div-sub-ledger").dataTable();
+            }
+        });
+    }
+
+    function AddAddSubLedgerSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.message);
+            RefreshList();
+            $('#SubLedger').val('');
+        }
+        else {
+            toastrError(result.messag)
+        }
+    }
+    function AddAccountHeadFailed() {
+        toastrError('Failed!');
+    }
+    function RefreshList() {
+        $.ajax({
+            url: '/Journal/GetAccountHeadDataList',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $("#table-accoundhead-list").dataTable().fnDestroy()
+                $('#table-accoundhead-list').html(data);
+                $("#table-accoundhead-list").dataTable();
+            }
+        });
+    }
+
+
+    $(document).on('click', '.delete-subledger-tr', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Journal/DeleteSubLedger/' + $(source).attr('data-ledgerId'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    RefreshList();
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+    });
+    //basheer on 29/01/2019
+    function acounthead()
+    {
+
+        var id = $('#Acchead').val();
+        //alert(acchead);
+        $.ajax({
+            url: '/Journal/Checkaccounthead/' + id,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrError(data.msg);
+                    $('#btn-addAccountHead').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+               
+                }
+                else {
+                    $('#btn-addAccountHead').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                }
+            }
+        });
+    }
+
+</script>

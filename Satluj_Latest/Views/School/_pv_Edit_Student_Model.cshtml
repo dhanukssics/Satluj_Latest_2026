@@ -1,0 +1,262 @@
+﻿@model Satluj_Latest.Models.EditStudentModel
+
+<div class="modal-dialog" role="document" style="background-color:#fff;">
+
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Edit Student</h4>
+        </div>
+    </div>
+
+    <form id="form-login"
+          asp-controller="School"
+          asp-action="EditStudent"
+          method="post"
+          enctype="multipart/form-data">
+
+        <div class="modal-body">
+            <div class="row">
+
+                <!-- LEFT SIDE -->
+                <div class="col-sm-6">
+
+                    <div class="text-center">
+                        <label>Upload Profile Picture</label>
+
+                        <input type="hidden" asp-for="profilePic" />
+                        <input type="hidden" asp-for="studentId" />
+                        <input type="hidden" asp-for="BusId" />
+                        <input type="hidden" asp-for="divisionId" />
+                        <input type="hidden" asp-for="classId" />
+                        <input type="hidden" asp-for="bloodGroup" />
+
+                        <div class="upload-box"
+                             id="file_preview_grid_edit"
+                             style="background-image:url(@(Model.filePath ?? "../Content/img/default-placeholder-1024x1024-960x960.png"));">
+                            <input id="default-editpic-browse" type="file" class="uploder-controler" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input asp-for="studentName" class="form-control" placeholder="Name" />
+                        <span asp-validation-for="studentName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Admission No.</label>
+                        <input asp-for="admissionNo" id="studentAdmissionNo" class="form-control" placeholder="Admission No." />
+                        <span id="spn-error-admissionNo" data-val="0" data-myval="10" class="text-danger"></span>
+                        <span asp-validation-for="admissionNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input asp-for="parentEmail" class="form-control" placeholder="Parent Email" />
+                        <span asp-validation-for="parentEmail" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mobile</label>
+                        <input asp-for="MobileNo" class="form-control" placeholder="Mobile No" />
+                        <span asp-validation-for="MobileNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>DOB</label>
+                        <div class="calendar-inp pos_icon_adj">
+                            <i class="fa fa-calendar" style="margin-left: 90%;"></i>
+                            <input asp-for="DOBstring" class="form-control dob-get-data-cls" />
+                            <span asp-validation-for="DOBstring" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mother Tongue</label>
+                        <input asp-for="MotherTongue" class="form-control" placeholder="Mother Tongue" />
+                        <span asp-validation-for="MotherTongue" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Country</label>
+                        <select asp-for="CountryId"
+                                asp-items="Html.GetEnumSelectList<Country>()"
+                                class="form-control pv_bank-type" id="countryId">
+                            <option value="">--Choose--</option>
+                        </select>
+                        <span asp-validation-for="CountryId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea asp-for="address" class="form-control" placeholder="Address"></textarea>
+                        <span asp-validation-for="address" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT SIDE -->
+                <div class="col-sm-6">
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label>State</label>
+                            <input asp-for="state" class="form-control" placeholder="State" />
+                            <span asp-validation-for="state" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label>City</label>
+                            <input asp-for="city" class="form-control" placeholder="City" />
+                            <span asp-validation-for="city" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label>Class</label>
+                            <input asp-for="className" class="form-control" readonly />
+                        </div>
+                        <div class="col-sm-6">
+                            <label>Division</label>
+                            <input asp-for="division" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Blood Group</label>
+                        <select class="form-control" id="slct-bloodGroup" name="bloodGroup">
+                            <option value="">--Choose--</option>
+                            <option>O−</option>
+                            <option>O+</option>
+                            <option>A-</option>
+                            <option>A+</option>
+                            <option>B-</option>
+                            <option>B+</option>
+                            <option>AB-</option>
+                            <option>AB+</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <div style="margin-top:5px;">
+                            @Html.RadioButtonFor(x => x.gender, "M")
+                            <span style="color:black;">Male</span>
+
+                            @Html.RadioButtonFor(x => x.gender, "F")
+                            <span style="color:black;">Female</span>
+
+                            <span asp-validation-for="gender" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Roll No.</label>
+                        <input asp-for="RollNo1" class="form-control" />
+                        <span asp-validation-for="RollNo1" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contact No.</label>
+                        <input asp-for="contactNo" class="form-control" />
+                        <span asp-validation-for="contactNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select asp-for="CategoryId"
+                                asp-items="Html.GetEnumSelectList<StudentCategory>()"
+                                class="form-control pv_bank-type">
+                            <option value="">--Choose--</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date of Joining</label>
+                        <div class="calendar-inp pos_icon_adj">
+                            <i class="fa fa-calendar" style="margin-left: 90%;"></i>
+                            <input asp-for="DateOfJoiningString" class="form-control dob-get-data-cls" />
+                            <span asp-validation-for="DateOfJoiningString" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Place of Birth</label>
+                        <input asp-for="PlaceOfBirth" class="form-control" />
+                        <span asp-validation-for="PlaceOfBirth" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nationality</label>
+                        <select asp-for="NationalityId"
+                                asp-items="Html.GetEnumSelectList<Nationality>()"
+                                class="form-control pv_bank-type">
+                            <option value="">--Choose--</option>
+                        </select>
+                        <span asp-validation-for="NationalityId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pincode</label>
+                        <input asp-for="Pincode" class="form-control" />
+                        <span asp-validation-for="Pincode" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button class="btn pay-now-btn" id="studentStudentAdd" type="submit">Save</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // Preselect blood group
+    $(document).ready(function () {
+        var grp = $("#bloodGroup").val();
+        $('#slct-bloodGroup').val(grp);
+    });
+
+    // Sync Bus dropdown → hidden BusId
+    $(document).on('change', '.pv_bus-drop-down', function () {
+        $("#BusId").val($(this).val());
+    });
+
+    // Datepicker
+    $('.dob-get-data-cls').datepicker({
+        format: "dd-mm-yyyy",
+        autoclose: true,
+        todayHighlight: true,
+        endDate: '+d'
+    });
+
+    // Admission No check
+    $(document).on('keyup', '#studentAdmissionNo', function () {
+        var studentId = $('#studentId').val();
+        var id = studentId + '~' + $(this).val();
+
+        $.ajax({
+            url: '/School/CheckAdmissionNoEdit?text=' + id,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.Status) {
+                    $('#spn-error-admissionNo').text(data.Message).show();
+                    $('#studentStudentAdd').prop("disabled", true).css({ opacity: 0.7 });
+                } else {
+                    $('#spn-error-admissionNo').hide().text("");
+                    $('#studentStudentAdd').prop("disabled", false).css({ opacity: 1 });
+                }
+            }
+        });
+
+    });
+</script>

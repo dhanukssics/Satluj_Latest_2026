@@ -1,0 +1,120 @@
+﻿@model Satluj_Latest.Models.StockUpdateModel
+
+@{
+    ViewData["Title"] = "MonthlyAttendanceReport";
+    Layout = "_SchoolAdminLayout";
+}
+
+<div class="row">
+
+    <input type="hidden" asp-for="SchoolId" />
+
+    <div class="col-md-12">
+
+        <div class="row">
+
+            <div class="form-group col-sm-3">
+                <label>Category :</label>
+
+                <select asp-for="CategoryId"
+                        asp-items="Model.LabCategories"
+                        class="form-control slct-lab-category-dropdwn1"
+                        style="width:100%;min-width:180px;">
+                    <option value="0">All</option>
+                </select>
+
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-sm-3">
+                <label>Print :</label><br />
+
+                <button type="button"
+                        class="btn pay-now-btn"
+                        onclick="printContent('print-trial-bal')">
+                    <i class="fa fa-print"></i> Print
+                </button>
+
+                <button type="button"
+                        class="btn pay-now-btn"
+                        id="btn-excel-trial-bal">
+                    <i class="fa fa-table"></i> Excel
+                </button>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="table-responsive">
+                <div class="col-md-12" id="print-trial-bal">
+                    <h3 class="text-center">Inventory Report</h3>
+                    <h5 class="text-center" id="inventory-report-head"></h5>
+
+                    <table class="table" id="inventory-report-list"></table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    $(document).on('change', '.slct-lab-category-dropdwn1', function () {
+        var catId = $(".slct-lab-category-dropdwn1 option:selected").val();
+        var category = $(".slct-lab-category-dropdwn1 option:selected").text();
+        if (catId != 0) {
+            $.ajax({
+                url: '/Laboratory/DatatableLabInventoryReport/' + catId,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#inventory-report-head').text(category);
+                    $('#inventory-report-list').html(data);
+                }
+            });
+        }
+        else {
+            $.ajax({
+                url: '/Laboratory/DatatableLabInventoryReport/' + 0,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#inventory-report-head').text('All Category');
+                    $('#inventory-report-list').html(data);
+                }
+            });
+        }
+    });
+
+    $(document).ready(function () {
+        $.ajax({
+            url: '/Laboratory/DatatableLabInventoryReport/' + 0,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#inventory-report-head').text('All Category');
+                $('#inventory-report-list').html(data);
+            }
+        });
+    });
+
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Laboratory/LabInventoryReport';
+    };
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+
+        var head= $(".slct-lab-category-dropdwn1 option:selected").text();
+        $("#inventory-report-list").table2excel({
+            name: "Table2Excel",
+            filename: "LAB INVENTORY REPORT as on " + head,
+            fileext: ".xls"
+        });
+    });
+</script>

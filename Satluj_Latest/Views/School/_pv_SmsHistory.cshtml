@@ -1,0 +1,94 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    var Currentcount = ViewBag.msgCount;
+    var totalcount = ViewBag.TotalCount;
+ 
+    // if (Model.Selecteddate_From == null && Model.Selecteddate_To==null)
+    //{
+    //   //ViewBag.result = new Satluj_Latest.Data.WebsiteService().GetAllSmsOnDate(Model.Selecteddate, Model.schoolId);
+    //    Currentcount = ViewBag.result.Item1;
+    //    ViewBag.result = ViewBag.Result.Item2;
+    //}
+    //else
+    // {
+    //     ViewBag.result = new Satluj_Latest.Data.WebsiteService().GetAllSmsOnTwoDate(Model.Selecteddate_From, Model.Selecteddate_To, Convert.ToString(Model.schoolId));
+    //     Currentcount = ViewBag.result.Count;
+
+    //}
+    // var totalcount = new Satluj_Latest.Data.WebsiteService().GetAllSms(Model.schoolId).Count;
+
+
+}
+<div>
+    <div class="message_count" style="width:20%; float:left;">
+        <h4>Message Count</h4>
+        <span>@Currentcount</span>
+    </div>
+
+    <div class="message_count" style="width:20%; float:left;">
+        <h4>Total Message Count</h4>
+        <span>@totalcount</span>
+    </div>
+</div>
+<table class="table custome-table" id="SMSHeadGridList">
+    <thead>
+        <tr>
+            <th>
+                Slno
+            </th>
+            <th>
+                Date
+            </th>
+            <th>
+                Head
+            </th>
+            <th>
+                Send To
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            string User = "";
+            var index = 1;
+            if (ViewBag.Result.Count > 0)
+            {
+                foreach (var sms in ViewBag.Result)
+                {
+                    <tr class="ng-click" data-id="@sms.headId" data-type="@sms.SenderType">
+                        <td>
+                            @index
+                        </td>
+                        <td>
+                            @sms.TimeStamp.ToString("dd-MM-yyyy")
+                        </td>
+                        <td>
+                            @sms.head
+                        </td>
+                        <td>
+                            @if (sms.SenderType == 0)
+                            {
+                                User = "Student";
+                            }
+                            else
+                            {
+                                User = "Staff";
+                            }
+                            @User
+                        </td>
+                    </tr>
+                    index++;
+                }
+            }
+
+
+        }
+
+
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        $("#SMSHeadGridList").dataTable();
+    })
+</script>

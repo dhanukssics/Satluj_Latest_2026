@@ -1,0 +1,614 @@
+﻿
+
+@model Satluj_Latest.Models.Lkg_Ukg_Nu_ReportModel
+@*@{
+    ViewBag.Title = "VProgressCard_others";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}*@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+    <title>Report Card - Satluj School</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .Commen_Th{
+           width: 15%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div>
+        @*--------------------PRINT BUTTON----------------------------------------------*@
+
+        <button type="button" class="btn btn-success btn-style" id="btn-print" style="width: 200px;background-color: #7c89ad; position:absolute; right:20px; top:20px; width: 100px;
+     padding: 10px; color: rgb(255, 255, 255); background-color: rgb(124, 137, 173); position: absolute; right: 135px; top: 20px; border: none; display: block; z-index: 999;   visibility: visible;cursor: pointer;" onclick="myFunction()">
+            Print
+        </button>
+        @*--------------------PRINT BUTTON----------------------------------------------*@
+    </div>
+
+    <div class="report-card" style="box-sizing:border-box;">
+        <table style="width:100%; font-size:15px;">
+            <tbody>
+                <tr>
+                    <th align="left">
+                        <img src="@Model.Title_Report.SchoolLogo" style="width:200px; height:100px;" style="float:left;" />
+                    </th>
+                    <th>
+                        <div>
+                            <h3 align="center" style="padding:0px; margin:0px;">Evaluation Report &nbsp; @Model.Title_Report.Session</h3>
+                            <p align="center" style="font-size:13px; margin-bottom:0px; margin-top:5px;">
+                                Sector 2, Panchkula Haryana, India 134112
+                            </p>
+                            <p align="center" style="font-size:13px; margin-bottom:0px; margin-top:5px;">
+                                Ph: 0172-2560267
+                            </p>
+                            <p align="center" style="font-size:13px; margin-bottom:0px; margin-top:5px;">
+                                Email: satlujjunior@gmail.com <span style="margin-left: 10px;">Website: www.satlujpublicschool.com</span>
+                            </p>
+                        </div>
+                    </th>
+                    <th align="right">
+                        <img src="@Model.Title_Report.StudentProfile" style="width:100px; height:100px;" />
+                    </th>
+                </tr>
+                
+                <tr>
+                    <th width="33.33%">
+                        <h4 align="left" style="padding: 5px 0px; margin: 0px;">
+                            Name:&nbsp;@Model.Title_Report.Name
+                            <br />
+                            Father's Name:&nbsp;@Model.Title_Report.FatherName
+                            <br />
+                            Mother's Name:&nbsp;@Model.Title_Report.MotherName
+                        </h4>
+                    </th>
+                    <th width="33.33%"></th>
+                    <th width="33.33%">
+                        <h4 align="left" style="padding: 5px 0px; margin: 0px;float:right;">
+                            
+                            Class:&nbsp;@Model.Title_Report.Class
+                            <br />
+                            Division:&nbsp;@Model.Title_Report.Division
+                            <br />
+                            Admission No:&nbsp;@Model.Title_Report.AdmissionNo
+                            <br />
+                            Date Of Birth:&nbsp;@Model.Title_Report.DateOfBirth
+                                                        
+                        </h4>
+                    </th>
+                </tr>
+
+
+
+
+
+
+
+                <tr>
+                    <th>
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th colspan="4">ACADEMIC PERFORMANCE - SCHOLASTIC AREAS</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: left;font-weight: 600;">English</th>
+                                    <th class="Commen_Th">Term-I</th>
+                                    <th class="Commen_Th">Term-II</th>
+                                    <th class="Commen_Th">Term-III</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="left">Writing Skills</td>
+                                    <td>@Model.English_Report.WritingSkills_I</td>
+                                    <td>@Model.English_Report.WritingSkills_II</td>
+                                    <td>@Model.English_Report.WritingSkills_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Reading Skills </td>
+                                    <td>@Model.English_Report.ReadingSkills_I</td>
+                                    <td>@Model.English_Report.ReadingSkills_II</td>
+                                    <td>@Model.English_Report.ReadingSkills_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Speaking Skills</td>
+                                    <td>@Model.English_Report.SpeakingSkills_I</td>
+                                    <td>@Model.English_Report.SpeakingSkills_II</td>
+                                    <td>@Model.English_Report.SpeakingSkills_III</td>
+                                </tr>
+                                @*<tr>
+                                    <td align="left">Reciting Skills</td>
+                                    <td>@Model.English_Report.RecitingSkills_I</td>
+                                    <td>@Model.English_Report.RecitingSkills_II</td>
+                                    <td>@Model.English_Report.RecitingSkills_III</td>
+                                </tr>*@
+                                <tr>
+                                    <td align="left">Listening Skills </td>
+                                    <td>@Model.English_Report.ListeningSkills_I</td>
+                                    <td>@Model.English_Report.ListeningSkills_II</td>
+                                    <td>@Model.English_Report.ListeningSkills_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Oral</td>
+                                    <td>@Model.English_Report.Oral_I</td>
+                                    <td>@Model.English_Report.Oral_II</td>
+                                    <td>@Model.English_Report.Oral_III</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; margin-top: 10px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;font-weight: 600;">Mathematics</th>
+                                    <th class="Commen_Th">Term-I</th>
+                                    <th class="Commen_Th">Term-II</th>
+                                    <th class="Commen_Th">Term-III</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @*<tr>
+                                    <td align="left">Understanding of concepts</td>
+                                    <td>@Model.Mathematics_Report.LogicalandReasoning_I</td>
+                                    <td>@Model.Mathematics_Report.LogicalandReasoning_II</td>
+                                    <td>@Model.Mathematics_Report.LogicalandReasoning_III</td>
+                                </tr>*@
+                                <tr>
+                                    <td align="left">Understanding of concepts</td>
+                                    <td>@Model.Mathematics_Report.Understandingofconcepts_I</td>
+                                    <td>@Model.Mathematics_Report.Understandingofconcepts_II</td>
+                                    <td>@Model.Mathematics_Report.Understandingofconcepts_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Mental Ability</td>
+                                    <td>@Model.Mathematics_Report.MentalAbility_I</td>
+                                    <td>@Model.Mathematics_Report.MentalAbility_II</td>
+                                    <td>@Model.Mathematics_Report.MentalAbility_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Oral</td>
+                                    <td>@Model.Mathematics_Report.Oral_I</td>
+                                    <td>@Model.Mathematics_Report.Oral_II</td>
+                                    <td>@Model.Mathematics_Report.Oral_III</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; margin-top: 10px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;font-weight: 600;">Environmental Studies </th>
+                                    <th class="Commen_Th">Term-I</th>
+                                    <th class="Commen_Th">Term-II</th>
+                                    <th class="Commen_Th">Term-III</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="left">Adventure Studies</td>
+                                    <td>@Model.EnvironmentalStudies_Report.AdventureStudies_I</td>
+                                    <td>@Model.EnvironmentalStudies_Report.AdventureStudies_II</td>
+                                    <td>@Model.EnvironmentalStudies_Report.AdventureStudies_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Understanding of concepts</td>
+                                    <td>@Model.EnvironmentalStudies_Report.Understandingofconcepts_I</td>
+                                    <td>@Model.EnvironmentalStudies_Report.Understandingofconcepts_II</td>
+                                    <td>@Model.EnvironmentalStudies_Report.Understandingofconcepts_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Activity </td>
+                                    <td>@Model.EnvironmentalStudies_Report.Activity_I</td>
+                                    <td>@Model.EnvironmentalStudies_Report.Activity_II</td>
+                                    <td>@Model.EnvironmentalStudies_Report.Activity_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Oral</td>
+                                    <td>@Model.EnvironmentalStudies_Report.Oral_I</td>
+                                    <td>@Model.EnvironmentalStudies_Report.Oral_II</td>
+                                    <td>@Model.EnvironmentalStudies_Report.Oral_III</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; margin-top: 5px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;font-weight: 600;">Health Status</th>
+                                    <th class="Commen_Th">Term-I</th>
+                                    <th class="Commen_Th">Term-II</th>
+                                    <th class="Commen_Th">Term-III</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="left">Height(Cms)</td>
+                                    <td>@Model.HealthStatus_Report.Height_Cms_I</td>
+                                    <td>@Model.HealthStatus_Report.Height_Cms_II</td>
+                                    <td>@Model.HealthStatus_Report.Height_Cms_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Weight(Kg)</td>
+                                    <td>@Model.HealthStatus_Report.Weight_Kg_I</td>
+                                    <td>@Model.HealthStatus_Report.Weight_Kg_II</td>
+                                    <td>@Model.HealthStatus_Report.Weight_Kg_III</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </th>
+                    <th style="vertical-align: top;">
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th colspan="4" style="text-transform: uppercase;">SCHOLASTIC AREAS</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: left;font-weight: 600;">Area</th>
+                                    <th>Term -I</th>
+                                    <th class="Commen_Th">Term-II</th>
+                                    <th class="Commen_Th">Term-III</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="left">Rhymes</td>
+                                    <td style="width: 15%;">@Model.SCHOLASTICAREAS_Report.Rhymes_I</td>
+                                    <td style="width: 15%;">@Model.SCHOLASTICAREAS_Report.Rhymes_II</td>
+                                    <td style="width: 15%;">@Model.SCHOLASTICAREAS_Report.Rhymes_III</td>
+                                </tr>
+                                @*<tr>
+                                    <td align="left">Computer Skills</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.ComputerSkills_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.ComputerSkills_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.ComputerSkills_III</td>
+                                </tr>*@
+                                <tr>
+                                    <td align="left">General Studies</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.GeneralStudies_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.GeneralStudies_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.GeneralStudies_III</td>
+                                </tr>
+
+                                <tr>
+                                    <td align="left">Story Telling</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.StoryTelling_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.StoryTelling_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.StoryTelling_III</td>
+                                </tr>
+                                @*<tr>
+                                    <td align="left">Pattern Writing</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.PatternWriting_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.PatternWriting_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.PatternWriting_III</td>
+                                </tr>*@
+                                <tr>
+                                    <td align="left">SmartClass Performance </td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.SmartClassPerformance_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.SmartClassPerformance_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.SmartClassPerformance_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Art & Craft</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.ArtandCraft_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.ArtandCraft_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.ArtandCraft_III</td>
+                                </tr>
+
+                                <tr>
+                                    <td align="left">Handwriting</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.Handwriting_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.Handwriting_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.Handwriting_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Physical Education</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.PhysicalEducation_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.PhysicalEducation_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.PhysicalEducation_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left" align="left">Music & Dance</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.MusicandDance_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.MusicandDance_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.MusicandDance_III</td>
+                                </tr>
+                                @*<tr>
+                                    <td align="left" align="left">Communication Skills</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.CommunicationSkills_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.CommunicationSkills_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.CommunicationSkills_III</td>
+                                </tr>*@
+                                <tr>
+                                    <td align="left" align="left">Work sheets</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.Worksheets_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.Worksheets_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.Worksheets_III</td>
+                                </tr>
+                                @*<tr>
+                                    <td align="left" align="left">InformationSheets</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.InformationSheets_I</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.InformationSheets_II</td>
+                                    <td>@Model.SCHOLASTICAREAS_Report.InformationSheets_III</td>
+                                </tr>*@
+                            </tbody>
+                        </table>
+
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; margin-top:10px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;font-weight: 600;">Hindi</th>
+                                    <th class="Commen_Th">Term-I</th>
+                                    <th class="Commen_Th">Term-II</th>
+                                    <th class="Commen_Th">Term-III</th>
+                                </tr>
+                            </thead>
+                            @*<tbody>*@
+                            <tbody>
+                                <tr>
+                                    <td align="left">Writing Skills</td>
+                                    <td>@Model.Hindi_Report.WritingSkills_I</td>
+                                    <td>@Model.Hindi_Report.WritingSkills_II</td>
+                                    <td>@Model.Hindi_Report.WritingSkills_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Reading Skills </td>
+                                    <td>@Model.Hindi_Report.ReadingSkills_I</td>
+                                    <td>@Model.Hindi_Report.ReadingSkills_II</td>
+                                    <td>@Model.Hindi_Report.ReadingSkills_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Speaking Skills</td>
+                                    <td>@Model.Hindi_Report.SpeakingSkills_I</td>
+                                    <td>@Model.Hindi_Report.SpeakingSkills_II</td>
+                                    <td>@Model.Hindi_Report.SpeakingSkills_III</td>
+                                </tr>
+                                @*<tr>
+                                    <td align="left">Reciting Skills</td>
+                                    <td>@Model.Hindi_Report.RecitingSkills_I</td>
+                                    <td>@Model.Hindi_Report.RecitingSkills_II</td>
+                                    <td>@Model.Hindi_Report.RecitingSkills_III</td>
+                                </tr>*@
+                                <tr>
+                                    <td align="left">Listening Skills </td>
+                                    <td>@Model.Hindi_Report.ListeningSkills_I</td>
+                                    <td>@Model.Hindi_Report.ListeningSkills_II</td>
+                                    <td>@Model.Hindi_Report.ListeningSkills_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Oral</td>
+                                    <td>@Model.Hindi_Report.Oral_I</td>
+                                    <td>@Model.Hindi_Report.Oral_II</td>
+                                    <td>@Model.Hindi_Report.Oral_III</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </th>
+                    <th style="vertical-align: top;">
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th colspan="4" style="text-transform: uppercase;">Personal Assessments</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: left;font-weight: 600;">Area</th>
+                                    <th class="Commen_Th">Term-I</th>
+                                    <th class="Commen_Th">Term-II</th>
+                                    <th class="Commen_Th">Term-III</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="left">Courteousness</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Courteousness_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Courteousness_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Courteousness_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Relationship</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Relationship_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Relationship_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Relationship_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Confidence</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Confidence_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Confidence_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Confidence_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Care of Belongings</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.CareOfBelongings_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.CareOfBelongings_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.CareOfBelongings_III</td>
+                                </tr>
+
+                                <tr>
+                                    <td align="left">Neatness</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Neatness_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Neatness_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Neatness_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Regularity</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Regularity_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Regularity_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Regularity_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Punctuality</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Punctuality_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Punctuality_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Punctuality_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Initiative</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Initiative_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Initiative_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Initiative_III</td>
+                                </tr>
+
+                                <tr>
+                                    <td align="left">Sharing & Caring</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.SharingandCaring_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.SharingandCaring_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.SharingandCaring_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Respect for Other’s Property</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.RespectForOthersProperty_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.RespectForOthersProperty_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.RespectForOthersProperty_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Concentration</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Concentration_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Concentration_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Concentration_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left" align="left">Cleanliness</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Cleanliness_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Cleanliness_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.Cleanliness_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">General Conduct</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.GeneralConduct_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.GeneralConduct_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.GeneralConduct_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left" align="left">Leadership Skills</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.LeadershipSkills_I</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.LeadershipSkills_II</td>
+                                    <td>@Model.PERSONALASSESSMENTS_Report.LeadershipSkills_III</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; margin-top: 11px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;font-weight: 600;">Attendance</th>
+                                    <th class="Commen_Th">Term-I</th>
+                                    <th class="Commen_Th">Term-II</th>
+                                    <th class="Commen_Th">Term-III</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="left">No. of Working Days</td>
+                                    <td>@Model.Attendance_Report.No_of_Working_Days_I</td>
+                                    <td>@Model.Attendance_Report.No_of_Working_Days_II</td>
+                                    <td>@Model.Attendance_Report.No_of_Working_Days_III</td>
+                                </tr>
+                                <tr>
+                                    <td align="left">Days Attended</td>
+                                    <td>@Model.Attendance_Report.Days_Attended_I</td>
+                                    <td>@Model.Attendance_Report.Days_Attended_II</td>
+                                    <td>@Model.Attendance_Report.Days_Attended_III</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </th>
+                </tr>
+
+                <tr>
+                    <th style="vertical-align: top;">
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; margin-top: 5px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;">Term I Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="left">@Model.Term_Remarks_Report.Term_Remarks_I
+                                    &nbsp;
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </th>
+                    <th style="vertical-align: top;">
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; margin-top: 5px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;">Term II Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="left">@Model.Term_Remarks_Report.Term_Remarks_II
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </th>
+                    <th style="vertical-align: top;">
+                        <table border="1" width="100%" style="border-collapse: collapse; font-size:13px; margin-top: 5px; font-weight: 500">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;">Term III Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="left">@Model.Term_Remarks_Report.Term_Remarks_III
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </th>
+                </tr>
+
+                <tr>
+                    <td colspan="3">
+                        <div style="width:20%; float:left;">
+                            <div style="height:34px;"></div>
+                            <h5>Date:&nbsp;@Model.Title_Report.Static_Date</h5>
+                        </div>
+
+                        <div style="width:20%; float:left; text-align:center;">
+                            <div style="height:34px;"></div>
+                            <h5>Class Teacher</h5>
+                        </div>
+
+                        <div style="width:20%; float:left; text-align:center;">
+                            <div style="height:34px;"></div>
+                            <h5>Checking Authority</h5>
+                        </div>
+                        <div style="width:20%; float:left; text-align:center;">
+                            <div style="height:34px;"></div>
+                            <h5>Director Principal</h5>
+                        </div>
+
+                        <div style="width:20%; float:left; text-align:center;">
+                            <div style="height:34px;"></div>
+                            <h5>Parents</h5>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
+
+
+<script>
+    function myFunction() {
+        var printButton = document.getElementById("btn-print");
+        printButton.style.visibility = 'hidden';
+        window.print();
+        printButton.style.visibility = 'visible';
+    }
+</script>

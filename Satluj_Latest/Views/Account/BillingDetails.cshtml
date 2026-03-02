@@ -1,0 +1,633 @@
+﻿@model Satluj_Latest.Models.FeeModel
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<style>
+    .billingDet h3 {
+        font-weight: 600;
+        font-size: 22px;
+        background-color: #333;
+        color: #FFF;
+        padding: 20px 15px;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 -25px 25px;
+    }
+
+    .billingDet .bor {
+        border: 1px solid #ccc;
+        margin: 0;
+        padding: 0 25px;
+        float: left;
+        width: 100%;
+    }
+
+    .billingDet .custome-table, .billingDet .account-table {
+        background-color: #eee;
+        border: 1px solid #ccc;
+    }
+
+        .billingDet .custome-table th, .billingDet .account-table th {
+            background-color: #ddd;
+            padding: 15px 25px !important;
+            border-bottom: 2px solid #ccc;
+            border-right: 1px solid #ccc;
+            border-top: 0;
+            text-transform: uppercase;
+        }
+
+        .billingDet .custome-table td, .billingDet .account-table td {
+            border-right: 1px solid #ccc;
+            padding: 10px 20px !important;
+            background-color: #fff;
+        }
+
+    #history-btn {
+        background-color: #FFF;
+        color: #0093d1;
+        border-radius: 3px;
+        border: 2px solid #0093d1;
+        padding: 10px 17px;
+        letter-spacing: 0.5px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    #addAdvancePayment:hover {
+        background-color: #004c70;
+        color: #FFF;
+    }
+
+    #history-btn:hover {
+        background-color: #0093d1;
+        color: #FFF;
+    }
+
+    #addAdvancePayment {
+        background-color: #fff;
+        color: #004c70;
+        border-radius: 3px;
+        border: 2px solid #004c70;
+        padding: 10px 17px;
+        letter-spacing: 0.5px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .pay-now-btn {
+        background-color: #0093d1;
+        color: #FFF;
+        border-radius: 3px;
+        text-transform: uppercase;
+        border: 2px solid #0093d1;
+        padding: 10px 25px;
+        letter-spacing: 1px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    #colse-advPayment {
+        background-color: #F44336;
+        color: #FFF;
+        border-radius: 3px;
+        text-transform: uppercase;
+        border: 2px solid #F44336;
+        padding: 10px 25px;
+        letter-spacing: 1px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+        #colse-advPayment:hover {
+            background-color: #F44336;
+            color: #000;
+        }
+</style>
+
+
+
+<div class="container billingDet" style="padding: 35px 15px;">
+    <div class="bor">
+        <div class="table-responsive" style="margin-top: 20px;">
+            <table class="table custome-table">
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Class
+                    </th>
+                    <th>
+                        Division
+                    </th>
+                    <th>
+                        Roll No.
+                    </th>
+                    <th>
+                        Incharge
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        @Model.SchoolModel.studentName
+                    </td>
+                    <td>
+                        @Model.SchoolModel.className
+                    </td>
+                    <td>
+                        @Model.SchoolModel.division
+                    </td>
+                    <td>
+                        @Model.SchoolModel.classNumber
+                    </td>
+                    <td>
+                        @Model.SchoolModel.classInCharge
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+
+                <h3>Billing Details </h3>
+
+                <input type="hidden" id="hfStudentId" value="@Model.SchoolModel.studentId" />
+                @*<div class="form-group">
+                    <h4><span style="float: left; width:100%; padding-bottom:12px;">Payment Details</span> </h4>
+                    <button id="addAdvancePayment" class="btn pay-now-btn"><i class="fa fa-calculator"></i> Advance Payment</button>
+                    <button id="history-btn" class="btn pay-now-btn pull-right"><i class="fa fa-history"></i> History</button>
+
+                </div>*@
+                <div class="billingbox">
+                    <div id="billingList">
+                        @Html.Partial("~/Views/Parent/_pv_Billing_PaymentDeteils_Grid.cshtml")
+                    </div>
+                </div>
+
+            </div><!-- end of col md 8 -->
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="addBillModel">
+</div>
+
+<div class="modal fade" id="editBillModel">
+</div>
+<div class="modal fade" id="tablePrintData">
+</div>
+<div class="modal fade" id="history-model">
+</div>
+<div class="modal fade" id="addAdvancelModel">
+
+    @{
+        var student = new Satluj_Latest.Data.Student(Model.SchoolModel.studentId);
+        var paymentList = student.GetStudentAdvancePaymentFees().OrderBy(z => z.DueDate).ToList();
+        var discountFee = student.Discount.ToList();
+    }
+    <input type="hidden" value="@student.SchoolId" id="schoolId" />
+    <input type="hidden" value="@student.ClassId" id="classId" />
+    <input type="hidden" value="@student.StudentId" id="studentId" />
+
+    <style>
+        [data-event=disable] > td:not(:first-child) {
+            pointer-events: none;
+            opacity: .5;
+        }
+
+        [data-event=disable] > td {
+            background-color: #f1f1f1 !important;
+        }
+    </style>
+
+
+
+    <div class="modal-dialog" role="document" style="background-color: #fff;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Advance Payment</h4>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-group isHidden">
+                <h4 style="text-align: right;"><span style="float: left;">Payment Details</span> <button class="btn pay-now-btn" data-toggle="modal" data-target="#modalPayment"><i class="fa fa-plus"></i> Add Payment</button></h4>
+            </div>
+            @if (paymentList.Count >= 1)
+            {
+                <div>
+                    <div class="table-responsive">
+                        <table class="table account-table" id="tbAcBill1">
+                            <tr id="thead">
+                                <th colspan="2">
+                                    Particulars
+                                </th>
+                                <th>
+                                    Discount
+                                </th>
+                                <th></th>
+                                <th style="width:20%; text-align: right;">
+                                    Amount
+                                </th>
+                            </tr>
+                            <tbody id="bodyTableAdv">
+                                @foreach (var fee in paymentList)
+                                {
+                                    <tr data-id="tbRowAmountAdvance" id="advTr">
+                                        <td style="width: 10px;">
+                                            @*-----for check box--------*@
+                                            @{
+                                                var isAny1 = 0;
+                                                foreach (var discount in discountFee)
+                                                {
+                                                    if (discount.feeId == fee.FeeId)
+                                                    {
+                                                        //var afterDisc = fee.Amount - discount.discountAmount;
+                                                        decimal feeAmount = fee.Amount;
+                                                        decimal dis = discount.discountAmount;
+                                                        decimal afterDisc = feeAmount - dis;
+                                                        <label>
+                                                            <input type="checkbox" class="checkbox-input" data-amount="@afterDisc" data-fee="@afterDisc^@fee.FeeId^@fee.FeeGuid^@fee.Amount^@discount.discountAmount^0^0" @*onchange="AddAdvanceFee(this)"*@ data-id="chekIps" />
+                                                            <span class="checkbox-virtual"></span>
+                                                        </label>
+                                                        isAny1 = 1;
+                                                    }
+
+                                                }
+                                                if (isAny1 == 0)
+                                                {
+                                                    <label>
+                                                        <input type="checkbox" class="checkbox-input" data-amount="@fee.Amount" data-fee="@fee.Amount^@fee.FeeId^@fee.FeeGuid^@fee.Amount^0^0^0" @*onchange="AddAdvanceFee(this)"*@ data-id="chekIps" />
+                                                        <span class="checkbox-virtual"></span>
+                                                    </label>
+                                                }
+                                            }
+                                        </td>
+
+                                        <td>
+                                            @*-----Fee Name--------*@
+                                            @fee.FeeName
+                                        </td>
+
+                                        <td>
+                                            @*-----Amount if discount--------*@
+                                            @foreach (var discount in discountFee)
+                                            {
+                                                if (discount.feeId == fee.FeeId)
+                                                {
+
+                                                    @String.Format("{0:0.00}", discount.discountAmount)
+
+                                                }
+
+                                            }
+                                        </td>
+
+                                        <td> @String.Format("{0:y}", fee.DueDate) </td>
+
+                                        <td style="width:20%; text-align: right;">
+                                            @{
+                                                var isAny = 0;
+
+                                                foreach (var discount in discountFee)
+                                                {
+
+                                                    if (discount.feeId == fee.FeeId)
+                                                    {
+                                                        <s>@String.Format("{0:0.00}", fee.Amount)</s>
+                                                        //var afterDisc = fee.Amount - discount.discountAmount;
+                                                        decimal feeAmount = fee.Amount;
+                                                        decimal dis = discount.discountAmount;
+                                                        decimal afterDisc = feeAmount - dis;
+                                                        <div @*data-amount="@afterDisc"*@><label>After Discount: </label><input id="txt-amount" type="text" style="border: none;pointer-events: none; text-align: right;" value="@String.Format("{0:0.00}", afterDisc)" /></div>
+                                                        isAny = 1;
+                                                    }
+
+                                                }
+                                                if (isAny == 0)
+                                                {
+
+                                                    <div @*data-amount="@fee.Amount"*@>
+                                                        <input id="txt-amount" type="text" style="border: none;pointer-events: none; text-align: right;" value="@String.Format("{0:0.00}", fee.Amount)" />
+                                                    </div>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>}
+                                                else
+                                                {
+                                                    <label>NO FEE DUES</label>
+                                                }
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" id="colse-advPayment" data-dismiss="modal">Cancel</button>
+            <button class="btn pay-now-btn isDisabled" id="advanceFeeAdd">Save</button>
+        </div>
+
+    </div>
+
+
+
+
+
+
+</div>
+
+<script>
+    var cancel = 0;
+    $(document).on('click', '#addPayment', function () {
+        var studentId = $('#hfStudentId').val();
+        $.ajax({
+            url: '/Account/AddPaymentPartialView/' + studentId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#addBillModel').html(data);
+                $.validator.unobtrusive.parse($("#addBillModel"));
+                $('#addBillModel').modal('show');
+            }
+        });
+
+    });
+    $(document).on('click', '#addAdvancePayment', function () {
+        $('#addAdvancelModel').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        //var studentId = $('#hfStudentId').val();
+        //$.ajax({
+        //    url: '/School/AddAdvancePaymentPartialView/' + studentId,
+        //    type: "GET",
+        //    dataType: 'html',
+        //    success: function (data) {
+        //        $('#addAdvancelModel').html(data);
+        //        $.validator.unobtrusive.parse($("#addAdvancelModel"));
+        $('#addAdvancelModel').modal('show');
+        //}
+        //});
+
+    });
+
+    $(document).on('click', '#history-btn', function () {
+        $('#history-model').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+
+        var studentId = $('#hfStudentId').val();
+        $.ajax({
+            url: '/Account/StudentHistoryBillPartialView/' + studentId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#history-model').html('');
+                $('#history-model').html(data);
+                $('#history-model').modal('show');
+            }
+        });
+
+    });
+
+    $(document).on('click', '#close-btn', function () {
+        if (cancel == 1) {
+            $(".se-pre-con").show();
+            location.reload(); // reloading for getting cancelled bill in list to select
+        }
+    });
+
+
+    function AddFeeStudentSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            location.reload();
+            //var studentId = $('#hfStudentId').val();
+            //$.ajax({
+            //    url: '/School/BillingPaymentDeteils/' + studentId,
+            //    type: "GET",
+            //    dataType: 'html',
+            //    success: function (data) {
+            //        $('#billingList').remove();
+            //        $('.billingbox').html("<div id='billingList'></div>")
+            //        $('#billingList').html(data);
+            //    }
+            //});
+
+            $('#addBillModel').modal('hide');
+
+        }
+        else {
+            $('#addBillModel').modal('hide');
+            toastrError(result.msg);
+        }
+    }
+    function EditFeeStudentSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            location.reload();
+
+            $('#editBillModel').modal('hide');
+
+        }
+        else {
+            $('#editBillModel').modal('hide');
+            toastrError(result.msg);
+        }
+    }
+
+
+    $("#btn-save-bill").click(function () {
+        //debugger
+        var paidAmount = $('#paying-amount').val();
+        var textBoxVal = 0;
+        var totalAmount = $('#hfTotal').val();
+        var chkAmount = 0;
+        var saveArray = [];
+        if ((parseFloat(paidAmount)) < (parseFloat(totalAmount))) {
+            toastrWarning("Amount is less than total amount");
+        }
+        else {
+            $("input:checked").each(function () {
+                textBoxVal = parseFloat($(this).parents('tr').find("#txt-amount").attr('data-id'));
+                chkAmount = parseFloat($(this).attr('data-amount'));
+                if (textBoxVal != chkAmount) {
+                    //   console.log($(this).attr('data-fee'));
+                    var dataAmount = textBoxVal
+                    var dataFeeid = $(this).attr('data-feeidd');
+                    var dataFeeGuid = $(this).attr('data-feeGuid');
+                    var dataMaxamt = $(this).attr('data-maxamt');
+                    var dataDisc = $(this).attr('data-disc');
+                    var billType = $(this).attr('data-billType');
+                    var dataFee = dataAmount + '^' + dataFeeid + '^' + dataFeeGuid + '^' + dataMaxamt + '^' + dataDisc + '^' + 1 + '^' + billType;
+                    $(this).attr('data-fee', dataFee);
+                }
+                var feeIdSave = $(this).attr("data-fee");
+
+                // it is checked
+                saveArray.push(feeIdSave);
+                console.log(JSON.stringify(saveArray));
+            });
+
+            var item = new Object();
+            item.SchoolId = $('#schoolId').val();
+            item.ClassId = $('#classId').val();
+            item.StudentId = $('#studentId').val();
+            item.PaidAmount = paidAmount;
+            item.FeeDetails = saveArray.toString();
+           // item.TimeStamp = sDate;
+            $.post("/Account/StudentMainBillPay/", item, function (result) {
+                console.log(JSON.stringify(result))
+                    if (result.status) {
+                        $('#btn-save-bill').addClass('isHidden');
+                        if (result.payment) {
+                            window.location.href = "/Account/PaymentPost/";
+                        }
+                        else {
+                            showNewPageForPrint(result.serialNo);
+                        }
+                    }
+                    else {
+                        toastrError(result.msg);
+                    }
+            });
+        }
+    });
+
+    function printViewData() {
+        var studentMainId = $('#studentId').val();
+        $.ajax({
+            url: '/Account/PrintData/' + studentMainId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#billingList').html(data);
+            }
+        });
+    }
+
+    function showNewPageForPrint(serialNo) {
+        var slno = serialNo;
+        var studentMainId = $('#studentId').val();
+        $.ajax({
+            url: '/Account/PrintAccountBillData/' + studentMainId + '~' + slno,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                //$('#tablePrintData').html('');
+                //$('#tablePrintData').html(data);
+                $('#tablePrintData').html(data);
+                //$.validator.unobtrusive.parse($("#tablePrintData"));
+                $('#tablePrintData').modal('show');
+            }
+        });
+    }
+
+    $(document).on('click', '#li-data', function () {
+        var studentId = $('#hfstudentId').val();
+        var billno = $(this).attr('data-id');
+        $("#ul-popup>li.active").removeClass("active");
+        $(this).addClass('active');
+        $.ajax({
+            url: '/Account/LoadTableForBilling/' + billno + '~' + studentId,
+            dataType: 'html',
+            success: function (data) {
+                $('#history-table-bill').html('');
+                $('#history-table-bill').html(data);
+            },
+        });
+    })
+</script>
+<script>
+    var array1 = [];
+    $(document).on('click', '[data-id="chekIps"]', function () {
+        AddRemoveFee(this);
+        var f = $(this), p = $(f).parents('tr');
+        if ($(f).is(':checked')) {
+            $(this).attr('checked', 'checked');
+            var t = $(p).html(), h = '<tr data-event="" data-id="tbRowAmount">' + t + '</tr>';
+            // it is checked
+            array1.push(h);
+            //   console.log(JSON.stringify(array1));
+        }
+        else {
+            var t = $(p).html(), h = '<tr data-event="" data-id="tbRowAmount">' + t + '</tr>';
+            var array2 = [];
+            array2.push(h);
+            for (var i = array1.length - 1; i >= 0; i--) {
+                //console.log(JSON.stringify(array1[i]));
+                //console.log(JSON.stringify(array2[0]));
+                if (array1[i] == array2[0]) {
+                    array1.splice(i, 1);
+                }
+            }
+            //   console.log(JSON.stringify(array1));
+            $(this).removeAttr('checked', 'checked');
+
+        }
+        if (array1.length <= 0) {
+            $('#advanceFeeAdd').addClass('isDisabled');
+        }
+        else {
+
+            $('#advanceFeeAdd').removeClass('isDisabled');
+
+        }
+    });
+    $(document).on('click', '#advanceFeeAdd', function () {
+
+        for (var i = array1.length - 1; i >= 0; i--) {
+            var arraySplit = array1[i].split("chekIps");
+            var qw1 = arraySplit[0];
+            var qw2 = arraySplit[1];
+            var qw3 = qw1 + "chekIps\" data-remo=\"adv\"" + qw2;
+
+            console.log(JSON.stringify(qw3));
+
+
+
+            $('#bodyTable').prepend(qw3);
+        }
+
+        //  $('#addAdvancelModel').modal('hide');
+        $('[data-id="chekIps"]').each(function () {
+            if ($(this).is(':checked')) {
+                var f = $(this).parents('#advTr');
+                $(f).remove();
+            }
+        });
+        sumTotal();
+        $('#addAdvancelModel').modal('hide');
+        $('#div-adv-pay').removeClass('isHidden')
+        array1 = [];
+    });
+
+
+
+    $(document).on('click', '#colse-advPayment', function () {
+        $('#advTr [data-id="chekIps"]').each(function () {
+            if ($(this).is(":checked")) {
+                $(this).trigger('click');
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('body').css('padding-top', $('.header').innerHeight());
+    });
+
+    $(window).resize(function () {
+        $('body').css('padding-top', $('.header').innerHeight());
+    })
+</script>
+

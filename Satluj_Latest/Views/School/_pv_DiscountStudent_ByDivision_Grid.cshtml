@@ -1,0 +1,80 @@
+﻿ @model Satluj_Latest.Models.SchoolModel
+@{
+    var discounts = new Satluj_Latest.Data.Division(Model.divisionId).GetStudentDiscountList();
+}
+<div class="table-responsive">
+    <table class="table custome-table table-student-list">
+        <thead>
+            <tr>
+                @*<th>
+
+                </th>*@
+                <th>
+                    Name
+                </th>
+                @*<th>
+                        Parent Name
+                    </th>
+                    <th>
+                        Address
+                    </th>
+                *@
+
+                <th>
+                    Class/Division
+                </th>
+                <th>
+                    Fee Name
+                </th>
+                <th>
+                    Discounted Amount
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var discount in discounts)
+            {
+
+                <tr class="ng-click-studentDiscount-details">
+                    @*@if (discount.student.FilePath != null)
+                    {
+                        <td class="ng-click-studentDiscount-details">
+                            <img src="@discount.student.FilePath" class="user-pic-tab" />
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="ng-click-studentDiscount-details">
+                            <img src="~/Content/img/children-1.gif" class="user-pic-tab" />
+                        </td>
+                    }*@
+                    <td class="ng-click-studentDiscount-details">
+                        @discount.student.StundentName
+                    </td>
+                    @*<td>
+                            @student.ParentName
+                        </td>
+                        <td>
+                            @student.Address
+                        </td>*@
+
+                    <td class="ng-click-studentDiscount-details">
+                        @discount.student.ClassName / @discount.student.DivisionName
+                    </td>
+                    <td class="ng-click-studentDiscount-details">
+                        @discount.feename
+                    </td>
+                    <td class="ng-click-studentDiscount-details">
+                        @String.Format("{0:0.00}", discount.discountAmount)
+                    </td>
+                    <td data-studentname="@discount.student.StundentName" data-amount="@discount.discountAmount" data-feename="@discount.feename">
+                        <button class="delete-fee-tr btn btn-peek" data-id="@discount.studentId" data-feeid="@discount.feeId"><i class="fa fa-trash "></i></button>
+                        <button class="edit-fee-tr btn pay-now-btn" data-id="@discount.studentId" data-feeid="@discount.feeId"><i class="fa fa-edit "></i></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

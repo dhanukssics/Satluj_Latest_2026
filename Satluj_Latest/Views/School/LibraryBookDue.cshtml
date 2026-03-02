@@ -1,0 +1,116 @@
+﻿@model Satluj_Latest.Models.LibraryModels
+@{
+    ViewBag.Title = "Book Due List";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Books</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+
+            </div>
+        </div>
+
+
+
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-book-list">
+
+                <thead>
+                    <tr>
+                        <th>
+                            No
+                        </th>
+                        <th>
+                            Book Serial Number
+                        </th>
+                        <th>
+                            Book Name
+                        </th>
+                        <th>
+                            Book Category
+                        </th>
+                        <th>
+                            Book Issued Date
+                        </th>
+                        <th>
+                            Student Name
+                        </th>
+                        <th>
+                            Class
+                        </th>
+                        <th>
+                            Division
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                        foreach (var data in new Satluj_Latest.Data.School(Model.schoolId).GetBookDueList())
+                        {
+                            <tr>
+                                <td class="">
+                                    @i
+                                </td>
+                                <td class="">
+                                    @data.SerialNumber
+                                </td>
+                                <td class="">
+                                    @data.Title
+                                </td>
+                                <td class="">
+                                    @data.Category
+                                </td>
+                                <td class="">
+                                    @data.IssueDateTime.ToString("dd/MM/yyyy H:mm")
+                                </td>
+                                <td class="">
+                                    @data.StundentName
+                                </td>
+                                <td class="">
+                                    @data.Class
+                                </td>
+                                <td class="">
+                                    @data.Division
+                                </td>
+                                
+
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+<script>
+
+
+    $(function () {
+        $("#table-book-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $("#table-book-list").dataTable().fnDestroy()
+        $("#table-book-list").dataTable();
+    }
+
+
+
+</script>

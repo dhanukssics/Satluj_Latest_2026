@@ -1,0 +1,152 @@
+﻿@model Satluj_Latest.Models.FeeModel
+
+@{
+    var student = new Satluj_Latest.Data.Student(Model.StudentId);
+    var paymentList = student.GetStudentPaidFees();
+    var totalAmount=paymentList.Sum(x => x.Amount);
+}
+<input type="hidden" value="@student.SchoolId" id="schoolId" />
+<input type="hidden" value="@student.ClassId" id="classId" />
+<input type="hidden" value="@student.StudentId" id="studentId" />
+
+
+<style>
+    [data-event=disable] > td:not(:first-child) {
+        pointer-events: none;
+        opacity: .5;
+    }
+
+    [data-event=disable] > td {
+        background-color: #f1f1f1 !important;
+    }
+</style>
+<div class="form-group isHidden">
+    <h4 style="text-align: right;"><span style="float: left;">Payment Details</span> <button class="btn pay-now-btn" data-toggle="modal" data-target="#modalPayment"><i class="fa fa-plus"></i> Add Payment</button></h4>
+</div>
+@if (paymentList.Count >= 1)
+{
+    <div>
+        <div class="table-responsive">
+            <table class="table account-table" id="tbAcBill">
+                <tr id="thead">
+                    <th colspan="2">
+                        Particulars
+                    </th>
+                    <th>
+                        Date
+                    </th>
+                    <th style="width:20%; text-align: right;">
+                        Amount
+                    </th>
+                </tr>
+                <tbody id="bodyTable">
+                    @foreach (var fee in paymentList)
+                    {
+                        <tr data-id="tbRowAmount">
+                            <td colspan="2">
+                                @fee.FeesName
+                            </td>
+
+                            <td>
+                                @String.Format("{0:y}", fee.TimeStamp)
+                            </td>
+
+                            <td style="width:20%; text-align: right;">
+                                @fee.Amount;
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">
+                            Total Fee
+                        </td>
+                        <td  style="text-align: right;">
+                            @totalAmount
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="form-group text-right">
+            @*<button class="btn btn-peek" id="editPayment" data-toggle="modal" data-target="#modalPaymentEdit"><i class="fa fa-edit"></i> Edit</button>*@
+            @*<button class="btn pay-now-btn" id="btn-save-bill"><i class="fa fa-save"></i> Save</button>*@
+            <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('tbAcBill')"><i class="fa fa-print"></i> Print</button>
+        </div>
+    </div>}
+else
+{
+    <label>NO FEE DUES</label>
+}
+<script>
+    $(document).on('click', '[data-toggle="tclose"]', function () {
+        var e = $(this), p = $(e).parent().parent();
+        $(p).remove();
+        sumTotal();
+    });
+
+    $(document).ready(function () {
+        $('[data-id="chekIp"]').each(function () {
+            AddRemoveFee(this);
+        });
+        sumTotal();
+    });
+
+    function sumTotal() {
+        var val = 0;
+        $('*[data-amount]').each(function () {
+            if ($(this).is(':checked')) {
+                val = parseFloat(val) + parseFloat($(this).attr('data-amount'));
+            }
+        });
+        $('#tdTotal').html(parseFloat(val));
+        console.log(val);
+    }
+
+    $(document).on('click', '[data-id="chekIp"]', function () {
+        AddRemoveFee(this);
+        var f = $(this), p = $(f).parents('tr');
+        if ($(f).is(':checked')) {
+            $(this).attr('checked', 'checked');
+            var t = $(p).html(), h = '<tr data-event="" data-id="tbRowAmount">' + t + '</tr>';
+            $('#bodyTable').prepend(h);
+            $(p).remove();
+            sumTotal();
+        }
+        else {
+            sumTotal();
+            $(this).removeAttr('checked', 'checked');
+            var t = $(p).html(), h = '<tr data-event="disable" data-id="tbRowAmount">' + t + '</tr>';
+            $('#bodyTable').append(h);
+            $(p).remove();
+        }
+
+    });
+
+    var array = [];
+    function AddRemoveFee(source) {
+        var feeId = $(source).attr("data-fee");
+        if ($(source).is(":checked")) {
+            array.push(feeId);
+            console.log(JSON.stringify(array));
+        }
+        else {
+            for (var i = array.length - 1; i >= 0; i--) {
+                if (array[i] === feeId) {
+                    array.splice(i, 1);
+                }
+            }
+            console.log(JSON.stringify(array));
+        }
+    }
+
+
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+    }
+</script>

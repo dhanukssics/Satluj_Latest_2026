@@ -1,0 +1,221 @@
+﻿
+@model Satluj_Latest.Models.DayBookReportModel
+@{
+    DateTime startDate = Model.FromDate;
+    DateTime endDate = Model.ToDate;
+    long schoolId = Model.SchoolId;
+    var school = new Satluj_Latest.Data.School(schoolId);
+    var data = school.GetRPReport(startDate, endDate, schoolId);
+    //decimal cashInHand = school.PaymentClosing(startDate, endDate);
+    //decimal bankBalance = school.PaymentClosingBank(startDate, endDate);
+    //decimal sumPayment = cashInHand + bankBalance + Convert.ToDecimal(data.Sum(x => x.Payment_));
+    //var list = data.GroupBy(x => x.AccHeadName).ToList();
+    var sumR = data.Sum(x => x.receipt);
+    var sumP = data.Sum(x => x.payment);
+    string schoolName = Model.SchoolName;
+    string heading = Model.Heading;
+}
+
+<thead>
+
+
+    <tr>
+        <td colspan="4" style="text-align:center; font-weight:bold;font-size:22; display:none;">
+            @schoolName
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4" style="text-align:center; font-weight:normal;font-size:18; display:none;">
+            Receipt & Payment
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4" style="text-align:center; font-weight:normal;font-size:12; display:none;">
+            @heading
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Receipt
+        </th>
+        <th>
+            Amount
+        </th>
+        <th>
+            Payment
+        </th>
+        <th>
+            Amount
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @foreach (var item in data)
+    {
+        <tr>
+            @if (item.SLNo == 0 || item.SLNo == 1)
+            {
+                <td style="color:red;">
+                    @item.AccountHeadReceipt
+                </td>
+                <td style="color:red;">
+                    @String.Format("{0:0.00}", item.receipt)
+                </td>
+            }
+            else
+            {
+                <td>
+                    @item.AccountHeadReceipt
+                </td>
+                <td>
+                    @String.Format("{0:0.00}", item.receipt)
+                </td>
+            }
+            @if (item.SLNo == 3 || item.SLNo == 4)
+            {
+                <td style="color:red;">
+                    @item.AccountHeadPayment
+                </td>
+                <td style="color:red;">
+                    @String.Format("{0:0.00}", item.payment)
+                </td>
+            }
+            else
+            {
+                <td>
+                    @item.AccountHeadPayment
+                </td>
+                <td>
+                   @String.Format("{0:0.00}", item.payment)
+                </td>
+            }
+        </tr>
+    }
+</tbody>
+<tfoot>
+    <tr>
+        <th>
+            Total
+        </th>
+        <th>
+            @String.Format("{0:0.00}", sumR)
+        </th>
+        <th>
+            Total
+        </th>
+        <th>
+            @String.Format("{0:0.00}", sumP)
+        </th>
+    </tr>
+</tfoot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*<thead>
+        <tr>
+            <th>
+                Account Head
+            </th>
+            <th>
+                Receipt
+            </th>
+            <th>
+                Payment
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var one in list)
+            {
+                <tr>
+                    <td>
+                        @one.Key
+                    </td>
+                    <td>
+                        @String.Format("{0:0.00}", data.Where(x => x.AccHeadName == one.Key).Sum(x => x.Receipt_))
+                    </td>
+                    <td>
+                        @String.Format("{0:0.00}", data.Where(x => x.AccHeadName == one.Key).Sum(x => x.Payment_))
+                    </td>
+                </tr>
+            }
+            if (!data.Any(x => x.AccHeadName == "Opening Cash In Hand"))
+            {
+                <tr>
+                    <td>
+                        Opening Cash In Hand
+                    </td>
+                    <td>
+                        @String.Format("{0:0.00}", 00)
+                    </td>
+                    <td>
+                        @String.Format("{0:0.00}", 00)
+                    </td>
+                </tr>
+            }
+            if (!data.Any(x => x.AccHeadName == "Opening Bank Balance"))
+            {
+                <tr>
+                    <td>
+                        Opening Bank Balance
+                    </td>
+                    <td>
+                        @String.Format("{0:0.00}", 00)
+                    </td>
+                    <td>
+                        @String.Format("{0:0.00}", 00)
+                    </td>
+                </tr>
+            }
+
+            <tr>
+                <td>
+                    Closing Cash In Hand
+                </td>
+                <td>
+                   @String.Format("{0:0.00}", 00)
+                </td>
+                <td>
+                    @String.Format("{0:0.00}", cashInHand)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Closing Bank Balance
+                </td>
+                <td>
+              @String.Format("{0:0.00}", 00)
+                </td>
+                <td>
+                    @String.Format("{0:0.00}", bankBalance)
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td style="font-weight:bold">Total</td>
+            <td>
+                @String.Format("{0:0.00}", data.Sum(x => x.Receipt_))
+            </td>
+            <td>
+                @String.Format("{0:0.00}", sumPayment)
+            </td>
+        </tr>
+
+    </tfoot>*@

@@ -1,0 +1,78 @@
+﻿@model Satluj_Latest.Models.SchoolValue
+
+<div class="modal-dialog modal-sm" role="document">
+
+    <form id="form-teacher-edit"
+          asp-action="EditClassDivision"
+          asp-controller="School"
+          method="post">
+
+        <input type="hidden" asp-for="classId" />
+        <input type="hidden" asp-for="divId" />
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Class Division</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="className">Class :</label>
+                            <input asp-for="className"
+                                   class="form-control"
+                                   placeholder="Class Name"
+                                   readonly />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label asp-for="DivisionName">Division :</label>
+                            <input asp-for="DivisionName"
+                                   class="form-control"
+                                   placeholder="Division" />
+                            <span asp-validation-for="DivisionName"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="submit"
+                        id="btn-editteacher"
+                        class="btn pay-now-btn">
+                    Edit
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('#form-teacher-edit').submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                EditClassDivisionSuccess(response);
+            },
+            error: function () {
+                ajaxFailure();
+            }
+        });
+    });
+</script>

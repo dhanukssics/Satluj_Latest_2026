@@ -1,0 +1,356 @@
+﻿@model Satluj_Latest.Models.StudentsDeclaredExamResultModel
+@{
+    int count = 1;
+    var TotalScore = Model.TotalScore;
+        bool IsAdmin = ViewBag.IsAdmin;
+    decimal practicalScore =  Model.TotalScore;
+
+    
+
+
+
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = @Model.ClassId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.ExamId, new { Value = @Model.ExamId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+@Html.HiddenFor(z => z.IsEntered, new { Value = @Model.IsEntered })
+@Html.HiddenFor(z => z.TotalScore, new { Value = @Model.TotalScore })
+
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            @if (Model.IsComputerScience == true)
+            {
+                <th style="color: black;">
+                    Theory (@Model.TotalScore)
+                </th>
+                if (Model.ExamId == 10053 && Model.SubjectId == 20099)
+                {
+                    <th style="color: black;">
+                        Practical (30)
+                    </th>
+                }
+                else if (Model.SubjectId == 20086 || Model.SubjectId == 20081 || Model.SubjectId == 20087 || Model.SubjectId == 20088 || Model.SubjectId == 20089 ||
+
+                 Model.SubjectId == 20093 || Model.SubjectId == 20096
+                    )
+                {
+                    <th style="color: black;">
+                        Practical (20)
+                    </th>
+                }
+                else if (Model.SubjectId == 20098 || Model.SubjectId == 20099 || Model.SubjectId == 20100 || Model.SubjectId == 20090 || Model.SubjectId == 20095)
+                {
+                    <th style="color: black;">
+                        Practical (30)
+                    </th>
+                }
+                else if (Model.SubjectId == 20092)
+                {
+                    <th style="color: black;">
+                        Practical (40)
+                    </th>
+                }
+                else if (Model.SubjectId == 20097 || Model.SubjectId == 20091)
+                {
+                    <th style="color: black;">
+                        Practical (70)
+                    </th>
+                }
+                else if (Model.SubjectId == 20127)
+                {
+
+                    <th style="color: black;">
+                        Practical (50.00)
+                    </th>
+                }
+                else if (Model.SubjectId == 20097)
+                {
+                    <th style="color: black;">
+                        Practical (@practicalScore)
+                    </th>
+                }
+                else if (Model.SubjectId == 20129)//Food Nutrition and Dietetics (834)
+                {
+                    <th style="color: black;">
+                        Practical (@practicalScore)
+                    </th>
+                }
+                else if (Model.SubjectId == 20130)//Mass Media Studies (835)
+                {
+                    <th style="color: black;">
+                        Practical (@practicalScore)
+                    </th>
+                }
+                else if (Model.SubjectId == 20115)
+                {
+                    <th style="color: black;">
+                        Practical (20)
+                    </th>
+                }
+                else
+                {
+                    <th style="color: black;">
+                        Practical (@practicalScore)
+                    </th>
+                }
+
+            }
+            else
+            {
+
+
+                if (Model.SubjectId == 20081)
+                {
+                    <th style="color: black;">
+                        Mark (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (20)
+                    </th>
+                }
+                else if (Model.SubjectId == 20127)//Marketing And Sales
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (50.00)
+                    </th>
+                }
+                else if (Model.SubjectId == 20128)//Marketing(812)
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (40.00)
+                    </th>
+
+                }
+                else if (Model.SubjectId == 20091) //Music(034)
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (70.00)
+                    </th>
+                }
+                else if (Model.SubjectId == 20097) //Painting
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (70.00)
+                    </th>
+                }
+
+                else if (Model.SubjectId == 20129) //Food Nutrition and Dietetics(834)
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (40.00)
+                    </th>
+                }
+                else if (Model.SubjectId == 20130) //Mass Media Studies (835)
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (40.00)
+                    </th>
+                }
+                else if (Model.SubjectId == 20115)
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (20)
+                    </th>
+                }
+                else if (Model.SubjectId == 20089)
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (20)
+                    </th>
+                }
+                else if (Model.SubjectId == 20133) //dance
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (70.00)
+                    </th>
+                }
+                else if (Model.SubjectId == 20131) //LegalStudies
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (20.00)
+                    </th>
+                }
+                else if (Model.SubjectId == 20132) //Psycology
+                {
+                    <th style="color: black;">
+                        Theory (@Model.TotalScore)
+                    </th>
+                    <th style="color: black;">
+                        Practical (30.00)
+                    </th>
+                }
+                else
+                {
+                    <th style="color: black;">
+                        Mark (@Model.TotalScore)
+                    </th>
+                }
+
+
+            }
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model.ListData)
+            {
+            <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                <td style="width:10%;">
+                    @count
+                </td>
+                <td style="width:50%;">
+                    @item.StudentName
+                </td>
+                <td style="width:40%;">
+                    @if (item.Mark == "" || item.Mark == "0.00")
+                    {
+                        <div>
+                            <input type="number" value="@String.Format("{00}", item.Mark)" style="color:black; " class="cls-mark" id="@count" />
+                        </div>
+                    }
+                    else
+                    {
+
+                        <div>
+                            @if (IsAdmin == true)
+                            {
+                                <input type="number" value="@String.Format("{00}", item.Mark)" style="color:black; " class="cls-mark" id="@count" />
+                            }
+                            else
+                            {
+                                <input type="number" value="@String.Format("{00}", item.Mark)" style="color:black; " class="cls-mark" readonly id="@count" />
+                            }
+                        </div>
+                    }
+                </td>
+                @if (Model.IsComputerScience == true)
+                {
+            <td style="width:40%;">
+                @if ((item.PracticalScore == "" || item.PracticalScore == "0.00") && (Model.SubjectId == 20127 || Model.SubjectId == 20092 ||
+                    Model.SubjectId == 20076||Model.SubjectId== 20084 || Model.SubjectId == 20128 || Model.SubjectId==20091 || Model.SubjectId == 20097
+                    || Model.SubjectId== 20129 || Model.SubjectId== 20130 || Model.SubjectId== 20090 || Model.SubjectId == 20115 ||Model.SubjectId== 20089
+                    ||Model.SubjectId== 20086 || Model.SubjectId== 20088 ||Model.SubjectId== 20087 ||Model.SubjectId== 20098||Model.SubjectId== 20099
+                    ||Model.SubjectId== 20100 || Model.SubjectId== 20095 ||Model.SubjectId== 20096 ||Model.SubjectId== 20093 || Model.SubjectId == 20133 || Model.SubjectId == 20131 || Model.SubjectId == 20132))
+                {
+                    <div>
+                        <input type="number" value="@String.Format("{00}", item.PracticalScore)" style="color:black; " class="cls-mark-practical" id="@count" />
+                    </div>
+                }
+                else
+        {
+
+            <div>
+                @if( Model.SubjectId == 20127 || Model.SubjectId == 20092 ||
+                                Model.SubjectId == 20076 || Model.SubjectId == 20084 || Model.SubjectId == 20128 || Model.SubjectId == 20091 || Model.SubjectId == 20097
+                                || Model.SubjectId == 20129 || Model.SubjectId == 20130  || Model.SubjectId == 20090 || Model.SubjectId == 20115 || Model.SubjectId == 20089
+                                || Model.SubjectId == 20086 || Model.SubjectId == 20088 || Model.SubjectId == 20087 || Model.SubjectId == 20098 || Model.SubjectId == 20099
+                    || Model.SubjectId == 20100 || Model.SubjectId == 20095 || Model.SubjectId == 20096|| Model.SubjectId == 20093 || Model.SubjectId == 20133 || Model.SubjectId == 20131 || Model.SubjectId == 20132)
+                {
+                    <input type="number" value="@String.Format("{00}", item.PracticalScore)" style="color:black; " class="cls-mark-practical" id="@count" />
+                }
+              
+            </div>
+            }
+         </td>
+                    }
+                
+
+                        else
+                        {
+
+            <td style="width:40%;">
+                @*<div>
+            @if (IsAdmin == true)
+            {
+                <input type="number" value="@String.Format("{00}", item.PracticalScore)" style="color:black; " class="cls-mark-practical" id="@count" />
+            }
+            else
+            {
+                <input type="number" value="@String.Format("{00}", item.PracticalScore)" style="color:black; " class="cls-mark-practical" readonly id="@count" />
+            }
+        </div>*@
+                @if ((item.PracticalScore == "" || item.PracticalScore == "0.00") && (Model.SubjectId == 20127 || Model.SubjectId == 20092
+                   || Model.SubjectId == 20076 || Model.SubjectId == 20084 ||Model.SubjectId== 20128 || Model.SubjectId == 20091 || Model.SubjectId == 20097
+                   || Model.SubjectId == 20129 || Model.SubjectId == 20130 || Model.SubjectId == 20090 || Model.SubjectId == 20115 || Model.SubjectId == 20089
+                   || Model.SubjectId == 20086 || Model.SubjectId == 20088 || Model.SubjectId == 20087 || Model.SubjectId == 20098 || Model.SubjectId == 20099
+                    || Model.SubjectId == 20100 || Model.SubjectId == 20095 || Model.SubjectId == 20096 || Model.SubjectId == 20093 || Model.SubjectId==20133 || Model.SubjectId == 20131 || Model.SubjectId == 20132))
+                {
+                    <div>
+                        <input type="number" value="@String.Format("{00}", item.PracticalScore)" style="color:black; " class="cls-mark-practical" id="@count" />
+                    </div>
+                }
+                else
+                {
+                    if (Model.SubjectId == 20127 || Model.SubjectId == 20092 ||
+                   Model.SubjectId == 20076 || Model.SubjectId == 20084 || Model.SubjectId == 20128 || Model.SubjectId == 20091 || Model.SubjectId == 20097
+                   || Model.SubjectId == 20129 || Model.SubjectId == 20130 || Model.SubjectId == 20090 || Model.SubjectId == 20115 || Model.SubjectId == 20089
+                   || Model.SubjectId == 20086 || Model.SubjectId == 20088 || Model.SubjectId == 20087 || Model.SubjectId == 20098 || Model.SubjectId == 20099
+                    || Model.SubjectId == 20100 || Model.SubjectId == 20095 || Model.SubjectId == 20096 || Model.SubjectId == 20093 || Model.SubjectId == 20133 || Model.SubjectId == 20131 || Model.SubjectId == 20132)
+                    {
+                        <input type="number" value="@String.Format("{00}", item.PracticalScore)" style="color:black; " class="cls-mark-practical" id="@count" />
+
+                    }
+                    @*<div>
+                @if (IsAdmin == true)
+                {
+                    <input type="number" value="@String.Format("{00}", item.PracticalScore)" style="color:black; " class="cls-mark-practical" id="@count" />
+                }
+                else
+                {
+                    <input type="number" value="@String.Format("{00}", item.PracticalScore)" style="color:black; " class="cls-mark-practical" readonly id="@count" />
+                }
+            </div>*@
+                }
+            </td>
+
+                        }
+
+                    </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-Mark-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

@@ -1,0 +1,99 @@
+﻿@model Satluj_Latest.Models.TrialBalanceModel
+@{
+    ViewBag.Title = "TrialBalance";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="form-group col-sm-2">
+        <label>Start</label>
+        <div class="with-icon">
+            <input type="text" class="form-control receipt-payment-start-date date-receipt-payment" data-date-end-date="0d" value="@Model.StartDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+
+    <div class="form-group col-sm-2">
+        <label>End</label>
+        <div class="with-icon">
+            <input type="text" class="form-control receipt-payment-end-date date-receipt-payment" data-date-end-date="0d" value="@Model.Today.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+    <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+        <button type="button" class="btn btn-sm btn-info btn-search" id="searchTrialBalanceData">Search</button>
+    </div>
+</div>
+<div class="row">
+    <div class="form-group text-center">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+        <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+    </div>
+</div>
+
+<div id="trial-balance-table-id">
+    @*@Html.Partial("~/Views/Journal/_pv_TrialBalanceList.cshtml",Model)*@
+</div>
+<script>
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Journal/TrialBalance';
+    }
+
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var head = "Trial Balance as on " + $('#Today').val();
+        $("#table-trial-balance").table2excel({
+            name: "Table2Excel",
+            filename: head,
+            fileext: ".xls"
+        });
+    });
+
+    $(document).on('click', '#searchTrialBalanceData', function () {
+        TrialBalanceWithDate();
+    });
+    function TrialBalanceWithDate() {
+        //debugger;
+        var date = $('.receipt-payment-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+        date = $('.receipt-payment-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        $.ajax({
+            url: '/Journal/SearchTrialBalanceData/' + start + '~' + end,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#trial-balance-table-id').html('');
+                $('#trial-balance-table-id').html(data);
+                var ss = $('.receipt-payment-start-date').val() + " to " + $('.receipt-payment-end-date').val();
+            }
+        });
+    }
+    $('.date-receipt-payment').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+    $(document).ready(function () {
+        TrialBalanceWithDate();
+    });
+</script>
+

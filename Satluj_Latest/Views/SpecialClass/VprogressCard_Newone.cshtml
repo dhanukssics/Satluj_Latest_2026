@@ -1,0 +1,676 @@
+﻿@model Satluj_Latest.Models.V_ProgressCard
+
+@{
+    int count = 0;
+    int countI = 0;
+    int countII = 0;
+    int countIII = 0;
+    int countIV = 0;
+    int countV = 0;
+    int countVIII = 0;
+    var logo = Model.SchoolLogo;
+    var studentData = new Satluj_Latest.Data.Student(Model.StudentId);
+    var aggregateScore = studentData.GetAggregateScoreData();
+    int aggCount = 0;
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Report Card - Satluj School</title>
+</head>
+
+<body style="font-family: Arial;">
+    @*--------------------PRINT BUTTON----------------------------------------------*@
+    @*<div style="height:30px;">
+            <button type="button" class="btn btn-success btn-style" id="btn-print" style="margin-top:20px;float:right;height: 100%; width: 6%;background-color: #7c89ad; margin-right:10px;" onclick="myFunction()">Print</button>
+        </div>*@
+    <button type="button" class="btn btn-success btn-style" id="btn-print" style="width: 200px;background-color: #7c89ad; position:absolute; right:20px; top:20px; width: 100px;
+     padding: 10px; color: rgb(255, 255, 255); background-color: rgb(124, 137, 173); position: absolute; right: 135px; top: 20px; border: none; display: block; z-index: 999;   visibility: visible;cursor: pointer;" onclick="myFunction()">
+        Print
+    </button>
+    @*--------------------PRINT BUTTON----------------------------------------------*@
+<div>
+    <img src="@logo" style="width:250px; float:left;" />
+    <div  style="margin-left:-149px;width:100%;">
+        <h3 align="center" style="padding:0px; margin:0px;">@Model.SchoolName</h3>
+        <p align="center" style="font-size: 14px; margin-bottom: 0px; margin-top: 5px; font-weight: bold;">
+            @Model.ReportName  (@Model.AcademicYear)
+        </p>
+        <p align="center" style="font-size:12px; margin-bottom:0px; margin-top:5px;font-weight:bold;">
+            Sector 4 Panchkula Haryana-134112 India Ph:0172-2560167 &nbsp;&nbsp;
+            <br />
+            Email: satlujps@yahoo.co.in
+            <br />
+            Website: www.satlujpublicschool.com
+        </p>
+        <img src="@Model.StudentProfile" style="width: 100px; height: 100px; margin-left: -52px; margin-right: -134px; margin-top: -76px;" align="right" />
+
+    </div>
+    <div class="row">
+        <div class="col-sm-4" style="width: 26%; margin-top: 20px;">
+            <h4 align="left" style="padding: 5px 0px; margin: 0px;">
+                Name: @Model.StudentName
+                <span style="margin-left:15px;">Class: @Model.ClassDivision </span>
+                <br />
+                Father's Name: @Model.FatherName
+            </h4>
+        </div>
+        <div class="col-sm-4" style="width: 28%; margin-top: -40px; margin-left: 516px;">
+
+            <h4 align="center" style="padding: 5px 0px; margin: 0px;">
+                Roll No: @Model.RollNo
+                <span style="margin-left:15px;">Admission No: @Model.AdmissionNo </span>
+                <br />
+                Mother's Name: @Model.MotherName
+            </h4>
+
+        </div>
+        <div class="col-sm-4" style="margin-left: 13px; width: 98%; margin-top: -26px;">
+            <h4 align="left" style="padding: 5px 0px; margin: 0px;float:right;">
+                D.O.B: @Model.DOB
+                <span style="margin-left:15px;">Session: @Model.AcademicYear </span>
+                <br />
+                <span style="float:right;"></span>
+            </h4>
+        </div>
+    </div>
+</div>
+    <div class="report-card" style="box-sizing:border-box;">
+        <table style="width:100%; font-size:15px;">
+            <tbody>
+                @*<tr>
+                    <th align="left">
+                        <img src="@logo" style="width:250px; float:left;" />
+                    </th>
+                    <th>
+                        <div style="margin-left:131px;width:100%;">
+                            <h3 align="center" style="padding:0px; margin:0px;">@Model.SchoolName</h3>
+                            <p align="center" style="font-size:14px; margin-bottom:0px; margin-top:5px;">
+                                @Model.ReportName  (@Model.AcademicYear)
+                            </p>
+                            <p align="center" style="font-size:12px; margin-bottom:0px; margin-top:5px;">
+                                Sector 4 Panchkula Haryana-134112 India Ph:0172-2560167 &nbsp;&nbsp;
+                                <br />
+                                Email: satlujps@yahoo.co.in
+                                <br />
+                                Website: www.satlujpublicschool.com
+                            </p>
+                        </div>
+                    </th>
+                    <th align="right">
+                        <img src="@Model.StudentProfile" style="width:100px; height:100px;" />
+                    </th>
+                </tr>*@
+                @*<tr>
+                    <th width="33.3%">
+                        <h4 align="left" style="padding: 5px 0px; margin: 0px;">
+                            Name: @Model.StudentName
+                            <span style="margin-left:15px;">Class: @Model.ClassDivision </span>
+                            <br />
+                            Father's Name: @Model.FatherName
+                        </h4>
+                    </th>
+                    <th width="40.3%" style="margin-left: 109px;">
+                        <h4 align="center" style="padding: 5px 0px; margin: 0px;">
+                            Roll No: @Model.RollNo
+                            <span style="margin-left:15px;">Admission No: @Model.AdmissionNo </span>
+                            <br />
+                            Mother's Name: @Model.MotherName
+                        </h4>
+                    </th>
+                    <th width="20.3%">
+                        <h4 align="left" style="padding: 5px 0px; margin: 0px;float:right;">
+                            D.O.B: @Model.DOB
+                            <span style="margin-left:15px;">Session: @Model.AcademicYear </span>
+                            <br />
+                            <span style="float:right;"></span>
+                        </h4>
+                    </th>
+                </tr>*@
+                <tr>
+                    <th colspan="2">
+                        <table border="1" style="border-collapse: collapse; font-size:13px; margin-top: -20px; width:95%;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">Language</th>
+                                    <th rowspan="2">Assess<br />ment</th>
+                                    <th rowspan="2">Reading Skill</th>
+                                    <th rowspan="2">Speaking <br />Skill</th>
+                                    <th rowspan="2">Listening<br />Skill</th>
+                                    <th rowspan="2">Weekly<br /> Assessment</th>
+                                    <th rowspan="2">Writing Skill</th>
+                                    <th rowspan="2">Aggregate
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <!--<th>Pronun<br />ciation</th>
+                                    <th>Fluency</th>
+                                    <th>Creative<br /> Writing</th>
+                                    <th>Hand<br />Writing</th>
+                                    <th>Grammar</th>
+                                    <th>Spellings</th>
+                                    <th>Vocabulary</th>
+                                    <th>Literature</th>-->
+                                    @* <th>Weekly<br /> Assessment</th>*@
+                                    <!--<th>Conver<br />sation</th>
+                                    <th>Recitation</th>
+                                    <th>Compre<br />hension</th>-->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model._CaseI)
+                                {
+                                    count = 0;
+                                    var listCount = item._CaseIDetails.Count();
+                                    foreach (var item2 in item._CaseIDetails)
+                                    {
+                                        if (count == 0)
+                                        {
+                                <tr>
+                                    <td align="center" rowspan="@listCount">@item.SubjectName</td>
+                                    <td>@item2.Assesment</td>
+                                    <td>@item2.Pronun</td> 
+                                    <td>@item2.Conversation</td>
+                                    <td>@item2.Comprehension</td>
+                                    <td>@item2.Weekly_Assesment</td>
+                                    <td>@item2.Literature</td>
+
+                                    <td>@item2.Aggregate</td>
+
+                                    @*<td>@item2.Creative_Writing</td>*@
+
+
+
+
+                                </tr>
+                                        }
+                                        else
+                                        {
+                            <tr>
+                                <td>@item2.Assesment</td>
+                                <td>@item2.Pronun</td>
+                                <td>@item2.Conversation</td>
+                                <td>@item2.Comprehension</td>
+                                <td>@item2.Weekly_Assesment</td>
+                                <td>@item2.Literature</td>
+
+                                <td>@item2.Aggregate</td>
+                                @*<td>@item2.Creative_Writing</td>*@
+
+
+
+                            </tr>
+                                        }
+                                        count = count + 1;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </th>
+                    <th style="vertical-align: top;">
+                        <table border="1" style="border-collapse: collapse; font-size:13px; margin-bottom:18px; width:100%;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">SUB</th>
+                                    <th rowspan="2">Assess<br />ment</th>
+                                    <th rowspan="2">Concept Clarity/<br />Activity</th>
+                                    <th rowspan="2">Weekly Assessment</th>
+                                    <th rowspan="2">Written Assessment</th>
+                                    <th rowspan="2">Aggregate</th>
+                                </tr>
+                                @*<tr>
+                                <th>Concepts</th>
+        <th>Activity</th>
+        <th>Tables</th>
+        <th>Mental<br />Ability</th>
+        <th>Written<br />Work</th>
+        <th>Weekly<br /> Assessment</th>
+                                </tr> *@
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model._CaseII)
+                                {
+                                    if (countI == 0)
+                                    {
+                                <tr>
+                                    <td align="center" rowspan="3">Mathematics</td>
+                                    <td>@item.Assesment</td>
+                                    <td>@item.Concept</td>
+                                    <td>@item.WeeklyAssesment</td>
+                                    <td>@item.WrittenWork</td>
+
+                                    <td style="width:30px;">@item.Aggregate</td>
+
+                                </tr>
+                                    }
+                                    else
+                                    {
+                            <tr>
+                                <td>@item.Assesment</td>
+                                <td>@item.Concept</td>
+                                <td>@item.WeeklyAssesment</td>
+                                <td>@item.WrittenWork</td>
+
+                                <td style="width:30px;">@item.Aggregate</td>
+                            </tr>
+                                    }
+                                    countI = countI + 1;
+                                }
+                            </tbody>
+                        </table>
+                        <table border="1" style="border-collapse:collapse; font-size:13px; margin-top: 5px; margin-bottom:22px; width:100%;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">SUB</th>
+                                    <th rowspan="2">Assess<br />ment</th>
+                                    <th>Activity /<br />Viva</th>
+                                    <th>Weekly<br /> Assessment</th>
+                                    <th>Written <br />Assessment</th>
+
+                                    @*<th colspan="4">Aspects</th>*@
+                                    <th sibi1=sibi1 rowspan="2">Aggregate</th>
+                                </tr>
+                                @*<tr>
+                                    <th>Activity /<br />Project</th>
+                                    <th>Group <br />Discussion</th>
+                                    <th>Written <br />Work</th>
+                                    <th>Weekly<br /> Assessment</th>
+                                </tr>*@
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model._CaseIII)
+                                {
+                                    if (countII == 0)
+                                    {
+                                <tr>
+                                    <td align="center" rowspan="3" style="width:79px;">Natural <br /> Science/ EVS1</td>
+                                    <td>@item.Assesment</td>
+                                    <td>@item.Activity_Pproject</td>
+                                    @* <td>@item.Group_Discussion</td>*@
+                                    <td>@item.Work_Sheet</td>
+                                    <td>@item.Written_Work</td>
+
+                                    <td style="width:30px;">@item.Aggregrate</td>
+                                </tr>
+                                    }
+                                    else
+                                    {
+                            <tr>
+                                <td>@item.Assesment</td>
+                                <td>@item.Activity_Pproject</td>
+                                @* <td>@item.Group_Discussion</td>*@
+                                <td>@item.Work_Sheet</td>
+                                <td>@item.Written_Work</td>
+
+                                <td>@item.Aggregrate</td>
+                            </tr>
+                                    }
+                                    countII = countII + 1;
+                                }
+                            </tbody>
+                        </table>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <table border="1" style="border-collapse: collapse; font-size:13px; Height:122px; width:85%;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">SUB</th>
+                                    <th rowspan="2">Assess<br />ment</th>
+                                    <th rowspan="2">Art/Craft</th>
+                                    <th rowspan="2">Music</th>
+                                    <th rowspan="2">Dance</th>
+                                    <th rowspan="2">Physical Education</th>
+                                </tr>
+                                @*<tr>
+                                    <th>Interest</th>
+                                    <th>Creativity</th>
+                                    <th>Interest</th>
+                                    <th>Rhythm</th>
+                                </tr>*@
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model._CaseVI)
+                                {
+                                    if (countV == 0)
+                                    {
+                                <tr>
+                                    <td align="center" rowspan="3">Art/Craft <br />  & <br /> Music/ <br />Dance</td>
+                                    <td>@item.assesment</td>
+                                    <td>@item.artInterest</td>
+                                    <td>@item.musicInterest</td>
+                                    <td>@item.musicRhythm</td>
+                                    <td>@item.artCreativity</td>
+
+                                </tr>
+                                    }
+                                    else
+                                    {
+                            <tr>
+                                <td>@item.assesment</td>
+                                <td>@item.artInterest</td>
+                                <td>@item.musicInterest</td>
+                                <td>@item.musicRhythm</td>
+                                <td>@item.artCreativity</td>
+
+                            </tr>
+                                    }
+                                    countV = countV + 1;
+
+                                }
+                            </tbody>
+                        </table>
+                    </th>
+                    <th>
+                        <table border="1" style="border-collapse: collapse; font-size:13px; width:89%; height:122px; margin-left:23px;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="width:88px;">Assess<br />ment</th>
+                                    @*<th colspan="3">Games</th>*@
+                                    <th colspan="2">Health</th>
+                                </tr>
+                                <tr>
+                                    @*<th>Enthusiasm</th>
+                                    <th>Discipline</th>*@
+                                    @*<th>Team spirit</th>*@
+                                    <th>Height (cms)</th>
+                                    <th>Weight (kgs)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model._CaseVII)
+                                {
+                                    <tr>
+                                        <td>@item.Assesment</td>
+                                        @*<td>@item.Enthusiasm</td>
+                                        <td>@item.Discipline</td>
+                                        <td>@item.TeamSpirit</td>*@
+                                        <td>@item.Height</td>
+                                        <td>@item.Weight</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </th>
+                    <th>
+                        <table border="1" style="border-collapse:collapse; font-size:13px; height:120px; width:100%;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">Assessment</th>
+                                    <th colspan="8">Personality Development</th>
+                                </tr>
+                                <tr>
+                                    <th>Courteousness</th>
+                                    <th>Confidence</th>
+                                    <th>Care of <br />Belongings</th>
+                                    <th>Neatness</th>
+                                    <th>Punctuality</th>
+                                    <th>Initiative</th>
+                                    <th>Sharing <br />& Caring</th>
+                                    @*<th>Property</th>*@
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model._CaseVIII)
+                                {
+                                    <tr>
+                                        <td>@item.Assesment</td>
+                                        <td>@item.Courteousness</td>
+                                        <td>@item.Confident</td>
+                                        <td>@item.CareOfBelongings</td>
+                                        <td>@item.Neatness</td>
+                                        <td>@item.Punctuality</td>
+                                        <td>@item.Initiative</td>
+                                        <td>@item.Sharing_Caring</td>
+                                        @*<td>@item.Property</td>*@
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <table border="1" style="border-collapse:collapse; font-size:13px; Height:110px; width:85%;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="Width:63px;">Assess<br />ment</th>
+                                    <th colspan="2">Attendance</th>
+                                    <th sibi2 rowspan="2">Aggregate</th>
+
+                                </tr>
+                                <tr>
+                                    <th>No. of Working days</th>
+                                    <th>Days Present</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model._CaseX)
+                                {
+                                    <tr>
+                                        <td>@item.Assesment</td>
+                                        <td>@item.TotalWorkingDays</td>
+                                        <td>@item.PresentDays</td>
+                                        <td>@aggregateScore[aggCount].Grade</td>
+                                    </tr>
+                                    aggCount = aggCount + 1;
+                                }
+                            </tbody>
+                        </table>
+                    </th>
+                    <th>
+                        <table border="1" style="border-collapse: collapse; font-size:13px; height:110px; width:110%; margin-left:-45px;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">SUB</th>
+                                    <th rowspan="2">Assess<br />ment</th>
+                                    <th rowspan="2">Activity/<br />Viva</th>
+                                    <th rowspan="2">Weekly  Assessment</th>
+                                    <th rowspan="2">Written Assessment</th>
+
+                                    <th rowspan="2">Aggregate</th>
+                                </tr>
+                                @*<tr>
+                                    <th>Activity / Project</th>
+                                    <th>Viva</th>
+                                    <th>Written Work</th>
+                                    <th>Work Sheet</th>
+                                </tr>*@
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model._CaseIV)
+                                {
+                                    if (countIII == 0)
+                                    {
+                                <tr>
+                                    <td align="center" rowspan="3">Social Studies/ EVS 2</td>
+                                    <td>@item.Assesment</td>
+                                    <td>@item.Activity_Project</td>
+                                    @*<td>@item.Viva</td>*@
+                                    <td>@item.WorkSheet</td>
+                                    <td>@item.Written_Work</td>
+
+                                    <td>@item.Aggregrate</td>
+                                </tr>
+                                    }
+                                    else
+                                    {
+                            <tr>
+                                <td>@item.Assesment</td>
+                                <td>@item.Activity_Project</td>
+                                @* <td>@item.Viva</td>*@
+                                <td>@item.WorkSheet</td>
+                                <td>@item.Written_Work</td>
+
+                                <td>@item.Aggregrate</td>
+                            </tr>
+                                    }
+                                    countIII = countIII + 1;
+                                }
+                            </tbody>
+                        </table>
+                    </th>
+                    <th>
+                        <table border="1" style="border-collapse: collapse; font-size:13px; width:100%;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">SUB</th>
+                                    <th rowspan="2">Assess<br />ment</th>
+                                    <th colspan="5">Aspects</th>
+                                    @*<th rowspan="2">Aggregate<br />Grade</th>*@
+                                </tr>
+                                <tr>
+                                   @* <th>Computer Science</th>*@<th style="width:51px;">IT</th>
+                                    <th>General Studies</th>
+                                    <th>Value Education</th>
+                                    <th>French</th>
+                                    <th>Smart Class</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model._CaseV)
+                                {
+                                    if (countIV == 0)
+                                    {
+                                        <tr>
+                                            <td align="center" rowspan="3" style="width:79px;">Relative Areas</td>
+                                            <td style="width:51px;">@item.Assesment</td>
+                                            <td>@item.Computer_Science</td>
+                                            <td>@item.GeneralStudies</td>
+                                            <td>@item.ValueEducation</td>
+                                            <td>@item.French</td>
+                                            <td style="width:53px;">@item.SmartClass</td>
+                                            @*<td>@item.Aggregate</td>*@
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td>@item.Assesment</td>
+                                            <td>@item.Computer_Science</td>
+                                            <td>@item.GeneralStudies</td>
+                                            <td>@item.ValueEducation</td>
+                                            <td>@item.French</td>
+                                            <td>@item.SmartClass</td>
+                                            @*<td>@item.Aggregate</td>*@
+                                        </tr>
+                                    }
+                                    countIV = countIV + 1;
+                                }
+                            </tbody>
+                        </table>
+                    </th>
+                </tr>
+                <tr>
+                    <th colspan="2">
+                        <table border="1" style="border-collapse:collapse; font-size:13px; margin-top:-18px; width:100%; height:100px;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="width:63px;">Assess <br />ment</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model._CaseIX)
+                                {
+                                    //if (countVIII == 0)
+                                    //{
+                                    <tr>
+                                        <td>@item.Assesment</td>
+                                        <td style="text-align:left;">@item.Reamrk</td>
+                                    </tr>
+                                    @*}
+                                        else
+                                        {
+                                            <tr>
+                                                <td>@item.Assesment</td>
+                                                <td>@item.Reamrk</td>
+                                            </tr>
+                                        }*@
+                                    countVIII = countVIII + 1;
+                                }
+                            </tbody>
+                        </table>
+                    </th>
+                    <th style="vertical-align:top;">
+                        <table border="1" style="border-collapse:collapse; width:100%; font-size:13px; margin-bottom:20px; height:100px;">
+                            <thead>
+                                <tr>
+                                    <th colspan="6">Key to Grades</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Grade</td>
+                                    <td>A<sup>*</sup></td>
+                                    <td>A</td>
+                                    <td>B</td>
+                                    <td>C</td>
+                                    <td>D</td>
+                                </tr>
+                                <tr>
+                                    <td>Percentage</td>
+                                    <td>90%-100% </td>
+                                    <td>75%-89%</td>
+                                    <td>56%-74%</td>
+                                    <td>40%-55% </td>
+                                    <td>Below 35%</td>
+                                </tr>
+                                <tr>
+                                    <td>Remarks</td>
+                                    <td>(Outstanding)</td>
+                                    <td>(Excellent)</td>
+                                    <td>(Good)</td>
+                                    <td> (Satisfactory)</td>
+                                    <td> (Need to Improve)</td>
+                                </tr>
+                                <tr>
+                                    <td>Aggregate Grade</td>
+                                    <td>A<sup>*</sup></td>
+                                    <td>A</td>
+                                    <td>B</td>
+                                    <td>C</td>
+                                    <td>D</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <div style="width:25%; float:left; text-align:center;">
+                            <div style="height:34px;"></div>
+                            <h5>Class Teacher/ HOY/ Link Officer Signature</h5>
+                        </div>
+                        <div style="width:25%; float:left; text-align:center;">
+                            <div style="height:34px;"></div>
+                            <h5>Parent's Signature</h5>
+                        </div>
+                        <div style="width:25%; float:left; text-align:center;">
+                            <div style="height:34px;"></div>
+                            <h5>Managing Director Signature</h5>
+                        </div>
+                        <div style="width:25%; float:left; text-align:center;">
+                            <div style="height:34px;"></div>
+                            <h5>Co-Chairman/ Principal's Signature</h5>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+<script>
+    function myFunction() {
+        var printButton = document.getElementById("btn-print");
+        printButton.style.visibility = 'hidden';
+        window.print();
+        printButton.style.visibility = 'visible';
+    }
+</script>

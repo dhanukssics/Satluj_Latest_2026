@@ -1,0 +1,71 @@
+﻿
+@model Satluj_Latest.Models.StudentsCoScholasticAreaResultModel
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+    var a1 = Model.ListData;
+
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = @Model.ClassId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.ExamId, new { Value = @Model.ExamId })
+@Html.HiddenFor(z => z.CoScholasticId, new { Value = @Model.CoScholasticId })
+@Html.HiddenFor(z => z.IsEntered, new { Value = @Model.IsEntered })
+
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                Score
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model.ListData)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td style="width:10%;">
+                        @count
+                    </td>
+                    <td style="width:50%;">
+                        @item.StudentName
+                    </td>
+                    <td style="width:40%;">
+                        @if (item.Mark == "" || item.Mark == "0.00")
+                        {
+                            <div>
+                                <input type="text" maxlength="1" value="@String.Format("{00}", item.Mark)" style="color:black;  border: 1px solid black; " class="cls-mark" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input type="text" maxlength="1" value="@String.Format("{00}", item.Mark)" style="color:black;  border: 1px solid black;" class="cls-mark" id="@count" />
+                                }
+                                else
+                                {
+                                    <input type="text" maxlength="1" value="@String.Format("{00}", item.Mark)" style="color:black;  border: 1px solid black;"  class="cls-mark" id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-Mark-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

@@ -1,0 +1,89 @@
+﻿@model Satluj_Latest.Models.SubjectsModel
+
+<div class="modal-dialog modal-lg" role="document">
+
+    @using (Html.BeginForm("EditSubjects", "Student", FormMethod.Post, new { id = "form-teacher-edit" }))
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.HiddenFor(m => m.SubjectId)
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Subjects</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Subjects :</label>
+                            <br />
+                            @Html.TextBoxFor(m => m.SubjectName,
+                            new { @class = "form-control", placeholder = "Subject Name" })
+                        @Html.ValidationMessageFor(m => m.SubjectName)
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label>Abbreviation :</label>
+                        <br />
+                        @Html.TextBoxFor(m => m.Abbreviation,
+                                                new { @class = "form-control", placeholder = "Abbreviation" })
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label>Code :</label>
+                        <br />
+                        @Html.TextBoxFor(m => m.Code,
+                                                new { @class = "form-control", placeholder = "Code" })
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label>Optional :</label>
+                        <br />
+                        @Html.CheckBoxFor(m => m.IsOptional)
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" id="btn-editteacher" class="btn pay-now-btn">Edit</button>
+        </div>
+
+    </div>
+        }
+</div>
+
+<script>
+    $("#form-teacher-edit").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: this.action,
+            type: this.method,
+            data: $(this).serialize(),
+            success: function (response) {
+                EditSubjectsSuccess(response);
+            },
+            error: function (xhr) {
+                ajaxFailure(xhr);
+            }
+        });
+    });
+</script>

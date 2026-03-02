@@ -1,0 +1,213 @@
+﻿@model Satluj_Latest.Models.EditStudentModel
+
+<div class="modal-dialog" role="document" style="background-color: #fff;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+                <span>&times;</span>
+            </button>
+            <h4 class="modal-title">Edit Student</h4>
+        </div>
+
+        <form id="edit-student-form"
+              asp-action="EditStudent"
+              asp-controller="School"
+              method="post"
+              enctype="multipart/form-data">
+
+            @Html.HiddenFor(m => m.profilePic)
+            @Html.HiddenFor(m => m.studentId)
+            @Html.HiddenFor(m => m.BusId)
+            @Html.HiddenFor(m => m.divisionId)
+            @Html.HiddenFor(m => m.classId)
+            @Html.HiddenFor(m => m.bloodGroup)
+
+            <div class="modal-body">
+                <div class="row">
+
+                    <!-- LEFT -->
+                    <div class="col-sm-6">
+                        <div class="text-center">
+                            <label>Upload Profile Picture</label>
+
+                            <div class="upload-box"
+                                 id="file_preview_grid_edit"
+                                 style="background-image:url('@(Model.filePath == null ?
+                                                                             "../Content/img/default-placeholder-1024x1024-960x960.png" :
+                                                                             Model.filePath)')">
+                                <input id="default-editpic-browse"
+                                       type="file"
+                                       name="uploadedFile"
+                                       class="uploder-controler" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Name</label>
+                            @Html.TextBoxFor(m => m.studentName, new { @class = "form-control", placeholder = "Name" })
+                            @Html.ValidationMessageFor(m => m.studentName)
+                        </div>
+
+                        <div class="form-group">
+                            <label>Admission No.</label>
+                            @Html.TextBoxFor(m => m.admissionNo, new { @class = "form-control", id = "studentAdmissionNo", placeholder = "Admission No." })
+                            <span id="spn-error-admissionNo" style="color:red;"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            @Html.TextBoxFor(m => m.parentEmail, new { @class = "form-control", placeholder = "Parent Email" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mobile</label>
+                            @Html.TextBoxFor(m => m.MobileNo, new { @class = "form-control", placeholder = "Mobile" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>DOB</label>
+                            <div class="calendar-inp pos_icon_adj">
+                                <i class="fa fa-calendar"></i>
+                                @Html.TextBoxFor(m => m.DOBstring,
+                                                                new { @class = "form-control dob-get-data-cls" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mother Tongue</label>
+                            @Html.TextBoxFor(m => m.MotherTongue, new { @class = "form-control" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>Country</label>
+                            <select asp-for="CountryId"
+                                    class="form-control"
+                                    asp-items="Html.GetEnumSelectList<Satluj_Latest.Country>()">
+                                <option value="">--Choose--</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Address</label>
+                            @Html.TextAreaFor(m => m.address, new { @class = "form-control" })
+                        </div>
+                    </div>
+
+                    <!-- RIGHT -->
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <label>State</label>
+                            @Html.TextBoxFor(m => m.state, new { @class = "form-control" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>City</label>
+                            @Html.TextBoxFor(m => m.city, new { @class = "form-control" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>Blood Group</label>
+                            <select class="form-control" id="slct-bloodGroup" name="bloodGroup">
+                                <option value="">--Choose--</option>
+                                <option value="O−">O−</option>
+                                <option value="O+">O+</option>
+                                <option value="A-">A-</option>
+                                <option value="A+">A+</option>
+                                <option value="B-">B-</option>
+                                <option value="B+">B+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="AB+">AB+</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <div>
+                                @Html.RadioButtonFor(x => x.gender, "M") <span>Male</span>
+                                @Html.RadioButtonFor(x => x.gender, "F") <span>Female</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Roll No</label>
+                            @Html.TextBoxFor(m => m.RollNo1, new { @class = "form-control" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select asp-for="CategoryId"
+                                    class="form-control"
+                                    asp-items="Html.GetEnumSelectList<Satluj_Latest.StudentCategory>()">
+                                <option value="">--Choose--</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Date of Joining</label>
+                            @Html.TextBoxFor(m => m.DateOfJoiningString, new { @class = "form-control dob-get-data-cls" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>Place of Birth</label>
+                            @Html.TextBoxFor(m => m.PlaceOfBirth, new { @class = "form-control" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nationality</label>
+                            <select asp-for="NationalityId"
+                                    class="form-control"
+                                    asp-items="Html.GetEnumSelectList<Satluj_Latest.Nationality>()">
+                                <option value="">--Choose--</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pincode</label>
+                            @Html.TextBoxFor(m => m.Pincode, new { @class = "form-control" })
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn pay-now-btn">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Submit AJAX
+    $("#edit-student-form").submit(function (e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: EditStudentSuccess,
+            error: EditStudentFailed
+        });
+    });
+
+    // Set blood group
+    $(function () {
+        $("#slct-bloodGroup").val("@Model.bloodGroup");
+    });
+
+    // Datepickers
+    $('.dob-get-data-cls').datepicker({
+        format: "dd-mm-yyyy",
+        autoclose: true,
+        todayHighlight: true,
+        endDate: '+d'
+    });
+</script>

@@ -1,0 +1,138 @@
+﻿@model Satluj_Latest.Models.SubjectsModel
+@{
+    ViewBag.Title = "Subjects";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<style>
+    .dev-adj-style {
+        padding: 3%;
+    }
+</style>
+<div class="row">
+    <div class="col-lg-12">
+        <h4>Subjects</h4>
+        <div id="div-account-head">
+            @Html.Partial("~/Views/Student/_pv_AddSubject.cshtml", Model)
+        </div>
+    </div>
+    @*------------------------------------------------------ First half -----------------------------------------*@
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h4>Subject List</h4>
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-subject-list">
+                @Html.Partial("~/Views/Student/_pv_SubjectList.cshtml", Model)
+            </table>
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="modalSubjectEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+<script>
+
+    $(function () {
+        $("#table-subject-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $("#table-subject-list").dataTable().fnDestroy()
+        $("#table-subject-list").dataTable();
+    }
+
+    function AddSubjectSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.msg);
+            $('#SubjectName').val('');
+            $('#option-check-id').prop('checked', false);
+            RefreshList();
+        }
+        else {
+            toastrError(result.msg)
+            $('#SubjectName').val('');
+            $('#option-check-id').prop('checked', false);
+        }
+    }
+
+    function AddSubjectFailed() {
+        toastrError('Failed!');
+    }
+
+    $(document).on('click', '.delete-subject-tr', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Student/DeleteSubject/' + $(source).attr('data-SubId'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    RefreshList();
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+    });
+   
+    function RefreshList() {
+        $.ajax({
+            url: '/Student/GetSubjectDataList',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $("#table-subject-list").dataTable().fnDestroy()
+                $('#table-subject-list').html(data);
+                $("#table-subject-list").dataTable();
+            }
+        });
+    }
+
+    $(document).on('click', '.edit-class-tr', function () {
+        var source = $(this);
+        $.ajax({
+            url: '/Student/SubjectsEditPartial/' + $(source).attr('data-SubId'),
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalSubjectEdit').html(data);
+                $.validator.unobtrusive.parse($("#modalSubjectEdit"));
+                $('#modalSubjectEdit').modal('show');
+            }
+        });
+    });
+
+    function EditSubjectsSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalSubjectEdit').modal('hide');
+            RefreshList();
+        }
+        else {
+            toastrError(result.msg);
+        }
+    }
+
+    function ajaxFailure() {
+        toastrError("Failed!");
+    }
+
+</script>

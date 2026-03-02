@@ -1,0 +1,306 @@
+﻿@model Satluj_Latest.Models.LibraryModels
+@{
+    ViewBag.Title = "Staff List";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Books</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+
+            </div>
+        </div>
+
+
+
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-book-list">
+
+                <thead>
+                    <tr>
+                        <th>
+                            SlMo
+                        </th>
+                        <th>
+                            Student Name
+                        </th>
+                        <th>
+                            Book Issued Date
+                        </th>
+                        <th>
+                            Book Accepted Date
+                        </th>
+                        <th>
+                            Status
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                        foreach (var student in new Satluj_Latest.Data.LibraryBook(Model.bookId).GetBookStudentList().OrderByDescending(z=>z.studentBookId))
+                        {
+                            <tr>
+                                <td class="">
+                                    @i
+                                </td>
+                                <td class="">
+                                    @student.Student.StundentName
+                                </td>
+                                <td class="">
+                                    @student.issueDateTime.ToString("dd/MM/yyyy H:mm")
+                                </td>
+                                <td class="">
+                                    @if (student.acceptDateTime != null)
+                                    {
+                                        DateTime ddd = DateTime.Now;
+                                        <span>
+                                            @ddd.ToString("dd/MM/yyyy H:mm")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </td>
+                                <td class="">
+                                    @if (student.status == false)
+                                    {
+                                        <p>Returned</p>
+                                    }
+                                    else if (student.status == true)
+                                    {
+                                        <p>Issued</p>
+                                    }
+                                </td>
+
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+<div class="modal fade" id="modalBookAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+<div class="modal fade" id="modalBookEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+
+<div class="modal fade" id="modalBookIssue" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+
+<script>
+
+    //$(document).on('click', '.ng-teacherDetails-click', function () {
+
+    //    window.location = '/School/TeacherDetails/' + $(this).attr('data-teacherid');
+    //});
+
+    $(function () {
+        $("#table-book-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $("#table-book-list").dataTable().fnDestroy()
+        $("#table-book-list").dataTable();
+    }
+
+    $(document).on('click', '#btn-add-book', function () {
+
+        $.ajax({
+            url: '/School/AddLibraryBookView',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalBookAdd').html(data);
+                $.validator.unobtrusive.parse($("#modalBookAdd"));
+                $('#modalBookAdd').modal('show');
+
+            }
+        });
+
+    });
+    function RefreshBookGrid() {
+        $.ajax({
+            url: '/School/BookListPartial',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#table-book-list').html('');
+                $('#table-book-list').html(data);
+                IntializeDataTable();
+            }
+        });
+    }
+
+
+
+
+    function AddBookSuccess(result) {
+
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalBookAdd').modal('hide');
+            RefreshBookGrid();
+        }
+        else {
+            $('#modalBookAdd').modal('hide');
+            toastrError(result.msg);
+        }
+
+    }
+
+    function EditBookSuccess(result) {
+
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalBookEdit').modal('hide');
+            RefreshBookGrid();
+
+        }
+        else {
+            $('#modalBookEdit').modal('hide');
+            toastrError(result.msg);
+        }
+
+    }
+
+    $(document).on('click', '.delete-book-tr', function () {
+        var id = $(this).attr('data-id');
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/School/DeleteLibraryBook/' + id,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    RefreshBookGrid();
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+
+    });
+
+
+    $(document).on('click', '.edit-staff-tr', function () {
+
+        var id = $(this).attr('data-id');
+
+        $.ajax({
+            url: '/School/EditLibraryBookView/' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalBookEdit').html(data);
+                $.validator.unobtrusive.parse($("#modalBookEdit"));
+                $('#modalBookEdit').modal('show');
+            }
+        });
+
+    });
+
+    $(document).on('click', '.issue-book-tr', function () {
+        var id = $(this).attr('data-id');
+        $.ajax({
+            url: '/School/IssueLibraryBookView/' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalBookIssue').html(data);
+                $.validator.unobtrusive.parse($("#modalBookIssue"));
+                $('#modalBookIssue').modal('show');
+            }
+        });
+
+    });
+
+
+    function BookIssueSuccess(result) {
+
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalBookIssue').modal('hide');
+            RefreshBookGrid();
+
+        }
+        else {
+            $('#modalBookIssue').modal('hide');
+            toastrError(result.msg);
+        }
+
+    }
+
+    $(document).on('click', '.accept-book-tr', function () {
+        var id = $(this).attr('data-id');
+
+        swal({
+            title: "Are you sure?",
+            text: "Book will shows as available !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Accept!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/School/AcceptLibraryBook/' + id,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    RefreshBookGrid();
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+
+    });
+
+</script>

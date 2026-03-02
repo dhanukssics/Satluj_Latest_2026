@@ -1,0 +1,327 @@
+﻿@model Satluj_Latest.Models.DateClass
+
+@{
+    var countincome = 1;
+    var countexpence = 1;
+    DateTime date = Model.Selecteddate;
+    // var income = new Satluj_Latest.Data.WebsiteService().IncomelistOnDate(Model.Selecteddate).ToList();
+    // var ExpencelistOnDate = new Satluj_Latest.Data.WebsiteService().ExpencelistOnDate(Model.Selecteddate).ToList();
+    //var totalexpence = ExpencelistOnDate.Sum(x => x.Amount);
+    var balanceBD = new Satluj_Latest.Data.WebsiteService().BalancebdDate(date, Model.SchoolId);
+    var CurrentincomeList = new Satluj_Latest.Data.WebsiteService().IncomelistOnDate(date, Model.SchoolId).ToList();
+    var totalincome = CurrentincomeList.Sum(x => x.Amount);
+
+    var CurrentExpenceList = new Satluj_Latest.Data.WebsiteService().ExpencelistOnDate(date, Model.SchoolId).ToList();
+    var totalexpence = CurrentExpenceList.Sum(x => x.Amount);
+    if (balanceBD > 0)
+    {
+        totalincome = totalincome + balanceBD;
+    }
+    else if (balanceBD < 0)
+    {
+        totalexpence = totalexpence + Math.Abs(balanceBD);
+    }
+
+    var balance = totalincome - totalexpence;
+    var balanceHead = "Balance: ";
+    if (balance > 0)
+    {
+        balanceHead = "Profit: ";
+    }
+    else if (balance < 0)
+    {
+        balanceHead = "Loss: ";
+    }
+    else
+    {
+        balanceHead = "Balance: ";
+    }
+
+}
+<style>
+    .comm_table_adjust {
+        height: auto !important;
+        overflow: auto !important;
+        display: inline-table;
+    }
+</style>
+<div>
+
+
+    <div class="table_main">
+        <div class="table_left">
+            <h3>Income</h3>
+            <table class="table_left_content comm_table comm_table_adjust" id="income-table" cellpadding="8">
+                <thead>
+                    <tr>
+                        <th width="40">Sl No</th>
+                        <th>A/c Head</th>
+                        <th>Account Type</th>
+                        <th>Amount</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="income">
+                    @if (balanceBD > 0)
+                    {
+                        <tr>
+                            <td></td>
+                            <td>Balance b/d</td>
+                            <td></td>
+                            <td>@balanceBD</td>
+                        </tr>
+                    }
+                    @foreach (var s in CurrentincomeList)
+                    {
+                        <tr data-id="@s.Id">
+                            <td>@countincome</td>
+                            @*<td><input type="text" class="isPointer in-account-head" value="@s.AccountHead" /></td>
+                            <td><input type="text" class="isPointer in-particular" value="@s.Particular" /></td>
+                            <td class="td-submit-row-edit"><input type="text" class="isPointer in-amount" value="@s.Amount" /></td>
+                            <td><a class="isClass"><i class="fa fa-pencil-square-o edit-income"></i></a></td>*@
+                            <td><input type="text" class="isPointer in-account-head" value="@s.AccountHead" /></td>
+                            <td>
+                                @*<input type="text" class="isPointer in-particular" value="@s.Particular" />*@
+                                <select class="isPointer in-particular">
+                                    @*<option value=@s.Particular selected=selected>@s.Particular</option>*@
+@*                                     <option value="Indirect Income" @(s.Particular == "Indirect Income" ? "selected=selected" : "")>Indirect Income</option>
+                                    <option value="Direct Income" @(s.Particular == "Direct Income" ? "selected=selected" : "")>Direct Income</option>
+                                    <option value="Liabilities" @(s.Particular == "Liabilities" ? "selected=selected" : "")>Liabilities</option>
+                                    <option value="Cash" @(s.Particular == "Cash" ? "selected=selected" : "")>Cash</option>
+                                    <option value="Bank" @(s.Particular == "Bank" ? "selected=selected" : "")>Bank</option>
+ *@
+                                    <option value="Indirect Income" selected="@(s.Particular == "Indirect Income")">
+                                        Indirect Income
+                                    </option>
+
+                                    <option value="Direct Income" selected="@(s.Particular == "Direct Income")">
+                                        Direct Income
+                                    </option>
+
+                                    <option value="Liabilities" selected="@(s.Particular == "Liabilities")">
+                                        Liabilities
+                                    </option>
+
+                                    <option value="Cash" selected="@(s.Particular == "Cash")">
+                                        Cash
+                                    </option>
+
+                                    <option value="Bank" selected="@(s.Particular == "Bank")">
+                                        Bank
+                                    </option>
+
+                                </select>
+                            </td>
+                            <td class="td-submit-row-edit"><input type="text" class="isPointer in-amount" value="@s.Amount" /></td>
+                            <td>
+                                <input type="hidden" value="0" id="hdn-enter-income" />
+                            </td>
+                            <td class="edit-row"><a class="isClass"><i class="fa fa-pencil-square-o edit-income"></i></a></td>
+
+                        </tr>
+                        countincome = countincome + 1;
+                    }
+
+                    <tr>
+                        <td>@countincome</td>
+                        @*<td><input type="text" class="in-account-head" /></td>
+                            <td><input type="text" class="in-particular" /></td>
+                            <td class="td-submit-row"><input type="text" class="in-amount" /></td>*@
+                        <td><input type="text" class="in-account-head" /></td>
+                        <td>
+                            <select class="in-particular">
+                                <option value="Indirect Income">Indirect Income</option>
+                                <option value="Direct Income">Direct Income</option>
+                                <option value="Liabilities">Liabilities</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Bank">Bank</option>
+                            </select>
+                        </td>
+                        <td class="td-submit-row"><input type="text" class="in-amount" /></td>
+                        <td>
+                            <input type="hidden" value="0" id="hdn-enter-income" />
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <input type="hidden" value="@countincome" id="hidden-income" />
+
+            <!-- ./table_left_content comm_table -->
+
+            <div class="add_inp_row2">
+                @*  <strong class="add_more_tble"><i class="fa fa-plus-circle"></i> <span class="income-add">Add more</span></strong>*@
+                @*<strong class="dlt_inp_row pull-right"><i class="fa fa-trash"></i> <span>Delete</span></strong>*@
+            </div>
+
+            <div class="table_total">
+                <input type="hidden" id="income" value="@totalincome" />
+                <h4>Total Income : <span id="newincome" value="@totalincome"> @totalincome INR</span></h4>
+            </div><!-- ./table_total -->
+        </div><!-- ./table_left -->
+
+        <div class="table_right">
+            <h3>Expense</h3>
+            <table class="table_right_content comm_table comm_table_adjust" cellpadding="8" id="expence-table">
+                <thead>
+                    <tr id="expence-tr">
+                        <th width="40">Sl No</th>
+                        <th>A/c Head</th>
+                        <th>Account Type</th>
+                        <th>Amount</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody class="expence">
+                    @if (balanceBD < 0)
+                    {
+                        <tr>
+                            <td></td>
+                            <td>Balance b/d</td>
+                            <td></td>
+                            <td>@Math.Abs(balanceBD)</td>
+                        </tr>
+                    }
+                    @foreach (var exp in CurrentExpenceList)
+                    {
+                        <tr data-id="@exp.Id">
+                            <td>@countexpence</td>
+                            @*<td><input type="text" class="isPointer ex-account-head" id="head" value="@exp.AccountHead" /></td>
+                            <td><input type="text" class="isPointer ex-particular" value="@exp.Particular" /></td>
+                            <td class="td-submit-row-expnce-edit"><input type="text" class="isPointer ex-amount" value="@exp.Amount" /></td>
+                            <td><a class="isClass"><i class="fa fa-pencil-square-o edit-expence"></i></a></td>*@
+                            <td><input type="text" class="isPointer ex-account-head" value="@exp.AccountHead" /></td>
+                            <td>
+                                @*<input type="text" class="isPointer ex-particular" value="@exp.Particular" />*@
+                                <select class="isPointer ex-particular">
+                                    @*<option value="@exp.Particular" selected=selected>@exp.Particular</option>*@
+@*                                     <option value="Indirect Expense" @(exp.Particular == "Asset" ? "selected=selected" : "")>Indirect Expense</option>
+                                    <option value="Asset" @(exp.Particular == "Asset" ? "selected=selected" : "")> Asset</option>
+                                    <option value="Direct Expense" @(exp.Particular == "Direct Expense" ? "selected=selected" : "")>Direct Expense</option>
+ *@        
+     <option value="Indirect Expense" selected="@(exp.Particular == "Indirect Expense")">
+                                        Indirect Expense
+                                    </option>
+
+                                    <option value="Asset" selected="@(exp.Particular == "Asset")">
+                                        Asset
+                                    </option>
+
+                                    <option value="Direct Expense" selected="@(exp.Particular == "Direct Expense")">
+                                        Direct Expense
+                                    </option>
+
+</select>
+                            </td>
+                            <td class="td-submit-row-expnce-edit"><input type="text" class="isPointer ex-amount" value="@exp.Amount" /></td>
+                            <td>
+                                <input type="hidden" value="0" id="hdn-enter-expence" />
+                            </td>
+                            <td class="edit-row"><a class="isClass"><i class="fa fa-pencil-square-o edit-expence"></i></a></td>
+
+                        </tr>
+
+                        countexpence = countexpence + 1;
+                    }
+                    <tr>
+                        <td>@countexpence</td>
+                        @*<td><input type="text" class="ex-account-head" id="head" /></td>
+                        <td><input type="text" class="ex-particular" /></td>
+                        <td class="td-submit-row-expnce"><input type="text" class="ex-amount" /></td>
+                        <td>
+                            <input type="hidden" value="0" id="hdn-enter-expence" />
+                        </td>*@
+                        <td><input type="text" class="ex-account-head" /></td>
+                        <td>
+                            <select class="ex-particular">
+                                <option value="Indirect Expense">Indirect Expense</option>
+                                <option value="Asset">Asset</option>
+                                <option value="Direct Expense">Direct Expense</option>
+                            </select>
+                        </td>
+                        <td class="td-submit-row-expnce"><input type="text" class="ex-amount" /></td>
+                        <td>
+                            <input type="hidden" value="0" id="hdn-enter-expence" />
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <input type="hidden" value="@countexpence" id="hidden-expence" />
+
+            <!-- ./table_right_content comm_table -->
+
+            <div class="add_inp_row2">
+                @* <strong class="add_more_tble2"><i class="fa fa-plus-circle"></i> <span class="expence-add">Add more</span></strong>*@
+                @*<strong class="dlt_inp_row2 pull-right"><i class="fa fa-trash"></i> <span>Delete</span></strong>*@
+            </div>
+
+
+
+            <div class="table_total">
+
+                <input type="hidden" id="expn" value="@totalexpence" />
+                <h4>Total Expense : <span id="newexpnce">@totalexpence</span> INR</h4>
+            </div><!-- ./table_total -->
+        </div><!-- ./table_right -->
+    </div><!-- ./table_main -->
+
+    <div class="table_footer">
+        <input type="hidden" id="balan" value="@totalexpence" />
+        <h2>@balanceHead<span id="newbalance"> @balance INR</span></h2>
+    </div>
+</div>
+
+<script id="income-list-append-template" type="application/html-template">
+    @*<tr id="income-tr">
+            <td class="slno"></td>
+            <td><input type="text" class="in-account-head" /></td>
+            <td><input type="text" class="in-particular" /></td>
+            <td class="td-submit-row"><input type="text" class="in-amount" /></td>
+        </tr>*@
+    <tr id="income-tr">
+        <td class="slno"></td>
+        <td><input type="text" class="in-account-head" /></td>
+        <td>
+            <select class="in-particular">
+                <option value="Indirect Income">Indirect Income</option>
+                <option value="Direct Income">Direct Income</option>
+                <option value="Liabilities">Liabilities</option>
+                <option value="Cash">Cash</option>
+                <option value="Bank">Bank</option>
+            </select>
+        </td>
+        <td class="td-submit-row"><input type="text" class="in-amount" /></td>
+        <td>
+            <input type="hidden" value="0" id="hdn-enter-income" />
+        </td>
+    </tr>
+</script>
+<script id="expence-list-append-template" type="application/html-template">
+    @*<tr id="expence-tr">
+            <td class="slno"></td>
+            <td><input type="text" class="ex-account-head" /></td>
+            <td><input type="text" class="ex-particular" /></td>
+            <td class="td-submit-row-expnce"><input type="text" class="ex-amount" /></td>
+        </tr>*@
+    <tr id="expence-tr">
+        <td class="slno"></td>
+        <td><input type="text" class="ex-account-head" /></td>
+        <td>
+            <select class="ex-particular">
+                <option value="Indirect Expense">Indirect Expense</option>
+                <option value="Asset">Asset</option>
+                <option value="Direct Expense">Direct Expense</option>
+            </select>
+        </td>
+        <td class="td-submit-row-expnce"><input type="text" class="ex-amount" /></td>
+        <td>
+            <input type="hidden" value="0" id="hdn-enter-expence" />
+        </td>
+    </tr>
+</script>
+
+
+
+

@@ -1,0 +1,45 @@
+﻿
+@model Satluj_Latest.Models.CoScholasticAreaModel
+@{
+    long schoolId = Model.SchoolId;
+    var data = new Satluj_Latest.Data.School(schoolId).GetAllCoScholasticArea();
+    int x = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<table class="table custome-table co-scholastic-area-list">
+    <thead>
+        <tr>
+            <th>
+                Sl No
+            </th>
+            <th>
+                Region
+            </th>
+            <th>
+                Co-Scholastic Area
+            </th>
+            @if (IsAdmin == true)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in data)
+        {
+            <tr>
+                <td>@x</td>
+                <td>@item.RegionName</td>
+                <td>@item.ItemName</td>
+                @if (IsAdmin == true)
+                {
+                    <td>
+                        <button class="delete-class-tr btn btn-peek" data-coso="@item.Id"><i class="fa fa-trash"></i></button>
+                        <button class="edit-class-tr btn btn-peek" data-coso="@item.Id"><i class="fa fa-edit"></i></button>
+                    </td>
+                }
+            </tr>
+            x = x + 1;
+        }
+    </tbody>
+</table>

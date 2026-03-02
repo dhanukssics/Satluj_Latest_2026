@@ -1,0 +1,75 @@
+﻿
+@model Satluj_Latest.Models.AddOptionalSubjectsToStudentsModel
+@{
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<div class="row">
+    <div class="col-md-12">
+        <div id="pv-table">
+            <div class="">
+                <table class="table custome-table table-student-list">
+                    <thead>
+                        <tr>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Admisson No
+                            </th>
+                            <th>
+                                Parent Name
+                            </th>
+                            <th>
+                                Address
+                            </th>
+                            <th>
+                                Contact No.
+                            </th>
+                            @if (IsAdmin == true)
+                            {
+                                <th></th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model.Data)
+                        {
+                            <tr>
+                                <td>
+                                    @if (student.FilePath != null)
+                                    {
+                                        <img src="@student.FilePath" class="user-pic-tab" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/Content/img/children-1.gif" class="user-pic-tab" />
+                                    }
+                                    @student.StudentName
+                                </td>
+                                <td>
+                                    @student.SpecialId
+                                </td>
+                                <td>
+                                    @student.ParentName
+                                </td>
+                                <td>
+                                    @student.Address
+                                </td>
+                                <td>
+                                    @student.ContactNumber
+                                </td>
+                                @if (IsAdmin == true)
+                                {
+                                    <td>
+                                        <button class="delete-class-tr btn btn-peek" data-subjectId="@student.SubjectId" data-student="@student.StudentId"><i class="fa fa-trash"></i></button>
+                                        @*<button class="edit-class-tr btn btn-peek" data-regionid="@student.StudentId"><i class="fa fa-edit"></i></button>*@
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

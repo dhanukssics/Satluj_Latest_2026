@@ -1,0 +1,159 @@
+﻿@model Satluj_Latest.Models.FeeAlertDataModel
+
+@{
+    Layout = "_SchoolAdminLayout";
+
+    var senderDetails = new Satluj_Latest.Data.School(Model.SchoolId).GetSenderDetails();
+    var feeIncomeData = new Satluj_Latest.Data.School(Model.SchoolId).GetFeeIncomeHead();
+
+    if (feeIncomeData != null)
+    {
+        Model.FeeIncomeHead = new Satluj_Latest.Models.FeeIncomeAccountHead
+        {
+            HeadId = feeIncomeData.AccountId,
+            AccountHead = feeIncomeData.AccHeadName
+        };
+    }
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Settings</h3>
+
+        <div id="sender-id-div">
+            @if (Model.Id != 0)
+            {
+                <partial name="_pv_Edit_FeeAlerDate" />
+            }
+            else
+            {
+                <partial name="_pv_Add_FeeAlerDate" />
+            }
+        </div>
+
+        <!-- Birthday Wishes -->
+        <div class="col-md-12 col-md-offset-1 settings-box">
+            <label class="cust-label">Send Birthday Wishes !</label>
+            <button class="btn btn-peek" id="send-brthday-wishes">Send</button>
+        </div>
+
+        <!-- Circular -->
+        <div class="col-md-12 col-md-offset-1 settings-box">
+            <label class="cust-label">Send Circular Notifications !</label>
+            <button class="btn btn-peek" id="send-circular-notification">Send</button>
+        </div>
+
+        <!-- Fee Due -->
+        <div class="col-md-12 col-md-offset-1 settings-box">
+            <label class="cust-label">Send Fee Due Alert !</label>
+            <button class="btn btn-peek" id="send-fee-due">Send</button>
+        </div>
+
+        <!-- App Details -->
+        <div class="col-md-12 col-md-offset-1 settings-box">
+            <label class="cust-label">Send App details !</label>
+            <button class="btn btn-peek" id="send-app-details">Send</button>
+        </div>
+
+        <!-- Billing Footer -->
+        <div class="col-md-12 col-md-offset-1 settings-box">
+            <label class="cust-label">Billing footer message</label>
+
+            <form id="form-footer" asp-controller="School" asp-action="AddBillingFooter" method="post">
+                <input asp-for="FooterMessage" class="form-control @(Model.FooterMessage != null ? "isDisabled" : "")" />
+                <span asp-validation-for="FooterMessage" class="text-danger"></span>
+
+                <div class="mt-2">
+                    <button type="button" id="btn-editfooter" class="btn pay-now-btn @(Model.FooterMessage == null ? "isHidden" : "")">Edit</button>
+                    <button type="submit" id="btn-addfooter" class="btn pay-now-btn @(Model.FooterMessage != null ? "isHidden" : "")">Save</button>
+                    <button type="button" id="btn-cancel-footer" class="btn btn-default isHidden">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Library Due Days -->
+        <div class="col-md-5 col-md-offset-1 settings-box">
+            <label class="cust-label">Library Due Days</label>
+
+            <form id="form-libraryDue" asp-controller="School" asp-action="AddLibraryDueDays" method="post">
+                <input asp-for="libraryDueDay" type="number" class="form-control @(Model.libraryDueDay > 0 ? "isDisabled" : "")" />
+                <span asp-validation-for="libraryDueDay"></span>
+
+                <div class="mt-2">
+                    <button type="button" id="btn-editlibraryDue" class="btn pay-now-btn @(Model.libraryDueDay == 0 ? "isHidden" : "")">Edit</button>
+                    <button type="submit" id="btn-addlibraryDue" class="btn pay-now-btn @(Model.libraryDueDay > 0 ? "isHidden" : "")">Save</button>
+                    <button type="button" id="btn-cancel-libraryDue" class="btn btn-default isHidden">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Library Fine -->
+        <div class="col-md-5 settings-box">
+            <label class="cust-label">Library Fine</label>
+
+            <form id="form-libraryFine" asp-controller="School" asp-action="AddLibraryDueFine" method="post">
+                <select asp-for="feeId"
+                        asp-items="new Satluj_Latest.Data.DropdownData().SchoolSpecialFeesList(Model.SchoolId)"
+                        class="form-control slct-fee-dropdwn">
+                    <option value="">--Choose Fee--</option>
+                </select>
+
+                <input asp-for="libFineAmount" type="number" class="form-control mt-2" />
+
+                <div class="mt-2">
+                    <button type="button" id="btn-editlibraryFine" class="btn pay-now-btn">Edit</button>
+                    <button type="submit" id="btn-addlibraryFine" class="btn pay-now-btn isHidden">Save</button>
+                    <button type="button" id="btn-cancel-libraryFine" class="btn btn-default isHidden">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- SMS Sender -->
+        <div class="col-md-5 settings-box">
+            @if (senderDetails != null)
+            {
+                <partial name="_pv_Edit_SMSCenderId" />
+            }
+            else
+            {
+                <partial name="_pv_Add_SMSCenderId" model="Model" />
+            }
+        </div>
+
+        <!-- Fee Income Head -->
+        <div class="col-md-5 settings-box">
+            @if (feeIncomeData != null)
+            {
+                <partial name="_pv_EditFeeIncomeHead" model="Model" />
+            }
+            else
+            {
+                <partial name="_pv_AddFeeIncomeHead" model="Model" />
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function ajaxForm(formId, successFn, failFn) {
+            $(formId).submit(function (e) {
+                e.preventDefault();
+                $.post($(this).attr('action'), $(this).serialize())
+                    .done(successFn)
+                    .fail(failFn);
+            });
+        }
+
+        ajaxForm('#form-footer', AddBillingFooterSuccess, AddBillingFooterFailure);
+        ajaxForm('#form-libraryDue', AddLibraryDueDaysSuccess, AddLibraryDueDaysFailure);
+        ajaxForm('#form-libraryFine', AddLibraryDueFineSuccess, AddLibraryDueFineFailure);
+
+        $('#send-brthday-wishes').click(() => $.get('/School/SendBirthdayWishes', () => toastrSuccess('Successful')));
+        $('#send-fee-due').click(() => $.get('/School/SendFeeDueAlert', r => r.status ? toastrSuccess(r.msg) : toastrError(r.msg)));
+        $('#send-circular-notification').click(() => $.get('/School/SendCircularNotificationMessages', () => toastrSuccess('Successful')));
+        $('#send-app-details').click(() => $.get('/School/SendAppDetails', r => r.status ? toastrSuccess(r.msg) : toastrError(r.msg)));
+    </script>
+}

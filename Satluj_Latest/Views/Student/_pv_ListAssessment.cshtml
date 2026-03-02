@@ -1,0 +1,65 @@
+﻿@Model Satluj_Latest.Models.AssementUpload
+
+
+                    <thead>
+                        <tr>
+
+                            <th>
+                                UploadedDate
+                            </th>
+
+
+                            <th>
+                                filename
+                            </th>
+                            <th>
+                                Actions
+                            </th>
+
+                            <th>
+                                View Answer
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model.Data)
+                            {
+                        <tr class="ng-click-studentDiscount-details">
+
+
+                            <td>
+                                @Convert.ToDateTime(student.File_Uploaded_Date).ToString("dddd, dd MMMM yyyy")
+                            </td>
+
+                            <td>
+                                @student.FileName &nbsp; &nbsp;&nbsp; &nbsp; :
+                            </td>
+
+                            <td>
+                                @if (!String.IsNullOrEmpty(@student.FileName))
+                                {
+                                    @Html.ActionLink("View", "DownloadFiles", "Student", new { Filename = @student.FileName }, null)
+                                    @Html.ActionLink("Edit", "Update_AssessmentFile", "Student", new { id = @student.FileId }, null)
+                                    @Html.ActionLink("Delete", "Delete_Assignments", "Student", new { id = @student.FileId }, null)
+                                }
+
+                            </td>
+
+                            
+                            
+                            <td>
+                                @if (@student.ClassId != null && @student.DivisionName != null && @student.SubjectId != null)
+                                {
+                                    @Html.ActionLink("ViewAnswer", "View_Answer", "Student", new { id = @student.ClassId, divid = @student.DivisionName, subid = @student.SubjectId }, null)
+                                 }
+                            </td>
+                            
+
+                        </tr>
+                        }
+                    </tbody>
+
+
+          
+
+

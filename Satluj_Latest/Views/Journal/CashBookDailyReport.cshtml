@@ -1,0 +1,161 @@
+﻿@model Satluj_Latest.Models.AddDayBookModel
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+@*<h2>Cash Book</h2>*@
+
+<div class="row">
+    <div class="form-group col-sm-2">
+        <label>Start</label>
+        <div class="with-icon">
+            <input type="text" class="form-control daybook-start-date date-cashBook" data-date-end-date="0d" value="@Model.startDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+
+    <div class="form-group col-sm-2">
+        <label>End</label>
+        <div class="with-icon">
+            <input type="text" class="form-control daybook-end-date date-cashBook" data-date-end-date="0d" value="@Model.endDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+    <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+        <button type="button" class="btn btn-sm btn-info btn-search" id="searchCashBookData">Search</button>
+    </div>
+    <div class="form-group col-sm-2" style="margin-top: 26px;">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+        <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12" id="print-trial-bal">
+        <h3 style="text-align:center;">Cash Book</h3><h5 style="text-align:center;" id="datecheck"></h5>
+        <div class="form-group col-sm-12" id="cash-book-status-id">        </div>
+        <table class="table custome-table" id="cash-book-list"></table>
+    </div>
+</div>
+<script>
+    $('.date-cashBook').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    function IntializeDataTable() {
+        $("#cash-book-list").dataTable().fnDestroy()
+        $("#cash-book-list").dataTable();
+    }
+    $(document).ready(function () {
+        searchCashBookDataWithDate();
+        DayBookStatusData();
+        var ss = $('.daybook-start-date').val() + " to " + $('.daybook-end-date').val();
+        $('#datecheck').text(ss);
+    });
+
+    $(document).on('click', '#searchCashBookData', function () {
+
+        var date = $('.daybook-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.daybook-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+
+        $.ajax({
+            url: '/Journal/SearchCashBookDailyData/' + start + '~' + end,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#cash-book-list').html('');
+                $('#cash-book-list').html(data);
+                //IntializeDataTable();
+                DayBookStatusData();
+                var ss = $('.daybook-start-date').val() + " to " + $('.daybook-end-date').val();
+                $('#datecheck').text(ss);
+            }
+        });
+    });
+
+    function searchCashBookDataWithDate() {
+        //debugger;
+        var date = $('.daybook-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.daybook-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+
+
+        $.ajax({
+            url: '/Journal/SearchCashBookDailyData/' + start + '~' + end,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#cash-book-list').html('');
+                $('#cash-book-list').html(data);
+                //IntializeDataTable();
+            }
+        });
+    }
+    function DayBookStatusData() {
+        //debugger;
+        var date = $('.daybook-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.daybook-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        $.ajax({
+            url: '/Journal/DayBookStatusData/' + start + '~' + end,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#cash-book-status-id').html('');
+                $('#cash-book-status-id').html(data);
+            }
+        });
+    }
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Journal/CashBook';
+    }
+
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var date = $('.daybook-start-date').val() + " to " + $('.daybook-end-date').val();
+        $("#cash-book-list").table2excel({
+            name: "Table2Excel",
+            filename: "Cash Book as on " + date,
+            fileext: ".xls"
+        });
+    });
+</script>

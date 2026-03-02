@@ -1,0 +1,107 @@
+﻿@model Satluj_Latest.Models.DayBookReportModel
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+<div class="row">
+    <div class="form-group col-sm-2">
+        <label>Start</label>
+        <div class="with-icon">
+            <input type="text" class="form-control rv-start-date date-rvReport" data-date-end-date="0d" value="@Model.FromDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+
+    <div class="form-group col-sm-2">
+        <label>End</label>
+        <div class="with-icon">
+            <input type="text" class="form-control rv-end-date date-rvReport" data-date-end-date="0d" value="@Model.ToDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+    <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+        <button type="button" class="btn btn-sm btn-info btn-search" id="searchrvData">Search</button>
+    </div>
+    <div class="form-group col-sm-2" style="margin-top: 26px;">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+        <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12" id="print-trial-bal">
+        <h3 style="text-align:center;">Receipt & Payment</h3><h5 style="text-align:center;" id="datecheck"></h5>
+        <table class="table custome-table" id="r-v-list"></table>
+    </div>
+</div>
+
+
+<script>
+    $('.date-rvReport').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    function IntializeDataTable() {
+        $("#r-v-list").dataTable().fnDestroy()
+        $("#r-v-list").dataTable();
+    }
+
+    $(document).ready(function () {
+        searchRPDataWithDate();
+        var ss = $('.rv-start-date').val() + " to " + $('.rv-end-date').val();
+        $('#datecheck').text(ss);
+    });
+
+    function searchRPDataWithDate() {
+        var date = $('.rv-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.rv-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+
+        $.ajax({
+            url: '/SchoolAccount/RPReport/' + start + '~' + end,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#r-v-list').html('');
+                $('#r-v-list').html(data);
+            }
+        });
+    }
+
+    $(document).on('click', '#searchrvData', function () {
+        searchRPDataWithDate();
+        var ss = $('.rv-start-date').val() + " to " + $('.rv-end-date').val();
+        $('#datecheck').text(ss);
+    });
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var date = $('.rv-start-date').val() + " to " + $('.rv-end-date').val();
+        $("#r-v-list").table2excel({
+            name: "Table2Excel",
+            filename: "Receipt & Payment as on " + date,
+            fileext: ".xls"
+        });
+    });
+
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/SchoolAccount/ReceiptAndPaymentHome';
+    }
+
+</script>

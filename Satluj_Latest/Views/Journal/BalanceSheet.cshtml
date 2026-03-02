@@ -1,0 +1,42 @@
+﻿@model Satluj_Latest.Models.TrialBalanceModel
+@{
+    ViewBag.Title = "TrialBalance";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="form-group text-center">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+        <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+    </div>
+</div>
+
+<div id="trial-balance-table-id">
+    @Html.Partial("~/Views/Journal/_pv_BalanceSheetList.cshtml", Model)
+</div>
+<script>
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Journal/BalanceSheet';
+    }
+
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var head = "Trial Balance as on " + $('#Today').val();
+        $("#table-trial-balance").table2excel({
+            name: "Table2Excel",
+            filename: head,
+            fileext: ".xls"
+        });
+    });
+</script>
+

@@ -1,0 +1,90 @@
+﻿@model Satluj_Latest.Models.StockUpdateModel
+
+<form id="form-add-exam" asp-controller="Laboratory" asp-action="SubmitStockUpdate" method="post">
+
+    <div class="row" style="padding-left:10px;">
+
+        <div class="form-group col-sm-3">
+            <label>Category :</label>
+            @Html.DropDownListFor(
+            m => m.CategoryId,
+                        Model.LabCategories,
+                        "-- Select --",
+                        new { @class = "form-control slct-lab-category-dropdwn1" })
+            @Html.ValidationMessageFor(m => m.CategoryId)
+        </div>
+
+        <div class="form-group col-sm-3">
+            <label>Item :</label>
+            @Html.TextBoxFor(m => m.Item, new { @class = "form-control", placeholder = "Item" })
+            @Html.ValidationMessageFor(m => m.Item)
+        </div>
+
+        <div class="form-group col-sm-3">
+            <label>Price :</label>
+            @Html.TextBoxFor(m => m.Price, new { @class = "form-control", placeholder = "Price" })
+            @Html.ValidationMessageFor(m => m.Price)
+        </div>
+
+        <div class="form-group col-sm-3">
+            <label>Purchase Id :</label>
+            @Html.TextBoxFor(m => m.PurchaseId, new { @class = "form-control", placeholder = "Purchase Id" })
+            @Html.ValidationMessageFor(m => m.PurchaseId)
+        </div>
+
+    </div>
+
+    <div class="row" style="padding-left:10px;">
+
+        <div class="form-group col-sm-3">
+            <label>Supplier Name :</label>
+            @Html.TextBoxFor(m => m.SupplirName,
+                        new { @class = "form-control", placeholder = "Supplier Name", id = "supplier-auto-complete" })
+            @Html.ValidationMessageFor(m => m.SupplirName)
+        </div>
+        <div class="form-group col-sm-3">
+            <label asp-for="Status">Status :</label>
+
+            <select asp-for="Status"
+                    asp-items="Html.GetEnumSelectList<StockStatus>()"
+                    class="form-control">
+                <option value="">--Choose--</option>
+            </select>
+
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+        
+
+        <div class="form-group col-sm-3" style="padding-top:26px;">
+            <button type="submit" class="btn pay-now-btn" id="btn-stock-update">Save</button>
+        </div>
+
+    </div>
+
+</form>
+<script>
+    $(document).on("submit", "#form-add-exam", function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (res) {
+                AddStockUpdateSuccess(res);
+            },
+            error: function (err) {
+                AddStockUpdateFailed(err);
+            }
+        });
+    });
+
+    function AddStockUpdateSuccess(res) {
+        alert(res.message);
+        $("#form-add-exam")[0].reset();
+    }
+
+    function AddStockUpdateFailed(err) {
+        alert("Something went wrong");
+    }
+</script>

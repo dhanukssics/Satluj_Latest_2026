@@ -1,0 +1,60 @@
+﻿@model Satluj_Latest.Models.FeeAlertDataModel
+
+<div class="col-md-12 col-md-offset-1" style="margin-bottom:70%; margin-top:3%;">
+    <div class="email-setup-main">
+
+        <form asp-action="AddSMSSenderIdData"
+              asp-controller="School"
+              method="post"
+              id="form-login">
+
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label>School Sender Id</label>
+
+                <span>
+                    <input asp-for="SenderDetails.SenderData"
+                           class="form-control"
+                           placeholder="Sender Id"
+                           style="width:30%;"
+                           autocomplete="off"
+                           id="senderId" />
+
+                    <span asp-validation-for="SenderDetails.SenderData"
+                          class="text-danger"></span>
+                </span>
+            </div>
+
+            <div class="form-group">
+                <span class="col-md-12" style="float:left; margin-top:15px;">
+                    <button type="submit" class="btn pay-now-btn">Add</button>
+                </span>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+
+        $('#senderId').val('');
+
+        $('#form-login').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    AddSchoolSenderIdSuccess(response);
+                },
+                error: function () {
+                    AddSchoolSenderIdFailed();
+                }
+            });
+        });
+    });
+</script>

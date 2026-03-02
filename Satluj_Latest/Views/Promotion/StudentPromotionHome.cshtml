@@ -1,0 +1,68 @@
+﻿@model Satluj_Latest.Models.PromoteStudents
+
+@{
+    ViewData["Title"] = "StudentPromotionHome";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<h2>Student Promotion</h2>
+
+<input type="hidden" asp-for="SchoolId" id="SchoolId" />
+
+<div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+
+                <!-- Academic Year -->
+                <div class="form-group col-sm-4">
+                    <label>Academic Year</label>
+                    <select asp-for="OldAcademicyearId"
+                            asp-items="Model.AcademicYearList"
+                            class="form-control"
+                            data-live-search="true"
+                            id="old-academic-year-dropdown-id">
+                        <option value="">--Choose--</option>
+                    </select>
+                    <span asp-validation-for="OldAcademicyearId" class="text-danger"></span>
+                </div>
+
+                <!-- Class -->
+                <div class="form-group col-sm-3">
+                    <label>Class</label>
+                    <select id="class-drop-down" class="form-control" disabled>
+                        <option>-- Please select Class --</option>
+                    </select>
+                </div>
+
+                <!-- Division -->
+                <div class="form-group col-sm-3">
+                    <label>Division</label>
+                    <select id="division-drop-down" class="form-control" disabled>
+                        <option>-- Please select division --</option>
+                    </select>
+                </div>
+
+                <!-- Search -->
+                <div class="col-sm-2">
+                    <label style="visibility:hidden;">Search</label>
+                    <div class="form-group">
+                        <button type="button"
+                                class="btn pay-now-btn"
+                                id="btn-students-search-promotion">
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="modalClassAdd" tabindex="-1" role="dialog"></div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table custome-table" id="students-list-for-promotion"></table>
+    </div>
+</div>

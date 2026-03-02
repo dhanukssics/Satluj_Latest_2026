@@ -1,0 +1,217 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+@*<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>*@
+
+<script src="~/Content/Plugins/Autocomplete/jquery.easy-autocomplete.min.js"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    @*<meta name="viewport" content="width=device-width, initial-scale=1">*@
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>SchoolMan | Online School Management Systems </title>
+    <!--Meta-->
+    <meta name="description" content="SchoolMan is a complete management application for school administration, teachers and parents, it provides a web as well as mobile application which can be downloaded from Google Play store. The mobile application will be customized to the particular school with school name. SchoolMan handles all your school activities by integrating the functionalities of school administration, teachers and communication with parents. It is also associated with a real time GPS tracking system for school bus which ensures safety and timely transit of students.">
+    <meta name="keywords" content="Schoolman, class management software, school management software, class software, School software, web based school management system, online school management systems, school management software, school management system, Online School Tutorial, Online school payment, school fee payment, timetable, schedule, timetable software, school scheduling">
+    <meta name="author" content="SchoolMan">
+    <!--Meta-->
+    <!-- Bootstrap -->
+    <link href="~/Content/css/bootstrap.css" rel="stylesheet" />
+    <!-- Custom style -->
+    <link href="~/Content/css/styles.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/Datepicker/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <!-- Google font Droid sans-->
+    <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
+    <!-- Font awesome icons css -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+
+
+    <link href="~/Content/fonts/schoolman/style.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/toastr/toastr.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/toastr/toastr.min.css" rel="stylesheet" />
+
+    <link href="~/Content/Plugins/Autocomplete/easy-autocomplete.min.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/Autocomplete/easy-autocomplete.themes.min.css" rel="stylesheet" />
+
+
+    <script src="~/Content/Plugins/toastr/toastr.min.js"></script>
+    <script src="~/Content/Plugins/toastr/toastrConfig.js"></script>
+    <link href="~/Content/plugins/Datepicker/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <script src="~/Content/plugins/Datepicker/bootstrap-datepicker.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">*@
+    @*<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">*@
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+
+    <!-- Favicon -->
+    <link href="~/Content/img/favicon.png" rel="shortcut icon" />
+
+
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link href="/Content/Plugins/SweetAlert/sweetalert.css" rel="stylesheet" />
+    <script src="/Content/Plugins/SweetAlert/sweetalert.min.js"></script>
+</head>
+<body>
+    <style>
+        li.sub-menu li {
+            font-size: 13px;
+        }
+    </style>
+    <div class="se-pre-con"></div>
+    <div class="main-section">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="header-main">
+
+                    </div><!-- end of header main -->
+                </div>
+            </div><!-- end of row -->
+            @{
+                var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+                var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+
+            }
+            <div class="">
+
+                @*@{
+                    var userData = new Data.Login((TbLogins)Session["User"]);
+                    var allotedMenu = userData.GetUserMenuList();
+                }*@
+                <div class="body-container">
+                  
+                        <div class="sidemenu-box">
+                            <div class="sidebar-menu">
+                                <div class="logo">
+                                    <img class="img-responsive" src="/Content/img/logo.png" alt="Peekabu" style="padding: 19px;" />
+                                </div><!-- end of logo -->
+                                <div class="side-menu">
+                                    <label class="mobile-label">Menu</label>
+                                    <ul class="responsive-menu">
+                                        @*<li>Navigations</li>*@
+                                    
+                                            <a href="/SuperAdmin/SchoolList"><li class="@(((controller == "superadmin" && action == "schoollist")) ? "active" : "")"><i class="icon-home"></i> School List</li></a>
+                           
+                                            <a href="/SuperAdmin/PaymentList"><li class="@(((controller == "superadmin" && action == "paymentlist")) ? "active" : "")"><i class="icon-list"></i> Payment List</li></a>
+                                        <a href="/SuperAdmin/StudentExcelUpload"><li class="@(((controller == "superadmin" && action == "studentexcelupload")) ? "active" : "")"><i class="icon-user-config"></i> Student Excel Upload</li></a>
+                                       
+                                            @*<li class="sub-menu @(((controller == "school" && action == "fee") || (controller == "school" && action == "feelist") || (controller == "school" && action == "feediscount")) ? " open" : "")">
+                                                <span><i class="fa fa-rupee"></i>  Fees</span>
+                                                <ul>
+                                                    <a href="/School/Fee"><li class="@(((controller == "school" && action == "fee")) ? "active" : "")"><i class="icon-currency"></i> Add Fee</li></a>
+                                                    <a href="/School/FeeList"><li class="@(((controller == "school" && action == "feelist")) ? "active" : "")"><i class="icon-list"></i> Fee List</li></a>
+                                                    <a href="/School/FeeDiscount"><li class="@(((controller == "school" && action == "feediscount")) ? "active" : "")"><i class="icon-discount"></i> Fee Discount</li></a>
+                                                </ul>
+                                            </li>*@
+                                         
+                             
+                                    </ul>
+                                </div>
+                            </div><!-- end of sidebar-menu-->
+                        </div><!-- end of col md 3 -->
+
+                    <div class="content-body">
+                        <div class="main-section-header">
+                            <ul>
+                                @*<li><img class="img-responsive" src="/Content/img/school-logo.png" /></li>*@
+                                <li>Super Admin</li>
+                                <li>|</li>
+                           
+                                    <li><a href="/Logout/AdminLogout"><i class="fa  fa-power-off"></i></a></li>
+                            
+
+                            </ul>
+                        </div>
+
+                        @RenderBody()
+                    </div>
+                </div>
+
+            </div><!-- end of row -->
+        </div><!-- end of container fluid -->
+    </div><!-- end of main section -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    @*<script src="https://code.jquery.com/jquery-2.1.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>*@
+    <!-- jQuery -->
+    @*<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>*@
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="~/Content/js/bootstrap.js"></script>
+    <script src="~/Content/Plugins/Datepicker/bootstrap-datepicker.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.dpicker').datepicker();
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.6/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $('.mobile-label').click(function () {
+            $('.responsive-menu').slideToggle();
+        });
+        $(document).on('click', '.sub-menu > span', function () {
+            //alert();
+            $(document).find('.sub-menu.open').removeClass('open');
+            $(this).parent().toggleClass('open');
+        });
+        $(document).on('click', '.sub-menu.open > span', function () {
+            $(this).parent().removeClass('open');
+        });
+
+        $(window).load(function () {
+            // Animate loader off screen
+            $(".se-pre-con").fadeOut("slow");
+        });
+
+    </script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+        <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+@*     @Scripts.Render("~/bundles/jqueryval")
+ *@
+    @*  <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>*@
+    @*<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>*@
+
+
+
+
+    <!-- DataTables -->
+    <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+    <script src="~/Content/Plugins/jquery.table2excel.min.js"></script>
+
+</body>
+</html>
+<script>
+    //Loader
+    $(document).ajaxStart(function () {
+        $(":submit").attr("disabled", true);
+        //$('body').pleaseWait();
+        ajaxLoaderStart();
+    });
+    $(document).ajaxComplete(function () {
+        $(":submit").attr("disabled", false);
+        //$('body').pleaseWait('stop');
+        ajaxLoaderStop();
+    });
+
+    function ajaxLoaderStart() {
+        $(".se-pre-con").show();
+
+    }
+
+    function ajaxLoaderStop() {
+        $(".se-pre-con").hide()
+
+    }
+
+</script>

@@ -1,0 +1,291 @@
+﻿@model Satluj_Latest.Models.SchoolValue
+@{
+    ViewBag.Title = "SchoolSettingsHome";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var school = new Satluj_Latest.Data.School(Model.schoolId);
+    var logo = school.FilePath;
+    var diary = school.GetSchoolDiaryLink();
+}
+<style>
+    .gap_bottom {
+        padding-bottom: 35px;
+    }
+
+        .gap_bottom label {
+            padding-top: 8px;
+        }
+
+    .setting_page {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+        .setting_page > div {
+            width: 50%;
+            padding-right: 20px;
+        }
+        .setting_page > div {
+    width: 48%;
+    margin-left: 2%;
+    margin-top: 20px;
+    padding: 20px;
+    background: #eaeaea;
+}
+</style>
+<h2 style="text-align: center;">Settings</h2>
+
+<div class="setting_page">
+    <div id="changePassword-div">
+        <h4>Change Password</h4>
+        <div class="parent-div">
+            <div id="change-password">
+            </div>
+        </div>
+    </div>
+    @**************************************************************************************@
+
+    <div id="Logo-div">
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Logo</h4>
+                @if (logo == null)
+            {
+                    <div class="add-file">
+                        <div class="form-group">
+                            <span class="col-md-12">
+                                <label class="cust-label">upload</label>
+                                <input type="file" id="fileDataLogo" class="upload-file upload-clean-Formats-dev-Logo" />
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <span class="col-md-12" style="float: left; margin-top:15px;">
+                                <button type="button" class="btn pay-now-btn bt-upload-Logo">Add </button>
+                            </span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="content-logo">
+                        <a href="@Url.Content(logo)" target="_blank" id="link-upload-logo" style="margin-right:20px">Click Here To View Logo</a>
+                        <button class="btn-edit-file-logo pay-now-btn"><i class="fa fa-edit"></i></button>
+                    </div>
+                    <div class="edit-file-logo isHidden">
+                        <div class="form-group">
+                            <span class="col-md-12">
+                                <label class="cust-label">upload</label>
+                                <input type="file" id="fileData" class="upload-file upload-clean-Formats-dev" />
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <span class="col-md-12" style="float: left; margin-top:15px;">
+                                <button type="button" class="btn btn-default btn-cancel-logo" style="margin-right:10px">Cancel </button>
+                                <button type="button" class="btn pay-now-btn bt-edit-upload-logo">Edit </button>
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @**************************************************************************************@
+    <div id="library-div">
+        <h4>Library Settings</h4>
+        <div class="parent-div">
+            <div id="librarySettings"></div>
+        </div>
+    </div>
+
+    @**************************************************************************************@
+    <div id="smtp-div">
+        <div class="row">
+            <div class="col-md-12">
+                <h4>SMTP Details</h4>
+                <div class="row">
+                    <div id="smtp--partial-div">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @**************************************************************************************@
+    
+
+</div>
+
+
+
+
+
+
+<script>
+
+    $(document).ready(function () {
+        LoadChangePassword();
+        LoadSMTPDetails();
+        LoadLibrary();
+    });
+
+    function LoadChangePassword() {
+        $.ajax({
+            url: '/School/ChangePasswordPartialView/',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#change-password').html(data);
+            }
+        });
+    }
+
+    function PasswordChangeSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.msg);
+            LoadChangePassword();
+        }
+        else {
+            toastrError(result.msg)
+            LoadChangePassword();
+        }
+    }
+
+    function PasswordChangeFailed() {
+        toastrError(result.msg);
+        LoadChangePassword();
+    }
+
+    //******************************************
+
+        var dataaa = "";
+    var dataLogo = "";
+
+    // For Edit Logo
+    $(document).on('change', '.upload-clean-Formats-dev', function () {
+        dataaa = this.files[0];
+    });
+
+    // For Add New Logo
+    $(document).on('change', '.upload-clean-Formats-dev-Logo', function () {
+        dataLogo = this.files[0];
+    });
+
+    // Show Edit Panel
+    $(document).on('click', '.btn-edit-file-logo', function () {
+        $('.content-logo').addClass('isHidden');
+        $('.edit-file-logo').removeClass('isHidden');
+    });
+
+    // Cancel Edit
+    $(document).on('click', '.btn-cancel-logo', function () {
+        $('.edit-file-logo').addClass('isHidden');
+        $('.content-logo').removeClass('isHidden');
+    });
+
+    // Save EDITED logo
+    $(document).on('click', '.bt-edit-upload-logo', function () {
+
+        if (!dataaa) {
+            toastrError("Please select a logo file");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("documentFile", dataaa);
+
+        $.ajax({
+            type: "POST",
+            url: "/School/LogoUploadEdit",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+
+                if (response.status) {
+
+                    $('#link-upload-logo').attr("href", response.url + "?t=" + new Date().getTime());
+
+                    $('.edit-file-logo').addClass('isHidden');
+                    $('.content-logo').removeClass('isHidden');
+
+                    toastrSuccess("Updated Successfully");
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            }
+        });
+    });
+
+    // ADD new logo
+    $(document).on('click', '.bt-upload-Logo', function () {
+
+        if (!dataLogo) {
+            toastrError("Please select a logo");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("documentFile", dataLogo);
+
+        $.ajax({
+            type: "POST",
+            url: "/School/LogoUpload",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+
+                if (response.status) {
+                    location.reload();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            }
+        });
+    });
+    //******************************************
+
+    function LoadSMTPDetails() {
+        $.ajax({
+            url: '/School/SMTPDetailsPartialView/',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#smtp--partial-div').html(data);
+            }
+        });
+    }
+
+    //******************************************
+
+    function LoadLibrary() {
+        $.ajax({
+            url: '/School/LibrarySettingsPartialView/',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#librarySettings').html(data);
+            }
+        });
+    }
+
+    function AddLibraryDueFineSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            LoadLibrary(); // reload partial view
+        } else {
+            toastrError(result.msg);
+        }
+    }
+
+    function AddLibraryDueFineFailure() {
+        toastrError("Failed to save library fine.");
+    }
+
+
+
+
+
+
+</script>

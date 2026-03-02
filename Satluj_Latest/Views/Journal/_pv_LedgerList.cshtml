@@ -1,0 +1,95 @@
+﻿
+@model Satluj_Latest.Models.AddDayBookModel
+@{
+    DateTime startDate = Model.startDate;
+    DateTime endDate = Model.endDate;
+    long schoolId = Model.SchoolId;
+    long headId = Model.HeadId;
+    int typeId = Model.FilterTypeId;
+    var data =  Model.LedgerList;
+
+}
+
+<style>
+    .numbCenter {
+        text-align: center;
+    }
+
+    .noBorder td {
+        border: none !important;
+    }
+
+    .tableHead {
+        font-weight: bold;
+        font-size: 20px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="table-responsive">
+            <table class="table archTable">
+                <thead>
+                    <tr>
+                        <th width="140">Date</th>
+                        <th width="650">Description</th>
+                        <th width="100">Voucher</th>
+                        <th width="100">Debit</th>
+                        <th width="100">Credit</th>
+                        @*<th width="100">Balance</th>*@
+                        <th width="100">Dr/Cr</th>
+                    </tr>
+                </thead>
+                @{
+                    int i = 1;
+                    foreach (var one in data)
+                    {
+
+                        <tbody>
+                            <tr>
+                                <td  class="tableHead">@one.HeadName</td>
+                                <td></td>
+                                <td></td>
+                                <td class="tableHead" align="center">@String.Format("{0:0.00}", one.DebitTotal)</td>
+                                <td class="tableHead" align="center">@String.Format("{0:0.00}", one.CreditTotal)</td>
+                                <td></td>
+                            </tr>
+
+                            @foreach (var subOne in one.list)
+                            {
+                                <tr class="noBorder">
+                                    @if(@subOne.EntryDate.Year!=0001)
+                                    {
+                                    <td align="left" width="140">@subOne.EntryDate.ToString("dd-MM-yyyy")</td>
+                                    }
+                                    else
+                                    {
+                                    <td align="left"> </td>
+                                    }
+                                    @if (subOne.Narration == "Total")
+                                    {
+                                        <td align="left" style="font-weight:bold;">@subOne.Narration</td>
+                                        <td align="center" style="font-weight:bold;">@subOne.VoucherNumber</td>
+                                        <td align="center" style="font-weight:bold;">@String.Format("{0:0.00}", subOne.DebitAmount)</td>
+                                        <td align="center" style="font-weight:bold;">@String.Format("{0:0.00}", subOne.CreditAmount)</td>
+                                        <td align="center" style="font-weight:bold;">@subOne.Symbol</td>
+                                    }
+                                    else
+                                    {
+                                        <td align="left">@subOne.Narration</td>
+                                        <td align="center">@subOne.VoucherNumber</td>
+                                        <td align="center">@String.Format("{0:0.00}", subOne.DebitAmount)</td>
+                                        <td align="center">@String.Format("{0:0.00}", subOne.CreditAmount)</td>
+                                        <td align="center">@subOne.Symbol</td>
+                                    }
+                                    
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                }
+            </table>
+        </div>
+    </div>
+</div>
+

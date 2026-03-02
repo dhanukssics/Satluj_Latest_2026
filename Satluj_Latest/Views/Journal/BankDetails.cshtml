@@ -1,0 +1,91 @@
+﻿@model Satluj_Latest.Models.BankDetailsModel
+@{
+    ViewBag.Title = "BankDetails";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<style>
+    .dev-adj-style {
+        padding: 3%;
+    }
+</style>
+<div class="row">
+    <div class="col-md-6">
+        <h4>Add Bank Details</h4>
+        <div id="div-account-head">
+            @Html.Partial("~/Views/Journal/_pv_Add_BankDetails.cshtml", Model)
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h4>Bank Details</h4>
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-bankDetails-list">
+                @Html.Partial("~/Views/Journal/_pv_BankDetailsList.cshtml", Model)
+            </table>
+        </div>
+    </div>
+
+</div>
+<script>
+    function AddBankNameSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.message);
+            RefreshList();
+            $('#BankName').val('');
+        }
+        else {
+            toastrError(result.messag)
+        }
+    }
+    function AddBankNameFailed() {
+        toastrError('Failed!');
+    }
+    $(function () {
+        $("#table-bankDetails-list").dataTable();
+    })
+    function RefreshList() {
+        $.ajax({
+            url: '/Journal/GetBankDetailsList',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $("#table-bankDetails-list").dataTable().fnDestroy()
+                $('#table-bankDetails-list').html(data);
+                $("#table-bankDetails-list").dataTable();
+            }
+        });
+    }
+    $(document).on('click', '.delete-bank-tr', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Journal/DeleteBank/' + $(source).attr('data-bankid'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    RefreshList();
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+    });
+</script>

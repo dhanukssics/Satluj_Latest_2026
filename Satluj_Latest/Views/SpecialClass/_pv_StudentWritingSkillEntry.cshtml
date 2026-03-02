@@ -1,0 +1,291 @@
+﻿
+@model Satluj_Latest.Models.StudentSkillMarks
+@{
+    <style>
+        .input_width{
+width: 110px;
+    max-width: 100%;
+        }
+
+
+    </style>
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+    var scoreDetails = new Satluj_Latest.Data.School(Model.SchoolId).Get_V_TotalScores(12);
+    //var Creative_Writing = "";
+    //var Hand_Writing = "";
+    //var Grammar = "";
+    //var Spelling = "";
+    //var Vocabulary = "";
+    //var Literature = "";
+    var writing_total = "";
+    var Weekly_Assesment = "";
+    if (scoreDetails != null && scoreDetails.Count > 0)
+    {
+        //if (scoreDetails.Any(x => x.SubTitle == "Creative_Writing"))
+        //{
+        //    Creative_Writing = scoreDetails.Where(x => x.SubTitle == "Creative_Writing").FirstOrDefault().Mark.ToString();
+        //}
+        //if (scoreDetails.Any(x => x.SubTitle == "Hand_Writing"))
+        //{
+        //    Hand_Writing = scoreDetails.Where(x => x.SubTitle == "Hand_Writing").FirstOrDefault().Mark.ToString();
+        //}
+        //if (scoreDetails.Any(x => x.SubTitle == "Grammar"))
+        //{
+        //    Grammar = scoreDetails.Where(x => x.SubTitle == "Grammar").FirstOrDefault().Mark.ToString();
+        //}
+        //if (scoreDetails.Any(x => x.SubTitle == "Spelling"))
+        //{
+        //    Spelling = scoreDetails.Where(x => x.SubTitle == "Spelling").FirstOrDefault().Mark.ToString();
+        //}
+        //if (scoreDetails.Any(x => x.SubTitle == "Vocabulary"))
+        //{
+        //    Vocabulary = scoreDetails.Where(x => x.SubTitle == "Vocabulary").FirstOrDefault().Mark.ToString();
+        //}
+        //if (scoreDetails.Any(x => x.SubTitle == "Literature"))
+        //{
+        //    Literature = scoreDetails.Where(x => x.SubTitle == "Literature").FirstOrDefault().Mark.ToString();
+        //}
+        if (scoreDetails.Any(x => x.SubTitle == "WeeklyAssessment"))
+        {
+            Weekly_Assesment = scoreDetails.Where(x => x.SubTitle == "WeeklyAssessment").FirstOrDefault().Mark.ToString();
+        }
+        if (scoreDetails.Any(x => x.SubTitle == "WritingSkill"))
+        {
+            writing_total = scoreDetails.Where(x => x.SubTitle == "WritingSkill").FirstOrDefault().Mark.ToString();
+        }
+    }
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                 WRITING(@writing_total)
+            </th>
+            @*<th style="color: black;">
+            CREATTIVE WRITING @Creative_Writing)
+        </th>
+        <th style="color: black;">
+            HAND WRITING (@Hand_Writing)
+        </th>
+        <th style="color: black;">
+            GRAMMAR (@Grammar)
+        </th>
+        <th style="color: black;">
+            SPELLINGS (@Spelling)
+        </th>
+        <th style="color: black;">
+           VOCABULARY (@Vocabulary)
+        </th>
+        <th style="color: black;">
+            LITERATURE (@Literature)
+        </th>*@
+            <th style="color: black;">
+                WEEKLY ASSESMENT (@Weekly_Assesment)
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+                <tr data-id="tbRowAmount" style="color:black;"  data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td style="width:10%;">
+                        @count
+                    </td>
+                    <td style="width:30%;">
+                        @item.StudentName
+                    </td>
+                    <td>
+                        @if (item._WritingSkill.UnitTest == null || item._WritingSkill.UnitTest == "")
+                        {
+                            <div>
+                                <input value="@item._WritingSkill.UnitTest" type="number" maxlength="3" style="color:black; " class="cls-mark-Writing_Skill input_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._WritingSkill.UnitTest" type="number" maxlength="3" style="color:black; " class="cls-mark-Writing_Skill input_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._WritingSkill.UnitTest" type="number" maxlength="3" style="color:black; " class="cls-mark-Writing_Skill input_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                        
+                        @*@if (item._WritingSkill.CreativeThinking.Trim() == "")
+            {
+                <div>
+                    <input value="@item._WritingSkill.CreativeThinking" type="number" maxlength="3" style="color:black; " class="cls-mark-CreativeThinking input_width" id="@count" />
+                </div>
+            }
+            else
+            {
+
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._WritingSkill.CreativeThinking" type="number" maxlength="3" style="color:black; " class="cls-mark-CreativeThinking input_width" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._WritingSkill.CreativeThinking" type="number" maxlength="3" style="color:black; " class="cls-mark-CreativeThinking input_width" readonly id="@count" />
+                    }
+                </div>
+            }
+
+        </td>
+        <td>
+            @if (item._WritingSkill.HandWriting.Trim() == "")
+            {
+                <div>
+                    <input value="@item._WritingSkill.HandWriting" type="number" maxlength="3" style="color:black; " class="cls-mark-HandWriting input_width" id="@count" />
+                </div>
+            }
+            else
+            {
+
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._WritingSkill.HandWriting" type="number" maxlength="3" style="color:black; " class="cls-mark-HandWriting input_width" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._WritingSkill.HandWriting" type="number" maxlength="3" style="color:black; " class="cls-mark-HandWriting input_width" readonly id="@count" />
+                    }
+                </div>
+            }
+
+        </td>
+        <td>
+            @if (item._WritingSkill.Grammer.Trim() == "")
+            {
+                <div>
+                    <input value="@item._WritingSkill.Grammer" type="number" maxlength="3" style="color:black; " class="cls-mark-Grammer input_width" id="@count" />
+                </div>
+            }
+            else
+            {
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._WritingSkill.Grammer" type="number" maxlength="3" style="color:black; " class="cls-mark-Grammer input_width" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._WritingSkill.Grammer" type="number" maxlength="3"style="color:black; " class="cls-mark-Grammer input_width" readonly id="@count" />
+                    }
+                </div>
+            }
+        </td>
+        <td>
+            @if (item._WritingSkill.Spelling.Trim() == "")
+            {
+                <div>
+                    <input value="@item._WritingSkill.Spelling" type="number" maxlength="3" style="color:black; " class="cls-mark-Spelling input_width" id="@count" />
+                </div>
+            }
+            else
+            {
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._WritingSkill.Spelling" type="number" maxlength="3" style="color:black; " class="cls-mark-Spelling input_width" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._WritingSkill.Spelling" type="number" maxlength="3" style="color:black; " class="cls-mark-Spelling input_width" readonly id="@count" />
+                    }
+                </div>
+            }
+        </td>
+        <td>
+            @if (item._WritingSkill.Vocabulary.Trim() == "")
+            {
+                <div>
+                    <input value="@item._WritingSkill.Vocabulary" type="number" maxlength="3" style="color:black; " class="cls-mark-Vocabulary input_width" id="@count" />
+                </div>
+            }
+            else
+            {
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._WritingSkill.Vocabulary" type="number" maxlength="3" style="color:black; " class="cls-mark-Vocabulary input_width" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._WritingSkill.Vocabulary" type="number" maxlength="3" style="color:black; " class="cls-mark-Vocabulary input_width" readonly id="@count" />
+                    }
+                </div>
+            }
+        </td>
+        <td>
+            @if (item._WritingSkill.UnitTest.Trim() == "")
+            {
+                <div>
+                    <input value="@item._WritingSkill.UnitTest" type="number" maxlength="3" style="color:black; " class="cls-mark-UnitTest input_width" id="@count" />
+                </div>
+            }
+            else
+            {
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._WritingSkill.UnitTest" type="number" maxlength="3" style="color:black; " class="cls-mark-UnitTest input_width" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._WritingSkill.UnitTest" type="number" maxlength="3" style="color:black; " class="cls-mark-UnitTest input_width" readonly id="@count" />
+                    }
+                </div>
+            }
+        </td>*@
+<td>
+                        @if (item._WritingSkill.WorkSheet.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._WritingSkill.WorkSheet" type="number" maxlength="3" style="color:black; " class="cls-mark-WorkSheet input_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._WritingSkill.WorkSheet" type="number" maxlength="3" style="color:black; " class="cls-mark-WorkSheet input_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._WritingSkill.WorkSheet" type="number" maxlength="3" style="color:black; " class="cls-mark-WorkSheet input_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-writing-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

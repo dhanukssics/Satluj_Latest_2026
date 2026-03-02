@@ -1,0 +1,93 @@
+﻿
+@model Satluj_Latest.Models.LibraryModels
+@{
+    var books = new Satluj_Latest.Data.School(Model.schoolId).GetAllBook();
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+
+
+<thead>
+    <tr>
+        <th>
+            No
+        </th>
+        <th>
+            Serial Number
+        </th>
+        <th>
+            Title
+        </th>
+        <th>
+            Author
+        </th>
+        <th>
+            Reference Number
+        </th>
+        <th>
+            Category
+        </th>
+        <th>
+            Status
+        </th>
+        <th>
+
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        foreach (var book in books)
+        {
+            <tr>
+                <td class="">
+                    @i
+                </td>
+                <td class="">
+                    @book.SerialNumber
+                </td>
+                <td class="">
+                    @book.Title
+                </td>
+                <td class="">
+                    @book.Author
+                </td>
+                <td class="">
+                    @book.ReferenceNumber
+                </td>
+                <td class="">
+                    @book.Category.Category
+                </td>
+                <td class="">
+                    @if (book.Status == 0)
+                    {
+                        <p>Available</p>
+                    }
+                    else if (book.Status == 1)
+                    {
+                        <p>Issued</p>
+                    }
+                </td>
+                <td>
+                    @if (IsAdmin == true)
+                    {
+                        <button class="delete-book-tr btn-peek" data-id="@book.BookId"><i class="fa fa-trash "></i></button>
+                        <button class="edit-staff-tr pay-now-btn" data-id="@book.BookId"><i class="fa fa-edit "></i></button>
+                    }
+                    @if (book.Status == 0)
+                    {
+                        <button class="issue-book-tr pay-now-btn" data-id="@book.BookId">Issue</button>
+                    }
+                    else if (book.Status == 1)
+                    {
+                        <button class="accept-book-tr btn-peek" data-id="@book.BookId">Accept</button>
+                    }
+
+                    <button class="btn-md btn-peek" data-id="@book.BookId" id="btn-view-detail">View</button>
+
+                </td>
+            </tr>
+            i++;
+        }
+    }
+</tbody>

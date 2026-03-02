@@ -1,0 +1,107 @@
+﻿@model Satluj_Latest.Models.TimetableModel
+
+<form id="form-add-exam"
+      asp-action="SubmitTimetable"
+      asp-controller="Student"
+      method="post">
+
+    <input asp-for="DivisonId" type="hidden" value="0" />
+
+    <div class="row" style="width:100%; padding-left: 10px;">
+        <div class="form-group col-sm-3">
+            <label style="color:black;">Class :</label>
+            <br />
+            <select asp-for="ClassId"
+                    asp-items="Satluj_Latest.Data.DropdownData.GetClasses(Model.SchoolId)"
+                    class="form-control slct-mark-dropdwn1"
+                    data-live-search="true"
+                    style="display:inline-block; width:100%;min-width:180px;">
+                <option value="">--Select--</option>
+            </select>
+            <span asp-validation-for="ClassId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group col-sm-3">
+            <label style="color:black;">Division :</label>
+            <br />
+            <select class="form-control slct-free-div-dropdown" disabled></select>
+            <span id="division-required-exam-add" style="display:none; color:red;"></span>
+        </div>
+
+        <div class="form-group col-sm-3">
+            <label style="color:black;">Teacher :</label>
+            <br />
+            <select asp-for="TeacherId"
+                    asp-items="Satluj_Latest.Data.DropdownData.GetTeachers(Model.SchoolId)"
+                    class="form-control"
+                    data-live-search="true"
+                    style="display:inline-block; width:100%;min-width:180px;">
+                <option value="">--Select--</option>
+            </select>
+            <span asp-validation-for="TeacherId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group col-sm-3">
+            <label style="color:black;">Subject :</label>
+            <br />
+            <select asp-for="SubjectId"
+                    asp-items="Satluj_Latest.Data.DropdownData.GetSubjectss(Model.SchoolId)"
+                    class="form-control"
+                    data-live-search="true"
+                    style="display:inline-block; width:100%;min-width:180px;">
+                <option value="">--Select--</option>
+            </select>
+            <span asp-validation-for="SubjectId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row" style="width:100%; padding-left: 10px;">
+        <div class="form-group col-sm-3">
+            <label style="color:black;">Periods :</label>
+            <br />
+            <select asp-for="Period"
+                    asp-items="Html.GetEnumSelectList<PeriodEnum>()"
+                    class="form-control"
+                    id="day-period-id"></select>
+            <span asp-validation-for="Period" class="text-danger"></span>
+        </div>
+
+        <div class="form-group col-sm-3">
+            <label style="color:black;">Day :</label>
+            <br />
+            <select asp-for="DayId"
+                    asp-items="Html.GetEnumSelectList<DayEnum>()"
+                    class="form-control"
+                    id="day-type-id"></select>
+            <span asp-validation-for="DayId" class="text-danger"></span>
+        </div>
+
+        <div class="col-sm-3">
+            <div style="padding: 26px;">
+                <button type="submit" style="display:none;" class="btn pay-now-btn" id="btn-timetable">
+                    Save
+                </button>
+                <button type="button" id="btn-dummy-timeTable" class="btn pay-now-btn">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    $("#form-add-exam").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                AddTimetableSuccess(response);
+            },
+            error: function () {
+                AddTimetableFailed();
+            }
+        });
+    });
+</script>

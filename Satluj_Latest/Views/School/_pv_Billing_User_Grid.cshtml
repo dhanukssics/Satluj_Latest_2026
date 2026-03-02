@@ -1,0 +1,49 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+<table class="table custome-table" id="billGridList">
+    <thead>
+        <tr>
+            <th>
+                Slno
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Class
+            </th>
+            <th>
+                Division
+            </th>
+            <th>
+                Roll No.
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var index = 1;
+        }
+        @foreach (var student in new Satluj_Latest.Data.School(Model.schoolId).GetPublishedClassStudentDetails().OrderBy(z => z.StundentName))
+        {
+            <tr class="ng-click" data-id="@student.StudentId">
+                <td>
+                    @index
+                </td>
+                <td>
+                    @student.StundentName
+                </td>
+                <td>
+                    @student.Class
+                </td>
+                <td>
+                    @student.Division.Division
+                </td>
+                <td>
+                    @student.ClasssNumber
+                </td>
+            </tr>
+            index++;
+        }
+    </tbody>
+</table>
+

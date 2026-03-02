@@ -1,0 +1,34 @@
+﻿@model Satluj_Latest.Models.PaymentModels
+@{
+    ViewBag.Title = "PaymentResponse";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+
+}
+
+<form method="post" action="/Student/PaymentConfirm" name="PaymentResponse" id="form-pay-response">
+    @{if (Model.ConfirmData != null && Model.ConfirmData.Count > 0)
+    {
+        foreach (var p in Model.ConfirmData)
+        {
+            if (p.Key.ToString() != "secure_hash" && !p.Key.ToString().ToLower().StartsWith("__") && p.Key.ToString() != "secretkey" && p.Key.ToString() != "submitted")
+            {
+
+                <input type="hidden" value=@p.Value.ToString() name=@p.Key.ToString() />
+            }
+        }
+    }
+    }
+    <input type="hidden" value="@Model.SecureHash" id="SecureHash" name="SecureHash" />
+    <input value="Submit" type="submit" class="submit-trigger" />
+</form>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('.submit-trigger').trigger('click');
+
+        });
+
+    });
+</script>
+

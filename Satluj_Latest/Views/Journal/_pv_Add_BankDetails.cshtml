@@ -1,0 +1,40 @@
+﻿@model Satluj_Latest.Models.BankDetailsModel
+
+<form id="form-add-exam"
+      asp-action="SubmitAddBankName"
+      asp-controller="Journal"
+      method="post">
+
+    <div class="row">
+        <div id="new-account-div" class="dev-adj-style">
+            <div class="form-group">
+                <input asp-for="BankName"
+                       class="form-control"
+                       placeholder="Bank Name"
+                       autocomplete="off" />
+                <span asp-validation-for="BankName"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit"
+                class="btn pay-now-btn"
+                id="btn-addBankName">
+            Save
+        </button>
+    </div>
+</form>
+<script>
+    $("#form-add-exam").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: this.action,
+            type: "POST",
+            data: $(this).serialize(),
+            success: AddBankNameSuccess,
+            error: AddBankNameFailed
+        });
+    });
+</script>

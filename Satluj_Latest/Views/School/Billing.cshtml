@@ -1,0 +1,205 @@
+﻿    @model Satluj_Latest.Models.SchoolModel
+@{
+    ViewBag.Title = "Billing";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+
+}
+<div class="row">
+    <div class="col-md-12">
+        <h3>Billing</h3>
+
+        <div class="row">
+            
+
+            <div class="form-group col-sm-4">
+                <label>Class</label>
+                @*@Html.DropDownListFor(m => m.classId, Satluj_Latest.Data.DropdownData.GetClasses(Model.schoolId), "--List All Student--", new { @class = "form-control class-drop-down", @data_live_search = "true" })*@
+                <select asp-for="classId"
+                        asp-items="ViewBag.ClassList"
+                        class="form-control class-drop-down"
+                        data-live-search="true">
+                    <option value="">--List All Student--</option>
+                </select>
+
+
+            </div>
+            
+            @*<div class="form-group col-sm-4">
+                <label>Search</label>
+                <div class="input-group" style="max-width: 300px;">
+                    <input type="text" class="form-control" placeholder="Search" aria-describedby="basic-addon2">
+                    <span class="input-group-btn" id="basic-addon2"><button class="btn pay-now-btn">Search</button></span>
+                </div>
+            </div>*@
+
+            <div class="form-group col-sm-4">
+                <label>Division</label>
+                <select id="division-drop-down" class="form-control" disabled>
+                    <option>-- Please select division --</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-responsive" id="user-list-view">
+            @*@Html.Partial("~/Views/School/_pv_Billing_User_Grid.cshtml")*@
+        </div>
+
+    </div><!-- end of col md 8 -->
+</div>
+<script>
+    //$('.mobile-label').click(function () {
+    //    $('.responsive-menu').slideToggle();
+    //});
+    //$(document).on('click', '.sub-menu > span', function () {
+    //    //alert();
+    //    $(document).find('.sub-menu.open').removeClass('open');
+    //    $(this).parent().toggleClass('open');
+    //});
+    //$(document).on('click', '.sub-menu.open > span', function () {
+    //    $(this).parent().removeClass('open');
+    //});
+    function IntializeDataTable() {
+    }
+    //-----------------------ARCHANA 19-JUN-2018 FOR INCREASE THE SPEED OF LIST------------------
+    $(document).ready(function () {
+        $(".class-drop-down").val($(".class-drop-down option:eq(1)").val());
+        var ClassId = $(".class-drop-down option:eq(1)").val();
+        $.ajax({
+            url: '/School/GetUserListByClassBilling/' + ClassId + '~' + 0,
+            dataType: 'html',
+            success: function (data) {
+                $(".se-pre-con").fadeOut("slow");
+                $('#user-list-view').html('');
+                $('#user-list-view').html(data);
+                $("#listByDiv").dataTable();
+
+                if (ClassId != '') {
+                    $.ajax({
+                        url: '/Data/LoadDivision?id=' + ClassId,
+                        type: "GET",
+                        success: function (result) {
+                            if (result.list.length > 0) {
+                                $("#division-drop-down").html(""); 
+                                $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                                $.each(result.list, function (i, item) {
+                                    $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                                });
+                                $("#division-drop-down").prop("disabled", false);
+                            }
+                            else {
+                                $("#division-drop-down").html(""); 
+                                $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                                $("#division-drop-down").prop("disabled", true);
+                            }
+                        }
+                    });
+                }
+                else {
+                }
+
+            },
+        });
+    });
+    //-----------------------ARCHANA 19-JUN-2018 FOR INCREASE THE SPEED OF LIST------------------
+    $(document).on('click', '.ng-click', function () {
+        var id = $(this).attr('data-id');
+        window.location.href = '/School/BillingDetails/' + id;
+    });
+
+
+    $(document).on('change', '.class-drop-down', function () {
+        //var id = $(this).val();
+        //if (id != '') {
+        //    // resetDropDown('Class');
+        //    $.ajax({
+        //        url: '/Data/LoadDivision?id=' + id,
+        //        type: "GET",
+        //        success: function (result) {
+        //            if (result.list.length > 0) {
+        //                $("#division-drop-down").html(""); // clear before appending new list
+        //                $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+        //                $.each(result.list, function (i, item) {
+        //                    $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+        //                });
+        //                $("#division-drop-down").prop("disabled", false);
+        //            }
+        //            else {
+        //                // resetDropDown('Class');
+        //                $("#division-drop-down").html(""); // clear before appending new list
+        //                $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+        //                $("#division-drop-down").prop("disabled", true);
+        //            }
+        //        }
+        //    });
+        //}
+        //else {
+        //    //  resetDropDown('Class');
+        //}
+
+
+
+        var classid = $(this).val();
+        var classId = 0;
+        if (classid != '') {
+            classId = classid;
+        }
+        $.ajax({
+            url: '/School/GetUserListByClassBilling/' + classId + '~' + 0,
+            dataType: 'html',
+            success: function (data) {
+                $(".se-pre-con").fadeOut("slow");
+                $('#user-list-view').html('');
+                $('#user-list-view').html(data);
+                $("#listByDiv").dataTable();
+            },
+        });
+        if (classid != '') {
+
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + classid,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+
+    $(document).on('change', '#division-drop-down', function () {
+        var id = $(this).val();
+        if (id != '' || id != 0) {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/School/GetUserListByDivision/' + id,
+                dataType: 'html',
+                success: function (data) {
+                    $('#user-list-view').html('');
+                    $('#user-list-view').html(data);
+                    $("#listByDiv").dataTable();
+                },
+            });
+        }
+        else {
+            //   resetDropDown('Class');
+        }
+    });
+    $(function () {
+        $("#billGridList").dataTable();
+    });
+</script>

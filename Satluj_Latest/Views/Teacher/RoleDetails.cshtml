@@ -1,0 +1,192 @@
+﻿@model Satluj_Latest.Models.RoleDetailsModel
+@{
+    ViewBag.Title = "CoScholasticArea";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">Role</h3>
+
+        <!-- FORM SECTION -->
+        <div class="row">
+            <div class="col-md-4 d-flex">
+                <form id="form-teacher-add"
+                      asp-action="AddRoleDetails"
+                      asp-controller="Teacher"
+                      method="post">
+                    <div class="form-inline" style="display:flex; gap:15px; align-items:center;">
+
+                        <div class="form-group">
+                            <label style="margin-right:5px;">Role :</label>
+                            <input asp-for="RoleName" class="form-control" placeholder="Role" />
+                            <span asp-validation-for="RoleName" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Save
+                        </button>
+
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <hr />
+
+        <!-- LIST SECTION BELOW FORM -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive mt-3">
+                    @Html.Partial("~/Views/Teacher/_pv_RoleList.cshtml", Model)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalRoleEdit" tabindex="-1" role="dialog"></div>
+<script>
+            $("#form-teacher-add").submit(function (e) {
+            e.preventDefault();   // stop normal submit
+
+            $.ajax({
+                url: "/Teacher/AddRoleDetails",
+                type: "POST",
+                data: $(this).serialize(),
+                success: function (response) {
+                    AddRoleDetailsSuccess(response);
+                },
+                error: function () {
+                    AddRoleDetailsFailure();
+                }
+            });
+        });
+
+    $(function () {
+        $(".role-list").dataTable();
+    })
+
+    function AddRoleDetailsSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            window.location.href = '/Teacher/RoleDetails/';
+        }
+        else {
+            toastrError(result.msg);
+            window.location.href = '/Teacher/RoleDetails/';
+        }
+    }
+    function AddRoleDetailsFailure(result) {
+        toastrError(result.msg);
+        window.location.href = '/Teacher/RoleDetails/';
+    }
+
+    $(document).on('click', '.delete-class-tr', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Teacher/DeleteRoleDetails/' + $(source).attr('data-roleId'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    setTimeout(function () {
+                        window.location.href = '/Teacher/RoleDetails/';
+                    }, 250);
+                }
+                else {
+                    YesDelete($(source).attr('data-roleId'));
+                }
+            }
+        });
+    }
+});
+    });
+
+
+    function YesDelete(roleId) {
+        var id = roleId;
+        swal({
+            title: "Some teachers or staffs have this role,Are you sure? ",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Teacher/DeleteRoleWithTeacherOrStaff/' + id,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    setTimeout(function () {
+                        window.location.href = '/Teacher/RoleDetails/';
+                    }, 250);
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+    }
+
+
+    $(document).on('click', '.edit-class-tr', function () {
+        var source = $(this);
+        $.ajax({
+            url: '/Teacher/RoleDetailsEditPartial/' + $(source).attr('data-roleId'),
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalRoleEdit').html(data);
+                $.validator.unobtrusive.parse($("#modalRoleEdit"));
+                $('#modalRoleEdit').modal('show');
+            }
+        });
+    });
+
+
+    function EditRoleDetailsSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalRoleEdit').modal('hide');
+            window.location.href = '/Teacher/RoleDetails/';
+        }
+        else {
+            toastrError(result.msg);
+        }
+    }
+
+    function ajaxFailure() {
+        toastrError("Failed!");
+    }
+
+
+</script>

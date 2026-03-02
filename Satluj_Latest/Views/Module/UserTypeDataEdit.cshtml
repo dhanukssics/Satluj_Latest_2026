@@ -1,0 +1,314 @@
+﻿@model Satluj_Latest.Models.UserModuleModel
+@{
+    ViewBag.Title = "ExamDeclaration";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<style>
+    .full-loader-dev {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 19999;
+        background: url(/Content/img/preloader.gif) center no-repeat rgb(255, 255, 255) !important;
+        /*background: url(/Content/img/school.png) !important;*/
+        background-size: 350px;
+        background-position: center;
+        content: '';
+    }
+</style>
+
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+<div class="se-pre-con"></div>
+<div class="full-loader-dev"></div>
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">USER TYPE EDIT</h3>
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Type </label>
+                    <br />
+                    <select asp-for="userType"
+                            asp-items="Html.GetEnumSelectList<UserTypeModule>()"
+                            class="form-control"
+                            id="user-type-type">
+                    </select>
+
+                    <span asp-validation-for="userType" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Type Name </label>
+                    <br />
+                    <select class="form-control" id="usertype-selection" disabled></select>
+                </div>
+            </div>
+            <div class="form-group col-md-3" id="chkDiv">
+                <label> </label>
+                <br />
+                @Html.CheckBoxFor(m => m.IsAdmin, new { @class = "", id = "isAdmin-check-id" })
+                <span>Admin </span>
+            </div>
+        </div>
+        <div id="list-ouut-allusertypes">
+
+        </div>
+    </div>
+</div>
+<script>
+
+    var array = [];
+
+    function AddRemoveUser(source) {
+        debugger;
+        var typeId = $(source).attr("data-id");
+        if ($(source).is(":checked")) {
+            array.push(typeId);
+        }
+        else {
+            for (var i = array.length - 1; i >= 0; i--) {
+                if (array[i] === typeId) {
+                    array.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    $(document).on('change', '#usertype-selection', function () {
+        $('#list-ouut-allusertypes').html('');
+        var user = $(this).val();
+        var typeId = $('#user-type-type').val();
+        var id = user + '~' + typeId;
+        if (id != '') {
+            $.ajax({
+                url: '/Module/EditListOfUserType/' + id,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#list-ouut-allusertypes').html('');
+                    $('#list-ouut-allusertypes').html(data);
+                }
+            });
+        }
+        else {
+            $('#list-ouut-all usertypes').html('');
+        }
+    });
+
+    $(document).on('change', '#user-type-type', function () {
+        $('#list-ouut-allusertypes').html('');
+        var type = $(this).val();
+        if (type != '') {
+            var schoolId = $('#SchoolId').val();
+            var id = type + '~' + schoolId;
+            $.ajax({
+                url: '/Module/LoadAllUserTypes?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#usertype-selection").html("");
+                        $("#usertype-selection").append($('<option></option>').val("0").html('-- Choose --'));
+                        $.each(result.list, function (i, item) {
+                            $("#usertype-selection").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#usertype-selection").prop("disabled", false);
+                    }
+                    else {
+                        $("#usertype-selection").html("");
+                        $("#usertype-selection").append($('<option></option>').val("0").html('-- No Data Found --'));
+                        $("#usertype-selection").prop("disabled", true);
+                        $('#UserTypeId').val("0");
+                    }
+                }
+            });
+        }
+        else {
+            $("#usertype-selection").html("");
+            $("#usertype-selection").append($('<option></option>').val("0").html('-- Choose --'));
+            $("#usertype-selection").prop("disabled", true);
+        }
+    });
+
+    $(document).ready(function () {
+        $('#list-ouut-allusertypes').html('');
+        var schoolId = $('#SchoolId').val();
+        var id = 0 + '~' + schoolId;
+        $.ajax({
+            url: '/Module/LoadAllUserTypes?id=' + id,
+            type: "GET",
+            success: function (result) {
+                if (result.list.length > 0) {
+                    $("#usertype-selection").html("");
+                    $("#usertype-selection").append($('<option></option>').val("0").html('-- Choose --'));
+                    $.each(result.list, function (i, item) {
+                        $("#usertype-selection").append($('<option></option>').val(item.Value).html(item.Text));
+                    });
+                    $("#usertype-selection").prop("disabled", false);
+                }
+                else {
+                    $("#usertype-selection").html("");
+                    $("#usertype-selection").append($('<option></option>').val("0").html('-- No Data Found --'));
+                    $("#usertype-selection").prop("disabled", true);
+                    $('#UserTypeId').val("0");
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '#editUserType-data-id', function () {
+        $('#editUserType-data-id').prop('disabled', true);
+        ajaxLoaderStart();
+        if ($('#usertype-selection').text != '') {
+            if (array.length > 0) {
+                var ob = new Object();
+                ob.userType = $('#user-type-type').val();
+                ob.UserTypeName = $('#usertype-selection').text();
+                ob.UserTypeId = $('#usertype-selection').val();
+                if ($('#isAdmin-check-id').is(":checked")) {
+                    ob.IsAdmin = true;
+                }
+                else {
+                    ob.IsAdmin = false;
+                }
+                ob.subListOnly = [];
+                $.each(array, function (key, value) {
+                    var data = new Object();
+                    data.Id = value;
+                    ob.subListOnly.push(data);
+                });
+                $.ajax({
+                    url: "/Module/SubmitEditUserModule",
+                    type: "POST",
+                    dataType: 'json',
+                    data: ob,
+                    global: false,
+                    success: function (response) {
+                        if (response.status) {
+                            toastrSuccess(response.msg);
+                            window.location.href = '/Module/UserTypeDataEdit/';
+                        }
+                        else {
+                            toastrError(response.msg);
+                            window.location.href = '/Module/UserTypeDataEdit/';
+                        }
+                    },
+                });
+            }
+            else {
+                toastrWarning("Please select new Modules ");
+                $('#editUserType-data-id').prop('disabled', false);
+            }
+        }
+        ajaxLoaderStop();
+    });
+
+    $(document).on('change', '#usertype-selection', function () {
+        debugger;
+        var userType = $(this).val();
+        $.ajax({
+            url: '/Module/CheckThatIsAnAdmin/' + userType,
+            type: "POST",
+            dataType: 'json',
+            global: false,
+            success: function (response) {
+                if (response.isAdmin == true)
+                    $('#isAdmin-check-id').prop('checked', true);
+                else
+                    $('#isAdmin-check-id').prop('checked', false);
+            },
+        });
+    });
+
+
+
+
+    $('#isAdmin-check-id').change(function () {
+        if ($(this).is(":checked")) {
+            $("[type=checkbox]").prop('checked', $(this).prop("checked"));
+            AddOrRemoveAllCheckBoxDetails();
+        }
+        else {
+            $("[type=checkbox]").prop('checked', false);
+            UncheckTheAdmin();
+            array = [];
+        }
+
+    });
+
+
+    function AddOrRemoveAllCheckBoxDetails() {
+        array = [];
+        $('.chk').each(function () {
+            var typeId = $(this).attr("data-id");
+            if ($(this).is(":checked")) {
+                array.push(typeId);
+            }
+            else {
+                for (var i = array.length - 1; i >= 0; i--) {
+                    if (array[i] === typeId) {
+                        array.splice(i, 1);
+                    }
+                }
+            }
+        });
+    };
+
+    $(window).load(function () {
+        $(".se-pre-con").fadeOut("slow");
+        $(".full-loader-dev").hide();
+
+    });
+
+    function ajaxLoaderStart() {
+        $(".se-pre-con").show();
+    }
+
+    function ajaxLoaderStop() {
+        $(".se-pre-con").hide()
+
+    }
+
+    $(document).ajaxStart(function () {
+        $(":submit").attr("disabled", true);
+        ajaxLoaderStart();
+    });
+    $(document).ajaxComplete(function () {
+        $(":submit").attr("disabled", false);
+        ajaxLoaderStop();
+    });
+
+
+
+    function UncheckTheAdmin() {
+        $('#list-ouut-allusertypes').html('');
+        var user = $('#usertype-selection').val();
+        var typeId = $('#user-type-type').val();
+        var id = user + '~' + typeId;
+        if (id != '') {
+            $.ajax({
+                url: '/Module/EditListOfUserType/' + id,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#list-ouut-allusertypes').html('');
+                    $('#list-ouut-allusertypes').html(data);
+                }
+            });
+        }
+        else {
+            $('#list-ouut-all usertypes').html('');
+        }
+    }
+
+
+
+
+
+
+
+
+
+</script>

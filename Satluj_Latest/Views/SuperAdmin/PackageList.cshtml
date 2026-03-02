@@ -1,0 +1,240 @@
+﻿@model Satluj_Latest.Models.SmsPackageModels
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Package List";
+}
+
+@*<style>
+        .ng-teacherDetails-click {
+            cursor: pointer;
+        }
+    </style>*@
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Package List</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                    @*<div class="input-group" style="max-width: 300px;">
+                            <input type="text" class="form-control" placeholder="Search" aria-describedby="basic-addon2">
+                            <span class="input-group-btn" id="basic-addon2"><button class="btn pay-now-btn">Search</button></span>
+                        </div>*@
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+                <div id="sms-status-div">
+                    @if (Model.SmsStatus)
+                    {
+                        <div class="form-group text-right">
+                            <button class="btn btn-danger" id="btn-deactivate-sms">SMS Deactivate</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group text-right">
+                            <button class="btn btn-success" id="btn-activate-sms">SMS Activate</button>
+                        </div>
+                    }
+                </div>
+
+
+
+                <div class="form-group text-right">
+                    <button class="btn pay-now-btn" id="AddPackage"><i class="fa fa-plus"></i> Add Package</button>
+                </div>
+            </div>
+        </div>
+
+        @{
+            DateTime xx = Convert.ToDateTime(Model.FromDate);
+
+        }
+        <input type="hidden" value="@Model.SchoolId" id="hfSchoolId" />
+        <input type="hidden" value="@xx.ToString("dd-MM-yyyy")" id="hfCurrentDate" />
+
+        <div class="table-responsive">
+            <table class="table custome-table" id="table-school-list">
+                @Html.Partial("~/Views/SuperAdmin/_pv_Package_list.cshtml", Model)
+            </table>
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+<div class="modal fade" id="modalPackageAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+<div class="modal fade" id="modalTeacherEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+
+
+
+<script>
+
+    $(function () {
+        $("#table-school-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $("#table-school-list").dataTable().fnDestroy()
+        $("#table-school-list").dataTable();
+    }
+
+    $(document).on('click', '#btn-paymentoption', function () {
+
+        var schoolId = $(this).attr('data-schoolId');
+        var paymentStatus = $(this).attr('data-paymentStatus');
+        $.ajax({
+            url: '/SuperAdmin/StatusPaymentGateway/' + schoolId + '~' + paymentStatus,
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    RefreshSchoolGrid();
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+
+    });
+
+    $(document).on('click', '#btn-activate-sms', function () {
+        var schoolId = $('#hfSchoolId').val();
+        $.ajax({
+            url: '/SuperAdmin/SmsActivate/' + schoolId + '~' + 1,
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    $('#sms-status-div').html("<div class=\"form-group text-right\"><button class=\"btn btn-danger\" id=\"btn-deactivate-sms\"> Deactivate</button></div>");
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-deactivate-sms', function () {
+        var schoolId = $('#hfSchoolId').val();
+        $.ajax({
+            url: '/SuperAdmin/SmsActivate/' + schoolId + '~' + 0,
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    $('#sms-status-div').html("<div class=\"form-group text-right\"><button class=\"btn btn-success\" id=\"btn-activate-sms\">Activate</button></div>");
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+    });
+    function RefreshSmsPackageGrid() {
+        var schoolId = $('#hfSchoolId').val();
+
+        $.ajax({
+            url: '/SuperAdmin/RefreshSmsPackageGrid/' + schoolId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#table-school-list').html('');
+                $('#table-school-list').html(data);
+                $("#table-school-list").dataTable().fnDestroy()
+                $("#table-school-list").dataTable();
+            }
+        });
+    }
+    $(document).on('click', '#AddPackage', function () {
+        var schoolId = $('#hfSchoolId').val();
+        $.ajax({
+            url: '/SuperAdmin/AddPackageView/' + schoolId,
+            dataType: 'html',
+            success: function (data) {
+                $('#modalPackageAdd').html(data);
+                $.validator.unobtrusive.parse($('#modalPackageAdd'));
+                $('#modalPackageAdd').modal('show');
+                $('#FromDate').datepicker({
+                    format: "dd-mm-yyyy",
+                    autoclose: true,
+                    todayHighlight: true,
+                    endDate: '+d'
+                });
+                $('#ToDate').datepicker({
+                    format: "dd-mm-yyyy",
+                    autoclose: true,
+                    todayHighlight: true
+
+                });
+
+                $('#FromDate').val($('#hfCurrentDate').val());
+                $('#ToDate').val($('#hfCurrentDate').val());
+
+            },
+        });
+    });
+
+    function AddSmsPackageSuccess(result) {
+        if (result.Status) {
+            toastrSuccess(result.Message);
+            $('#modalPackageAdd').modal('hide');
+            RefreshSmsPackageGrid();
+        }
+        else {
+            $('#modalPackageAdd').modal('hide');
+            toastrError(result.Message);
+        }
+    }
+
+    $(document).on('click', '#btn-disablepack-sms', function () {
+        var schoolId = $('#hfSchoolId').val();
+        var packageId = $(this).attr('id-packageId');
+
+        $.ajax({
+            url: '/SuperAdmin/SmsPackageActivate/' + schoolId + '~' + packageId + '~' + 1,
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    RefreshSmsPackageGrid()
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-enablepack-sms', function () {
+        var schoolId = $('#hfSchoolId').val();
+        var packageId = $(this).attr('id-packageId');
+
+        $.ajax({
+            url: '/SuperAdmin/SmsPackageActivate/' + schoolId + '~' + packageId + '~' + 0,
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    RefreshSmsPackageGrid()
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+    });
+</script>

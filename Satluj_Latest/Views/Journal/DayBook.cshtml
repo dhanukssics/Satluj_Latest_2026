@@ -1,0 +1,370 @@
+﻿@model Satluj_Latest.Models.AddDayBookModel
+@{
+    ViewBag.Title = "DayBook";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    .gap_bottom {
+        padding-bottom: 35px;
+    }
+
+        .gap_bottom label {
+            padding-top: 8px;
+        }
+</style>
+<h2>Day Book</h2>
+
+<div id="add-day-book-Id">
+    @Html.Partial("~/Views/Journal/_pv_Add_DayBook.cshtml", Model)
+</div>
+<div class="modal fade" id="get-VoucherNo-for-edit">
+</div>
+<div class="modal fade" id="tablePrintData">
+</div>
+
+@*-----------------------------------------------------------------------*@
+<div class="col-md-6" id="calculate-amount-id">
+    @*<div class="form-group gap_bottom">
+            <div class="col-md-6">
+                <label>@amount</label>
+            </div>
+        </div>*@
+    @Html.Partial("~/Views/Journal/_pv_ProfitOrLoss.cshtml", Model)
+</div>
+
+<script>
+    $('.date-dayBook-add').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).ready(function () {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var today = dd + '-' + mm + '-' + yyyy;
+
+        $('.date-dayBook-add').val(today);
+        $('#btn-print-daybook-add').show();
+        $('#btn-save-daybook').show();
+        $('#btn-print-daybook-edit').show();
+        $('#btn-edit-save-daybook').show();
+        GetVoucherNumber();
+    });
+
+    $(document).on('change', '.accHead-drop-down', function () {
+        //debugger;
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadSubLedgerList?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#SubLedgerId").html("");
+                        //$("#SubLedgerId").append($('<option></option>').val("").html('-- Select SubLedger --'));
+                        $.each(result.list, function (i, item) {
+                            $("#SubLedgerId").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#SubLedgerId").prop("disabled", false);
+                    }
+                    else {
+                        $("#SubLedgerId").html("");
+                        $("#SubLedgerId").append($('<option></option>').val("").html('-- No SubLedger Found --'));
+                        $("#SubLedgerId").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+        }
+    });
+
+    $(document).on('change', '.pv_account-type', function () {
+        //debugger;
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Journal/GetVoucherNo?id=' + id,
+                type: "GET",
+                success: function (response) {
+                    if (response.status > 0) {
+                        $("#VoucherNo").val('');
+                        $("#VoucherNo").val(response.result);
+                    }
+                    else {
+                        $("#VoucherNo").val('');
+
+                    }
+                }
+            });
+        }
+        else {
+        }
+    });
+
+    $(document).on('click', '#btn-edit-daybook', function () {
+        $.ajax({
+            url: '/Journal/SearchVoucherNo/',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#get-VoucherNo-for-edit').html('');
+                $('#get-VoucherNo-for-edit').html(data);
+                $.validator.unobtrusive.parse($("#get-VoucherNo-for-edit"));
+                $('#get-VoucherNo-for-edit').modal('show');
+            }
+        });
+    });
+
+    function AddDayBookSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.msg);
+            RefreshPage();
+        }
+        else {
+            toastrError("No changes made!")
+        }
+    }
+
+    function AddDayBookFailed() {
+        RefreshPage();
+        toastrError('No changes made!');
+    }
+
+    function GetVoucherNumber() {
+        var id = 0;
+        $.ajax({
+            url: '/Journal/GetVoucherNo?id=' + id,
+            type: "GET",
+            success: function (response) {
+                if (response.status > 0) {
+                    $("#VoucherNo").val('');
+                    $("#VoucherNo").val(response.result);
+                }
+                else {
+                    $("#VoucherNo").val('');
+
+                }
+            }
+        });
+    }
+
+    function RefreshPage() {
+        $.ajax({
+            url: '/Journal/AddDayBookReaload',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#add-day-book-Id').html('');
+                $('#add-day-book-Id').html(data);
+                GetVoucherNumber();
+                $('.date-dayBook-add').val('');
+
+                $('.date-dayBook-add').datepicker({
+                    format: 'dd-mm-yyyy',
+                    autoclose: true,
+                    todayHighlight: true
+                });
+                //-------------For set current date 
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1; //January is 0!
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                var today = dd + '-' + mm + '-' + yyyy;
+                $('.date-dayBook-add').val(today);
+                //--------------------------
+                StatusRange();
+            }
+        });
+    }
+
+    $(document).on('click', '#btn-voucher-search', function () {
+        //debugger;
+        var obj = new Object();
+        obj.TypeId = $('#daybook-type-id').val();
+        obj.SearchVoucherNo = $('#SearchVoucherNo').val();
+        if ($('#SearchVoucherNo').val() != '') {
+            $.ajax({
+                url: '/Journal/SearchVoucher',
+                type: "GET",
+                dataType: 'html',
+                data: obj,
+                success: function (data) {
+                    $('#add-day-book-Id').html('');
+                    $('#add-day-book-Id').html(data);
+                    $.validator.unobtrusive.parse($("#add-day-book-Id"));
+                    $('#get-VoucherNo-for-edit').modal('hide');
+                    ReloadDetailsEdit();
+                    //$(".date-dayBook-add").focus();
+                }
+            });
+        }
+        else {
+            var message = "Please enter a Voucher No!";
+            $('#spn-error-voucher-number').text(message);
+            $('#spn-error-voucher-number').show();
+            $('#btn-voucher-search').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+    });
+
+    function ReloadDetailsEdit() {
+        $('.date-dayBook-add').datepicker({
+            format: 'dd-mm-yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+    }
+
+    function EditDayBookSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.message);
+            RefreshPage();
+        }
+        else {
+            toastrError("No changes made!")
+        }
+    }
+
+    function EditDayBookFailed() {
+        RefreshPage();
+        toastrError('Failed!');
+    }
+
+    //$(document).on('blur', '#SearchVoucherNo', function () {
+    $(document).on('click', '#btn-voucher-search-dummy', function () {
+        //debugger;
+        var data = $('#SearchVoucherNo').val();
+        var type = $('#daybook-type-id').val();
+        var dataSet = data + '~' + type;
+        $.ajax({
+            url: '/Journal/CheckVoucherNumber?text=' + dataSet,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.Status) {
+                    var message = "No such Voucher number!";
+                    $('#spn-error-voucher-number').text(message);
+                    $('#spn-error-voucher-number').show();
+                    $('#btn-voucher-search').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                }
+                else {
+                    $('#spn-error-voucher-number').hide();
+                    $('#btn-voucher-search').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                    $('#btn-voucher-search').trigger('click');
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-cancel-daybook', function () {
+        RefreshPage();
+    });
+
+    function StatusRange() {
+        $.ajax({
+            url: '/Journal/StatusRange',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#calculate-amount-id').html('');
+                $('#calculate-amount-id').html(data);
+            }
+        });
+    }
+
+    $(document).on('click', '#btn-print-daybook-add', function () {
+        //debugger;
+        $('#btn-print-daybook-add').hide();
+        $('#btn-save-daybook').hide();
+
+        var obj = new Object();
+        obj.TypeId = $('#day-book-type-idd').val();
+        obj.EntryDateString = $('#EntryDateString').val();
+        obj.VoucherNo = $('#VoucherNo').val();
+        obj.HeadId = $('#day-book-head-id').val();
+        obj.SubLedgerId = $('#SubLedgerId').val();
+        obj.Amount = $('#Amount').val();
+        obj.Narration = $('#Narration').val();
+        $.ajax({
+            url: '/Journal/AddDayBook',
+            type: "GET",
+            dataType: 'json',
+            data: obj,
+            success: function (result) {
+                if (result.status) {
+                    PrintData();
+                }
+                else {
+                    AddDayBookFailed();
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-print-daybook-edit', function () {
+        //debugger;
+        $('#btn-print-daybook-edit').hide();
+        $('#btn-edit-save-daybook').hide();
+
+        var obj = new Object();
+        obj.TypeId = $('#day-book-type-idd').val();
+        obj.EntryDateString = $('#EntryDateString').val();
+        obj.VoucherNo = $('#VoucherNo').val();
+        obj.HeadId = $('#day-book-head-id').val();
+        obj.SubLedgerId = $('#SubLedgerId').val();
+        obj.Amount = $('#Amount').val();
+        obj.Narration = $('#Narration').val();
+        obj.DayBookId = $('#DayBookId').val();
+        $.ajax({
+            url: '/Journal/EditDayBook',
+            type: "GET",
+            dataType: 'json',
+            data: obj,
+            success: function (result) {
+                if (result.status) {
+                    PrintData();
+                }
+                else {
+                    PrintData();
+                }
+            }
+        });
+    });
+
+    function PrintData() {
+        var obj = new Object();
+        obj.TypeId = $('#day-book-type-idd').val();
+        obj.EntryDateString = $('#EntryDateString').val();
+        obj.VoucherNo = $('#VoucherNo').val();
+        obj.HeadId = $('#day-book-head-id').val();
+        obj.SubLedgerId = $('#SubLedgerId').val();
+        obj.Amount = $('#Amount').val();
+        obj.Narration = $('#Narration').val();
+        $.ajax({
+            url: '/Journal/DayBookPrint',
+            type: "GET",
+            dataType: 'html',
+            data: obj,
+            success: function (data) {
+                $('#tablePrintData').html(data);
+                $('#tablePrintData').modal('show');
+            }
+        });
+    }
+</script>

@@ -1,0 +1,79 @@
+﻿@model Satluj_Latest.Models.FilterModel
+@{
+    ViewBag.Title = "ClassList";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    //var user = (Satluj_Latest.DataLibrary.tb_Login)Session["User"];
+
+    var school = new Satluj_Latest.Data.School(Model.schoolId);
+}
+@Html.HiddenFor(z => z.FeeId, new { Value = @Model.FeeId })
+
+<table class="table custome-table" id="table-feeclasslist">
+    <thead>
+        <tr>
+            <th>
+                Slno
+            </th>
+            <th>
+                Class
+            </th>
+            <th>
+                Division
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            if (school != null)
+            {
+                int i = 1;
+                var getClass = new List<Satluj_Latest.Data.Class>();
+                if (Model.ClassName != string.Empty && Model.ClassName != null)
+                {
+                    getClass = school.Class.Where(z => z.ClassName.ToLower() == Model.ClassName.ToLower()).ToList().OrderBy(z => z.ClassOrder).ToList();
+                }
+                else
+                {
+                    getClass = school.Class.ToList().OrderBy(z => z.ClassOrder).ToList();
+                }
+                if (getClass.Count > 0)
+                {
+                    foreach (var item in getClass)
+                    {
+                        foreach (var div in school.Divisions.Where(z => z.ClassId == item.ClassId && z.IsActive).ToList().OrderBy(z => z.DivisionName).ToList())
+                        {
+                            <tr data-classid="@item.ClassId" data-divid="@div.DivisionId">
+                                <td class="ng-click" data-classid="@item.ClassId" data-divid="@div.DivisionId">
+                                    @i
+                                </td>
+                                <td class="ng-click" data-classid="@item.ClassId" data-divid="@div.DivisionId">
+                                    @item.ClassName
+                                </td>
+                                <td class="ng-click" data-classid="@item.ClassId" data-divid="@div.DivisionId">
+                                    @div.DivisionName
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                }
+                else
+                {
+
+                }
+            }
+            else
+            {
+
+            }
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).on('click', '.ng-click', function () {
+        var divId = $(this).attr('data-divid');
+        var feeId = $('#FeeId').val();
+        window.location = '/School/AssignSpecialFee/' + divId + '~' + feeId;
+    });
+</script>

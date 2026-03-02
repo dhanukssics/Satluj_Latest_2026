@@ -1,0 +1,76 @@
+﻿
+@model Satluj_Latest.Models.StudentListForProgressCardModel
+@{
+    var data = Model._list;
+    var examId = Model.ExamId;
+    var className = Model.Class;
+    var ClassId = Model.ClassId;
+    var DivisionId = Model.DivisionId;
+    //List<string> list = new List<string> { "VI", "VII", "VIII", "XI", "XII", "XI-CS1", "XI-BS", "XI-CC", "XII-CS", "XII-BS", "XII-CC", "XI SCIENCE", "XI COMMERCE", "XI HUMANITIES", "XII SCIENCE", "XII COMMERCE", "XII HUMANITIES" };
+    List<string> list = new List<string> { "VI", "VII", "VIII" };
+    List<string> higherSecondaryList = new List<string> { "XI", "XII", "XI-CS1", "XI-BS", "XI-CC", "XII-CS", "XII-BS", "XII-CC", "XI SCIENCE", "XI COMMERCE", "XI HUMANITIES", "XII SCIENCE", "XII COMMERCE", "XII HUMANITIES" };
+}
+@if (data != null)
+{
+    <div class="table-responsive">
+        <table class="table custome-table">
+            <thead>
+                <tr>
+                    <th style="width:100%;">
+                        Students
+                    </th>
+                    <th>
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in data)
+                {
+                    var studentData = student.StudnetId.ToString() + '~' + examId.ToString() +'~'+ ClassId.ToString()+'~'+ DivisionId.ToString();
+                    <tr>
+                        <td data-id="@student.StudnetId" style="width:75%;">
+                            @student.StudnetName
+                        </td>
+                        @if (list.Contains(className)) // Vth STudnets have seperate progress card , X students does not have Progress card . So checking that the class is X or V
+                        {
+                            <td>
+                                <a href="/Progress/VtoIXProgressCard_Previous/@studentData" target="_blank" class="btn pay-now-btn " data-toggle="model" style="margin-left: 63px;" id="btn-student-Generate">Generate</a>
+                            </td>
+                        }
+                        else if (className == "V") // Vth STudnets have seperate progress card ,now just shows the old Progress Card
+                        {
+                    <td>
+                        <a href="/SpecialClass/VProgressCard_Previous/@studentData" target="_blank" class="btn pay-now-btn " data-toggle="model" style="margin-left: 63px;" id="btn-student-Generate">Generate</a>
+
+                    </td>
+                        }
+                        else if (className == "IX" || className == "X") // Vth STudnets have seperate progress card ,now just shows the old Progress Card
+                        {
+                            <td>
+                                <a href="/Progress/IXProgressCard_Previous/@studentData" target="_blank" class="btn pay-now-btn " data-toggle="model" style="margin-left: 63px;" id="btn-student-Generate">Generate</a>
+                            </td>
+                        }
+                        else if (higherSecondaryList.Contains(className)) // Higher Secondary Class having an another Progress card
+                        {
+                            <td>
+                                <a href="/Progress/HigherSecondaryProgressCard_Previous/@studentData" target="_blank" class="btn pay-now-btn " data-toggle="model" style="margin-left: 63px;" id="btn-student-Generate">Generate</a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <a class="btn pay-now-btn " data-toggle="model" style="margin-left: 63px;" id="btn-student-Generate-No-ProgressCard">Generate001</a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+
+}
+

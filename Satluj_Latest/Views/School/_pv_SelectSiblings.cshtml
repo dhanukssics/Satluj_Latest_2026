@@ -1,0 +1,55 @@
+﻿
+@model Satluj_Latest.Models.SchoolModel
+@{
+    var dd = new Satluj_Latest.Data.DropdownData();
+}
+<div class="modal-dialog">
+    <!-- Modal content-->
+    @Html.HiddenFor(m => m.CurrentAddedStudent, new { Value = Model.CurrentAddedStudent })
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" id="close-btn" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Add Child</h4>
+        </div>
+        <div class="modal-body login-without" style="display: inline-block; margin: 0; padding: 0; background: #2a7c81; width: 100%; border-radius:0px 0px 7px 7px;">
+            <div class="login" style="padding: 0 0 !important;">
+                <div class="login-form fullWid">
+                    <h3>Student Detail</h3>
+                    <div class="form-group">
+                        @Html.DropDownListFor(m => m.classId, dd.GetSchoolList().OrderBy(z => z.Text), "--School Name--", new { @class = "newDes", @data_live_search = "true", @style = "    background-color: #2f7e86;" })
+                    </div>
+                    <div class="form-group">
+                        <input id="admission" style="height:47px;" class="newDes" placeholder="Admission Number" />
+                    </div>
+                    @*<p>Please contact school for admission Number</p>*@
+                    <div id="std-detail-3">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $('#admission').delayKeyup(function () {
+        var searchText = $('#admission').val();
+        var schoolId = $('#classId').val();
+        var currentStudent = $('#CurrentAddedStudent').val();
+        if (searchText.length > 2) {
+            $.ajax({
+                url: '/School/SearchAdmission/' + searchText + '~' + schoolId + '~' + currentStudent,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#std-detail-3').html(data);
+                }
+            });
+        }
+        else {
+            $('#search-suggestion-no-result').hide();
+            ClearSuggestion();
+        }
+    }, 500);
+</script>

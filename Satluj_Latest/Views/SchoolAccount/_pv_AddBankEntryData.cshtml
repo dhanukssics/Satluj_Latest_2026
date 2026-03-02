@@ -1,0 +1,195 @@
+﻿@model Satluj_Latest.Models.BankEntryModel
+
+<style>
+    .dev_design {
+        float: left;
+        width: 100%;
+        padding-bottom: 0 !important;
+    }
+</style>
+
+<form id="form-login"
+      asp-action="AddBankEntry"
+      asp-controller="SchoolAccount"
+      method="post">
+
+    <div class="col-md-6">
+
+        <!-- Bank Name -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Bank Name</label>
+            </div>
+            <div class="col-md-9">
+                <select asp-for="BankId"
+                        asp-items="ViewBag.Bnaklist"
+                        class="form-control accHead-drop-down"
+                        id="day-bank-Name-id">
+                    <option value="">--Select--</option>
+                </select>
+                <span asp-validation-for="BankId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Type -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Type</label>
+            </div>
+            <div class="col-md-5">
+                <select asp-for="TypeId"
+                        asp-items="Html.GetEnumSelectList<BankType>()"
+                        class="form-control pv_bank-type"
+                        id="book-entry-type-id"></select>
+                <span asp-validation-for="TypeId" class="text-danger"></span>
+            </div>
+            <div class="col-md-4" id="chkDiv">
+                <input asp-for="CashTransaction" id="cash-check-id" />
+                <span> Cash</span>
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Date</label>
+            </div>
+            <div class="col-md-9 calendar-inp pos_icon_adj">
+                <input asp-for="EntryDateString"
+                       class="form-control date-bankEntry-add-date display-currentDate" />
+                <span asp-validation-for="EntryDateString" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Voucher No -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Voucher No</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="VoucherNo"
+                       class="form-control"
+                       readonly />
+                <span asp-validation-for="VoucherNo" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Account Head -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Account Head</label>
+            </div>
+            <div class="col-md-9">
+                <select asp-for="HeadId"
+                        asp-items="ViewBag.Accounthead"
+                        class="form-control accHead-drop-down"
+                        data-live-search="true"
+                        id="day-book-head-id">
+                    <option value="">--Choose--</option>
+                </select>
+                <span asp-validation-for="HeadId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- SubLedger -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>SubLedger</label>
+            </div>
+            <div class="col-md-9">
+                <select asp-for="SubLedgerId"
+                        class="form-control"
+                        disabled>
+                    <option value="0">--select Subledger--</option>
+                </select>
+                <span asp-validation-for="SubLedgerId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Amount</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="Amount"
+                       class="form-control"
+                       id="bank-book-current-balance-check" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Narration -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Narration</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="Narration" class="form-control" />
+            </div>
+        </div>
+
+        <!-- Cheque -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Cheque No</label>
+            </div>
+            <div class="col-md-5">
+                <input asp-for="ChequeNo"
+                       class="form-control"
+                       id="book-entry-ChequeNo-id" />
+            </div>
+            <div class="col-md-4">
+                <select asp-for="PaymentModeId"
+                        asp-items="Html.GetEnumSelectList<PaymentMode>()"
+                        class="form-control pv_bank-type"
+                        id="book-entry-mode-id"></select>
+            </div>
+        </div>
+
+        <!-- Cheque Date -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="col-md-3">
+                <label>Cheque Date</label>
+            </div>
+            <div class="col-md-9 calendar-inp pos_icon_adj">
+                <input asp-for="ChequeDateString"
+                       class="form-control date-bankEntry-add-date display-currentDate" />
+                <span asp-validation-for="ChequeDateString" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="form-group gap_bottom dev_design">
+            <div class="modal-footer">
+                <button type="button" id="btn-search-bankbook" class="btn pay-now-btn" style="background:#898e98;">
+                    Search
+                </button>
+                <button type="submit" id="btn-save-bankbook" class="btn pay-now-btn">
+                    Save
+                </button>
+            </div>
+        </div>
+
+    </div>
+</form>
+@section Scripts {
+
+    <script>
+        $("#form-login").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: "POST",
+                data: $(this).serialize(),
+                success: function (response) {
+                    AddBankEntrySuccess(response);
+                },
+                error: function () {
+                    AddBankEntryFailed();
+                }
+            });
+        });
+    </script>
+}

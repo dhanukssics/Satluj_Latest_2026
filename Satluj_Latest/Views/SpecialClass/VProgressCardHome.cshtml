@@ -1,0 +1,57 @@
+﻿
+
+@model Satluj_Latest.Models.VProgressCardList
+@{
+    ViewBag.Title = "GenerateCertificate";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var reportName = Model.ProgressCardName;
+}
+<div class="row">
+    <div class="col-lg-12">
+        <h3 style="margin-top: 5px;"> V Progress Card</h3>
+            <div class="row">
+                <div class="form-group col-sm-3">
+                    <br/>
+                        <label>Division : </label>
+                </div>
+                <div class="form-group col-sm-3">
+                    <br/>
+                <select asp-for="DivisionId"
+                        asp-items="ViewBag.Divisionlist"
+                        class="form-control division-drop-down class-drop-down"
+                        data-live-search="true">
+                    <option value="">--Choose--</option>
+                </select>
+
+                <span asp-validation-for="DivisionId" class="text-danger"></span>
+            </div>
+            </div>
+    </div>
+</div>
+<div  id="vStudentList-Id"></div>
+<script>
+
+    $(document).on('change', '.class-drop-down', function () {
+        $('#vStudentList-Id').html('');
+        var id = $(this).val();
+        if (id != 0) {
+            $.ajax({
+                url: '/SpecialClass/ViewAll_V_ClassStudents?id=' + id,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#vStudentList-Id').html(data);
+                }
+            });
+        }
+    });
+
+
+
+
+
+
+
+
+
+</script>

@@ -1,0 +1,21 @@
+﻿@model Satluj_Latest.Models.AddAccountHeadModel
+
+<form id="form-add-exam"
+      asp-action="SubmitAddAccountHead"
+      asp-controller="Journal"
+      method="post">    <div class="row">
+        <div id="new-account-div" class="dev-adj-style">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.AccountHeadName, new { autocomplete = "off", placeholder = "Account Head Name", @class = "form-control", style = "text-transform: uppercase", onchange = "acounthead()", id = "Acchead" })
+                @Html.ValidationMessageFor(z => z.AccountHeadName)
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        @*<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>*@
+        <button type="submit" class="btn pay-now-btn" id="btn-addAccountHead">Save</button>
+    </div>
+</form>
+<script>
+
+</script>

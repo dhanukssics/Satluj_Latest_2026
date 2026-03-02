@@ -1,0 +1,150 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "TeacherList";
+}
+
+@*<style>
+        .ng-teacherDetails-click {
+            cursor: pointer;
+        }
+    </style>*@
+<style>
+    .slash {
+        content: '/';
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Student Excel Upload</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                    @*<div class="input-group" style="max-width: 300px;">
+                            <input type="text" class="form-control" placeholder="Search" aria-describedby="basic-addon2">
+                            <span class="input-group-btn" id="basic-addon2"><button class="btn pay-now-btn">Search</button></span>
+                        </div>*@
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+                <div class="form-group text-right">
+                </div>
+            </div>
+        </div>
+        <div class="add-file">
+
+            <div class="form-group">
+                <span class="col-md-12">
+                    <label class="cust-label">upload</label>
+                    <input type="file" id="fileData" class="upload-file upload-clean-Formats-dev" />
+
+                </span>
+            </div>
+            <div class="form-group">
+                <span class="col-md-12" style="float: left; margin-top:15px;">
+                    @*  <input type="button" class="add-form-btn" value="Send Test Mail" />*@
+                    <button type="button" class="btn pay-now-btn bt-upload">Add </button>
+                </span>
+            </div>
+
+        </div>
+
+     
+        @*<div class="table-responsive">
+            <table class="table custome-table" id="table-school-list">
+                @Html.Partial("~/Views/SuperAdmin/_pv_School_list.cshtml")
+            </table>
+        </div>*@
+    </div><!-- end of col md 12 -->
+</div>
+
+<div class="modal fade" id="modalTeacherAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+<div class="modal fade" id="modalTeacherEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+
+
+
+<script>
+
+    $(function () {
+        $("#table-school-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $("#table-school-list").dataTable().fnDestroy()
+        $("#table-school-list").dataTable();
+    }
+
+
+    $(document).on('click', '#btn-paymentoption', function () {
+
+        var schoolId = $(this).attr('data-schoolId');
+        var paymentStatus = $(this).attr('data-paymentStatus');
+        $.ajax({
+            url: '/SuperAdmin/StatusPaymentGateway/' + schoolId + '~' + paymentStatus,
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    RefreshSchoolGrid();
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+
+    });
+
+
+    function RefreshSchoolGrid() {
+        $.ajax({
+            url: '/SuperAdmin/RefreshSchoolGrid',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#table-school-list').html('');
+                $('#table-school-list').html(data);
+                $("#table-school-list").dataTable().fnDestroy()
+                $("#table-school-list").dataTable();
+            }
+        });
+    }
+    var dataaa = "";
+    $(document).on('change', '.upload-clean-Formats-dev', function () {
+        //debugger;
+        var source = $(this);
+        var formData = new FormData();
+        dataaa = this.files[0];
+    });
+    $(document).on('click', '.bt-upload', function () {
+        var formData = new FormData();
+        formData.append("documentFile", dataaa);
+        $.ajax({
+            type: "POST",
+            url: "/SuperAdmin/UploadStudentExcel",
+            dataType: 'json',
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function (xhr) {
+            },
+            success: function (response) {
+                if (response.status) {
+                    alert("Excel Successfully Uploaded");
+                    var data = response.UserData;
+                    location.reload();
+                }
+                else {
+                    alert(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    });
+</script>

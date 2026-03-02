@@ -1,0 +1,44 @@
+﻿
+<table class="table table-bordered table-striped" id="collection-grid" style="border: 0.5px solid #d2cece;">
+    <thead>
+        <tr>
+            <th>Sl No</th>
+            <th>Bill No</th>
+            <th>Date</th>
+            <th>Student Name</th>
+            <th>Class & Division</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var billDetails = new Satluj_Latest.Data.School(Model.SchoolId).GetReportDailyByDate(Model.StartDate, Model.EndDate);
+            var index = 1;
+            decimal totAmt = 0;
+        }
+
+        @foreach (var billDetail in billDetails)
+        {
+            <tr class="bill-click" style="cursor:pointer" data-id="@billDetail.BillNo" data-studId="@billDetail.StudentId">
+                <td>@index</td>
+                <td>@billDetail.BillNo</td>
+                <td>@billDetail.Date.ToString("dd-MM-yyyy")</td>
+                <td>@billDetail.Student.StundentName</td>
+                <td>@billDetail.Student.ClassName / @billDetail.Student.DivisionName</td>
+                <td>@String.Format("{0:0.00}", billDetail.Amount)</td>
+            </tr>
+            totAmt = totAmt + billDetail.Amount;
+            index++;
+        }
+        <tr>
+            <td class="ttl-total"> Total </td>
+            <td class="ttl-total"></td>
+            <td class="ttl-total"></td>
+            <td class="ttl-total"></td>
+            <td class="ttl-total"></td>
+            <td class="ttl-total">@String.Format("{0:0.00}", totAmt)</td>
+        </tr>
+            
+    </tbody>
+</table>
+@*<h4 class="ttl-total">Total: @String.Format("{0:0.00}", totAmt)</h4>*@

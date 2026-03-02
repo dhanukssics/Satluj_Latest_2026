@@ -1,0 +1,45 @@
+﻿@model Satluj_Latest.Models.AddAccountHeadModel
+@{
+    var accountDetails = new Satluj_Latest.Data.School(Model.SchoolId).GetAccountDetails();
+}
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Account Head
+        </th>
+        <th>
+            SubLedger
+        </th>
+
+        <th>
+
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        foreach (var account in accountDetails)
+        {
+            <tr>
+                <td class="ng-teacherDetails-click" data-staffid="@account.LedgerId">
+                    @i
+                </td>
+                <td class="ng-teacherDetails-click" data-staffid="@account.LedgerId">
+                    @account.AccHead
+                </td>
+                <td class="ng-teacherDetails-click" data-staffid="@account.LedgerId">
+                    @account.SubLedgerName
+                </td>
+                <td data-teacherid="@account.LedgerId">
+                    <button class="delete-subledger-tr btn-peek" data-ledgerId="@account.LedgerId"><i class="fa fa-trash "></i></button>
+                    @*<button class="edit-staff-tr pay-now-btn" data-staffid="@account.LedgerId"><i class="fa fa-edit "></i></button>*@
+                </td>
+            </tr>
+            i++;
+        }
+    }
+</tbody>

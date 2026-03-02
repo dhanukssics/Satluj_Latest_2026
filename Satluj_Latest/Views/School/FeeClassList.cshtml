@@ -1,0 +1,129 @@
+﻿@model Satluj_Latest.Models.FeeclassList
+@{
+    ViewBag.Title = "FeeClassList";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<div class="form-group text-right">
+    <button class="btn pay-now-btn" onclick="goBack()">Back</button>
+</div>
+<div class="table-responsive">
+    @{
+        var obj = new Satluj_Latest.Models.FeeclassList();
+        obj.schoolId = Model.schoolId;
+        obj.feeId = Model.feeId;
+    }
+    <table class="table custome-table" id="table-feeclasslist">
+        @Html.Partial("~/Views/School/_pv_FeeClassList.cshtml", obj)
+    </table>
+</div>
+
+
+<div class="modal fade" id="modalFeeClassEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+
+<script>
+
+    function goBack() {
+        window.history.back();
+    }
+
+
+    function RefreshFeeClasslistGrid(value) {
+        $.ajax({
+            url: '/School/RefreshFeeClasslistPartial/' + value,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $("#table-feeclasslist").dataTable().fnDestroy()
+                $('#table-feeclasslist').html(data);
+                $("#table-feeclasslist").dataTable();
+            }
+        });
+    }
+
+    $(function () {
+        $("#table-feeclasslist").dataTable();
+    })
+
+    $(document).on('click', '.delete-feeclass-tr', function () {
+
+        var source = $(this);
+
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+
+
+        $.ajax({
+            url: '/School/DeleteFeeClass/' + $(source).attr('data-feeclassid'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+
+                if (data.status) {
+                    toastrSuccess(data.msg);
+
+                    setTimeout(function () {
+                        RefreshFeeClasslistGrid($(source).attr('data-feeid'));
+                    }, 250);
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+        //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+    }
+    //else {
+    //    swal("Cancelled", "Your imaginary file is safe :)", "error");
+    //}
+});
+
+    });
+
+    $(document).on('click', '.edit-feeclass-tr', function () {
+
+        var source = $(this);
+        $.ajax({
+            url: '/School/FeeClassEditPartial/' + $(source).attr('data-feeclassid'),
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalFeeClassEdit').html(data);
+                $.validator.unobtrusive.parse($("#modalFeeClassEdit"));
+                $('#modalFeeClassEdit').modal('show');
+            }
+        });
+
+    });
+
+    function EditFeeClassSuccess(result) {
+        if (result.status) {
+            //console.log(result.list)
+            toastrSuccess(result.msg);
+
+            setTimeout(function () {
+                RefreshFeeClasslistGrid(result.feeId);
+            }, 250);
+            $('#modalFeeClassEdit').modal('hide');
+        }
+        else {
+            $('#modalFeeClassEdit').modal('hide');
+            toastrError(result.msg);
+        }
+    }
+
+</script>

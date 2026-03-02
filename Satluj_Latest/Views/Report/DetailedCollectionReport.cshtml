@@ -1,0 +1,113 @@
+﻿@model Satluj_Latest.Models.FeeModel
+@{
+    ViewBag.Title = "CollectionReport";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+<style>
+    .tableTopBor {
+            border-top: 0px solid #000000 !important;
+    }
+
+         .table > tbody > tr > td {
+       border-left: 0.5px solid #000000 !important;
+    }
+</style>
+
+<div class="row">
+    <div class="form-group col-sm-2">
+        <label>Start</label>
+        <div class="with-icon">
+            <input type="text" class="form-control detailed-start-date date-detailed" data-date-end-date="0d" value="@Model.StartDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+
+    <div class="form-group col-sm-2">
+        <label>End</label>
+        <div class="with-icon">
+            <input type="text" class="form-control detailed-end-date date-detailed" data-date-end-date="0d" value="@Model.EndDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+    <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+        <button type="button" class="btn btn-sm btn-info btn-search" id="searchDetailedDataBtn">Search</button>
+    </div>
+    <div class="form-group col-sm-2" style="margin-top: 26px;">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+        <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+
+    </div>
+</div>
+<div class="table-responsive">
+    <div class="col-md-12" id="print-trial-bal">
+        <h3 style="text-align:center;">Detailed Collection Report</h3><h5 style="text-align:center;"></h5>
+        <table class="table custome-table" id="detailed-report-list" style="border-left: 0.5px solid #000000;border-right: 0.5px solid #000000;border-bottom: 0.5px solid #000000;"></table>
+    </div>
+</div>
+
+<script>
+    $('.date-detailed').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    function IntializeDataTable() {
+        $("#detailed-report-list").dataTable().fnDestroy()
+        $("#detailed-report-list").dataTable();
+    }
+
+    $(document).ready(function () {
+        DataFilling();
+    });
+
+    $(document).on('click', '#searchDetailedDataBtn', function () {
+        DataFilling();
+    });
+
+    function DataFilling() {
+        var date = $('.detailed-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.detailed-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        $.ajax({
+            url: '/Report/SearchDetailedData/' + start + '~' + end,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#detailed-report-list').html('');
+                $('#detailed-report-list').html(data);
+            }
+        });
+    }
+
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Report/DetailedCollectionReport';
+    }
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var date = $('.detailed-start-date').val() + " to " + $('.detailed-end-date').val();
+        $("#detailed-report-list").table2excel({
+            name: "Table2Excel",
+            filename: "Detailed Collection Report as on " + date,
+            fileext: ".xls"
+        });
+    });
+
+
+</script>

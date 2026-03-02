@@ -1,0 +1,128 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+
+@{
+    List<Satluj_Latest.Data.Student> students;
+
+
+    if (Model.divisionId != 0)
+    {
+        students = new Satluj_Latest.Data.Division(Model.divisionId).GetStudentDetails().OrderBy(z => z.StundentName).ToList();
+    }
+    else
+    {
+        if (Model.classId != 0)
+        {
+            students = new Satluj_Latest.Data.Class(Model.classId).GetStudentDetails().OrderBy(z => z.StundentName).ToList();
+        }
+        else
+        {
+            students = new Satluj_Latest.Data.School(Model.schoolId).GetStudentDetails().OrderBy(z => z.StundentName).ToList();
+        }
+    }
+
+        bool IsAdmin = ViewBag.IsAdmin;
+
+}
+<div class="table-responsive">
+    <table class="table custome-table table-student-list">
+        <thead>
+            <tr>
+
+                <th>
+                    Name
+                </th>
+                <th>
+                    Parent
+                </th>
+                @*<th>
+                        Address
+                    </th>*@
+                <th>
+                    Contact
+                </th>
+                <th>
+                    Class/Division
+                </th>
+                @*<th>
+                        Bus Name
+                    </th>*@
+                <th>
+                    Admn No
+                </th>
+                @if (IsAdmin == true)
+                {
+                    <th>
+                        Edit
+                    </th>
+                    <th></th>
+                }
+                else
+                {
+                    <th></th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in students)
+            {
+
+                <tr style="cursor: pointer !important;">
+                    <td class="student-row" data-id="@student.StudentId">
+                        @if (student.FilePath != null)
+                        {
+
+                            <img src="@student.FilePath" class="user-pic-tab" />
+                        }
+                        else
+                        {
+                            <img src="~/Content/img/children-1.gif" class="user-pic-tab" />
+                        }
+                        @student.StundentName
+                    </td>
+                    <td class="student-row" data-id="@student.StudentId">
+                        @student.ParentName
+                    </td>
+                    @*<td>
+                            @student.Address
+                        </td>*@
+                    <td class="student-row" data-id="@student.StudentId">
+                        @student.ContactNumber
+                    </td>
+                    <td class="student-row" data-id="@student.StudentId">
+                        @student.ClassName/@student.DivisionName
+                    </td>
+                    @*<td class="student-row" data-id="@student.StudentId">
+                            @if (student.Bus.BusId != 1)
+                            {
+                                @student.Bus.BusName}
+                            else
+                            {<p>NA</p> }
+                        </td>*@
+                    <td class="student-row" data-id="@student.StudentId">
+                        @student.StudentSpecialId
+                    </td>
+                    @if (IsAdmin == true)
+                    {
+                        <td>
+                            @*<button class="btn pay-now-btn "  href="/School/StudentDetailedViewPrint/@student.StudentId"><i class="fa fa-print"></i>Print </button>*@
+                            <a href="/School/StudentDetailedViewPrint/@student.StudentId" target="_blank" class="btn pay-now-btn " data-toggle="model"><i class="fa fa-print"></i> Print</a>
+                            <button class="btn pay-now-btn edit-student-td" id="student-info-id" data-studentid="@student.StudentId"><i class="fa fa-edit"></i>Personal </button>
+                            <button class="btn pay-now-btn edit-student-parents-td" id="parents-info-id" data-studentid="@student.StudentId"><i class="fa fa-edit"></i>Parents </button>
+                        </td>
+                        <td>
+                            @*<button class="edit-student-td btn pay-now-btn" data-studentid="@student.StudentId"><i class="fa fa-edit "></i></button>*@
+                            <button class="delete-student-td btn btn-peek" data-studentid="@student.StudentId"><i class="fa fa-trash "></i></button>
+                            @*<button class="delete-student-td btn btn-peek" data-studentid="@student.StudentId"><i class="fa fa-print "></i></button>*@
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <a href="/School/StudentDetailedViewPrint/@student.StudentId" target="_blank" class="btn pay-now-btn " data-toggle="model"><i class="fa fa-print"></i> Print</a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

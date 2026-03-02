@@ -1,0 +1,92 @@
+﻿@using Satluj_Latest.Models.ViewModels
+@model TeachervViewModel
+
+@{
+    var school = new Satluj_Latest.Data.School(Model.SchoolId);
+    bool IsAdmin = Model.IsAdmin;
+
+}
+
+
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Name
+        </th>
+        <th>
+            Contact No.
+        </th>
+        <th>
+            In Charge
+        </th>
+        <th>
+            Email
+        </th>
+        <th>
+            Id
+        </th>
+        @*<th>Designation</th>*@
+        <th>Department</th>
+        @*<th>Roles</th>*@
+
+        @if (IsAdmin == true)
+        {
+            <th></th>
+        }
+    </tr>
+</thead>
+<tbody>
+    @if (school != null)
+    {
+        int i = 1;
+        foreach (var item in Model.Teachers)
+        {
+            <tr>
+                <td class="ng-teacherDetails-click" data-teacherid="@item.TeacherId">
+                    @i
+                </td>
+                <td class="ng-teacherDetails-click" data-teacherid="@item.TeacherId">
+                    @item.TeacherName
+                </td>
+                <td class="ng-teacherDetails-click" data-teacherid="@item.TeacherId">
+                    @item.ContactNumber
+                </td>
+                <td class="ng-teacherDetails-click" data-teacherid="@item.TeacherId">
+                    @if (item.TeacherClass.Count > 0)
+                    {
+                        @item.TeacherClass.FirstOrDefault().ClassName <span class="slash"></span> @item.TeacherClass.FirstOrDefault().DivisionName
+                    }
+                </td>
+                <td class="ng-teacherDetails-click" data-teacherid="@item.TeacherId">
+                    @item.Email
+                </td>
+                <td class="ng-teacherDetails-click" data-teacherid="@item.TeacherId">
+                    @item.TeacherSpecialId
+                </td>
+                @*<td class="ng-teacherDetails-click" data-teacherid="@item.TeacherId">
+                        @item.Designation()
+                    </td>*@
+                <td class="ng-teacherDetails-click" data-teacherid="@item.TeacherId">
+                    @item.Department()
+                </td>
+                @*<td class="ng-teacherDetails-click" data-teacherid="@item.TeacherId">
+                       @item.RolesString()
+                    </td>*@
+                @if (IsAdmin == true)
+                {
+                    <td data-teacherid="@item.TeacherId">
+                        <button class="delete-teacher-tr btn-peek"
+                                data-id="@item.TeacherId">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                        <button class="edit-teacher-tr pay-now-btn" data-id="@item.TeacherId"><i class="fa fa-edit "></i></button>
+                    </td>
+                }
+            </tr>
+            i++;
+        }
+    }
+</tbody>

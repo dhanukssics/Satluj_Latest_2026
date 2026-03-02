@@ -1,0 +1,241 @@
+﻿@model Satluj_Latest.Models.PerformanceModel
+@{
+    ViewBag.Title = "TeacherRoleManagementEditHome";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    .full-loader-dev {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 19999;
+        background: url(/Content/img/preloader.gif) center no-repeat rgb(255, 255, 255) !important;
+        background-size: 350px;
+        background-position: center;
+        content: '';
+    }
+</style>
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+<div class="se-pre-con"></div>
+<div class="full-loader-dev"></div>
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">TEACHER & SUBJECT </h3>
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Teacher </label>
+                    <br />
+                    <select asp-for="TeacherId"
+                            asp-items="ViewBag.teacherlist"
+                            class="form-control"
+                            id="teacher-id"
+                            data-live-search="true"
+                            style="display:inline-block; width:100%; min-width:180px;">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="TeacherId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <br />
+                    <select asp-for="SubjectId"
+                            asp-items="ViewBag.subjectlist"
+                            class="form-control"
+                            id="subject-id"
+                            data-live-search="true"
+                            style="display:inline-block; width:100%; min-width:180px;">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="SubjectId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label></label>
+                    <br />
+                    <button type="button" class="btn pay-now-btn" id="btn-teacher-subject">Search</button>
+                </div>
+            </div>
+        </div>
+        <div id="list-out-allTeacherSubject">
+
+        </div>
+    </div>
+</div>
+<script>
+
+    var array = [];
+
+    function AddRemoveUser(source) {
+        PushIntoArrayTheAllCheckedItems();
+        var typeId = $(source).attr("data-id");
+        if ($(source).is(":checked")) {
+            array.push(typeId);
+        }
+        else {
+            for (var i = array.length - 1; i >= 0; i--) {
+                if (array[i] === typeId) {
+                    array.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    $(document).on('click', '#btn-teacher-subject', function () {
+        debugger;
+        $('#list-out-allTeacherSubject').html('');
+        var teacherId = $('#teacher-id').val();
+        var subjectId = $('#subject-id').val();
+        var id = teacherId + '~' + subjectId;
+        if (id != '') {
+            $.ajax({
+                url: '/Performance/EditTeacherRoleManagement/' + id,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#list-out-allTeacherSubject').html('');
+                    $('#list-out-allTeacherSubject').html(data);
+                    PushIntoArrayTheAllCheckedItems();
+                }
+            });
+        }
+        else {
+            $('#list-out-allTeacherSubject').html('');
+        }
+    });
+
+    $(window).load(function () {
+        $(".se-pre-con").fadeOut("slow");
+        $(".full-loader-dev").hide();
+
+    });
+
+    function ajaxLoaderStart() {
+        $(".se-pre-con").show();
+    }
+
+    function ajaxLoaderStop() {
+        $(".se-pre-con").hide()
+
+    }
+
+    $(document).ajaxStart(function () {
+        $(":submit").attr("disabled", true);
+        ajaxLoaderStart();
+    });
+
+    $(document).ajaxComplete(function () {
+        $(":submit").attr("disabled", false);
+        ajaxLoaderStop();
+    });
+
+    $(document).ready(function () {
+        $('#list-out-allTeacherSubject').html('');
+        var teacherId = $('#teacher-id').val();
+        var subjectId = $('#subject-id').val();
+        var id = teacherId + '~' + subjectId;
+        if (id != '') {
+            $.ajax({
+                url: '/Performance/EditTeacherRoleManagement/' + id,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#list-out-allTeacherSubject').html('');
+                    $('#list-out-allTeacherSubject').html(data);
+                    PushIntoArrayTheAllCheckedItems();
+                }
+            });
+        }
+        else {
+            $('#list-out-allTeacherSubject').html('');
+        }
+    });
+
+    $(document).on('click', '#editTeacherSubject-data-id', function () {
+        $('#editTeacherSubject-data-id').prop('disabled', true);
+        ajaxLoaderStart();
+        if (array.length > 0) {
+            var ob = new Object();
+            ob.TeacherId = $('#teacher-id').val();
+            ob.SubjectId = $('#subject-id').val();
+            ob.ClassList = [];
+            $.each(array, function (key, value) {
+                var data = new Object();
+                data.ClassId = value;
+                ob.ClassList.push(data);
+            });
+            $.ajax({
+                url: "/Performance/SubmitEditTeacherClassSubject",
+                type: "POST",
+                dataType: 'json',
+                data: ob,
+                global: false,
+                success: function (response) {
+                    if (response.status) {
+                        toastrSuccess(response.msg);
+                        window.location.href = '/Performance/TeacherRoleManagementEditHome/';
+                    }
+                    else {
+                        toastrError(response.msg);
+                        window.location.href = '/Performance/TeacherRoleManagementEditHome/';
+                    }
+                },
+            });
+        }
+        else {
+            //toastrWarning("Please select new Modules ");
+            //$('#editUserType-data-id').prop('disabled', false);
+            var ob = new Object();
+            ob.TeacherId = $('#teacher-id').val();
+            ob.SubjectId = $('#subject-id').val();
+            ob.ClassList = [];
+            $.ajax({
+                url: "/Performance/DeleteAllTeachersAndParticularSubject",
+                type: "POST",
+                dataType: 'json',
+                data: ob,
+                global: false,
+                success: function (response) {
+                    if (response.status) {
+                        toastrSuccess(response.msg);
+                        window.location.href = '/Performance/TeacherRoleManagementEditHome/';
+                    }
+                    else {
+                        toastrError(response.msg);
+                        window.location.href = '/Performance/TeacherRoleManagementEditHome/';
+                    }
+                },
+            });
+        }
+        ajaxLoaderStop();
+    });
+
+    function PushIntoArrayTheAllCheckedItems() {
+        debugger;
+        array = [];
+        $('.chk').each(function () {
+            var typeId = $(this).attr("data-id");
+            if ($(this).is(":checked")) {
+                array.push(typeId);
+            }
+            else {
+                for (var i = array.length - 1; i >= 0; i--) {
+                    if (array[i] === typeId) {
+                        array.splice(i, 1);
+                    }
+                }
+            }
+        });
+    }
+
+
+
+</script>

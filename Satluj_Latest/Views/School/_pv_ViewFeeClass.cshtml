@@ -1,0 +1,36 @@
+﻿@model Satluj_Latest.Models.ViewFeeClass
+@{
+    var classs = new Satluj_Latest.Data.WebsiteService().getAllClassByFeeId(Model.SchoolId, Model.FeeId).ToList();
+}
+
+@if (classs.Count > 0)
+{
+    foreach (var item in classs.Where(z => z.PublishStatus == true).ToList().OrderBy(z => z.ClassOrder))
+    {
+        <div class="row feeclass-div" data-classid="@item.ClassId">
+
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label style="margin-top: 35px;">Class @item.ClassName</label>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>Amt</label>
+                    <input type="number" class="form-control loop-class-amount" placeholder="Amt" /><label>INR</label>
+                </div>
+            </div>
+
+        </div>
+    }
+}
+else
+{
+    if (Model.FeeId != 0)
+    {
+        <div>
+            No Class To Update!
+        </div>
+    }
+}

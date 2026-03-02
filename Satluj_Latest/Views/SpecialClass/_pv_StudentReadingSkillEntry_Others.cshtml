@@ -1,0 +1,789 @@
+﻿@model Satluj_Latest.Models.StudentSkillMarks
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+    
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+<style>
+
+    .cust-ip{
+    padding: 5px 5px !important;
+    width: 40px;
+    text-align: center;
+    height:25px;
+
+    }
+    .TH-Slnumber{
+        color: black;
+        padding-right: 7px;
+        width: 1px;
+
+    }
+
+    .Th-English{
+        color: black;
+            padding-right: 4px;
+            width: 1px;
+            padding-left: 4px;
+    }
+    
+    
+
+</style>
+
+<div class="table-responsive">
+
+
+            @if (Model.SubjectId == 1) // English
+            {
+        <table class="table account-table" id="tbstdMarkList">
+            <tr id="thead">
+                <th style="" class="TH-Slnumber">
+                    Sl.No
+                </th>
+                <th style="color: black;">
+                    Name
+                   
+                </th>
+                <th class="Th-English">
+                    Writing
+                </th>
+                <th class="Th-English">
+                    Reading
+                </th>
+                <th class="Th-English">
+                    Speaking
+                </th>
+                @*<th class="Th-English">
+                    Reciting
+                </th>*@
+                <th class="Th-English">
+                    Listening
+                </th>
+                <th class="Th-English">
+                    Oral
+                </th>
+            </tr>
+            <tbody id="bodyTable">
+               
+                @foreach (var a1 in Model._Lkg_Ukg_Mo)
+                {
+                    <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@a1.StudentId" data-ClassId="@a1.ClassId" class="cls-tr-class">
+                        <td >
+                         @*<label>@count</label>*@   
+                            @count
+                        </td>
+                        <td>
+                            @a1.studentName
+                        </td>
+                        <td>
+                            <div>
+                                <input value="@a1.WritingSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-Writing cust-ip" id="count" />
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <input value="@a1.ReadingSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-Reading cust-ip" id="count" />
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <input value="@a1.SpeakingSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-Speaking cust-ip" id="count" />
+                            </div>
+                        </td>
+                        @*<td>
+                            <div>
+                                <input value="@a1.RecitingSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-Reciting cust-ip" id="count" />
+                            </div>
+                        </td>*@
+                        <td>
+                            <div>
+                                <input value="@a1.ListeningSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-Listening cust-ip" id="count" />
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <input value="@a1.Oral" style="color:black;" type="text" maxlength="3" class="cls-mark-Oral cust-ip" id="count" />
+                            </div>
+                        </td>
+
+                    </tr>
+                     count = count + 1;
+                }
+
+                
+
+
+            </tbody>
+        </table>
+
+        <div class="modal-footer">
+            <button type="button" id="students-reading-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+        </div>
+            }
+            else if (Model.SubjectId == 2) //Hindi
+            {
+        <table class="table account-table" id="tbstdMarkList">
+            <tr id="thead">
+                <th class="TH-Slnumber">
+                    Sl.No
+                </th>
+                <th style="color: black;">
+                    Name
+                </th>
+                <th class="Th-English">
+                    Writing
+                </th>
+                <th class="Th-English">
+                    Reading
+                </th>
+                <th class="Th-English">
+                    Speaking
+                </th>
+                @*<th class="Th-English">
+                    Reciting
+                </th>*@
+                <th class="Th-English">
+                    Listening
+                </th>
+                <th class="Th-English">
+                    Oral
+                </th>
+            </tr>
+            <tbody id="bodyTable">
+
+                @foreach (var a1 in Model._Lkg_Ukg_Mo)
+                {
+                    <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@a1.StudentId" data-ClassId="@a1.ClassId" class="cls-tr-class">
+                        <td>
+                            @*<label>@count</label>*@
+                            @count
+                        </td>
+                        <td>
+                            @a1.studentName
+                        </td>
+                        <td>
+                            <div>
+                                <input value="@a1.WritingSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-Writing cust-ip" id="count" />
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <input value="@a1.ReadingSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-Reading cust-ip" id="count" />
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <input value="@a1.SpeakingSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-Speaking cust-ip" id="count" />
+                            </div>
+                        </td>
+                        @*<td>
+                            <div>
+                                <input value="@a1.RecitingSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-Reciting cust-ip" id="count" />
+                            </div>
+                        </td>*@
+                        <td>
+                            <div>
+                                <input value="@a1.ListeningSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-Listening cust-ip" id="count" />
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <input value="@a1.Oral" style="color:black;" type="text" maxlength="3" class="cls-mark-Oral cust-ip" id="count" />
+                            </div>
+                        </td>
+
+                    </tr>
+                    count = count + 1;
+                }
+
+
+
+            </tbody>
+        </table>
+
+        <div class="modal-footer">
+            <button type="button" id="students-reading-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+        </div>
+            }
+            else if (Model.SubjectId == 3)//Mathematics
+            {
+        <table class="table account-table" id="tbstdMarkList">
+            <tr id="thead">
+                <th class="TH-Slnumber">
+                    Sl.No
+                </th>
+                <th style="color: black;">
+                    Name
+                </th>
+                @*<th class="Th-English">
+                    Logical and Reasoning
+                </th>*@
+                <th class="Th-English">
+                    Understanding of concepts
+                </th>
+                <th class="Th-English">
+                    Mental Ability
+                </th>
+                <th class="Th-English">
+                    Oral
+                </th>
+                
+            </tr>
+
+            <tbody id="bodyTable">
+                @foreach (var a1 in Model._Lkg_Ukg_Mo)
+                {
+
+                    <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@a1.StudentId" data-ClassId="@a1.ClassId" class="cls-tr-class">
+                        <td>
+                            @count
+                        </td>
+                        <td>
+                            @a1.studentName
+                        </td>
+                        @*<td>
+                            <div>
+                                <input value="@a1.LogicalandReasoning" style="color:black;" type="text" maxlength="3" class="cls-mark-LogicalandReasoning cust-ip" id="count" />
+                            </div>
+                        </td>*@
+                        <td>
+                            <div>
+                                <input value="@a1.Understandingofconcepts" style="color:black;" type="text" maxlength="3" class="cls-mark-Understandingofconcepts cust-ip" id="count" />
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <input value="@a1.MentalAbility" style="color:black;" type="text" maxlength="3" class="cls-mark-MentalAbility cust-ip" id="count" />
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <input value="@a1.Oral" style="color:black;" type="text" maxlength="3" class="cls-mark-Oral cust-ip" id="count" />
+                            </div>
+                        </td>
+
+
+                    </tr>
+
+                    count = count + 1;
+                }
+
+
+
+            </tbody>
+        </table>
+
+        <div class="modal-footer">
+            <button type="button" id="students-reading-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+        </div>
+            }
+            else if (Model.SubjectId == 4)//EnvironmentalStudies
+                    {
+                <table class="table account-table" id="tbstdMarkList">
+                    <tr id="thead">
+                        <th class="TH-Slnumber">
+                            Sl.No
+                        </th>
+                        <th style="color: black;">
+                            Name
+                        </th>
+                        <th class="Th-English">
+                            Adventure Studies
+                        </th>
+                        <th class="Th-English">
+                            Understanding of concepts
+                        </th>
+                        <th class="Th-English">
+                            Activity
+                        </th>
+                        <th class="Th-English">
+                            Oral
+                        </th>
+
+                    </tr>
+                    <tbody id="bodyTable">
+
+                        @foreach (var a1 in Model._Lkg_Ukg_Mo)
+                        {
+                            <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@a1.StudentId" data-ClassId="@a1.ClassId" class="cls-tr-class">
+                                <td>
+                                    @count
+                                </td>
+                                <td>
+                                    @a1.studentName
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.AdventureStudies" style="color:black;" type="text" maxlength="3" class="cls-mark-AdventureStudies cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Understandingofconcepts" style="color:black;" type="text" maxlength="3" class="cls-mark-Understandingofconcepts cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Activity" style="color:black;" type="text" maxlength="3" class="cls-mark-Activity cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Oral" style="color:black;" type="text" maxlength="3" class="cls-mark-Oral cust-ip" id="count" />
+                                    </div>
+                                </td>
+
+
+                            </tr>
+
+                            count = count + 1;
+                        }
+
+                       
+
+
+                    </tbody>
+                </table>
+
+                <div class="modal-footer">
+            <button type="button" id="students-reading-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+        </div>
+            }
+
+            else if (Model.SubjectId == 5)//Colastic
+            {
+                <table class="table account-table" id="tbstdMarkList">
+                    <tr id="thead">
+                        <th class="TH-Slnumber">
+                            Sl.No
+                        </th>
+                        <th style="color: black;">
+                            Name
+
+                        </th>
+                        <th class="Th-English">
+                            Rhymes
+                        </th>
+                        @*<th class="Th-English">
+                            Compu ter Skill s
+                        </th>*@
+                        <th class="Th-English">
+                            General Studies
+                        </th>
+                        <th class="Th-English">
+                            Story Telling
+                        </th>
+                        @*<th class="Th-English">
+                            Patte rn Writi ng
+                        </th>*@
+                        <th class="Th-English">
+                            Smart Class Performance
+                        </th>
+
+                        <th class="Th-English">
+                            Art&Craft
+                        </th>
+                        <th class="Th-English">
+                            Hand writing
+                        </th>
+                        <th class="Th-English">
+                            Physical Education
+                        </th>
+                        <th class="Th-English">
+                            Music&Dance
+                        </th>
+                        @*<th class="Th-English">
+                            Commu nicat ionSk ills
+                        </th>*@
+                        <th class="Th-English">
+                            Work sheets
+                        </th>
+                        <th class="Th-English">
+                            Information Sheets
+                        </th>
+
+
+
+
+                    </tr>
+                    <tbody id="bodyTable">
+
+                        @foreach (var a1 in Model._Lkg_Ukg_Mo)
+                {
+                            <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@a1.StudentId" data-ClassId="@a1.ClassId" class="cls-tr-class">
+                                <td>
+                                    @*<label>@count</label>*@
+                                    @count
+                                </td>
+                                <td>
+                                    @a1.studentName
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Rhymes" style="color:black;" type="text" maxlength="3" class="cls-mark-Rhymes cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                @*<td>
+                                    <div>
+                                        <input value="@a1.ComputerSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-ComputerSkills cust-ip" id="count" />
+                                    </div>
+                                </td>*@
+                                <td>
+                                    <div>
+                                        <input value="@a1.GeneralStudies" style="color:black;" type="text" maxlength="3" class="cls-mark-GeneralStudies cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.StoryTelling" style="color:black;" type="text" maxlength="3" class="cls-mark-StoryTelling cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                @*<td>
+                                    <div>
+                                        <input value="@a1.PatternWriting" style="color:black;" type="text" maxlength="3" class="cls-mark-PatternWriting cust-ip" id="count" />
+                                    </div>
+                                </td>*@
+                                <td>
+                                    <div>
+                                        <input value="@a1.SmartClassPerformance" style="color:black;" type="text" maxlength="3" class="cls-mark-SmartClassPerformance cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.ArtandCraft" style="color:black;" type="text" maxlength="3" class="cls-mark-ArtandCraft cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Handwriting" style="color:black;" type="text" maxlength="3" class="cls-mark-Handwriting cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.PhysicalEducation" style="color:black;" type="text" maxlength="3" class="cls-mark-PhysicalEducation cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.MusicandDance" style="color:black;" type="text" maxlength="3" class="cls-mark-MusicandDance cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                @*<td>
+                                    <div>
+                                        <input value="@a1.CommunicationSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-CommunicationSkills cust-ip" id="count" />
+                                    </div>
+                                </td>*@
+                                <td>
+                                    <div>
+                                        <input value="@a1.Worksheets" style="color:black;" type="text" maxlength="3" class="cls-mark-Worksheets cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.InformationSheets" style="color:black;" type="text" maxlength="3" class="cls-mark-InformationSheets cust-ip" id="count" />
+                                    </div>
+                                </td>
+
+                            </tr>
+                            count = count + 1;
+                        }
+
+
+
+
+                    </tbody>
+                </table>
+
+                <div class="modal-footer">
+                    <button type="button" id="students-reading-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+                </div>
+            }
+            else if (Model.SubjectId == 6)//personal..
+            {
+                <table class="table account-table" id="tbstdMarkList">
+                    <tr id="thead">
+                        <th class="TH-Slnumber">
+                            Sl.No
+                        </th>
+                        <th style="color: black;">
+                            Name
+
+                        </th>
+                        <th class="Th-English">
+                            Courteous ness
+                        </th>
+                        <th class="Th-English">
+                            Relation ship
+                        </th>
+                        <th class="Th-English">
+                            Confidence
+                        </th>
+                        <th class="Th-English">
+                            Care Of Belongings
+                        </th>
+                        <th class="Th-English">
+                            Neatness
+                        </th>
+                        <th class="Th-English">
+                            Regularity
+                        </th>
+
+                        <th class="Th-English">
+                            Punctuality
+                        </th>
+                        <th class="Th-English">
+                            Initiative
+                        </th>
+                        <th class="Th-English">
+                            Sharing & Caring
+                        </th>
+                        <th class="Th-English">
+                            Respect For Other's Property
+                        </th>
+                        <th class="Th-English">
+                            Concentration
+                        </th>
+                        <th class="Th-English">
+                            Cleanliness
+                        </th>
+                        <th class="Th-English">
+                            General Conduct
+                        </th>
+                        <th class="Th-English">
+                            Leadership Skills
+                        </th>
+
+
+
+
+                    </tr>
+                    <tbody id="bodyTable">
+
+                        @foreach (var a1 in Model._Lkg_Ukg_Mo)
+                {
+                            <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@a1.StudentId" data-ClassId="@a1.ClassId" class="cls-tr-class">
+                                <td>
+                                    @*<label>@count</label>*@
+                                    @count
+                                </td>
+                                <td>
+                                    @a1.studentName
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Courteousness" style="color:black;" type="text" maxlength="3" class="cls-mark-Courteousness cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Relationship" style="color:black;" type="text" maxlength="3" class="cls-mark-Relationship cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Confidence" style="color:black;" type="text" maxlength="3" class="cls-mark-Confidence cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.CareOfBelongings" style="color:black;" type="text" maxlength="3" class="cls-mark-CareOfBelongings cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Neatness" style="color:black;" type="text" maxlength="3" class="cls-mark-Neatness cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Regularity" style="color:black;" type="text" maxlength="3" class="cls-mark-Regularity cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Punctuality" style="color:black;" type="text" maxlength="3" class="cls-mark-Punctuality cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Initiative" style="color:black;" type="text" maxlength="3" class="cls-mark-Initiative cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.SharingandCaring" style="color:black;" type="text" maxlength="3" class="cls-mark-SharingandCaring cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.RespectForOthersProperty" style="color:black;" type="text" maxlength="3" class="cls-mark-RespectForOthersProperty cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Concentration" style="color:black;" type="text" maxlength="3" class="cls-mark-Concentration cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Cleanliness" style="color:black;" type="text" maxlength="3" class="cls-mark-Cleanliness cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.GeneralConduct" style="color:black;" type="text" maxlength="3" class="cls-mark-GeneralConduct cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.LeadershipSkills" style="color:black;" type="text" maxlength="3" class="cls-mark-LeadershipSkills cust-ip" id="count" />
+                                    </div>
+                                </td>
+
+                            </tr>
+                            count = count + 1;
+                        }
+
+
+
+
+                    </tbody>
+                </table>
+
+                <div class="modal-footer">
+                    <button type="button" id="students-reading-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+                </div>
+            }
+            else if (Model.SubjectId == 7) //HEALTH
+            {
+                <table class="table account-table" id="tbstdMarkList">
+                    <tr id="thead">
+                        <th class="TH-Slnumber">
+                            Sl.No
+                        </th>
+                        <th style="color: black;">
+                            Name
+                        </th>
+                        <th class="Th-English">
+                            Height (CMS)
+                        </th>
+                        <th class="Th-English">
+                            Weight (KGS)
+                        </th>
+                        <th class="Th-English" style="width:69px;">
+                            Working Days
+                        </th>
+                        <th class="Th-English">
+                            Present  @*.........This start*@
+                        </th>
+                        
+                    </tr>
+
+
+
+                    <tbody id="bodyTable">
+                        @foreach (var a1 in Model._Lkg_Ukg_Mo)
+                {
+
+                            <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@a1.StudentId" data-ClassId="@a1.ClassId" class="cls-tr-class">
+                                <td>
+                                    @count
+                                </td>
+                                <td>
+                                    @a1.studentName
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Height" style="color:black;" type="text" maxlength="3" class="cls-mark-Height cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.Weight" style="color:black;" type="text" maxlength="3" class="cls-mark-Weight cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.NoOfWorkingDays" style="color:black;" type="text" maxlength="3" class="cls-mark-NoOfWorkingDays cust-ip" id="count" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <input value="@a1.DaysAttended" style="color:black;" type="text" maxlength="3" class="cls-mark-DaysAttended cust-ip" id="count" />
+                                    </div>
+                                </td>
+
+
+                            </tr>
+
+                            count = count + 1;
+                        }
+
+
+
+                    </tbody>
+                </table>
+
+                <div class="modal-footer">
+                    <button type="button" id="students-reading-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+                </div>
+            }
+            else if (Model.SubjectId == 8)
+            {
+                <table class="table account-table" id="tbstdMarkList">
+                    <tr class="TH-Slnumber">
+                        <th style="color: black;">
+                            Sl.No
+                        </th>
+                        <th style="color: black;">
+                            Name
+                        </th>
+                        <th style="color: black;">
+                            Remark
+                        </th>
+                        
+                    </tr>
+
+
+
+                    <tbody id="bodyTable">
+                        @foreach (var a1 in Model._Lkg_Ukg_Mo)
+                {
+
+                            <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@a1.StudentId" data-ClassId="@a1.ClassId" class="cls-tr-class">
+                                <td>
+                                    @count
+                                </td>
+                                <td>
+                                    @a1.studentName
+                                </td>
+                                <td>
+                                    <div>
+                                        <textarea style="color:black;width: 100%;" type="t" class="cls-mark-Remark" id="count" >@a1.Remark</textarea>
+                                    </div>
+                                </td>
+                                
+
+
+                            </tr>
+
+                            count = count + 1;
+                        }
+
+
+
+                    </tbody>
+                </table>
+
+                <div class="modal-footer">
+                    <button type="button" id="students-reading-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+                </div>
+            }
+
+
+</div>

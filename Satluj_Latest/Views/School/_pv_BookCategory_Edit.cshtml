@@ -1,0 +1,86 @@
+﻿@model Satluj_Latest.Models.LibraryModels
+
+<div class="modal-dialog modal-sm" role="document">
+
+    <style>
+        span {
+            color: red;
+        }
+    </style>
+
+    <form id="form-category-edit"
+          asp-action="EditBookCategory"
+          asp-controller="School"
+          method="post">
+
+        <input type="hidden" asp-for="schoolId" />
+        <input type="hidden" asp-for="categoryId" />
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Book Category</h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label asp-for="categoryName"></label>
+                    <input asp-for="categoryName"
+                           class="form-control"
+                           autocomplete="off"
+                           placeholder="name" />
+                    <span asp-validation-for="categoryName"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="submit" class="btn pay-now-btn">
+                    Save
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('#form-category-edit').submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                EditCategorySuccess(response);
+            },
+            error: function () {
+                ajaxFailure();
+            }
+        });
+    });
+
+    $(document).on('blur', '#Email', function () {
+
+        $.ajax({
+            url: '/School/CheckEmail',
+            type: "GET",
+            data: { text: $(this).val() },
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    $('#spn-error-email-teacher').text(data.message).show();
+                    $('#btn-dummy-addteacher')
+                        .css({ 'pointer-events': 'none', 'opacity': '.8' });
+                } else {
+                    $('#spn-error-email-teacher').hide();
+                    $('#btn-dummy-addteacher')
+                        .css({ 'pointer-events': 'auto', 'opacity': '1' });
+                }
+            }
+        });
+    });
+</script>

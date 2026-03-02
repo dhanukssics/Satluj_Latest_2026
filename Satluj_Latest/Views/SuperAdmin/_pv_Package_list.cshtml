@@ -1,0 +1,79 @@
+﻿@model Satluj_Latest.Models.SmsPackageModels
+
+@{
+    var package = new Satluj_Latest.Data.Admin().GetSmsPackageBySchoolId(Model.SchoolId);
+}
+
+
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            From Date
+        </th>
+        <th>
+            To Date
+        </th>
+        <th>
+            Count
+        </th>
+        <th>
+            per/ps
+        </th>
+
+        <th>
+           Extra Sms
+        </th>
+        <th>
+            Extra Amount
+        </th>
+        <th>
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @if (package != null)
+    {
+        int i = 1;
+        foreach (var item in package)
+        {
+            <tr>
+                <td class="ng-teacherDetails-click">
+                    @i
+                </td>
+                <td class="ng-teacherDetails-click">
+                    @item.FromDate.ToString("dd-MM-yyyy")
+                </td>
+                <td class="ng-teacherDetails-click">
+                    @item.ToDate.ToString("dd-MM-yyyy")
+                </td>
+                <td class="ng-teacherDetails-click">
+                    @item.AllowedSms
+                </td>
+                <td class="ng-teacherDetails-click">
+                    @item.SmsRate
+                </td>
+                <td class="ng-teacherDetails-click">
+                    @item.ExtraSmsCount
+                </td>
+                <td class="ng-teacherDetails-click">
+                    @item.ExtraAmount
+                </td>
+                <td>
+                    @if (item.IsDisabled)
+                    {
+                        <button class="btn btn-success btn-sm" id-packageId="@item.PackageId" id="btn-enablepack-sms">Enable Me</button>
+                    }                                                                                   
+                    else
+                    {
+                        <button class="btn btn-danger btn-sm" id-packageId="@item.PackageId" id="btn-disablepack-sms">Disable Me</button>
+                    }
+                </td>
+            
+            </tr>
+            i++;
+        }
+    }
+</tbody>

@@ -1,0 +1,1084 @@
+﻿@model Satluj_Latest.Models.FeeModel
+@{
+    ViewBag.Title = "BillingDetails";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <a href="/School/Billing" class="btn btn-peek"><i class="fa fa-arrow-left"></i> Back</a>
+        </div>
+        <h3>Billing Details </h3>
+
+        <div class="table-responsive">
+            <table class="table custome-table">
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Class
+                    </th>
+                    <th>
+                        Division
+                    </th>
+                    <th>
+                        Roll No.
+                    </th>
+                    <th>
+                        Incharge
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        @Model.SchoolModel.studentName
+                    </td>
+                    <td>
+                        @Model.SchoolModel.className
+                    </td>
+                    <td>
+                        @Model.SchoolModel.division
+                    </td>
+                    <td>
+                        @Model.SchoolModel.classNumber
+                    </td>
+                    <td>
+                        @Model.SchoolModel.classInCharge
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <input type="hidden" id="hfStudentId" value="@Model.SchoolModel.studentId" />
+
+        <div class="row" style="margin-right: 0px !important;margin-left: 0px !important;">
+            <div class="form-group">
+                <h4><span style="float: left; width:100%; padding-bottom:12px;">Payment Details</span> </h4>
+                <button id="addPayment" class="btn pay-now-btn"><i class="fa fa-plus"></i> Add Payment</button>
+                <button id="addAdvancePayment" class="btn pay-now-btn"><i class="fa fa-calculator"></i> Advance Payment</button>
+
+                <button id="history-btn" class="btn pay-now-btn pull-right"><i class="fa fa-history"></i> History</button>
+                <div class="with-icon" style="width: 150px; float: right; margin-right:10px;">
+                    <input type="text" class="form-control bill-start-date" data-date-end-date="0d" value="@Model.SchoolModel.curredntDateTime.ToString("dd-MM-yyyy")">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                <select id="PaymentType" class="form-control" style="width: 150px; float: right; margin-right:380px;">
+                    <option value="1" selected>Cash</option>
+                    <option value="2">Cheque</option>
+                    <option value="3">Bank Transfer</option>
+                </select>
+
+
+            </div>
+        </div>
+
+        <div class="row form-group" style="margin-right: 0px !important;margin-left: 0px !important;">
+            <div class="form-group">
+                <div id="div-bakname" class="isHidden" style="width: 150px; float: right; margin-right:10px;">
+                    <label>Bank Name</label>
+                    <select asp-for="BankId"
+                            asp-items="ViewBag.BankList"
+                            class="form-control accHead-drop-down">
+                        <option value="">--Select Bank--</option>
+                    </select>
+
+                    <span asp-validation-for="BankId" class="text-danger"></span>
+
+                </div>
+
+                <div class="isHidden" id="div-ckdate" style="width: 150px; float: right; margin-right:10px;">
+                    <label>Cheque Date</label>
+                    <div class="with-icon">
+                        <input type="text" class="form-control chq-date" data-date-end-date="0d" value="@Model.SchoolModel.curredntDateTime.ToString("dd-MM-yyyy")">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                </div>
+                <div id="div-chkno" class="isHidden" style="width: 150px; float: right; margin-right:10px;">
+                    <label>Cheque Number</label>
+                    <input type="text" class="form-control " value="" id="chk-no">
+                </div>
+
+            </div>
+        </div>
+        <div class="billingbox">
+            <div id="billingList">
+                @Html.Partial("~/Views/School/_pv_Billing_PaymentDeteils_Grid.cshtml")
+            </div>
+        </div>
+
+    </div><!-- end of col md 8 -->
+</div>
+<!-- Modal -->
+<div class="modal fade" id="addBillModel">
+</div>
+
+<div class="modal fade" id="editBillModel">
+</div>
+<div class="modal fade" id="tablePrintData">
+</div>
+<div class="modal fade" id="history-model">
+</div>
+<div class="modal fade" id="addAdvancelModel">
+
+    @{
+        var student = new Satluj_Latest.Data.Student(Model.SchoolModel.studentId);
+        var paymentList = student.GetStudentAdvancePaymentFees().OrderBy(z => z.DueDate).ToList();
+        var discountFee = student.Discount.ToList();
+    }
+    <input type="hidden" value="@student.SchoolId" id="schoolId" />
+    <input type="hidden" value="@student.ClassId" id="classId" />
+    <input type="hidden" value="@student.StudentId" id="studentId" />
+
+    <style>
+        [data-event=disable] > td:not(:first-child) {
+            pointer-events: none;
+            opacity: .5;
+        }
+
+        [data-event=disable] > td {
+            background-color: #f1f1f1 !important;
+        }
+    </style>
+
+
+
+    <div class="modal-dialog" role="document" style="background-color: #fff; width:50% !important; height: inherit !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Advance Payment</h4>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-group isHidden">
+                <h4 style="text-align: right;"><span style="float: left;">Payment Details</span> <button class="btn pay-now-btn" data-toggle="modal" data-target="#modalPayment"><i class="fa fa-plus"></i> Add Payment</button></h4>
+            </div>
+            @if (paymentList.Count >= 1)
+            {
+            <div>
+                <div class="table-responsive">
+                    <table class="table account-table" id="tbAcBill1">
+                        <tr id="thead">
+                            <th colspan="2">
+                                Particulars
+                            </th>
+                            <th>
+                                Discount
+                            </th>
+                            <th></th>
+                            <th style="width:20%; text-align: right;">
+                                Amount
+                            </th>
+                        </tr>
+                        <tbody id="bodyTableAdv">
+                            @foreach (var fee in paymentList)
+                                {
+                            <tr data-id="tbRowAmountAdvance" id="advTr">
+                                <td style="width: 10px;">
+                                    @*-----for check box--------*@
+                                    @{
+                                                var isAny1 = 0;
+                                                foreach (var discount in discountFee)
+                                                {
+                                                    if (discount.feeId == fee.FeeId)
+                                                    {
+                                                        //var afterDisc = fee.Amount - discount.discountAmount;
+                                                        decimal feeAmount = fee.Amount;
+                                                        decimal dis = discount.discountAmount;
+                                                        decimal afterDisc = feeAmount - dis;
+                                    <label>
+                                        <input type="checkbox" class="checkbox-input" data-amount="@afterDisc" data-fee="@afterDisc^@fee.FeeId^@fee.FeeGuid^@fee.Amount^@discount.discountAmount^0^0" @*onchange="AddAdvanceFee(this)"*@ data-id="chekIps" />
+                                        <span class="checkbox-virtual"></span>
+                                    </label>
+                                                        isAny1 = 1;
+                                                    }
+
+                                                }
+                                                if (isAny1 == 0)
+                                                {
+                                    <label>
+                                        <input type="checkbox" class="checkbox-input" data-amount="@fee.Amount" data-fee="@fee.Amount^@fee.FeeId^@fee.FeeGuid^@fee.Amount^0^0^0" @*onchange="AddAdvanceFee(this)"*@ data-id="chekIps" />
+                                        <span class="checkbox-virtual"></span>
+                                    </label>
+                                                }
+                                    }
+                                </td>
+
+                                <td>
+                                    @*-----Fee Name--------*@
+                                    @fee.FeeName
+                                </td>
+
+                                <td>
+                                    @*-----Amount if discount--------*@
+                                    @foreach (var discount in discountFee)
+                                            {
+                                                if (discount.feeId == fee.FeeId)
+                                                {
+
+                                    @String.Format("{0:0.00}", discount.discountAmount)
+
+                                                }
+
+                                            }
+                                </td>
+
+                                <td> @String.Format("{0:y}", fee.DueDate) </td>
+
+                                <td style="width:20%; text-align: right;">
+                                    @{
+                                                var isAny = 0;
+
+                                                foreach (var discount in discountFee)
+                                                {
+
+                                                    if (discount.feeId == fee.FeeId)
+                                                    {
+                                    <s>@String.Format("{0:0.00}", fee.Amount)</s>
+                                                        //var afterDisc = fee.Amount - discount.discountAmount;
+                                                        decimal feeAmount = fee.Amount;
+                                                        decimal dis = discount.discountAmount;
+                                                        decimal afterDisc = feeAmount - dis;
+                                    <div @*data-amount="@afterDisc"*@><label>After Discount: </label><input id="txt-amount" type="text" style="border: none;pointer-events: none; text-align: right;" value="@String.Format("{0:0.00}", afterDisc)" /></div>
+                                                        isAny = 1;
+                                                    }
+
+                                                }
+                                                if (isAny == 0)
+                                                {
+
+                                    <div @*data-amount="@fee.Amount"*@>
+                                        <input id="txt-amount" type="text" style="border: none;pointer-events: none; text-align: right;" value="@String.Format("{0:0.00}", fee.Amount)" />
+                                    </div>
+                                                }
+                                    }
+                                </td>
+                            </tr>
+                                                }
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>}
+                                                else
+                                                {
+            <label>NO FEE DUES</label>
+                                                }
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" id="colse-advPayment" data-dismiss="modal">Cancel</button>
+            <button class="btn pay-now-btn isDisabled" id="advanceFeeAdd">Save</button>
+        </div>
+
+    </div>
+
+
+
+
+
+</div>
+<div class="modal fade" id="returnPaymentMode-model" z-index="99999" role="dialog" aria-labelledby="myModalLabel6">
+
+</div>
+
+
+<script>
+
+    $(document).on('change', '#PaymentType', function () {
+        var type = $(this).val();
+        if (type == 1) {
+            $('#div-bakname').addClass('isHidden');
+            $('#div-ckdate').addClass('isHidden');
+            $('#div-chkno').addClass('isHidden');
+        }
+        else if (type == 2) {
+            $('#div-bakname').removeClass('isHidden');
+            $('#div-ckdate').removeClass('isHidden');
+            $('#div-chkno').removeClass('isHidden');
+        }
+
+        else if (type == 3) {
+            $('#div-bakname').removeClass('isHidden');
+            $('#div-ckdate').addClass('isHidden');
+            $('#div-chkno').addClass('isHidden');
+        }
+    })
+
+
+    var sDate = "";
+    var chkDate = "";
+    $(document).ready(function () {
+        $('.bill-start-date').datepicker({
+            format: 'dd-mm-yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        sDate = $('.bill-start-date').val();
+
+        var res = sDate.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        sDate = mm + '-' + dd + '-' + yyyy;
+
+        $('.chq-date').datepicker({
+            format: 'dd-mm-yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        chkDate = $('.chq-date').val();
+
+        var res = chkDate.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        chkDate = mm + '-' + dd + '-' + yyyy;
+
+       
+    })
+
+    $(document).on('change', '.bill-start-date', function () {
+        sDate = $(this).val();
+        var res = sDate.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        sDate = mm + '-' + dd + '-' + yyyy + " 11:00:00.000";
+
+    })
+    $(document).on('change', '.chq-date', function () {
+        chkDate = $(this).val();
+        var res = chkDate.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        chkDate = mm + '-' + dd + '-' + yyyy + " 11:00:00.000";
+
+    })
+    var cancel = 0;
+    $(document).on('click', '#addPayment', function () {
+        var studentId = $('#hfStudentId').val();
+        $.ajax({
+            url: '/School/AddPaymentPartialView/' + studentId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#addBillModel').html(data);
+                $.validator.unobtrusive.parse($("#addBillModel"));
+                $('#addBillModel').modal('show');
+            }
+        });
+    });
+
+    $(document).on('click', '#addAdvancePayment', function () {
+        $('#addAdvancelModel').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        //var studentId = $('#hfStudentId').val();
+        //$.ajax({
+        //    url: '/School/AddAdvancePaymentPartialView/' + studentId,
+        //    type: "GET",
+        //    dataType: 'html',
+        //    success: function (data) {
+        //        $('#addAdvancelModel').html(data);
+        //        $.validator.unobtrusive.parse($("#addAdvancelModel"));
+        $('#addAdvancelModel').modal('show');
+        //}
+        //});
+    });
+
+    $(document).on('click', '#editPayment', function () {
+        var studentId = $('#hfStudentId').val();
+        $.ajax({
+            url: '/School/EditBillingPayment/' + studentId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#editBillModel').html(data);
+                $.validator.unobtrusive.parse($("#editBillModel"));
+                $('#editBillModel').modal('show');
+            }
+        });
+    });
+
+    $(document).on('click', '#history-btn', function () {
+        $('#history-model').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        var studentId = $('#hfStudentId').val();
+        $.ajax({
+            url: '/School/AddStudentBillPartialView/' + studentId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#history-model').html('');
+
+                $('#history-model').html(data);
+                $('#history-model').modal('show');
+            }
+        });
+    });
+
+    $(document).on('click', '#close-btn', function () {
+        if (cancel == 1) {
+            $(".se-pre-con").show();
+            location.reload(); // reloading for getting cancelled bill in list to select
+        }
+    });
+
+    function AddFeeStudentSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            location.reload();
+            //var studentId = $('#hfStudentId').val();
+            //$.ajax({
+            //    url: '/School/BillingPaymentDeteils/' + studentId,
+            //    type: "GET",
+            //    dataType: 'html',
+            //    success: function (data) {
+            //        $('#billingList').remove();
+            //        $('.billingbox').html("<div id='billingList'></div>")
+            //        $('#billingList').html(data);
+            //    }
+            //});
+
+            $('#addBillModel').modal('hide');
+
+        }
+        else {
+            $('#addBillModel').modal('hide');
+            toastrError(result.msg);
+        }
+    }
+
+    function EditFeeStudentSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            location.reload();
+
+            $('#editBillModel').modal('hide');
+
+        }
+        else {
+            $('#editBillModel').modal('hide');
+            toastrError(result.msg);
+        }
+    }
+
+    //----------------------------------- Archana 26-Jul-17 ---------------
+    $("#btn-save-bill").click(function () {
+        debugger
+        var type = $('#PaymentType').val();
+        var okFlag = 0;
+        var bankId = "";
+        var ckhDateee = "";
+        var chkNo = "";
+        if (type == 1) {
+            okFlag = 1;
+        }
+        else if (type == 2) {
+            bankId = $('#BankId').val();
+            ckhDateee = chkDate;//$('.chq-date').val();
+            chkNo = $('#chk-no').val();
+            if ((bankId == "") || (ckhDateee == "") || (chkNo == "")) {
+                okFlag = 0;
+            }
+            else {
+                if ((bankId == undefined) || (ckhDateee == undefined) || (chkNo == undefined)) {
+                    okFlag = 0;
+                }
+                else {
+                    okFlag = 1;
+                }
+            }
+        }
+
+        else if (type == 3) {
+            bankId = $('#BankId').val();
+
+            if ((bankId == "") || (bankId == undefined)) {
+                okFlag = 0;
+            }
+            else {
+                okFlag = 1;
+            }
+        }
+
+        if (okFlag == 1) {
+
+            var paidAmount = $('#paying-amount').val();
+            var textBoxVal = 0;
+            var totalAmount = $('#hfTotal').val();
+            var chkAmount = 0;
+            var saveArray = [];
+            var prevBal = $('#tdBalance').attr('data-id');
+            var currentAmount = totalAmount - prevBal;
+            if ((parseFloat(paidAmount)) < (parseFloat(currentAmount))) {
+                toastrWarning("Amount is less than total amount");
+            }
+            else {
+                $("input:checked").each(function () {
+                    textBoxVal = parseFloat($(this).parents('tr').find("#txt-amount").val());
+                    chkAmount = parseFloat($(this).attr('data-amount'));
+                    if (textBoxVal != chkAmount) {
+                        //   console.log($(this).attr('data-fee'));
+                        var dataAmount = textBoxVal
+                        var dataFeeid = $(this).attr('data-feeidd');
+                        var dataFeeGuid = $(this).attr('data-feeGuid');
+                        var dataMaxamt = $(this).attr('data-maxamt');
+                        var dataDisc = $(this).attr('data-disc');
+                        var billType = $(this).attr('data-billType');
+                        var prev_parentBill=$(this).attr('data-prev-billNo');
+                        var dataFee = dataAmount + '^' + dataFeeid + '^' + dataFeeGuid + '^' + dataMaxamt + '^' + dataDisc + '^' + 1 + '^' + billType+'^'+prev_parentBill;
+                        $(this).attr('data-fee', dataFee);
+                    }
+                    var feeIdSave = $(this).attr("data-fee");
+
+                    // it is checked
+                    saveArray.push(feeIdSave);
+                    console.log(JSON.stringify(saveArray));
+                });
+
+                var item = new Object();
+                item.SchoolId = $('#schoolId').val();
+                item.ClassId = $('#classId').val();
+                item.StudentId = $('#studentId').val();
+                item.PaidAmount = paidAmount;
+                item.PaymentType = type;
+                item.ChequeDate = ckhDateee;
+                item.ChequeNumber = chkNo;
+                item.BankId = bankId;
+                item.FeeDetails = saveArray.toString();
+                item.TimeStamp = sDate;
+                $.post("/School/StudentMainBillPay/", item, function (result) {
+                    console.log(JSON.stringify(result))
+                    if (result.status) {
+                        if (result.status) {
+                            //toastrSuccess(result.msg);
+                            //location.reload();
+                            //printViewData();
+                            $('#btn-save-bill').addClass('isHidden');
+                            showNewPageForPrint(result.serialNo);
+                        }
+                        else {
+                            toastrError(result.msg);
+                        }
+                    }
+                });
+            }
+        }
+        else {
+            alert("Please enter all fields");
+        }
+
+    });
+
+    function printViewData() {
+        var studentMainId = $('#studentId').val();
+        $.ajax({
+            url: '/School/PrintData/' + studentMainId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#billingList').html(data);
+            }
+        });
+    }
+
+    function showNewPageForPrint(serialNo) {
+        var slno = serialNo;
+        var studentMainId = $('#studentId').val();
+        console.log(slno, studentMainId);
+        $.ajax({
+            url: '/School/PrintAccountBillData/' + studentMainId + '~' + slno,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                //$('#tablePrintData').html('');
+                //$('#tablePrintData').html(data);
+                $('#tablePrintData').html(data);
+                //$.validator.unobtrusive.parse($("#tablePrintData"));
+                $('#tablePrintData').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                })
+
+            }
+        });
+    }
+    //----------------------------------- Archana 26-Jul-17 ---------------
+    $(document).on('click', '#li-data', function () {
+        var studentId = $('#hfstudentId').val();
+        var billno = $(this).attr('data-id');
+        $("#ul-popup>li.active").removeClass("active");
+        $(this).addClass('active');
+        $.ajax({
+            url: '/School/LoadTableForBilling/' + billno + '~' + studentId,
+            dataType: 'html',
+            success: function (data) {
+                $('#history-table-bill').html('');
+                $('#history-table-bill').html(data);
+            },
+        });
+    })
+
+    var array1 = [];
+    $(document).on('click', '[data-id="chekIps"]', function () {
+        AddRemoveFee(this);
+        var f = $(this), p = $(f).parents('tr');
+        if ($(f).is(':checked')) {
+            $(this).attr('checked', 'checked');
+            var t = $(p).html(), h = '<tr data-event="" data-id="tbRowAmount">' + t + '</tr>';
+            // it is checked
+            array1.push(h);
+            //   console.log(JSON.stringify(array1));
+        }
+        else {
+            var t = $(p).html(), h = '<tr data-event="" data-id="tbRowAmount">' + t + '</tr>';
+            var array2 = [];
+            array2.push(h);
+            for (var i = array1.length - 1; i >= 0; i--) {
+                //console.log(JSON.stringify(array1[i]));
+                //console.log(JSON.stringify(array2[0]));
+                if (array1[i] == array2[0]) {
+                    array1.splice(i, 1);
+                }
+            }
+            //   console.log(JSON.stringify(array1));
+            $(this).removeAttr('checked', 'checked');
+
+        }
+        if (array1.length <= 0) {
+            $('#advanceFeeAdd').addClass('isDisabled');
+        }
+        else {
+
+            $('#advanceFeeAdd').removeClass('isDisabled');
+
+        }
+    });
+
+    $(document).on('click', '#advanceFeeAdd', function () {
+        for (var i = array1.length - 1; i >= 0; i--) {
+            var arraySplit = array1[i].split("chekIps");
+            var qw1 = arraySplit[0];
+            var qw2 = arraySplit[1];
+            var qw3 = qw1 + "chekIps\" data-remo=\"adv\"" + qw2;
+
+            console.log(JSON.stringify(qw3));
+
+
+
+            $('#bodyTable').prepend(qw3);
+        }
+
+        //  $('#addAdvancelModel').modal('hide');
+        $('[data-id="chekIps"]').each(function () {
+            if ($(this).is(':checked')) {
+                var f = $(this).parents('#advTr');
+                $(f).remove();
+            }
+        });
+        sumTotal();
+        $('#addAdvancelModel').modal('hide');
+        $('#div-adv-pay').removeClass('isHidden')
+        array1 = [];
+    });
+
+    $(document).on('click', '#cancelBill', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Cancel Bill!",
+            cancelButtonText: "No, Leave it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) { // Archana  commented those lines for take a return payment mode . For that avoid the bill cancel from this and add this code in after the payment mode save section
+    if (isConfirm) {
+        //cancel = 1;
+        //$.ajax({
+        //    url: '/School/CancelBill/' + $(source).attr('data-billNo') + '~' + $(source).attr('data-studentId'),
+        //    type: "GET",
+        //    dataType: 'json',
+        //    success: function (data) {
+        //        if (data.status) {
+        //            toastrSuccess(data.msg);
+        //            var studentId = $('#hfStudentId').val();
+        //            $.ajax({
+        //                url: '/School/AddStudentBillPartialView/' + studentId,
+        //                type: "GET",
+        //                dataType: 'html',
+        //                success: function (data) {
+        //                    $('#history-model').html('');
+        //                    $('#history-model').html(data);
+        //                    $('#history-model').modal('show');
+        //                }
+        //            });
+        //        }
+        //        else {
+        //            toastrError(data.msg);
+        //        }
+        //    }
+        //});
+        var id = $(source).attr('data-billNo') + '~' + $(source).attr('data-studentId');
+        $.ajax({
+            url: '/School/LoadReturnPaymentMode/' + id,
+            dataType: 'html',
+            success: function (data) {
+                $('#returnPaymentMode-model').html('');
+                $('#returnPaymentMode-model').html(data);
+                $('#returnPaymentMode-model').modal('show');
+                    
+                
+                $('#chk-date-return').datepicker({
+                    format: 'dd-mm-yyyy',
+                    autoclose: true,
+                    todayHighlight: true
+                });
+
+
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                var today = dd + '-' + mm + '-' + yyyy;
+                $('#chk-date-return').val(today);
+            },
+        });
+    }
+});
+
+    });
+
+    $(document).on('click', '#colse-advPayment', function () {
+
+        $('#advTr [data-id="chekIps"]').each(function () {
+            if ($(this).is(":checked")) {
+                $(this).trigger('click');
+            }
+        });
+
+    });
+
+    $(document).on('click', '#close-print-pop', function () {
+        $('#history-btn').addClass('isDisabled');
+        location.reload();
+    });
+
+    var timer = 0;
+
+    $(document).on('keyup', '#txt-amount', function () {
+
+        var objj = $(this);
+
+        var amount = parseFloat($(this).val());
+
+        clearTimeout(timer);
+
+        timer = setTimeout(function () {
+
+            if ((amount > parseFloat(objj.parents('tr').children().children().children().attr('data-amount')))) {
+                objj.val(parseFloat(objj.parents('tr').children().children().children().attr('data-amount')))
+                sumTotal();
+            }
+            else { sumTotal(); }
+
+        }, 800);
+
+    });
+
+    $(document).on('click', '#delete-spcl-fee', function () {
+
+        var source = $(this);
+        var studentId = $(this).attr('data-studentId');
+        var feeGuid = $(this).attr('data-id');
+
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+
+
+        $.ajax({
+            url: '/School/DeleteStudentEditableFee/' + studentId + '~' + feeGuid,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+
+                if (data.status) {
+                    toastrSuccess(data.msg);
+
+                    source.parent().parent().remove();
+                    sumTotal();
+
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+
+        //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+    }
+    //else {
+    //    swal("Cancelled", "Your imaginary file is safe :)", "error");
+    //}
+});
+    });
+
+    $(document).on('click', '#delete-common-fee', function () {
+
+        var source = $(this);
+        var studentId = $(this).attr('data-studentId');
+        var feeGuid = $(this).attr('data-id');
+        var classId = $('#classId').val();
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+
+
+        $.ajax({
+            url: '/School/DeleteStudentCommonFee/' + studentId + '~' + feeGuid + '~' + classId,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+
+                if (data.status) {
+                    toastrSuccess(data.msg);
+
+                    source.parent().parent().remove();
+                    sumTotal();
+
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+
+        //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+    }
+    //else {
+    //    swal("Cancelled", "Your imaginary file is safe :)", "error");
+    //}
+});
+    });
+
+    $(document).on('click', '#save-add-payment', function () {
+
+        //debugger
+
+
+        var advtotalAmount = 0;
+        var saveAddPaymentArray = [];
+        var PaidAmount = $('#Amount').val();
+        var FeeName = $('#autoFeeId').val();
+
+
+        $(".addpayment-fee-input").each(function () {
+            feeId = parseInt($(this).attr("data-id"));
+            advtotalAmount = parseFloat($(this).val());
+            var feeIdSave = "";
+            if (advtotalAmount > 0) {
+                feeIdSave = feeId + '~' + advtotalAmount;
+                saveAddPaymentArray.push(feeIdSave);
+            }
+
+            // it is checked
+            console.log(JSON.stringify(saveAddPaymentArray));
+        });
+
+
+        var item = new Object();
+        item.SchoolId = $('#schoolId').val();
+        item.ClassId = $('#classId').val();
+        item.StudentId = $('#studentId').val();
+        item.PaidAmount = PaidAmount;
+        item.FeeName = FeeName;
+        item.FeeDetails = saveAddPaymentArray.toString();
+        var isAdvanStatus = false;
+        if ((PaidAmount > 0) && (FeeName != "")) {
+            isAdvanStatus = true;
+        }
+        if ((saveAddPaymentArray.length > 0) || (isAdvanStatus == true)) {
+
+            if (parseFloat(PaidAmount) > 0) {
+
+            }
+            $.post("/School/AddAdditionalFeeStudent/", item, function (result) {
+                console.log(JSON.stringify(result))
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    location.reload();
+                    $('#addBillModel').modal('hide');
+                }
+                else {
+                    $('#addBillModel').modal('hide');
+                    toastrError(result.msg);
+                }
+            });
+        }
+        else {
+            toastrWarning("Please enter fees");
+        }
+
+
+    });
+
+    $(document).on('change', '#ReturnPaymentType', function () {
+        var type = $(this).val();
+        if (type == 1) {
+            $('#div-bankdetails').addClass('isHidden');
+            $('.div-chequeDetails').addClass('isHidden');
+        }
+        else if (type == 2) {
+            $('#div-bankdetails').removeClass('isHidden');
+            $('.div-chequeDetails').removeClass('isHidden');
+        }
+
+        else if (type == 3) {
+            $('#div-bankdetails').removeClass('isHidden');
+            $('.div-chequeDetails').addClass('isHidden');
+        }
+    })
+
+    $(document).on('click', '#btn-bill-cancel', function () {
+        //debugger;
+        var chkDate = '';
+        var bankId = 0;
+        var chequeNo = $('#chk-no-return').val();
+        var chequeDate = $('#chk-date-return').val();
+        var mode = $('#ReturnPaymentType').val();
+        var studentId=$('#hfstudentId').val();
+        var billNo=$('#hfbillno').val();
+        var ok = 0;
+        if (mode == 2) {// Cheque
+            if (chequeNo == '') {
+                $('#cheque-no-required').show();
+                $('#btn-bill-cancel').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                ok = 0;
+            }
+            else if (chequeDate != '') {
+                bankId = $('#rtuen-BankId').val();
+                var res = chequeDate.split("-");
+                var dd = res[0];
+                var mm = res[1];
+                var yyyy = res[2];
+                chkDate = mm + '-' + dd + '-' + yyyy + " 11:00:00.000";
+                $('#cheque-date-required').hide();
+                $('#cheque-no-required').hide();
+                $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+                ok = 1;
+            }
+            else {
+                $('#cheque-date-required').show();
+                $('#btn-bill-cancel').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                ok = 0;
+            }
+        }
+        else if (mode == 3) {
+            bankId = $('#rtuen-BankId').val();
+            $('#cheque-date-required').hide();
+            $('#cheque-no-required').hide();
+            $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+            ok = 1;
+        }
+        else {
+            $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+            ok = 1;
+        }
+        if (ok == 1) {
+            var id = billNo + '~' + studentId + '~' + mode + '~' + bankId + '~' + chequeNo + '~' + chequeDate;
+            cancel = 1;
+            $.ajax({
+                url: '/School/CancelBill/' + id,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status) {
+                        toastrSuccess(data.msg);
+                        var studentId = $('#hfStudentId').val();
+                        $.ajax({
+                            url: '/School/AddStudentBillPartialView/' + studentId,
+                            type: "GET",
+                            dataType: 'html',
+                            success: function (data) {
+                                //event.preventDefault();
+                                //$('#returnPaymentMode-model').html('');
+                                //$('#history-model').html('');
+                                //$('#history-model').html(data);
+                                //$('#history-model').modal('show');
+                                //$("#li-data").focus();
+                                location.reload();
+                            }
+                        });
+                    }
+                    else {
+                        toastrError(data.msg);
+                    }
+                }
+            });
+
+
+        }
+
+    });
+
+    $(document).on('keyup', '#chk-no-return', function () {
+        if ($('#chk-no-return').val() != '') {
+            $('#cheque-no-required').hide();
+            $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+        }
+        else {
+            $('#cheque-no-required').show();
+            $('#btn-bill-cancel').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+    });
+
+   
+
+    $(document).on('click', '#btn-cancel-in-billCancel', function () {
+        location.reload();
+    });
+</script>

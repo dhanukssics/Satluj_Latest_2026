@@ -1,0 +1,1159 @@
+
+body {
+    font-family: 'Raleway', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+ul, li, a {
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    transition: all ease 0.2s;
+}
+
+    a:hover {
+        text-decoration: none;
+    }
+
+img {
+    padding: 0;
+    margin: 0;
+}
+
+textarea {
+    resize: none;
+}
+
+input[type=text], input[type=password], input[type=email], input[type=tel], input[type=date], textarea, select {
+    border-radius: 0px !important;
+    /*border: none;*/
+    /*height: 46px;*/
+    padding: 10px 20px;
+}
+
+
+.register-body {
+    background-color: #c3d3e3;
+    padding-top: 85px; /*background-image:url(/Content/img/register-bg.png); background-repeat:no-repeat; background-size:cover;*/
+}
+
+.school-boy-img {
+    padding-top: 80px;
+}
+
+.register h3 {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 28px;
+    padding-bottom: 10px;
+}
+
+.submit {
+    width: 100%;
+    padding: 12px 0px;
+    border: none;
+    background: #fa6e83;
+    text-transform: uppercase;
+    color: #fff;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.register input[type=checkbox] {
+    display: none;
+}
+
+.checkbox-css {
+    width: 15px;
+    height: 15px;
+    background: #fff;
+    float: left;
+    border: 1px solid #4a4a4a;
+    margin-top: 2px;
+    margin-right: 12px;
+}
+
+    .checkbox-css.active {
+        background: #00b900;
+        border-color: #00b900;
+    }
+
+        .checkbox-css.active.fa-check {
+            color: #fff;
+            font-size: 12px;
+            padding-left: 1px;
+            padding-top: 1px;
+        }
+
+.terms-conditions {
+    padding: 5px 0px;
+    width: 100%;
+    display: inline-block;
+}
+
+.register {
+    margin: 5% 0px;
+}
+
+.copyright {
+    padding-top: 20px;
+    display: inline-block;
+    font-size: 12px;
+}
+
+.footer-reg {
+    background: #00626b;
+    padding: 20px 0px;
+    color: #fff;
+}
+
+.foot-menu {
+    padding-top: 20px;
+}
+
+    .foot-menu li {
+        display: inline-block;
+        margin-left: 15px;
+        font-size: 12px;
+    }
+
+        .foot-menu li a {
+            color: #fff;
+        }
+
+            .foot-menu li a:hover {
+                text-decoration: underline;
+            }
+
+
+.login-body {
+    background-color: #008c99;
+    padding-top: 85px;
+    /*background-image: url(/Content/img/login-bg.png);*/
+    background-size: cover;
+}
+
+.login {
+    color: #fff;
+    float: left;
+    width: 100%;
+    padding-top: 25px;
+}
+
+    .login h2 {
+        font-size: 60px;
+        text-transform: uppercase;
+        font-weight: 600;
+        padding-bottom: 20px;
+    }
+
+    .login h5 {
+        font-size: 23px;
+        font-family: 'PT Sans', sans-serif;
+        padding-bottom: 12px;
+    }
+
+    .login p {
+        font-size: 18px;
+        padding-bottom: 10px;
+        line-height: 30px;
+    }
+
+.child-img {
+    padding-top: 40px;
+}
+
+.login-form {
+    background: rgba(0,0,0,0.5);
+    padding: 15px 40px;
+    border-radius: 4px;
+}
+
+    .login-form h3 {
+        font-weight: 600;
+        font-size: 28px;
+        padding: 15px 0px;
+    }
+
+.forgot-pass {
+    padding-bottom: 10px;
+}
+
+    .forgot-pass:hover {
+        color: #fff;
+    }
+
+
+
+/* Main nav start */
+.header {
+    padding: 10px 0px;
+    box-shadow: 0px 2px 5px #ccc;
+    margin-bottom: 2px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 180;
+    background-color: #FFF;
+}
+
+#menu {
+    padding-top: 5px;
+    background: #fff;
+    z-index: 999;
+}
+
+.site-nav {
+    background: #fff;
+    color: #1a1b18;
+    position: relative;
+}
+
+    .site-nav a {
+        text-decoration: none;
+        transition: all linear 0.15s;
+    }
+
+    .site-nav .logo {
+        display: inline-block;
+        color: #fff;
+        font-size: 1.7em;
+        line-height: 1.55em;
+        letter-spacing: -2px;
+        text-transform: uppercase;
+        padding: 0 10px;
+        z-index: 0;
+        position: relative;
+    }
+
+        .site-nav .logo a {
+            color: #efefef;
+        }
+
+    .site-nav .menu {
+        box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
+        border-top: 1px solid #d9d9d9;
+        display: none;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        position: absolute;
+        top: 70px;
+        right: 0;
+        left: 0;
+    }
+
+        .site-nav .menu a {
+            color: #000;
+            border-bottom: 1px solid #d9d9d9;
+            display: block;
+            padding: 15px;
+            font-family: 'PT Sans', sans-serif;
+            text-transform: uppercase;
+            font-size: 14px;
+            font-weight: bold;
+            color: #4a4a4a;
+        }
+
+            .site-nav .menu a:hover {
+                color: #fa6e83;
+            }
+
+    .site-nav .navBars {
+        cursor: pointer;
+        display: inline-block;
+        font-size: 2.7em;
+        line-height: 1.5em;
+        float: right;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+#toggle {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: -99999px;
+}
+
+    #toggle:checked ~ nav .menu {
+        display: block;
+    }
+
+
+
+/*20-11-17*/
+
+.login-without {
+    background-color: #f9f9f9;
+    padding-top: 80px;
+    background-image: url(/Content/img/withoutbg.jpg);
+    background-size: cover;
+}
+
+    .login-without .login-form {
+        background-color: #2b7c84fa;
+        border-top: 5px solid #fa6e83;
+        border-radius: 0 0 5px 5px;
+    }
+
+    .login-without .newDes {
+        width: 100%;
+        padding: 0 15px;
+        float: left;
+        background-color: transparent;
+        border: 2px solid #ffffffb8;
+        margin: 0;
+    }
+
+    .login-without .form-group {
+        float: left;
+        width: 100%;
+    }
+
+    .login-without .login-form p {
+        font-size: 13px;
+        padding-bottom: 0;
+        line-height: inherit;
+        letter-spacing: 0.3px;
+        margin: 0 0 3px;
+    }
+
+.fullWid {
+    float: left;
+    width: 100%;
+    display:flex; /*Archana commended this for adject the design in app module*/ /*Archana agaian uncommend this line because the header shows the mobile button*/ 
+    flex-wrap:wrap;
+}
+
+
+.newDes::-webkit-input-placeholder {
+    color: #FFF;
+}
+
+.newDes::-moz-placeholder {
+    color: #FFF;
+}
+
+.newDes:-ms-input-placeholder {
+    color: #FFF;
+}
+
+.newDes:-moz-placeholder {
+    color: #FFF;
+}
+
+.login-without .login {
+    padding: 12% 0;
+}
+
+    .login-without .login .submit:hover {
+        background-color: #e85eaa;
+    }
+
+html * {
+    outline: 0;
+}
+
+.slctList.fullWid {
+    padding: 30% 0px;
+}
+
+.menuSlct {
+    background-color: #26b4c3;
+    padding-top: 80px;
+    background-image: url(/Content/img/menu.png);
+    background-size: cover;
+    text-align: center;
+}
+
+.slctList li {
+    list-style: none;
+    display: inline-block;
+    padding: 0 1%;
+}
+
+.slctList img.iconImg {
+    max-width: 160px;
+}
+
+.slctList li p {
+    color: #000;
+    text-transform: uppercase;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition-duration: .4s;
+    transition-timing-function: linear;
+}
+
+.slctList li:hover p {
+    color: #fbd303;
+}
+
+.parentLogin {
+    /*background: url(/Content/img/grbg.png) repeat #036b62;*/
+    /*background: url(/Content/img/grbg.png) repeat #fff;*/
+    background-color: white;
+}
+
+.parentbottom {
+    /*background: url(/Content/img/prnt.png) no-repeat center bottom;*/ /*Parent Login page kids reading imaage*/
+}
+
+.parentLogin .login-form {
+    background-color: #17535aa3;
+    border-radius: 5px;
+    padding: 10px 5px 0;
+}
+
+    .parentLogin .login-form h3 {
+        font-weight: 200;
+        text-transform: uppercase;
+        font-size: 32px;
+        text-align: center;
+        padding: 15px 0;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #ffffff73;
+    }
+
+.parentLogin .logBtn {
+    background-color: #ffffff2e;
+    border: 1px solid #ffffff75;
+    width: 100%;
+    float: left;
+    margin: 0;
+    padding: 0 15px;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 20px;
+    transition-duration: .4s;
+    transition-timing-function: linear;
+}
+
+    .parentLogin .logBtn:hover {
+        background-color: #008c99;
+    }
+
+    .parentLogin .logBtn img {
+        padding-right: 15px;
+    }
+
+.parentLogin .form-group {
+    padding: 0 25px;
+    margin-bottom: 15px;
+}
+
+.parentLogin .addStdnts {
+    background-color: #9b67ac;
+    color: #FFF;
+    text-align: center;
+    font-size: 15px;
+    letter-spacing: 0.4px;
+    font-weight: 700;
+    border-radius: 5px;
+    padding: 15px 23px 15px 20px;
+    transition-duration: .4s;
+    transition-timing-function: linear;
+    /*margin-top: -90px;*/
+    float: left;
+}
+
+    .parentLogin .addStdnts img {
+        padding-right: 7px;
+        max-width: 39px;
+    }
+
+.parent-home {
+    padding-bottom: 35px;
+}
+
+.parentLogin .addStdnts:hover {
+    background-color: #e4409b;
+    color: #FFF;
+}
+
+.form-sp {
+    margin: 35px -1% 1px;
+    width: 102%;
+}
+
+    .form-sp img {
+        margin-right: 5px;
+    }
+
+.parentLogin .login {
+    padding: 13% 0 20%;
+}
+
+.parent_loginFee {
+    background-color: #FFF;
+    padding-top: 80px;
+    background-image: url(/Content/img/chilImg.png);
+    background-size: cover;
+    text-align: center;
+}
+
+    .parent_loginFee .login-form {
+        background-color: #FFF;
+        position: relative;
+        color: #000;
+        padding: 0;
+    }
+
+    .parent_loginFee .posiImg {
+        position: absolute;
+        bottom: 0;
+        left: -92px;
+        z-index: 100;
+        max-width: 120px;
+    }
+
+    .parent_loginFee .login-form h3 {
+        background-color: #f9d21b;
+        background-image: url(/Content/img/yelStrip.png);
+        text-transform: uppercase;
+        font-size: 24px;
+        padding: 25px 15px;
+        margin-bottom: 45px;
+    }
+
+    .parent_loginFee .form-group {
+        margin: 15px 0;
+        width: 100%;
+        float: left;
+        padding: 0 45px;
+    }
+
+    .parent_loginFee input.form-control {
+        border: 1px solid #ccc;
+        border-radius: 5px !important;
+    }
+
+    .parent_loginFee .forgot-pass {
+        color: #666;
+        text-decoration: underline;
+        padding: 0;
+    }
+
+    .parent_loginFee .submit {
+        padding: 14px 0px;
+        border-radius: 35px;
+        background: #f9d21b;
+        text-transform: uppercase;
+        color: #000;
+        margin-bottom: 40px;
+        transition-duration: .4s;
+        transition-timing-function: linear;
+    }
+
+        .parent_loginFee .submit:hover {
+            background: #ebbf0e;
+            color: #000;
+        }
+
+    .parent_loginFee .logconts {
+        color: #FFF;
+        text-align: left;
+        padding: 5% 20px 20px 18%;
+    }
+
+        .parent_loginFee .logconts h2 {
+            font-size: 45px;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-bottom: 1px solid #FFF;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .parent_loginFee .logconts p {
+            text-transform: uppercase;
+            font-size: 19px;
+            font-weight: 600;
+            margin: 10px 0;
+            line-height: 24px;
+            float: left;
+            width: 100%;
+        }
+
+            .parent_loginFee .logconts p img {
+                padding-right: 10px;
+                max-width: 37px;
+            }
+
+    .parent_loginFee .feePay {
+        background-color: #ebbf0e;
+        color: #333;
+        padding: 13px 35px;
+        border-radius: 3px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .parent_loginFee .spBt {
+        padding: 8% 0 15px;
+    }
+
+    .parent_loginFee .login {
+        padding: 13% 0 7% 80px;
+    }
+
+section {
+    float: left;
+    width: 100%;
+}
+
+.listhome li {
+    list-style: none;
+    display: inline-block;
+    padding: 0 7px 0 0;
+}
+
+    .listhome li span {
+        color: #FFF;
+        line-height: 25px;
+        background-color: #e33796;
+        width: 26px;
+        border-radius: 100%;
+        margin: -2px 7px -2px -14px;
+        float: left;
+        text-align: center;
+        height: 25px;
+    }
+
+.listhome .prtvbtn {
+    background-color: #FFF;
+    color: #333;
+    padding: 6px 19px;
+    border-radius: 35px;
+    float: left;
+    font-weight: 600;
+}
+
+    .listhome .prtvbtn:hover {
+        background-color: #e33796;
+        color: #FFF;
+    }
+
+.listhome li:hover span {
+    color: #FFF;
+}
+
+.parent-home p {
+    font-size: 22px;
+    padding-bottom: 0;
+    margin-bottom: 25px;
+    line-height: 30px;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+    .parent-home p img {
+        margin-right: 10px;
+        max-width: 30px;
+    }
+
+.paymentSuccess {
+    background: url(/Content/img/pay.png) no-repeat center center;
+}
+
+.succBox {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #FFF;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 1px 1px 25px #ccc;
+}
+
+    .succBox img {
+        max-width: 100px;
+    }
+
+.paymentSuccess .login {
+    padding: 21% 0px 8%;
+}
+
+.succBox h3 {
+    color: #333;
+    letter-spacing: 0.5px;
+    font-size: 25px;
+    font-weight: 500;
+    margin: 25px 0;
+}
+
+.succBox p {
+    font-size: 17px;
+    color: #000;
+}
+
+    .succBox p span {
+        color: #18c529;
+        font-weight: 600;
+    }
+
+.error-pay p {
+    padding: 0px 6%;
+    line-height: 22px;
+    font-size: 15px;
+    margin-bottom: 7px;
+    font-weight: 500;
+    color: #f93f3f;
+    float: left;
+    width: 100%;
+}
+
+    .error-pay p a {
+        color: #000;
+    }
+
+.error-pay h3 {
+    margin: 10px 0 25px;
+}
+
+.error-pay .succBox img {
+    margin-top: 20px;
+}
+
+.bckbtn {
+    background-color: #333;
+    color: #FFF !important;
+    padding: 11px 25px;
+    font-size: 14px;
+    margin: 15px 0;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.error-pay.login {
+    padding: 17% 0px 8%;
+}
+
+.clear {
+    clear: both;
+    font-size: 0;
+    line-height: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.parentReg {
+    background: url(/Content/img/par-Registration.jpg) #000;
+}
+
+    .parentReg .form-control {
+        font-weight: 600;
+        color: #000;
+        display: block;
+        width: 100%;
+        height: auto !important;
+        padding: 13px 15px !important;
+        font-size: 14px;
+        border-radius: 0px !important;
+    }
+
+    .parentReg .login-form {
+        background: rgba(33, 52, 90, 0.45);
+        border: 1px solid #cccccc4a;
+    }
+
+    .parentReg .login {
+        padding: 36px 0;
+        max-width: 800px;
+        margin: 0 auto;
+        float: none;
+    }
+
+.terms-ser {
+    padding: 125px 0px 35px;
+    background: url(/Content/img/menu.png) #76a5b1;
+    background-size: cover;
+}
+
+.termsBox {
+    background-color: #ffffffad;
+    border: 3px solid #FFF;
+    border-radius: 5px;
+    padding: 35px 3.6%;
+    box-shadow: 0px 0px 15px #00000087;
+    ;
+}
+
+    .termsBox h3 {
+        font-size: 24px;
+        margin: -35px -3.9% 30px;
+        text-align: center;
+        width: 107.8%;
+        border-radius: 5px 5px 0 0;
+        background-color: #2a8791;
+        display: block;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        padding: 20px 5px;
+        color: #FFF;
+        text-transform: uppercase;
+    }
+
+    .termsBox h6 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 25px 0 13px;
+        letter-spacing: 0.3px;
+    }
+
+    .termsBox p {
+        margin: 0 0 13px;
+        line-height: 22px;
+        font-weight: 500;
+    }
+
+/*07-02-18 START*/
+
+.price-incide {
+    font-family: 'PT Sans', sans-serif;
+}
+
+.courseBox {
+    float: left;
+    width: 100%;
+}
+
+.memPrice {
+    background-color: #517781;
+}
+
+.banConts {
+    text-align: center;
+    color: #FFF;
+    padding: 3% 0 20%;
+}
+
+    .banConts h2 {
+        font-size: 36px;
+        font-weight: 600;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        margin: 25px 0 0;
+    }
+
+    .banConts p {
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+.price-plans {
+    background: #FFF;
+    padding: 50px 0px;
+}
+
+.triangulo {
+    background: #22ccf7;
+    width: 100%;
+    min-height: 95px;
+    text-align: center;
+    background-size: cover;
+}
+
+.pricingDet-list {
+    transition: all ease 0.2s;
+}
+
+    .pricingDet-list:hover {
+        transform: scale(1.02, 1.02);
+    }
+
+.toTit {
+    font-weight: 600;
+    background: #34d6ff;
+    font-size: 16px;
+    color: #FFF;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 13px 5px;
+    min-height: 40px;
+    line-height: 17px;
+    z-index: 160;
+    letter-spacing: 0.2px;
+    margin: 0;
+}
+
+.price-incide {
+    color: #FFF;
+    font-size: 33px;
+    font-weight: 600;
+    text-align: center;
+    float: left;
+    width: 100%;
+    padding: 15px 5px;
+    margin-left: 15px;
+}
+
+    .price-incide sup {
+        font-weight: 300;
+        font-size: 23px;
+        top: -15px;
+        right: -4px;
+    }
+
+.priceTop {
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    float: none;
+    text-align: center;
+    display: block;
+}
+
+.price-incide sub {
+    font-size: 16px;
+    font-weight: 500;
+    bottom: -15px;
+    left: -14px;
+}
+
+.priSp {
+    padding: 0;
+    width: 29%;
+    float: left;
+    margin: 15px 2% 0;
+}
+
+.pricingDet-list .price-footer {
+    font-weight: 600;
+    background: url(../img/price-btm.png) #fff0 center no-repeat;
+    font-size: 12px;
+    color: #FFF;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 19px 0px 10px;
+    min-height: 110px;
+    background-size: cover;
+}
+
+.pricingDet-list h4 {
+    color: #333;
+    font-size: 13px;
+    font-weight: normal;
+    text-align: center;
+    border-bottom: 1px solid #d6d6d670;
+    padding: 15px 10px;
+    margin: 0;
+}
+
+.price-footer .button-style-2 {
+    color: #FFF;
+    font-size: 15px;
+}
+
+.bgPr {
+    background-color: #eeeeee;
+}
+
+.container-price {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 15px 35px;
+}
+
+.priceLefts .wraper {
+    border: 1px solid #d6d6d6;
+    border-right: 0;
+}
+
+.priceLefts {
+    padding-right: 0 !important;
+}
+
+    .priceLefts h4 {
+        font-size: 15px;
+        font-weight: 600;
+        padding: 10px 25px;
+    }
+
+.ownPrice {
+    background-color: #307283;
+}
+
+.contHeig {
+    min-height: 135px;
+    background-color: #FFF;
+}
+
+.tpPr {
+    margin-top: -20px;
+}
+
+.priceLefts .ownrSpc h4 {
+    padding: 13px 25px;
+}
+
+.wraper {
+    float: left;
+    width: 100%;
+    ;
+}
+
+.clear {
+    clear: both;
+    font-size: 0;
+    line-height: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+/*07-02-18 END*/
+
+
+@media screen and (max-width:1024px) {  .footer-reg {  display: none; }  }
+
+@media screen and (min-width: 767px) {
+    .site-nav .navBars {
+        display: none;
+    }
+
+    .site-nav .container {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .site-nav .logo {
+        margin: 0;
+    }
+
+    .site-nav .menu {
+        display: block;
+        box-shadow: none;
+        border: none;
+        float: right;
+        position: static;
+    }
+
+        .site-nav .menu li {
+            display: inline-block;
+        }
+
+        .site-nav .menu a {
+            border: none;
+            padding: 20px 10px;
+        }
+}
+/* Main nav end */
+
+
+@media screen and (max-width:767px) {
+    .copyright {
+        text-align: center;
+        width: 100%;
+        display: table;
+        margin: auto;
+        margin-bottom: 20px;
+    }
+
+    .foot-menu {
+        margin: auto;
+        text-align: center;
+    }
+
+        .foot-menu li:first-child {
+            margin-left: 0px;
+        }
+
+    .posiImg {
+        display: none;
+    }
+
+    .parent_loginFee .login {
+        padding: 10% 15px;
+    }
+
+    .parent_loginFee .logconts {
+        padding: 0px 25px 35px !important;
+    }
+
+        .parent_loginFee .logconts h2 {
+            font-size: 35px;
+        }
+
+    .priSp {
+        width: 46%;
+    }
+}
+
+@media screen and (max-width:991px) {
+    .register {
+        margin: 2% 0px 12% 0px;
+    }
+
+    .parent_loginFee .logconts {
+        padding: 35px 10px;
+        width: 100%;
+        float: left;
+    }
+}
+
+@media screen and (max-width:580px) {
+    .slctList img.iconImg {
+        max-width: 95px;
+    }
+
+    .slctList li p {
+        font-size: 15px;
+    }
+
+    .header {
+        padding: 5px 0;
+    }
+
+    .parent_loginFee .form-group {
+        margin: 10px 0;
+        padding: 0 20px;
+    }
+
+    .parent_loginFee .login-form h3 {
+        font-size: 21px;
+        padding: 20px 15px;
+        margin-bottom: 30px;
+    }
+
+    .parent_loginFee .submit {
+        font-size: 15px;
+    }
+
+    .priSp {
+        width: 100%;
+        margin: 10px 0;
+    }
+}
+
+.se-pre-con {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 19999;
+    background: url(/Content/img/preloader.gif) center no-repeat rgba(255, 255, 255, 0.66);
+    background-size: 350px;
+    background-position: center;
+    content: '';
+}
+
+
+
+.isPointer {
+    cursor: pointer;
+}

@@ -1,0 +1,162 @@
+﻿@model Satluj_Latest.Models.AssetsLiabilityModel
+@{
+    DateTime dateEntry = Model.EntryDate;
+}
+<style>
+    body {
+        font-family: 'Lato', sans-serif;
+    }
+
+    .main_container {
+        width: 100%;
+        margin: auto;
+        background: #fafafa;
+        padding: 50px 50px;
+    }
+
+    .table_header {
+        width: 100%;
+        margin: 20px 0px;
+    }
+
+        .table_header h5 {
+            text-align: center;
+            font-size: 16px;
+            font-weight: normal;
+            margin-bottom: 15px;
+        }
+
+            .table_header h5 i {
+                padding-right: 6px;
+            }
+
+    .table_main {
+        border-top: 1px solid #ccc;
+        float: none;
+        width: 100%;
+    }
+
+    .table_header input {
+        margin: auto;
+        display: table;
+        padding: 8px 13px;
+        width: 200px;
+    }
+
+
+    .word_breaking {
+        word-break: break-all;
+    }
+
+    .table_footer {
+        margin: auto;
+        display: table;
+        padding: 25px 0px;
+        border-top: 1px solid #ccc;
+        width: 100%;
+        text-align: center;
+    }
+
+    .table_main input[type=text] {
+        width: 87%;
+        height: 20px;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .add_inp_row, .add_inp_row2 {
+        padding-top: 20px;
+    }
+
+        .add_inp_row strong, .add_inp_row2 strong {
+            cursor: pointer;
+        }
+
+    .gap_bottom {
+        padding-bottom: 35px;
+    }
+
+        .gap_bottom label {
+            padding-top: 8px;
+        }
+
+    .head-style {
+        float: left;
+        width: 200px !important;
+        display: inline-block;
+        /*width: 50%;*/
+    }
+
+    .data-style {
+        width: calc(100% - 200px) !important;
+        /*width: 50%;*/
+        float: left;
+        display: inline-block;
+    }
+</style>
+<div class="modal-dialog modal-lg" id="printPopUp" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Print Data</h4>
+        </div>
+        <div class="main_container" id="print-inc&exp">
+            <div style="text-align:center;font-size: 19px;"><b>ASSETS & LIABILITIES report as on @dateEntry.ToString("dd-MM-yyyy")</b></div>
+            <div class="form-group gap_bottom" style="width:100%; float:left;">
+                <h3 style="text-align:center;">@Model.TypeData</h3>
+                <div class="col-md-12">
+                    <div class="form-group gap_bottom row">
+                        <label style="width: 200px; float:left;">Date</label>
+                        <label style="width:calc(100% - 200px); float:left;">@Model.EntryDateString</label>
+                    </div>
+
+                    <div class="form-group gap_bottom row">
+                        <label style="width: 200px; float:left;">Voucher No</label>
+                        <label style="width:calc(100% - 200px); float:left;">@Model.InviceNumber</label>
+                    </div>
+                    
+                    <div class="form-group gap_bottom row">
+                        <label style="width: 200px; float:left;">Account Head</label>
+                        <label style="width:calc(100% - 200px); float:left;">@Model.HeadName</label>
+                    </div>
+
+                    <div class="form-group gap_bottom row">
+                        <label style="width: 200px; float:left;">Amount</label>
+                        <label style="width:calc(100% - 200px); float:left;">@Model.Amount</label>
+                    </div>
+
+                    <div class="form-group gap_bottom row">
+                        <label style="width: 200px; float:left;">Add Amount</label>
+                        <label style="width:calc(100% - 200px); float:left;">@Model.AddStatusString</label>
+                    </div>
+
+                    <div class="form-group gap_bottom row">
+                        <label style="width: 200px; float:left;">Narration</label>
+                        <label style="width:calc(100% - 200px); float:left;">@Model.Narration</label>
+                    </div>
+                    
+                </div>
+            </div>
+
+        </div>
+        <div class="form-group text-center">
+            <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-inc&exp')"><i class="fa fa-print"></i> Print</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Journal/Assets';
+    }
+
+    $(document).on('click', '.ng-click', function () {
+    });
+</script>
+
+

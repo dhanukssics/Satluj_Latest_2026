@@ -1,0 +1,64 @@
+﻿@model Satluj_Latest.Models.TrialBalanceModel
+@{
+    var headName = "Balance Sheet as on " + @Model.Today.ToString("dd-MMM-yyyy");
+    var balanceSheet = new Satluj_Latest.Data.School(Model.SchoolId).GetBalanceSheetList();
+}
+<div class="row">
+    @Html.HiddenFor(m => m.Today, new { Value = Model.Today })
+    <div class="col-md-12" id="print-trial-bal">
+        <h3 style="text-align:center;">@headName</h3>
+        <div class="table-responsive" style="padding: 0px 50px 0px 50px;">
+            <table class="table custome-table table-bordered" id="table-trial-balance">
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">
+                            Assets
+                        </th>
+                        <th style="text-align: center;">
+                            Amount
+                        </th>
+                        <th style="text-align: center;">
+                            Liability
+                        </th>
+                        <th style="text-align: center;">
+                            Amount
+                        </th>
+                        <th style="display:none;">
+                            Type
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var item in await balanceSheet)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Assets
+                                </td>
+                                <td>
+                                    @if (item.AssetsAmount != 0)
+                                    {
+                                        @String.Format("{0:0.00}", item.AssetsAmount)
+                                    }
+                                </td>
+                                <td>
+                                    @item.Liability
+                                </td>
+                                <td>
+                                    @if (item.LiabilityAmount != 0)
+                                    {
+                                        @String.Format("{0:0.00}", item.LiabilityAmount)
+                                    }
+                                </td>
+                                <td style="display:none;">
+                                    @item.Head
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

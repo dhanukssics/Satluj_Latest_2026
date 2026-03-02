@@ -1,0 +1,70 @@
+﻿@model Satluj_Latest.Models.StockUpdateModel
+@{
+    var stockList = new Satluj_Latest.Data.School(Model.SchoolId).GetCurrentStockReport(Model.CategoryId);
+}
+
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        @*<th>
+            Category
+        </th>*@
+        <th>
+            Item
+        </th>
+        <th>
+            Purchase Id
+        </th>
+        <th>
+            Price
+        </th>
+        <th>
+            Supplier Name
+        </th>
+        <th>
+            Status
+        </th>
+
+    </tr>
+</thead>
+<tbody>
+    @{
+        if (stockList != null)
+        {
+            int i = 1;
+            foreach (var item in stockList)
+            {
+                <tr style="cursor: pointer !important;">
+                    <td>
+                        @i
+                    </td>
+                    @*<td>
+                        @item.LabName
+                    </td>*@
+                    <td>
+                        @item.Item
+                    </td>
+                    <td>
+                        @item.PurchaseId
+                    </td>
+                    <td>
+                        @item.Price
+                    </td>
+                    <td>
+                        @item.SupplierName
+                    </td>
+                    <td>
+                        @item.Status
+                    </td>
+                </tr>
+                i++;
+            }
+        }
+        else
+        {
+
+        }
+    }
+</tbody>

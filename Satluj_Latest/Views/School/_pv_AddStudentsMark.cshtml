@@ -1,0 +1,102 @@
+﻿@model Satluj_Latest.Models.AddStudentMarkModel
+@{
+
+    var dataList = new List<Satluj_Latest.Models.StudentList>();
+        bool IsAdmin = ViewBag.IsAdmin;
+
+}
+<input type="hidden" value="@Model.ExamId" id="examId" />
+<input type="hidden" value="@Model.SubjectId" id="subId" />
+<input type="hidden" value="@Model.TotalInternalMark" id="internalmark" />
+<input type="hidden" value="@Model.TotalExternalMark" id="externalmark" />
+
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                Theory (@Model.TotalInternalMark)
+            </th>
+            <th style="color: black; display:none;">
+                Practical (@Model.TotalExternalMark)
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+            @{int count = 1;
+                //added by basheer on 28/01/2019 to add id for textbox in loop
+                int externalcount = 10000;
+            }
+
+            @foreach (var item in Model.StudentList)
+            {
+                <tr data-id="tbRowAmount" style="color:black; " data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td>
+                        @count
+                    </td>
+                    <td>
+                        @item.StudentName
+                    </td>
+                    <td>
+                        @if (item.InternalMark == 0)
+                        {
+                            <div>
+                                <input type="number" value="" style="color:black; " onchange="imarkchange(@count)" class="cls-internal-mark" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.InternalMark)" style="color:black; " onchange="imarkchange(@count)" class="cls-internal-mark" id="@count" />
+                                }
+                                else
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.InternalMark)" style="color:black; " onchange="imarkchange(@count)" readonly class="cls-internal-mark" id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td style="display:none;">
+                        @if ( item.ExternalMark == 0)
+                        {
+                            <div>
+                                <input type="number" value="" style="color:black; " onchange="emarkchange(@externalcount)" class="cls-external-mark " id="@externalcount" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.ExternalMark)" style="color:black; " onchange="emarkchange(@externalcount)" class="cls-external-mark " id="@externalcount" />
+                                }
+                                else
+                                {
+                                    <input type="number" value="@String.Format("{00}", item.ExternalMark)" style="color:black; " onchange="emarkchange(@externalcount)" readonly class="cls-external-mark " id="@externalcount" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                </tr>
+                count = count + 1;
+                externalcount = externalcount + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="markSave_btn" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>
+
+<script>
+
+</script>

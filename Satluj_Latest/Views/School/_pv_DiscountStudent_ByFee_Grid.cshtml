@@ -1,0 +1,69 @@
+﻿    @model Satluj_Latest.Models.FeeModel
+@{
+    var students = new Satluj_Latest.Data.School(Model.SchoolId).GetStudentDetailsByFeeDiscount(Model.FeeId).OrderBy(z => z.StundentName).ToList();
+
+}
+<div class="table-responsive">
+    <table class="table custome-table table-student-list">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Parent Name
+                </th>
+                <th>
+                    Address
+                </th>
+                <th>
+                    Contact No.
+                </th>
+                <th>
+                    Class/Division
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in students)
+            {
+
+                <tr class="ng-click-studentDiscount-details">
+
+                    <td>
+                        <label style="margin-right: 10px;">
+                            <input id="chkBox-user" class="checkbox-input" type="checkbox" data-id="@student.StudentId" onchange="AddRemoveUser(this)" />
+                            <span class="checkbox-virtual"></span>
+                        </label>
+
+
+                        @if (student.FilePath != null)
+                        {
+                            <img src="@student.FilePath" class="user-pic-tab" />
+                        }
+                        else
+                        {
+                            <img src="~/Content/img/children-1.gif" class="user-pic-tab" />
+                        }
+                        @student.StundentName
+                    </td>
+                    <td>
+                        @student.ParentName
+                    </td>
+                    <td>
+                        @student.Address
+                    </td>
+                    <td>
+                        @student.ContactNumber
+                    </td>
+                    <td>
+                        @student.Class / @student.Division
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

@@ -1,0 +1,81 @@
+﻿@model Satluj_Latest.Models.FeeModel
+@{
+    var data = new Satluj_Latest.Data.School(Model.SchoolId).GetBilledData(Model.StartDate, Model.EndDate).ToList();
+
+}
+<style>
+    .numbCenter {
+        text-align: center;
+    }
+
+    .noBorder td {
+        border: none !important;
+    }
+
+    .tableHead {
+        font-weight: bold;
+        font-size: 20px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="table-responsive">
+            <table class="table archTable" @*style="border-left: 0.5px solid #d2cece;border-right: 0.5px solid #d2cece;border-bottom: 0.5px solid #d2cece;"*@>
+                <thead>
+                    <tr>
+                        <th>Sl.No</th>
+                        <th>Student Name</th>
+                        <th>Class</th>
+                        <th>Contact</th>
+                        @*<th>Details</th>*@
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                        decimal tot = 0;
+                        foreach (var one in data)
+                        {
+                            tot = tot + one.Total;
+
+                            <tr>
+                                <td>@i</td>
+                                <td> @one.StudentName</td>
+                                <td> @one.ClassDetails</td>
+                                <td> @one.ContactNumber</td>
+                                @*<td>Total</td>*@
+                                <td align="center">@String.Format("{0:0.00}", one.Total)</td>
+                            </tr>
+
+                            @*@foreach (var subOne in one.SubList)
+                                {
+                                    <tr class="noBorder">
+                                        <td></td>
+                                        <td> </td>
+                                        <td> </td>
+                                        <td></td>
+                                        <td>@subOne.FeeName</td>
+                                        <td align="center">@String.Format("{0:0.00}", subOne.Amount)</td>
+                                    </tr>
+                                }*@
+
+                        i = i + 1;
+                    }
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        @*<td>Total</td>*@
+                        <td style="font-weight: bold;" align="center">@String.Format("{0:0.00}", tot)</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

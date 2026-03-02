@@ -1,0 +1,53 @@
+﻿@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+<section class="menuSlct">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-5">
+                <img src="~/Content/img/child.png" class="img-responsive visible-lg visible-md child-img" />
+            </div>
+
+            <div class="col-md-7">
+                <ul class="slctList fullWid">
+
+                    <li>
+                        <a href="/Account/SchoolLogin">
+                            <img src="~/Content/img/school.png" class="iconImg" />
+                            <p>school</p>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/Account/MasterLogin">
+                            <img src="~/Content/img/Master.png" class="iconImg" />
+                            <p>Master</p>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/Account/StaffLogin">
+                            <img src="~/Content/img/staff.png" class="iconImg" />
+                            <p>Teacher</p>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/Account/ParentLogin">
+                            <img src="~/Content/img/parent.png" class="iconImg"/>
+                            <p>parent</p>
+                        </a>
+                    </li>
+                   
+                </ul>
+            </div><!-- /col-md-5 -->
+        </div><!-- /row -->
+    </div><!-- /container -->
+</section>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(".se-pre-con").hide();
+        });
+    </script>
+}

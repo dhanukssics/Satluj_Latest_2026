@@ -1,0 +1,196 @@
+﻿
+@model Satluj_Latest.Models.SubjectScoreModel
+@*@model Satluj_Latest.Models.VProgressCardList*@
+@{
+    ViewBag.Title = "GenerateCertificate";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    //var reportName = Model.ProgressCardName;
+}
+
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+@Html.HiddenFor(z => z.UserId, new { Value = @Model.UserId })
+@Html.HiddenFor(z => z.IsAdminCheck, new { Value = @Model.IsAdminCheck })
+
+<div class="row">
+    <div class="col-lg-12">
+        <h4 style="margin-top: 5px;"> NURSERY/KG - Progress Card</h4>
+
+        <span>
+            <a href="http://satluj.schoolman.in/Media/School/Logo/GradingScale_Commen.pdf" style="font-weight:bold; margin-left: 80%;" target="_blank">Progress Card Back Side</a>
+        </span>
+        <br />
+        <div class="row">
+            <div class="form-group col-sm-2">
+                <div class="form-group">
+                    <label>Class : </label>
+                    <br />
+                    <select asp-for="ClassId"
+                            asp-items="ViewBag.Classlist"
+                            class="form-control ClassId-id"
+                            data-live-search="true"
+                            name="classDropdown">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="DivisionId" class="text-danger"></span>
+
+                </div>
+            </div>
+            <div class="form-group col-sm-2">
+                <div class="form-group">
+                    <label>Division : </label>
+                    <br />
+                    <select class="form-control class-drop-down"></select>
+
+
+                </div>
+            </div>
+            <div class="form-group col-sm-2">
+                <div class="form-group">
+                    <label>Date : </label>
+                    <br />
+                    @Html.TextBoxFor(m => m.StartDateString, new { @class = "form-control date-cashentry-add", placeholder = "" })
+                    <i class="fa "></i>
+                    @Html.ValidationMessageFor(m => m.StartDateString)
+                </div>
+            </div>
+
+
+            </div>
+        </div>
+</div>
+<div id="vStudentList-Id"></div>
+<script>
+
+
+    $('.date-cashentry-add').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).ready(function () {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var today = dd + '-' + mm + '-' + yyyy;
+        $('.date-cashentry-add').val(today);
+    });
+
+    //$(document).on('change', '.class-drop-down', function () {
+    //    $('#vStudentList-Id').html('');
+    //    var id = $(this).val();
+    //    if (id != 0) {
+    //        $.ajax({
+    //            url: '/SpecialClass/ViewAll_V_ClassStudents?id=' + id,
+    //            type: "GET",
+    //            dataType: 'html',
+    //            success: function (data) {
+    //                $('#vStudentList-Id').html(data);
+    //            }
+    //        });
+    //    }
+    //});
+
+    $("#id_sub_menu_kg").addClass("open");
+    $("#Id_VProgressCardHome_Others").addClass("active");
+
+    $(".assesment-id").append($('<option></option>').val("0").html('-- Select Assesments --'));
+    $(".class-drop-down").append($('<option></option>').val("0").html('-- Select Division --'));
+    $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
+    $(".skill_selction").append($('<option></option>').val("0").html('-- Select Skill --'));
+
+    $(".assesment-id").prop("disabled", true);
+    $(".slct-subject-dropdown").prop("disabled", true);
+    $(".skill_selction").prop("disabled", true);
+
+    $(document).on('change', '.ClassId-id', function () {
+
+        $('#result-entry-div-id').html('');
+
+
+
+        $(".assesment-id").html("");
+        $(".class-drop-down").html("");
+        $(".slct-subject-dropdown").html("");
+        $(".skill_selction").html("");
+
+        $(".assesment-id").append($('<option></option>').val("0").html('-- Select Assesments --'));
+        $(".class-drop-down").append($('<option></option>').val("0").html('-- Select Division --'));
+        $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
+        $(".skill_selction").append($('<option></option>').val("0").html('-- Select Skill --'));
+
+        $(".assesment-id").prop("disabled", true);
+        $(".slct-subject-dropdown").prop("disabled", true);
+        $(".skill_selction").prop("disabled", true);
+
+        var id = $(".ClassId-id option:selected").text();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadSpecialDivission_others?id=' + id + '~' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".class-drop-down").html("");
+                        $(".class-drop-down").append($('<option></option>').val("0").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $(".class-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".class-drop-down").prop("disabled", false);
+                    }
+                    else {
+
+                        $(".class-drop-down").html("");
+                        $(".class-drop-down").append($('<option></option>').val("").html('---'));
+                        $(".class-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            $(".class-drop-down").html("");
+            $(".class-drop-down").append($('<option></option>').val("").html('---'));
+            $(".class-drop-down").prop("disabled", true);
+        }
+
+
+
+    });
+
+
+
+    $(document).on('change', '.class-drop-down', function () {
+
+        $('#vStudentList-Id').html('');
+        var id = $(this).val();
+
+        var ClassId = $(".ClassId-id option:selected").val();
+        var DivissionId = $(".class-drop-down option:selected").val();
+        var id = ClassId + '~' + DivissionId;
+
+
+            if (id != 0) {
+                $.ajax({
+                    url: '/SpecialClass/ViewAll_V_ClassStudents_Others?id=' + id,
+                    type: "GET",
+                    dataType: 'html',
+                    success: function (data) {                        
+                        $('#vStudentList-Id').html(data);
+                    }
+                });
+            }
+
+    });
+
+
+
+</script>
+

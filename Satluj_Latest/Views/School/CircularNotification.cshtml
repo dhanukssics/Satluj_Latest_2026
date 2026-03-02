@@ -1,0 +1,170 @@
+﻿@model Satluj_Latest.Models.CircularList
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    .ng-click-feeDetails {
+        cursor: pointer;
+    }
+</style>
+
+<h3>Circular Notifications</h3>
+<div class="form-group text-right">
+    <button class="btn pay-now-btn btn-add-circular">Add Circular Notification </button>
+</div>
+<div class="table-responsive">
+    <table class="table custome-table" id="table-circularList">
+        @Html.Partial("~/Views/School/_pv_CircularNotification.cshtml", Model)
+    </table>
+</div>
+
+
+<div class="modal fade" id="modalAddCircular" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1">
+
+</div>
+<div class="modal fade" id="modalEditCircular" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1">
+
+</div>
+
+
+<script>
+    $(function () {
+        $("#table-circularList").dataTable();
+    });
+
+    $(document).on('click', '.btn-add-circular', function () {
+        $.ajax({
+            url: '/School/AddCircularNotifications',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalAddCircular').html(data);
+                $.validator.unobtrusive.parse($("#modalAddCircular"));
+                $('#modalAddCircular').modal('show');
+            }
+        });
+    });
+
+    function RefresData() {
+        //debugger;
+        $.ajax({
+            url: '/School/CircularNotificationDataList/',
+            dataType: 'html',
+            success: function (data) {
+                $('#table-circularList').html('');
+                $('#table-circularList').html(data);
+            },
+        });
+
+    }
+
+    $(document).on('click', '.delete-circular-data', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/School/DeleteCircularNotification/' + $(source).attr('data-id'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    RefresData();
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+    });
+
+
+    $(document).on('click', '.edit-circular-data', function () {
+        var id = $(this).attr('data-id');
+        $.ajax({
+            url: '/School/EditDocument/' + id,
+            dataType: 'html',
+            success: function (data) {
+                //debugger;
+                $('#modalEditCircular').html('');;
+                $('#modalEditCircular').html(data);
+                $.validator.unobtrusive.parse($("#modalEditCircular"));
+                $('#modalEditCircular').modal('show');
+            },
+        });
+    });
+
+
+
+
+    $('#DocumentDate').datepicker({
+        format: "dd-mm-yyyy"
+    });
+
+
+    $(document).on('change', '.upload-clean-Formats-dev-edit', function () {
+        //debugger;
+        //alert('hi');
+        var source = $(this);
+        var userId = $('#UserId').val();
+        var formData = new FormData();
+        formData.append("documentFile", this.files[0]);
+        formData.append("UserId", userId);
+        $.ajax({
+            type: "POST",
+            url: "/School/DocumentUpload",
+            dataType: 'json',
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function (xhr) {
+            },
+            success: function (response) {
+                if (response.Status) {
+                    var data = response.UserData;
+                    $('#FilePath').val(data);
+                }
+                else {
+                    toastrError('No such Files!');
+                }
+            },
+            error: function (data) {
+            }
+        });
+
+    });
+
+
+    function CircularNotificationsEditSuccess(result) {
+        if (result.status == true) {
+            //debugger;
+            $('#modalEditCircular').modal('hide');
+            RefresData();
+            toastrSuccess(result.message);
+        }
+        else {
+            toastrError("No changes")
+        }
+    }
+
+    function CircularNotificationsEditFailed() {
+        $('#modalEditCircular').modal('hide');
+        RefresData();
+        toastrError('Failed!');
+    }
+
+</script>

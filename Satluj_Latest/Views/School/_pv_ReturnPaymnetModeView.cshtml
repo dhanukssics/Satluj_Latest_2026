@@ -1,0 +1,73 @@
+﻿@model Satluj_Latest.Models.FeeModel
+@{
+    var studentId = Model.SchoolModel.studentId;
+
+}
+@{
+    var dd = new Satluj_Latest.Data.DropdownData();
+}
+<div class="modal-dialog modal-sm" style="width:35%; margin:auto;">
+    <input type="hidden" id="hfstudentId" value="@Model.SchoolModel.studentId" />
+    <input type="hidden" id="hfbillno" value="@Model.BillNumber" />
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel6">Return Payment Mode</h4>
+        </div>
+        <div class="modal-body" style="height:40%;">
+
+            <div class="col-md-12">
+                <div class="form-group" style="margin-bottom: 10%;">
+                    <div class="col-md-5">
+                        <label>Return Mode</label>
+                    </div>
+                    <div class="col-md-7">
+                        <select id="ReturnPaymentType" class="form-control">
+                            <option value="1" selected="">Cash</option>
+                            <option value="2">Cheque</option>
+                            <option value="3">Bank Transfer</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="form-group isHidden" style="margin-bottom: 10%;" id="div-bankdetails">
+                    <div class="col-md-5">
+                        <label>Bank Name</label>
+                    </div>
+                    <div class="col-md-7">
+                        @Html.DropDownListFor(m => m.BankId, dd.GetBankLists(Model.SchoolId), new { @class = "form-control accHead-drop-down ",id="rtuen-BankId" })
+                    </div>
+                </div>
+
+                <div class="form-group div-chequeDetails isHidden" style="margin-bottom: 10%;">
+                    <div class="col-md-5">
+                        <label>Cheque Number</label>
+                    </div>
+                    <div class="col-md-7">
+                        <label>Cheque Date</label>
+                    </div>
+                </div>
+
+                <div class="form-group div-chequeDetails isHidden" style="margin-bottom: 10%;">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control " value="" id="chk-no-return">
+                        <span id="cheque-no-required" style="display:none; color:red;">Cheque No Required</span>
+                    </div>
+                    <div class="col-md-7 calendar-inp pos_icon_adj">
+                        @Html.TextBoxFor(m => m.ChequeDate, new { @class = "form-control date-cheque", placeholder = "", id = "chk-date-return" })
+                        <i class="fa "></i>
+                        <span id="cheque-date-required" style="display:none; color:red;">Cheque Date Required</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12" style="margin-top: 3%;">
+                <div class="col-md-5">
+                    <button type="button" class="btn btn-default" id="btn-cancel-in-billCancel" data-dismiss="modal">Cancel</button>
+                </div>
+                <div class="col-md-7 with-icon">
+                    <button class="btn pay-now-btn" type="button" id="btn-bill-cancel" style="background-color:red">Bill Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,291 @@
+﻿@model Satluj_Latest.Models.AddFee
+<div class="modal-dialog modal-md" role="document" style="height:50%;">
+
+    <style>
+        span {
+            color: red;
+        }
+    </style>
+
+   <form id="form-add-fee"
+      asp-action="AddFee"
+      asp-controller="School"
+      method="post">
+
+    <input type="hidden" asp-for="SchoolId" />
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add Fee</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>FeeName</label>
+                    @Html.TextBoxFor(m => m.FeeName, new { autocomplete = "off", placeholder = "FeeName", @class = "form-control" })
+                    @Html.ValidationMessageFor(z => z.FeeName)
+                </div>
+                <div class="form-group">
+                    @*<label>FeeType</label>
+                        <div class="form-group">*@
+                    <div class="radio-inline">
+
+                        <label>@Html.RadioButtonFor(m => m.FeeType, 1, new { @name = "01", @checked = true ,@class="commonFee"}) Common Fee</label>
+                    </div>
+                    <div class="radio-inline">
+                        <label>@Html.RadioButtonFor(m => m.FeeType, 2, new { @name = "01", @class = "specialFee" }) Special Fee</label>
+                    </div>
+                </div>
+                @*<div class="form-group">
+                        <div class="checkbox-inline">
+                            <label>
+                                <input id="dueCkhBox" onchange="CheckThisDueThisDste(this)" type="checkbox" /> Due Date
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.EndDateString, "{0:dd-MM-yyyy}", new { autocomplete = "off", placeholder = "Date", @class = "form-control isHidden dpicker" })
+
+                            @Html.HiddenFor(z => z.IsReccuring)
+
+                            @Html.HiddenFor(z => z.IsDueDate)
+                        </div>
+                    </div>*@
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="checkbox-inline">
+                                <label>
+                                    <input id="dueCkhBox" onchange="CheckThisDueThisDste(this)" type="checkbox" /> Effective Date
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.EndDateString, "{0:dd-MM-yyyy}", new { autocomplete = "off", placeholder = "Date", @class = "form-control isHidden dpicker" })
+
+                                @Html.HiddenFor(z => z.IsReccuring)
+
+                                @Html.HiddenFor(z => z.IsDueDate)
+                            </div>
+                        </div>
+                        @*Archana 22-May-2018*@
+                        <div class="col-lg-6 " id="fineInfoUnit">
+                            <div class="checkbox-inline">
+                                <label>
+                                    <input id="fineCkhBox" type="checkbox" onchange="CheckHaveFine(this)" /> Have Fine
+                                </label>
+                            </div>
+                            <div class="form-group isHidden fineInfoDetails">
+                                @Html.TextBoxFor(m => m.HaveFineDateString, "{0:dd-MM-yyyy}", new { autocomplete = "off", placeholder = "Date", @class = "form-control  dpickerFine " })
+                                <span id="spn-error-HaveFineDateString" data-val="0" data-myval="10" style="color:red;"></span>
+                            </div>
+                            <div class="form-group isHidden fineInfoDetails">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Amount</label>
+                                        @Html.TextBoxFor(m => m.FineAmount, new { autocomplete = "off", placeholder = "Amount", @class = "form-control" })
+                                        @Html.ValidationMessageFor(z => z.FineAmount)
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>No of days</label>
+                                        @Html.TextBoxFor(m => m.FineDays, new { autocomplete = "off", placeholder = "No of days", @class = "form-control" })
+                                        @Html.ValidationMessageFor(z => z.FineDays)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*Archana 22-May-2018*@
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-inline">
+                        <label>
+                            <input id="ReccuCkhBox" onchange="CheckThis(this)" type="checkbox" /> Recurring
+                        </label>
+                    </div>
+
+                    <div class="checkbox-inline ">
+                        <select class="form-control isHidden interval-dropdown">
+                            <option value="2">02</option>
+                            <option value="3">03</option>
+                            <option value="4">04</option>
+                            <option value="6">06</option>
+                            <option value="12">12</option>
+                        </select>
+                        @Html.TextBoxFor(m => m.Interval, new { @type = "hidden" })
+
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DueDateString, "{0:dd-MM-yyyy}", new { autocomplete = "off", placeholder = "Date", @class = "form-control isHidden dpicker" })
+                </div>
+            </div>
+
+            <div class="modal-footer" style="margin-top:20px;">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button style="display:none;" id="btn-addfees_new" class="btn pay-now-btn">Save</button>
+                <button type="button" id="btn-dummy-addfees_new" class="btn pay-now-btn">Save</button>
+            </div>
+        </div>
+        </form>
+    }
+    <script>
+        //$(document).ready(function () {
+        //    $.datepicker.setDefaults({
+        //        dateFormat: 'dd/mm/yyyy'
+        //    });
+        //});
+        function CheckThis(source) {
+            if ($(source).is(":checked")) {
+                $('#IsReccuring').val(1);
+                $('#IsDueDate').val(0);
+
+                $('.interval-dropdown').removeClass('isHidden');
+                $('#DueDateString').removeClass('isHidden');
+                $('#Interval').val($('.interval-dropdown').val());
+                if ($('#dueCkhBox').is(":checked")) {
+                    $('#dueCkhBox').prop('checked', false);
+                    $('#EndDateString').addClass('isHidden');
+                }
+                $('#fineInfoUnit').addClass('isHidden');//Archana
+                //  $('.dpicker').datepicker();
+                //     $('.dpicker').datepicker('option', 'dateFormat', 'dd-mm-yy');
+                //$('.dpicker').datepicker({
+                //    format: 'dd/mm/yyyy',
+                //    onSelect: '01/01/2011',
+                //    autoclose: true,
+                //    todayHighlight: true
+                //});
+
+
+                //$(".dpicker").datepicker(
+                //'dateFormat', 'dd-mm-yyyy'
+                // );
+                //$(".dpicker").datepicker(
+                //    "setDate", "01/01/2017"
+                //    );
+
+                $('.dpicker').datepicker({
+                    format: 'dd-mm-yyyy',
+                    autoclose: true,
+                    todayHighlight: true,
+                    //onSelect: '01/01/2018',
+                });
+            }
+            else {
+                $('#IsReccuring').val(0);
+                $('.interval-dropdown').addClass('isHidden');
+                $('#DueDateString').addClass('isHidden');
+                $('#Interval').val(1);
+                if ($('.commonFee').prop('checked')) {// Archana
+                    $('#fineInfoUnit').removeClass('isHidden');
+                }
+                else {
+                    $('#fineInfoUnit').addClass('isHidden');
+                }
+            }
+        }
+
+        function CheckThisDueThisDste(source) {
+            if ($(source).is(":checked")) {
+                $('#IsDueDate').val(1);
+                $('#IsReccuring').val(0);
+                $('#EndDateString').removeClass('isHidden');
+                if ($('#ReccuCkhBox').is(":checked")) {
+                    $('#ReccuCkhBox').prop('checked', false);
+                    $('.interval-dropdown').addClass('isHidden');
+                    $('#DueDateString').addClass('isHidden');
+                }
+                $('#EndDateString').datepicker({
+                    format: 'dd-mm-yyyy',
+                    autoclose: true,
+                    todayHighlight: true,
+                });
+            }
+            else {
+                $('#IsDueDate').val(0);
+                $('#EndDateString').addClass('isHidden');
+            }
+        }
+
+        $(".interval-dropdown").change(function () {
+            $('#Interval').val($(this).val());
+        });
+
+        ////Archana creates new scripts for fine calculations
+        $("input[class=commonFee]:radio").change(function () {
+            if ($('#ReccuCkhBox').is(":checked")) {
+                $('#fineInfoUnit').addClass('isHidden');
+            }
+            else {
+                $('#fineInfoUnit').removeClass('isHidden');
+            }
+        });
+
+        $("input[class=specialFee]:radio").change(function () {
+                $('#fineInfoUnit').addClass('isHidden');
+        });
+
+        $("input[class=specialFee]:radio").change(function () {
+            $('.fineInfoUnit').addClass('isHidden');
+        });
+        function CheckHaveFine(source) {
+            if ($(source).is(":checked")) {
+                $('.fineInfoDetails').removeClass('isHidden');
+                $('.dpickerFine').datepicker({
+                    format: 'dd-mm-yyyy',
+                    autoclose: true,
+                    todayHighlight: true,
+                });
+            }
+            else {
+                $('.fineInfoDetails').addClass('isHidden');
+                $('#FineAmount').val(0.00);
+                $('#FineDays').val(0);
+                $('#HaveFineDateString').val('');
+            }
+        };
+        $(document).on('click', '#btn-dummy-addfees_new', function () {
+            //debugger;
+            if ($('#fineCkhBox').prop('checked')) {
+                if ($('#HaveFineDateString').val() == null || $('#HaveFineDateString').val() == "") {
+                    $('#spn-error-HaveFineDateString').text('Please select due date');
+                    $('#ValidateForm').val(true);
+                    $('#spn-error-HaveFineDateString').show();
+                }
+                else {
+                    $('#ValidateForm').val(false);
+                    $('#spn-error-HaveFineDateString').hide();
+                    $('#btn-addfees_new').trigger('click');
+                }
+            }
+            else {
+                $('#ValidateForm').val(false);
+                $('#spn-error-HaveFineDateString').hide();
+                $('#btn-addfees_new').trigger('click');
+            }
+        });
+        $("#HaveFineDateString").change(function () {
+            $('#ValidateForm').val(false);
+            $('#spn-error-HaveFineDateString').hide();
+        });
+
+             $("#form-add-fee").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: "POST",
+                data: $(this).serialize(),
+                success: function (res) {
+                    AddFeeSuccess(res);
+                },
+                error: function () {
+                    ajaxFailure();
+                }
+            });
+        });
+
+
+    </script>
+</div>
+

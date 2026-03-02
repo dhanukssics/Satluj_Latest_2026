@@ -1,0 +1,449 @@
+﻿@model Satluj_Latest.Models.FeeModel
+@{
+    ViewBag.Title = "Student";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var student = new Satluj_Latest.Data.Student(Model.StudentId);
+    var historyBills = student.GetHistoryTableByBillNo(Model.BillNumber);
+    var studentPaidFee = student.StudentPaidAmountByBillNo(Model.BillNumber);
+    var x = 0;
+}
+
+<style>
+    span {
+        color: red;
+    }
+</style>
+<input type="hidden" value="@student.StudentId" id="excel-studentId" />
+<input type="hidden" value="@student.StundentName" id="excel-head-student" />
+<input type="hidden" value="@student.ClassName" id="excel-head-class" />
+<input type="hidden" value="@student.DivisionName" id="excel-head-division" />
+<input type="hidden" value="@Model.BillNumber" id="excel-head-bill" />
+<div class="row" id="print-report-full">
+    <div class="col-md-12">
+        @*<h3 style="margin-top: 5px; margin-bottom: 15px; text-align:center;">Bill Detailed Report</h3>
+        <div>*@
+            @*<table style="width: 100%; margin-bottom: 20px;" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td>
+                        <label> Student Name : </label> @student.StundentName
+                    </td>
+                    <td>
+                        <label>Class & Division : </label> @student.ClassName @student.DivisionName
+                    </td>
+                    <td>
+                        <label>Bill Number : </label> @Model.BillNumber
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label> Parent : </label> @student.ParentName
+                    </td>
+                    <td>
+                        <label>Contact : </label> @student.ContactNumber
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-info btn-print" onclick="printContent('print-report-full')">Print </button>
+                        <button type="button" class="btn btn-sm btn-info btn-Cancel">Cancel</button>
+                    </td>
+                </tr>
+            </table>*@
+        @*</div>*@
+
+        <table style="width: 100%; margin-bottom: 20px;" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td colspan="3" class="text-center" style="border-bottom: 3px solid #8a8787;">
+                    @if (student.School.FilePath != null)
+                    {
+                        <div class="frmHeader" style="margin:auto; display:table;">
+                            <img src="@student.School.FilePath" width="90" style="position: absolute;  left: 25%; margin-right: 5px;" />
+                            <div style="text-align:center;">
+                                <h1>@student.SchoolName</h1>
+                                <h4>@student.SchoolAddress</h4>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="frmHeader" style="width:100%; text-align:center; margin:auto; display:table;">
+                            <h1>@student.SchoolName</h1>
+                            <h4>@student.SchoolAddress</h4>
+                        </div>
+
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:center; padding-top: 10px;font-size: 20px;" colspan="3">
+                    <label>FEE RECEIPT </label>
+                </td>
+
+            </tr>
+            <tr>
+                <td >
+                    <label>Student Name : </label> @student.StundentName
+                </td>
+                <td >
+                    <label>Class & Division :  </label> @student.ClassName @student.DivisionName
+                </td>
+                <td>
+                    <label>Bill Number : </label> @Model.BillNumber
+                </td>
+            </tr>
+            <tr>
+                <td >
+                    <label>Parent : </label> @student.ParentName
+                </td>
+                <td>
+                    <label>Contact : </label> @student.ContactNumber
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-info btn-print" onclick="printContent('print-report-full')">Print </button>
+                    <button type="button" class="btn btn-sm btn-info btn-Cancel">Cancel</button>
+                </td>
+            </tr>
+        </table>
+
+
+
+
+
+        <div id="pv-table">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Particulars</th>
+                            <th>Discount</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{var index = 1;
+            decimal sum = 0;}
+                        @foreach (var historyBill in historyBills)
+            {
+                            <tr>
+                                <td>@index</td>
+                                @try
+                {
+                    if (historyBill.FeeClass.DueDate != null)
+                    {
+                                        <td>@historyBill.Fee.FeesName @String.Format("{0:y}", historyBill.FeeClass.DueDate)</td>
+                                    }
+                                }
+
+                                catch (Exception ex)
+                                {
+                                    bool isThere = student.IsDueBill(historyBill.FeeGuid);
+                                    if (isThere)
+                                    {
+                                        <td>@historyBill.Fee.FeesName Due</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@historyBill.Fee.FeesName</td>
+                                    }
+                                }
+
+                                <td>
+                                    @if (historyBill.Discount > 0)
+                                    {
+                                        @String.Format("{0:0.00}", historyBill.Discount)
+                                    }
+                                </td>
+                                <td>@String.Format("{0:0.00}", historyBill.Amount)</td>
+                            </tr>
+                            sum = sum + historyBill.Amount;
+                            index++;
+
+                        }
+                    </tbody>
+                    <tfoot>
+                        @if (studentPaidFee != null)
+            {
+                            <tr>
+                                <td style="padding: 5px; font-weight: bold;" colspan="2">
+                                    Total Fee
+                                </td>
+                                <td style="padding: 5px; text-align: right; font-weight: bold;" colspan="3">
+                                    @String.Format("{0:0.00}", sum)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px; font-weight: bold;" colspan="2">
+                                    Previous Balance
+                                </td>
+                                <td style="padding: 5px; text-align: right; font-weight: bold;" colspan="3">
+                                    @String.Format("{0:0.00}", studentPaidFee.PreviousBalance)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px; font-weight: bold;" colspan="2">
+                                    Amount Paid
+                                </td>
+                                <td style="padding: 5px; text-align: right; font-weight: bold;" colspan="3">
+                                    @String.Format("{0:0.00}", studentPaidFee.PaidAmount)
+                                </td>
+                            </tr>
+
+                        }
+                        else
+                        {
+
+                            <tr>
+                                <td style="padding: 5px; font-weight: bold;" colspan="2">
+                                    Total Fee
+                                </td>
+                                <td style="padding: 5px; text-align: right; font-weight: bold;" colspan="3">
+                                    @String.Format("{0:0.00}", sum)
+                                </td>
+                            </tr>
+                        }
+                    </tfoot>
+
+                    @*<tfoot>
+                            <tr>
+                                <td style="padding: 5px; font-weight: bold;" colspan="2">
+                                    Total Fee
+                                </td>
+                                <td style="padding: 5px; text-align: right; font-weight: bold;" colspan="3">
+                                    @String.Format("{0:0.00}", sum)
+                                </td>
+                            </tr>
+                        </tfoot>*@
+                </table>
+            </div>
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+<div class="modal fade" id="returnPaymentMode-model" z-index="99999" role="dialog" aria-labelledby="myModalLabel6">
+
+</div>
+<!-- Modal -->
+<script>
+    //$('.btn-csv').click(function () {
+    //    var head = $('#excel-head-student').val() + "( " + $('#excel-head-class').val() + " / " + $('#excel-head-division').val() + " ) BillNo: " + $('#excel-head-bill').val();
+    //    setTimeout(function () {
+    //        $("#pv-table").table2excel({
+    //            name: "Table2Excel",
+    //            filename: "Billing Report of " + head,
+    //            fileext: ".xls"
+    //        });
+    //    }, 2000);
+    //});
+
+
+
+
+    $(document).on('click', '.btn-Cancel', function () {
+        //debugger;
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Cancel Bill!",
+            cancelButtonText: "No, Leave it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        //cancel = 1;
+        //$.ajax({
+        //    url: '/School/CancelBill/' + $('#excel-head-bill').val() + '~' + $('#excel-studentId').val(),
+        //    type: "GET",
+        //    dataType: 'json',
+        //    success: function (data) {
+        //        if (data.status) {
+        //            toastrSuccess(data.msg);
+        //            window.location.href = '/School/CollectionReport';
+        //        }
+        //        else {
+        //            toastrError(data.msg);
+        //        }
+        //    }
+        //});
+        var id = $(source).attr('data-billNo') + '~' + $(source).attr('data-studentId');
+        $.ajax({
+            url: '/School/LoadReturnPaymentMode/' + id,
+            dataType: 'html',
+            success: function (data) {
+                $('#returnPaymentMode-model').html('');
+                $('#returnPaymentMode-model').html(data);
+                $('#returnPaymentMode-model').modal('show');
+
+                $('#chk-date-return').datepicker({
+                    format: 'dd-mm-yyyy',
+                    autoclose: true,
+                    todayHighlight: true
+                });
+
+
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                var today = dd + '-' + mm + '-' + yyyy;
+                $('#chk-date-return').val(today);
+
+            },
+        });
+    }
+});
+    });
+
+    function printContent(el) {
+        $('.btn-print').hide();
+        $('.btn-Cancel').hide();
+
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        //window.location.href = '/School/CollectionReport';
+        var id = $('#excel-head-bill').val();
+        var studId = $('#excel-studentId').val();
+        window.location.href = '/School/CollectionReportDetail/' + id + '~' + studId;
+
+        $('.btn-print').show();
+        $('.btn-Cancel').show();
+    }
+
+
+
+    $(document).on('change', '#ReturnPaymentType', function () {
+        var type = $(this).val();
+        if (type == 1) {
+            $('#div-bankdetails').addClass('isHidden');
+            $('.div-chequeDetails').addClass('isHidden');
+        }
+        else if (type == 2) {
+            $('#div-bankdetails').removeClass('isHidden');
+            $('.div-chequeDetails').removeClass('isHidden');
+        }
+
+        else if (type == 3) {
+            $('#div-bankdetails').removeClass('isHidden');
+            $('.div-chequeDetails').addClass('isHidden');
+        }
+    })
+
+    $(document).on('click', '#btn-bill-cancel', function () {
+        var chkDate = '';
+        var bankId = 0;
+        var chequeNo = $('#chk-no-return').val();
+        var chequeDate = $('#chk-date-return').val();
+        var mode = $('#ReturnPaymentType').val();
+        var studentId = $('#hfstudentId').val();
+        var billNo = $('#hfbillno').val();
+        var ok = 0;
+        if (mode == 2) {// Cheque
+            if (chequeNo == '') {
+                $('#cheque-no-required').show();
+                $('#btn-bill-cancel').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                ok = 0;
+            }
+            else if (chequeDate != '') {
+                bankId = $('#BankId').val();
+                var res = chequeDate.split("-");
+                var dd = res[0];
+                var mm = res[1];
+                var yyyy = res[2];
+                chkDate = mm + '-' + dd + '-' + yyyy + " 11:00:00.000";
+                $('#cheque-date-required').hide();
+                $('#cheque-no-required').hide();
+                $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+                ok = 1;
+            }
+            else {
+                $('#cheque-date-required').show();
+                $('#btn-bill-cancel').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                ok = 0;
+            }
+        }
+        else if (mode == 3) {
+            bankId = $('#BankId').val();
+            $('#cheque-date-required').hide();
+            $('#cheque-no-required').hide();
+            $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+            ok = 1;
+        }
+        else {
+            $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+            ok = 1;
+        }
+        if (ok == 1) {
+            var id = billNo + '~' + studentId + '~' + mode + '~' + bankId + '~' + chequeNo + '~' + chequeDate;
+            cancel = 1;
+            $.ajax({
+                url: '/School/CancelBill/' + id,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status) {
+                        toastrSuccess(data.msg);
+                        var studentId = $('#hfStudentId').val();
+                        $.ajax({
+                            url: '/School/AddStudentBillPartialView/' + studentId,
+                            type: "GET",
+                            dataType: 'html',
+                            success: function (data) {
+                                //event.preventDefault();
+                                //$('#returnPaymentMode-model').html('');
+                                //$('#history-model').html('');
+                                //$('#history-model').html(data);
+                                //$('#history-model').modal('show');
+                                //$("#li-data").focus();
+                                location.reload();
+                            }
+                        });
+                    }
+                    else {
+                        toastrError(data.msg);
+                    }
+                }
+            });
+
+
+        }
+
+    });
+
+    $(document).on('keyup', '#chk-no-return', function () {
+        if ($('#chk-no-return').val() != '') {
+            $('#cheque-no-required').hide();
+            $('#btn-bill-cancel').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });//OK
+        }
+        else {
+            $('#cheque-no-required').show();
+            $('#btn-bill-cancel').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+    });
+
+    $('.date-cheque').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).on('click', '#btn-cancel-in-billCancel', function () {
+        location.reload();
+    });
+
+
+</script>
+
+
+

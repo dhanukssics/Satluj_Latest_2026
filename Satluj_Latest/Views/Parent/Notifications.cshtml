@@ -1,0 +1,160 @@
+﻿@model Satluj_Latest.Models.ParentStudentClassModel
+@{
+    ViewBag.Title = "Notifications";
+    Layout = "~/Views/Shared/_ParentLayout.cshtml";
+}
+
+
+<style>
+    .timetable-menu {
+        padding: 0px;
+        margin: 0px;
+        border-top: 1px solid #dedede;
+        border-bottom: 1px solid #dedede;
+    }
+
+    .main-content {
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+        background: #fff;
+        padding: 15px 0px;
+        box-shadow: 1px 5px 5px #ccc;
+    }
+
+    .timetable-menu li {
+        display: inline-block;
+        text-align: center;
+        background: #fff;
+        padding: 6px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border-right: 1px solid #dedede;
+    }
+
+        .timetable-menu li > a > img {
+            display: block;
+            margin: auto;
+            padding: 2px 0px;
+        }
+
+        .timetable-menu li.active {
+            /*background: #00a7ee;*/
+            background: #264C73;
+        }
+
+            .timetable-menu li.active > a {
+                color: #fff;
+            }
+
+    .with-icon {
+        position: relative;
+    }
+
+        .with-icon i {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+        }
+
+    input[type=text], input[type=password], textarea, select {
+        border: 1px solid #ccc;
+    }
+
+    .schooJs {
+        padding: 50px 0px;
+        min-height: 85vh;
+    }
+
+    .student-name-design {
+        color: #0394d1;
+        filter: contrast;
+        margin-bottom: 4%;
+        font-weight: bold;
+    }
+
+     .contSpc{
+        padding: 55px 15px 30px;
+    }
+     .loginHeight{min-height: 525px;}
+
+    @@media screen and (max-width:768px){
+        .contSpc{ padding: 80px 15px 25px; }
+        .loginHeight {
+            min-height: 400px;
+        }
+        
+    }
+</style>
+
+@Html.HiddenFor(m => m.ParentId, new { Value = Model.ParentId })
+<section class="schooJs loginHeight">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 contSpc">
+                @*<div class="row">
+                    <div class="col-md-12">*@
+                        <h3 style="text-align:center;"> Notifications</h3>
+                        <label class="mobile-label"></label>
+                        <ul class="timetable-menu">
+                            <li class="active" onclick="EventsView()" style="width:48.5%; font-size: large; height:5%;" id="EventListingId"><a> Events</a></li>
+                            <li id="CircularListingId" onclick="CircularsView()" style="width:49.5%;  font-size: large; height:5%;"><a>Circulars</a></li>
+                        </ul>
+                    @*</div>
+                </div>*@
+
+                <div class="ndiv page-holder">
+                    <div class="ndiv Content-section">
+                        <div class="ndiv stb-time-table-holder">
+                            <div id="notificationViewdiv">
+                                @Html.Partial("~/Views/Parent/_ParentEvent.cshtml",Model)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+<script>
+
+    function CircularsView() {
+        var id = $('#ParentId').val();
+        $.ajax({
+            url: '/Parent/GetParentCircularList/'+id,
+            dataType: 'html',
+            success: function (data) {
+                $('#notificationViewdiv').html('');
+                $('#notificationViewdiv').html(data);
+                $('#EventListingId').removeClass('active');
+                $('#CircularListingId').addClass('active');
+            },
+        });
+    };
+
+
+    function EventsView() {
+        window.location.href = '/Parent/Notifications/';
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>

@@ -1,0 +1,159 @@
+﻿@model Satluj_Latest.Models.AcademicPeriodsModelClass
+
+@{
+    ViewData["Title"] = "Periods";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top:5px;">ACADEMICS PERIODS</h3>
+
+        <div class="row" style="margin-left:15px !important;">
+
+            <form id="form-teacher-add"
+                  asp-action="AddAcademicPeriods"
+                  asp-controller="Teacher"
+                  method="post"
+                  data-ajax="true"
+                  data-ajax-method="POST"
+                  data-ajax-success="AddAcademicPeriodsSuccess"
+                  data-ajax-failure="AddAcademicPeriodsFailure">
+
+                <input type="hidden" asp-for="SchoolId" />
+                <input type="hidden" asp-for="ClassId" />
+
+                <div class="row">
+
+                    <div class="form-group col-sm-3">
+                        <label>Region :</label>
+                        <select asp-for="RegionId"
+                                asp-items="ViewBag.Regionlist"
+                                class="form-control slct-region-dropdwn"
+                                data-live-search="true"
+                                style="display:inline-block; width:100%; min-width:180px;">
+                            <option value="">--Choose--</option>
+                        </select>
+                        <span asp-validation-for="RegionId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label>Class :</label>
+                        <select class="form-control slct-class-dropdown" disabled></select>
+                        <span id="class-required-periods-add" style="display:none;color:red;"></span>
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label>Start Date :</label>
+                        <input asp-for="StartDatestring" class="form-control date-add" />
+                        <span asp-validation-for="StartDatestring" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label>End Date :</label>
+                        <input asp-for="EndDatestring" class="form-control date-add" />
+                        <span asp-validation-for="EndDatestring" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="form-group col-sm-3">
+                        <label>Periods Name :</label>
+                        <input asp-for="PeriodsName" class="form-control" placeholder="Periods Name" />
+                        <span asp-validation-for="PeriodsName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label></label>
+                        <button type="submit" class="btn pay-now-btn" style="margin-top:9%;">
+                            <i class="fa fa-save"></i> Save
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <div class="table-responsive" id="academicAreaList">
+            <partial name="~/Views/Teacher/_pv_AcademicPeriodsList.cshtml" />
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(document).on('change', '.slct-region-dropdwn', function () {
+        $('#RegionId').val($(this).val());
+        var id = $(this).val();
+
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadAllClass?id=' + id + '&schoolid=' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-class-dropdown").html("");
+                        $(".slct-class-dropdown").append($('<option></option>').val("0").html(' All '));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-class-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-class-dropdown").prop("disabled", false);
+                    }
+                    else {
+                        $(".slct-class-dropdown").html("");
+                        $(".slct-class-dropdown").append($('<option></option>').val("0").html('-- No Class Found --'));
+                        $(".slct-class-dropdown").prop("disabled", true);
+                        $('#ClassId').val("0");
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-class-dropdown").html("");
+            $(".slct-class-dropdown").append($('<option></option>').val("0").html('-- Select Class --'));
+            $(".slct-class-dropdown").prop("disabled", true);
+        }
+    });
+
+    $('.date-add').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).ready(function () {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        $('.date-add').val(dd + '-' + mm + '-' + yyyy);
+    });
+
+    function AddAcademicPeriodsSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            RefreshData();
+        } else {
+            toastrError(result.msg);
+        }
+    }
+
+    function AddAcademicPeriodsFailure(result) {
+        toastrError(result.msg);
+    }
+
+    function RefreshData() {
+        $.get('/Teacher/ListAcademicPeriodsData/', function (data) {
+            $('#academicAreaList').html(data);
+            $('#PeriodsName').val('');
+        });
+    }
+
+    $(document).on('change', '.slct-class-dropdown', function () {
+        $('#ClassId').val($(this).val());
+    });
+</script>

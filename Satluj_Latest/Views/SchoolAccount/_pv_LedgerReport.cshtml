@@ -1,0 +1,119 @@
+﻿@model Satluj_Latest.Models.LedgerReportModel
+@{
+    DateTime startDate = Model.FromDate;
+    DateTime endDate = Model.ToDate;
+    long schoolId = Model.SchoolId;
+    long headId = Model.HeadId;
+    long subId = Model.SubId;
+    string schoolName = Model.SchoolName;
+    string heading = Model.Heading;
+
+    var school = new Satluj_Latest.Data.School(schoolId);
+    var data = school.GetLedgerReport(startDate, endDate, schoolId, headId, subId);
+}
+
+<thead>
+    <tr>
+        <td colspan="5" style="text-align:center; font-weight:bold;font-size:22; display:none;">
+            @schoolName
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5" style="text-align:center; font-weight:normal;font-size:18; display:none;">
+            Ledger
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5" style="text-align:center; font-weight:normal;font-size:12; display:none;">
+            @heading
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Date
+        </th>
+        <th>
+            Description
+        </th>
+        <th>
+            Credit
+        </th>
+        <th>
+            Debit
+        </th>
+        <th>
+            Dt/Cr
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @foreach (var item in data)
+    {
+        var incomeSum = item._LedgerDetailsList.Sum(x => x.Income);
+        var expenseSum = item._LedgerDetailsList.Sum(x => x.Expence);
+        <tr>
+            <td style="font-weight: bold;" colspan="2">
+                @item.AccountHead
+            </td>
+            <td style="font-weight: bold;">
+                @String.Format("{0:0.00}", item._LedgerDetailsList.Sum(x => x.Income))
+            </td>
+            <td style="font-weight: bold;">
+                @String.Format("{0:0.00}", item._LedgerDetailsList.Sum(x => x.Expence))
+            </td>
+
+            @if (incomeSum > expenseSum)
+            {
+                <td>
+                    Cr
+                </td>
+            }
+            else if(incomeSum== expenseSum)
+            {
+                <td>
+                    --
+                </td>
+            }
+            else
+            {
+                <td>
+                   Dt
+                </td>
+            }
+        </tr>
+        foreach (var sub in item._LedgerDetailsList.OrderBy(x=>x.AccountDate.Date).ToList())
+            {
+            <tr>
+                <td>@sub.AccountDate.ToShortDateString()</td>
+                <td>@sub.SubLedger</td>
+                <td>@String.Format("{0:0.00}", sub.Income)</td>
+                <td>@String.Format("{0:0.00}", sub.Expence)</td>
+                <td>@sub.Status</td>
+            </tr>
+        }
+        <tr>
+            <td></td>
+            <td style="font-weight: bold;">Total</td>
+            @if (incomeSum > expenseSum)
+            {
+                <td style="font-weight: bold;">@String.Format("{0:0.00}", incomeSum - expenseSum)</td>
+                <td></td>
+                <td style="font-weight: bold;">Cr</td>
+            }
+            else if(incomeSum== expenseSum)
+            {
+                <td>0.00</td>
+                <td >0.00</td>
+                <td>--</td>
+            }
+            else
+            {
+            <td></td>
+            <td style="font-weight: bold;">@String.Format("{0:0.00}", expenseSum - incomeSum)</td>
+            <td style="font-weight: bold;">Dt</td>
+            }
+
+        </tr>
+
+    }
+</tbody>

@@ -1,0 +1,221 @@
+﻿@model Satluj_Latest.Models.SubjectScoreModel
+
+@{
+    ViewBag.Title = "PreviousYear_Progresscard";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+@Html.HiddenFor(z => z.UserId, new { Value = @Model.UserId })
+@Html.HiddenFor(z => z.IsAdminCheck, new { Value = @Model.IsAdminCheck })
+<div class="row">
+    <div class="col-lg-12">
+        <h4 style="margin-top: 5px;"> I To IV - Progress Card</h4>
+
+        <span>
+            <a href="http://satluj.schoolman.in/Media/School/Logo/GradingScale_Commen.pdf" style="font-weight:bold; margin-left: 80%;" target="_blank">Progress Card Back Side</a>
+        </span>
+        <br />
+        <div class="row">
+
+            <div class="form-group col-sm-2">
+                <div class="form-group">
+                    <label>Academic Year</label>
+                    <br />
+                    <select asp-for="Academicyear"
+                            asp-items="ViewBag.Academicyear"
+                            class="form-control Academicid"
+                            data-live-search="true"
+                            name="Academicyeardropdown">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="Academicyear" class="text-danger"></span>
+
+                </div>
+            </div>
+            <div class="form-group col-sm-2">
+                <div class="form-group">
+                    <label>Class : </label>
+                    <br />
+                    @*@Html.DropDownListFor(m => m.ClassId, Satluj_Latest.Data.DropdownData.GetClass_Preschool_One_Four(Model.SchoolId), "--Choose--", new { @class = "form-control ClassId-id", @data_live_search = "true", name = "classDropdown" })
+        @Html.ValidationMessageFor(m => m.DivisionId)*@
+
+                    <select class="form-control classDropdown"></select>
+                </div>
+            </div>
+            @*<div class="form-group col-sm-2">
+                <div class="form-group">
+                    <label>Division : </label>
+                    <br />
+                    <select class="form-control class-drop-down"></select>
+
+
+                </div>
+            </div>*@
+
+        </div>
+    </div>
+</div>
+<div id="vStudentList-Id"></div>
+
+<script>
+
+
+    $('.date-cashentry-add').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).ready(function () {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var today = dd + '-' + mm + '-' + yyyy;
+        $('.date-cashentry-add').val(today);
+    });
+
+    //$(document).on('change', '.class-drop-down', function () {
+    //    $('#vStudentList-Id').html('');
+    //    var id = $(this).val();
+    //    if (id != 0) {
+    //        $.ajax({
+    //            url: '/SpecialClass/ViewAll_V_ClassStudents?id=' + id,
+    //            type: "GET",
+    //            dataType: 'html',
+    //            success: function (data) {
+    //                $('#vStudentList-Id').html(data);
+    //            }
+    //        });
+    //    }
+    //});
+
+
+
+    $("#id_sub_menu_ONE_FOUR").addClass("open");
+    $("#Id_PreviousYear_Progresscard").addClass("active");
+
+
+
+
+    $(".assesment-id").append($('<option></option>').val("0").html('-- Select Assesments --'));
+    $(".class-drop-down").append($('<option></option>').val("0").html('-- Select Division --'));
+    $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
+    $(".skill_selction").append($('<option></option>').val("0").html('-- Select Skill --'));
+
+    $(".assesment-id").prop("disabled", true);
+    $(".slct-subject-dropdown").prop("disabled", true);
+    $(".skill_selction").prop("disabled", true);
+
+    $(document).on('change', '.classDropdown', function () {
+
+        $('#result-entry-div-id').html('');
+
+
+
+        $(".assesment-id").html("");
+        $(".class-drop-down").html("");
+        $(".slct-subject-dropdown").html("");
+        $(".skill_selction").html("");
+
+        $(".assesment-id").append($('<option></option>').val("0").html('-- Select Assesments --'));
+        $(".class-drop-down").append($('<option></option>').val("0").html('-- Select Division --'));
+        $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
+        $(".skill_selction").append($('<option></option>').val("0").html('-- Select Skill --'));
+
+        $(".assesment-id").prop("disabled", true);
+        $(".slct-subject-dropdown").prop("disabled", true);
+        $(".skill_selction").prop("disabled", true);
+        var Academic_year = $(".Academicid option:selected").text();
+        var ClassId = $(".classDropdown option:selected").val();
+        var id = ClassId + '~' + Academic_year;
+        if (id != 0) {
+            $.ajax({
+                url: '/SpecialClass/ViewAll_Previous_ClassStudents_ONE_FOUR?id=' + id,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#vStudentList-Id').html(data);
+                }
+            });
+        }
+                
+     });
+      
+      
+
+
+
+   
+
+
+
+    //$(document).on('change', '.class-drop-down', function () {
+
+    //    $('#vStudentList-Id').html('');
+    //    var id = $(this).val();
+    //    var Academic_year = $(".Academicid option:selected").text();
+    //    var ClassId = $(".classDropdown option:selected").val();
+    //    var DivissionId = $(".class-drop-down option:selected").val();
+    //    var id = ClassId + '~' + DivissionId + '~' + Academic_year;
+    
+
+    //    if (id != 0) {
+    //        $.ajax({
+    //            url: '/SpecialClass/ViewAll_Previous_ClassStudents_ONE_FOUR?id=' + id,
+    //            type: "GET",
+    //            dataType: 'html',
+    //            success: function (data) {
+    //                $('#vStudentList-Id').html(data);
+    //            }
+    //        });
+    //    }
+
+    //});
+    $(document).on('change', '.Academicid', function () {
+        var id = $(".Academicid option:selected").val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadSpecialClass_Previous?id=' + id + '~' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".classDropdown").html("");
+                        $(".classDropdown").append($('<option></option>').val("0").html('-- Select Class --'));
+                        $.each(result.list, function (i, item) {
+                            $(".classDropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".classDropdown").prop("disabled", false);
+                    }
+                    else {
+
+                        $(".classDropdown").html("");
+                        $(".classDropdown").append($('<option></option>').val("").html('---'));
+                        $(".classDropdown").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            $(".classDropdown").html("");
+            $(".classDropdown").append($('<option></option>').val("").html('---'));
+            $(".classDropdown").prop("disabled", true);
+        }
+
+
+
+    });
+
+
+
+</script>
+
+

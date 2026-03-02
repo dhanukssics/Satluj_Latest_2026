@@ -1,0 +1,131 @@
+﻿@model Satluj_Latest.Models.DeclaredExamSubjectModel
+
+@{
+    ViewData["Title"] = "DeclaredExamSubject";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+
+    long schoolId = Model.SchoolId;
+    long examId = Model.ExamId;
+    var head = new Satluj_Latest.Data.School(schoolId).ExamName(examId);
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <a asp-controller="Progress"
+               asp-action="ExamDeclaration"
+               class="btn btn-peek">
+                <i class="fa fa-arrow-left"></i> Back
+            </a>
+        </div>
+
+        <h3 style="margin-top: 5px;">@head</h3>
+
+        <form id="form-teacher-add"
+              asp-controller="Progress"
+              asp-action="AddDeclaredExamsSubject"
+              method="post">
+
+            @Html.HiddenFor(m => m.SchoolId)
+            @Html.HiddenFor(m => m.ExamId)
+
+            <div class="row">
+
+                <div class="form-group col-sm-3">
+                    <label>Subject :</label>
+                    @Html.DropDownListFor(
+                    m => m.SubjectId,
+                                        (IEnumerable<SelectListItem>)ViewBag.store,
+                                        "--Choose--",
+                                        new { @class = "form-control", id = "subject-id" })
+                    @Html.ValidationMessageFor(m => m.SubjectId)
+                </div>
+
+                <div class="form-group col-sm-3">
+                    <label>Exam Date :</label>
+                    @Html.TextBoxFor(m => m.ExamTimeString,
+                                        new { @class = "form-control date-exam-sub-add" })
+                    @Html.ValidationMessageFor(m => m.ExamTimeString)
+                </div>
+
+                <div class="form-group col-sm-3">
+                    <label>Total Score :</label>
+                    @Html.TextBoxFor(m => m.TotalScore,
+                                        new { @class = "form-control", type = "number" })
+                    @Html.ValidationMessageFor(m => m.TotalScore)
+                </div>
+
+                <div class="form-group col-sm-3">
+                    <label>Remark :</label>
+                    @Html.TextBoxFor(m => m.Remark,
+                                        new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Remark)
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn pay-now-btn">
+                    <i class="fa fa-save"></i> Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            @await Html.PartialAsync(
+                        "~/Views/Progress/_pv_DeclaredExamSubjectList.cshtml", Model)
+        </div>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="modalDeclaredExamSubjectEdit"
+     tabindex="-1"
+     role="dialog">
+</div>
+
+@section Scripts {
+<script>
+    $('.date-exam-sub-add').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $('#form-teacher-add').on('submit', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: AddExamDeclarationSubjectSuccess,
+            error: function () {
+                toastrError("Submission failed");
+            }
+        });
+    });
+
+    function AddExamDeclarationSubjectSuccess(result) {
+        var id = $('#ExamId').val();
+        if (result.status) {
+            toastrSuccess(result.msg);
+            window.location.href = '/Progress/DeclaredExamSubject/' + id;
+        } else {
+            toastrError(result.msg);
+        }
+    }
+
+    function AddExamDeclarationSubjectFailure(result) {
+        toastrError(result.msg);
+    }
+
+    $(function () {
+        $(".declared-exam-list").DataTable();
+    });
+</script>
+}

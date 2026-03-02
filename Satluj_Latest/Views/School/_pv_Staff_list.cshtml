@@ -1,0 +1,69 @@
+﻿@using Satluj_Latest.Models.ViewModels
+@model StaffListViewModel
+
+<thead>
+    <tr>
+        <th>Slno</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Password</th>
+        <th>Designation</th>
+        <th>Department</th>
+
+        @if (Model.IsAdmin)
+        {
+            <th></th>
+        }
+    </tr>
+</thead>
+
+<tbody>
+    @{
+        int i = 1;
+    }
+
+    @foreach (var staff in Model.Staffs)
+    {
+        <tr>
+            <td class="ng-teacherDetails-click" data-staffid="@staff.UserId">
+                @i
+            </td>
+
+            <td class="ng-teacherDetails-click" data-staffid="@staff.UserId">
+                @staff.StaffName
+            </td>
+
+            <td class="ng-teacherDetails-click" data-staffid="@staff.UserId">
+                @staff.EmailId
+            </td>
+
+            <td class="ng-teacherDetails-click" data-staffid="@staff.UserId">
+                @staff.Password
+            </td>
+
+            <td class="ng-teacherDetails-click" data-staffid="@staff.UserId">
+                @staff.Designation()
+            </td>
+
+            <td class="ng-teacherDetails-click" data-staffid="@staff.UserId">
+                @staff.Department()
+            </td>
+
+            @if (Model.IsAdmin)
+            {
+                <td data-staffid="@staff.UserId">
+                    <button class="delete-teacher-tr btn-peek" data-staffid="@staff.UserId">
+                        <i class="fa fa-trash"></i>
+                    </button>
+
+                    <button class="edit-staff-tr pay-now-btn" data-staffid="@staff.UserId">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                </td>
+            }
+        </tr>
+
+        i++;
+    }
+</tbody>
+

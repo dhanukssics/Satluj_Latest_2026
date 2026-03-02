@@ -1,0 +1,86 @@
+﻿@model Satluj_Latest.Models.AddOptionalSubjectsToStudentsModel
+@{
+
+}
+<style>
+    .ng-click-studentDiscount-details {
+        cursor: pointer;
+    }
+
+    .box-color {
+        background-color: #fff;
+        display: block;
+        position: relative;
+        float: left;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .head-box {
+        margin-top: 0px;
+        background-color: #03a9f4;
+        padding: 15px;
+        margin-left: -15px;
+        margin-right: -15px;
+        color: #fff;
+        font-weight: 700;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <div id="pv-table">
+            <div class="">
+                <table class="table custome-table table-student-list">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" class="check-all"  />
+                                Name
+                            </th>
+                            <th>
+                                Parent Name
+                            </th>
+                            <th>
+                                Address
+                            </th>
+                            <th>
+                                Contact No.
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model.Data)
+                        {
+                            <tr class="ng-click-studentDiscount-details">
+                                <td>
+                                    <label style="margin-right: 10px;">
+                                        <input id="chkBox-user" class="checkbox-input" type="checkbox" data-id="@student.StudentId" onchange="AddRemoveUser(this)" />
+                                        <span class="checkbox-virtual"></span>
+                                    </label>
+                                    @if (student.FilePath != null)
+                                    {
+                                        <img src="@student.FilePath" class="user-pic-tab" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/Content/img/children-1.gif" class="user-pic-tab" />
+                                    }
+                                    @student.StudentName
+                                </td>
+                                <td>
+                                    @student.ParentName
+                                </td>
+                                <td>
+                                    @student.Address
+                                </td>
+                                <td>
+                                    @student.ContactNumber
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

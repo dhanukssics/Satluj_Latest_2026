@@ -1,0 +1,187 @@
+﻿@model Satluj_Latest.Models.CashEntryModel
+
+<form id="form-login"
+      asp-controller="SchoolAccount"
+      asp-action="EditCashEntry"
+      method="post">
+
+    <input type="hidden" asp-for="CashId" id="edit-cashData-id" />
+
+    <div class="col-md-6">
+
+        <!-- Type -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Type</label>
+            </div>
+            <div class="col-md-5">
+                <select asp-for="TypeId"
+                        asp-items="Html.GetEnumSelectList<AccountType>()"
+                        class="form-control pv_account-type"
+                        id="cash-entry-type-idd"
+                        disabled>
+                </select>
+
+                <input type="hidden" asp-for="TypeId" />
+
+                <span asp-validation-for="TypeId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4" id="chkDiv">
+                @Html.CheckBoxFor(
+                                m => m.AdvanceStatus,
+                                new { id = "cash-check-advance-id", disabled = "disabled" })
+
+                @Html.HiddenFor(m => m.AdvanceStatus)
+
+                <span>Advance</span>
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Date</label>
+            </div>
+            <div class="col-md-9 calendar-inp pos_icon_adj">
+                <input asp-for="EntryDateString"
+                       class="form-control date-cashentry-add"
+                       readonly disabled />
+
+                @Html.HiddenFor(m => m.EntryDateString)
+
+                <span asp-validation-for="EntryDateString" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Voucher No -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Voucher No</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="VoucherNo"
+                       class="form-control"
+                       readonly disabled />
+
+                @Html.HiddenFor(m => m.VoucherNo)
+
+                <span asp-validation-for="VoucherNo" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Account Head -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Account Head</label>
+            </div>
+            <div class="col-md-9">
+                <select asp-for="HeadId"
+                        asp-items="ViewBag.Accountlist"
+                        class="form-control edit-accHead-drop-down"
+                        id="cash-entry-head-id">
+                    <option value="">--Choose--</option>
+                </select>
+
+                <span asp-validation-for="HeadId" class="text-danger"></span>
+
+                <span asp-validation-for="HeadId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- SubLedger -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>SubLedger</label>
+            </div>
+
+            <div class="col-md-9 isHidden" id="sub-view-through-head">
+                <select asp-for="SubLedgerId"
+                        asp-items="@(new SelectList(
+                                    new[] { new { value = 0, text = "--select division--" } },
+                                    "value",
+                                    "text"))"
+                        class="form-control"
+                        id="SubLedgerId_Edit"
+                        disabled>
+                </select>
+
+                <input type="hidden" asp-for="SubLedgerId" />
+
+                <span asp-validation-for="SubLedgerId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-9" id="sub-view-through-search">
+                <input asp-for="SubLedgerData"
+                       class="form-control"
+                       readonly
+                       id="default-selected-subledger" />
+            </div>
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Amount</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="Amount"
+                       class="form-control"
+                       readonly disabled />
+
+                @Html.HiddenFor(m => m.Amount)
+
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Narration -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Narration</label>
+            </div>
+            <div class="col-md-9">
+                <input asp-for="Narration"
+                       class="form-control"
+                       placeholder="Narration" />
+
+                <span asp-validation-for="Narration" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <button type="button" id="btn-edit-cancel-cashbook" class="btn pay-now-btn">
+                    Cancel
+                </button>
+            </div>
+            <div class="col-md-9">
+                <button type="submit" id="btn-edit-save-cashbook" class="btn pay-now-btn">
+                    Edit
+                </button>
+                <button type="button" id="btn-cashbook-Clear-Feild" class="btn" style="background:#898e98;">
+                    Clear
+                </button>
+            </div>
+        </div>
+
+    </div>
+</form>
+<script>
+    $(document).on("submit", "#form-login", function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                AddCashEntrySuccess(response);
+            },
+            error: function (xhr) {
+                AddCashEntryFailed(xhr);
+            }
+        });
+    });
+</script>

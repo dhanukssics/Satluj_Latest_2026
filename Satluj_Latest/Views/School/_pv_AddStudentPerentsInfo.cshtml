@@ -1,0 +1,184 @@
+﻿@model Satluj_Latest.Models.StudentModel
+
+<form id="form-login"
+      asp-action="AddNewStudentParentInfo"
+      asp-controller="School"
+      method="post">
+
+    <input type="hidden" asp-for="studentId" />
+    <input type="hidden" asp-for="classId" />
+    <input type="hidden" asp-for="divisionId" />
+
+    <!-- Names -->
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="form-group col-sm-4">
+                <label asp-for="FatherName"></label><span style="color:red">***</span>
+                <input asp-for="FatherName" class="form-control" placeholder="Father Name" />
+                <span asp-validation-for="FatherName"></span>
+            </div>
+
+            <div class="form-group col-sm-4">
+                <label asp-for="MotherName"></label><span style="color:red">***</span>
+                <input asp-for="MotherName" class="form-control" placeholder="Mother Name" />
+                <span asp-validation-for="MotherName"></span>
+            </div>
+
+            <div class="form-group col-sm-4">
+                <label asp-for="GuardianName"></label>
+                <input asp-for="GuardianName" class="form-control" placeholder="Guardian Name" />
+                <span asp-validation-for="GuardianName"></span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Education -->
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="form-group col-sm-4">
+                <label asp-for="FatherEducation"></label>
+                <input asp-for="FatherEducation" class="form-control" placeholder="Education" />
+                <span asp-validation-for="FatherEducation"></span>
+            </div>
+
+            <div class="form-group col-sm-4">
+                <label asp-for="MotherEducaton"></label>
+                <input asp-for="MotherEducaton" class="form-control" placeholder="Education" />
+                <span asp-validation-for="MotherEducaton"></span>
+            </div>
+
+            <div class="form-group col-sm-4">
+                <label asp-for="GuardianEduation"></label>
+                <input asp-for="GuardianEduation" class="form-control" placeholder="Education" />
+                <span asp-validation-for="GuardianEduation"></span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Occupation -->
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="form-group col-sm-4">
+                <label asp-for="FatherOccupation"></label>
+                <input asp-for="FatherOccupation" class="form-control" placeholder="Father Occupation" />
+                <span asp-validation-for="FatherOccupation"></span>
+            </div>
+
+            <div class="form-group col-sm-4">
+                <label asp-for="MotherOccupation"></label>
+                <input asp-for="MotherOccupation" class="form-control" placeholder="Mother Occupation" />
+                <span asp-validation-for="MotherOccupation"></span>
+            </div>
+
+            <div class="form-group col-sm-4">
+                <label asp-for="GuardianOccupation"></label>
+                <input asp-for="GuardianOccupation" class="form-control" placeholder="Guardian Occupation" />
+                <span asp-validation-for="GuardianOccupation"></span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="form-group col-sm-4">
+                <label asp-for="FatherContact"></label><span style="color:red">***</span>
+                <input asp-for="FatherContact" type="number" class="form-control" placeholder="Contact No" />
+                <span asp-validation-for="FatherContact"></span>
+            </div>
+
+            <div class="form-group col-sm-4">
+                <label asp-for="MotherContact"></label>
+                <input asp-for="MotherContact" type="number" class="form-control" placeholder="Contact No" />
+                <span asp-validation-for="MotherContact"></span>
+            </div>
+
+            <div class="form-group col-sm-4">
+                <label asp-for="GuardianContact"></label>
+                <input asp-for="GuardianContact" type="number" class="form-control" placeholder="Contact No" />
+                <span asp-validation-for="GuardianContact"></span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Email -->
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="form-group col-sm-4">
+                <label asp-for="FatherEmail"></label><span style="color:red">***</span>
+                <input asp-for="FatherEmail" class="form-control" placeholder="Email" />
+                <span asp-validation-for="FatherEmail"></span>
+            </div>
+
+            <div class="form-group col-sm-4">
+                <label asp-for="MotherEmail"></label>
+                <input asp-for="MotherEmail" class="form-control" placeholder="Email" />
+                <span asp-validation-for="MotherEmail"></span>
+            </div>
+
+            <div class="form-group col-sm-4">
+                <label asp-for="GuardianEmail"></label>
+                <input asp-for="GuardianEmail" class="form-control" placeholder="Email" />
+                <span asp-validation-for="GuardianEmail"></span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Password + Actions -->
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="form-group col-sm-4">
+                <label asp-for="Password"></label><span style="color:red">***</span>
+                <input asp-for="Password"
+                       type="password"
+                       class="form-control"
+                       placeholder="Password"
+                       autocomplete="new-password" />
+                <span asp-validation-for="Password"></span>
+            </div>
+
+            <div class="form-group col-sm-4"></div>
+
+            <div class="form-group col-sm-4">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="submit"
+                        id="studentStudentParentAdd"
+                        class="btn pay-now-btn">
+                    Save
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</form>
+<script>
+    $("#form-login").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (res) {
+                StudentParentsAddSuccess(res);
+            },
+            error: function () {
+                StudentAddFailed();
+            }
+        });
+    });
+</script>

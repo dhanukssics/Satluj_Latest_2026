@@ -1,0 +1,329 @@
+﻿@model Satluj_Latest.Models.TimetableModel
+@{
+    ViewBag.Title = " Time Table";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+@Html.HiddenFor(z => z.TeacherId, new { Value = 0 })
+@Html.HiddenFor(z => z.SubjectId, new { Value = 0 })
+
+<style>
+    .timetable-menu {
+        padding: 0px;
+        margin: 0px;
+        border-top: 1px solid #dedede;
+        border-bottom: 1px solid #dedede;
+    }
+
+    .main-content {
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+        background: #fff;
+        padding: 15px 0px;
+        box-shadow: 1px 5px 5px #ccc;
+    }
+
+    .timetable-menu li {
+        display: inline-block;
+        text-align: center;
+        background: #fff;
+        padding: 6px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border-right: 1px solid #dedede;
+    }
+
+        .timetable-menu li > a > img {
+            display: block;
+            margin: auto;
+            padding: 2px 0px;
+        }
+
+        .timetable-menu li.active {
+            background: #00a7ee;
+        }
+
+            .timetable-menu li.active > a {
+                color: #fff;
+            }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="text-align:center;">  Time Table</h3>
+        <label class="mobile-label"></label>
+        <ul class="timetable-menu">
+            <li class="active" style="width:48%; font-size: large; height:5%;" id="ClassWiseTimeTable"></i><a onclick="ClassWiseView()"> Class Time Table</a></li>
+            <li id="TeacherWiseTimeTable" style="width:48%;  font-size: large; height:5%;"></i><a onclick="TeacherWiseView()">Teacher Time Table</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="ndiv page-holder">
+    <div class="ndiv Content-section">
+        <div class="ndiv stb-time-table-holder">
+            <div id="timetable-view-space">
+                @Html.Partial("~/Views/Student/_AddTimeTable.cshtml")
+            </div>
+            <div id="time-table">
+                <div class="table-responsive" id="content">
+                    <h4 style="text-align:center; font-weight: bold;"> @Model.SchoolName</h4>
+                    <table class="table custome-table" id="timetable-list-space"></table>
+                </div>
+                @*<div id="content1">
+                    <h3>Hello, this is a H3 tag</h3>
+                    <p>A paragraph</p>
+                </div>*@
+                <div id="editor"></div>
+            </div>
+            @*<button class="btn pay-now-btn" id="btn-pdf-bill"><i class="fa fa-print"></i> PDF</button>*@
+        </div>
+    </div>
+    <div class="modal fade" id="modalEditTimeTable" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
+
+    </div>
+
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('.mobile-label').html($('.timetable-menu > li.active').html());
+        $('.mobile-label').click(function () {
+            $('.timetable-menu').slideToggle();
+        });
+
+        var id = $('.slct-mark-dropdwn1 option:selected').val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadAllSchoolDivision?id=' + id + '&schoolid=' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    //debugger;
+                    if (result.list.length > 0) {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-free-div-dropdown").prop("disabled", false);
+
+                    }
+                    else {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- No Division Found --'));
+                        $(".slct-free-div-dropdown").prop("disabled", true);
+                    }
+                }
+            });
+        }
+
+    });
+
+    $(document).on('change', '.slct-mark-dropdwn1', function () {
+        //debugger;
+        $('#ClassId').val($(this).val());
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadAllSchoolDivision?id=' + id + '&schoolid=' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    //debugger;
+                    if (result.list.length > 0) {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-free-div-dropdown").prop("disabled", false);
+
+                    }
+                    else {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- No Division Found --'));
+                        $(".slct-free-div-dropdown").prop("disabled", true);
+                    }
+                    $('#timetable-list-space').html("");
+                }
+            });
+        }
+        else {
+            $('#division-required-teacher-add').hide();
+            $(".slct-free-div-dropdown").html("");
+            $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+            $(".slct-free-div-dropdown").prop("disabled", true);
+            $('#division-required-exam-edit').hide();
+        }
+    });
+
+    function LoadData() {
+        var divisonId = $('.slct-free-div-dropdown option:selected').val();
+        var classId = $('.slct-mark-dropdwn1 option:selected').val();
+
+        var id = classId + "~" + divisonId;
+        $.ajax({
+            url: '/Student/GetTimeTableList/' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#timetable-list-space').html(data);
+            }
+        });
+    }
+
+    function AddTimetableSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.msg);
+            LoadData();
+        }
+        else {
+            toastrError(result.msg)
+        }
+    }
+
+    function AddTimetableFailed(result) {
+        toastrError(result.msg)
+    }
+
+    $(document).on('change', '.slct-free-div-dropdown', function () {
+        //debugger;
+        var divisonId = $('.slct-free-div-dropdown').val();
+        var classId = $('.slct-mark-dropdwn1 option:selected').val();
+        //var classId = $('#ClassId').val();
+        var id = classId + "~" + divisonId;
+        $.ajax({
+            url: '/Student/GetTimeTableList/' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#timetable-list-space').html(data);
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-dummy-timeTable', function () {
+        //debugger;
+        var divisonId = $('.slct-free-div-dropdown option:selected').val();
+        $('#DivisonId').val(divisonId);
+        $('#btn-timetable').trigger('click');
+
+    });
+
+    $(document).on('click', '.edit-time-table', function () {
+        debugger;
+        var id = $(this).attr('data-id');
+        var day = $(this).attr('data-day');
+        var clasId = $(this).attr('data-class');
+        var divId = $(this).attr('data-div');
+        var subject = $(this).attr('data-sub');
+        if (subject == "") {
+            toastrError("No subject assigned this period!")
+        }
+        else {
+            var data = id + "~" + day + "~" + clasId + "~" + divId + "~" + subject;
+            $.ajax({
+                url: '/Student/EditTimeTable/' + data,
+                dataType: 'html',
+                success: function (data) {
+                    //debugger;
+                    $('#modalEditTimeTable').html('');;
+                    $('#modalEditTimeTable').html(data);
+                    $.validator.unobtrusive.parse($("#modalEditExams"));
+                    $('#modalEditTimeTable').modal('show');
+                },
+            });
+        }
+    });
+
+    function EditTimeTableSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.msg);
+            $('#modalEditTimeTable').modal('hide');
+            LoadData();
+        }
+        else {
+            toastrError(result.msg)
+        }
+    }
+
+    function AddTimetableFailed(result) {
+        toastrError(result.msg)
+    }
+
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        $('#btn-Print-bill').addClass('IsHidden');
+        $('.fa-edit').addClass('IsHidden');
+        window.print();
+        document.body.innerHTML = restorepage;
+        $('#btn-Print-bill').removeClass('IsHidden');
+        $('.fa-edit').removeClass('IsHidden');
+    };
+
+    function ClassWiseView() {
+        window.location.href = '/Student/TimeTable/';
+    }
+
+    function TeacherWiseView() {
+        $.ajax({
+            url: '/Student/GetTeacherTimeTableList/',
+            dataType: 'html',
+            success: function (data) {
+                $('#TeacherWiseTimeTable').addClass('active');
+                $('#ClassWiseTimeTable').removeClass('active');
+                $('#timetable-view-space').html('');
+                $('#timetable-view-space').html(data);
+                $('#timetable-list-space').html('');
+            },
+        });
+    }
+
+    $(document).on('change', '#teacher-drop-Id', function () {
+        var id = $('#teacher-drop-Id').val();
+        $.ajax({
+            url: '/Student/GetTeacherTimeTableListReport/' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#timetable-list-space').html('');
+                $('#timetable-list-space').html(data);
+            }
+        });
+    });
+
+
+    $(document).ready(function () {
+        
+    });
+    //var doc = new jsPDF();
+    var specialElementHandlers = {
+        '#editor': function (element, renderer) {
+            return true;
+        }
+    };
+   
+    $(document).on('click', '#btn-pdf-bill', function () {
+        debugger;
+        // Default export is a4 paper, portrait, using milimeters for units
+        var doc = new jsPDF()
+
+        //doc.text(JSON.stringify($('#content').html()), 10, 10)
+        //doc.fromHTML
+        //doc.save('a4.pdf')
+        //alert($('#content').html());
+        doc.fromHTML($('#content').html(), 15, 15, {
+            'width': 170,
+            'elementHandlers': specialElementHandlers
+        });
+        doc.save('sample-file.pdf');
+    });
+
+
+</script>

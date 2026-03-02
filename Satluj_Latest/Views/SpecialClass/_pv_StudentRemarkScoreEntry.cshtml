@@ -1,0 +1,97 @@
+﻿
+@model Satluj_Latest.Models.StudentNonSubjectSkillMarks
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+
+<style>
+    .iput_width {
+        width: 100%;
+        height: 45px;
+    }
+</style>
+
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black; width:15%;">
+                Student Name
+            </th>
+            <th style="color: black; width:40%;">
+                REMARK
+            </th>
+            <th style="color: black; width:40%;">
+                Additional Remark
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td>
+                        @count
+                    </td>
+                    <td>
+                        @item.StudentName
+                    </td>
+                    <td>
+                        @if (item._RemarkSchore.Remark.Trim() == "")
+                        {
+                            <div>
+                                @Html.DropDownListFor(model => item._RemarkSchore.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item._RemarkSchore.Remark, new { @class = "cls-mark-Remark" })
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    @Html.DropDownListFor(model => item._RemarkSchore.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item._RemarkSchore.Remark, new { @class = "cls-mark-Remark" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownListFor(model => item._RemarkSchore.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item._RemarkSchore.Remark, new { @class = "cls-mark-Remark", @disabled = "disabled" })
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @if (item._RemarkSchore.AdditionalRemark.Trim() == "")
+                        {
+                            <div>
+                                <input type="textarea" wrap="hard" autocomplete="off" maxlength="10000" value="@item._RemarkSchore.AdditionalRemark" style="color:black; " class="cls-AdditionalRemark iput_width" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input type="textarea" wrap="hard" autocomplete="off" maxlength="10000" value="@item._RemarkSchore.AdditionalRemark" style="color:black; " class="cls-AdditionalRemark iput_width" id="@count" />
+                                }
+                                else
+                                {
+                                    <input type="textarea" wrap="hard" autocomplete="off" maxlength="10000" value="@item._RemarkSchore.AdditionalRemark" style="color:black; " class="cls-AdditionalRemark iput_width" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-remark-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

@@ -1,0 +1,70 @@
+﻿
+@model Satluj_Latest.Models.TrialBalanceModel
+@{
+    var headName =  @Model.StartDate.ToString("dd-MMM-yyyy") +"  to  "+ @Model.Today.ToString("dd-MMM-yyyy");
+    var accountIncomExpe = Model.TrialBalanceList;
+}
+<div class="row">
+    @Html.HiddenFor(m => m.Today, new { Value = Model.Today })
+    <div class="col-md-12" id="print-trial-bal">
+        <h3 style="text-align:center;">Trial Balance</h3>
+        <h5 style="text-align:center;" >@headName</h5>
+        <div class="table-responsive" style="padding: 0px 50px 0px 50px;">
+            <table class="table custome-table table-bordered" id="table-trial-balance">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">
+                            Slno
+                        </th>
+                        <th>
+                            Account Head
+                        </th>
+                        <th style="text-align: center;">
+                            Debit
+                        </th>
+                        <th style="text-align: center;">
+                            Credit
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int i = 1;
+                        foreach (var item in accountIncomExpe)
+                        {
+                            <tr>
+                                <td>
+                                    @if (i > accountIncomExpe.Count - 2)
+                                    {
+
+                                    }
+                                    else
+                                    {
+                                        @i
+                                    }
+                                </td>
+                                <td>
+                                    @item.AccHeadName
+                                </td>
+                                <td>
+                                    @String.Format("{0:0.00}", item.Expense)
+                                </td>
+                                <td>
+                                    @String.Format("{0:0.00}", item.Income)
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+                @*<tfoot>
+                    <tr>
+                        <td></td>
+                        <td class="" style="font-weight: bold;">Total</td>
+                        <td class="text-right" style="font-weight: bold;" id="tdDebitTotal">Total</td>
+                        <td class="text-right" style="font-weight: bold;" id="tdCreditTotal">Total</td>
+                    </tr>
+                </tfoot>*@
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,140 @@
+﻿@model Satluj_Latest.Models.StudentSkillMarks
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+    var scoreDetails = new Satluj_Latest.Data.School(Model.SchoolId).Get_V_TotalScores(10);
+    var prpnou_Total = "";
+    var fluency = "";
+    var Reading_Total = "";
+    if (scoreDetails != null && scoreDetails.Count > 0)
+    {
+        //if (scoreDetails.Any(x => x.SubTitle == "Pronun"))
+        //{
+        //    prpnou_Total = scoreDetails.Where(x => x.SubTitle == "Pronun").FirstOrDefault().Mark.ToString();
+        //}
+        //if (scoreDetails.Any(x => x.SubTitle == "Pronun"))
+        //{
+        //    fluency = scoreDetails.Where(x => x.SubTitle == "Fluency").FirstOrDefault().Mark.ToString();
+        //}
+
+        if (scoreDetails.Any(x => x.SubTitle == "ReadingSkill"))
+        {
+            Reading_Total = scoreDetails.Where(x => x.SubTitle == "ReadingSkill").FirstOrDefault().Mark.ToString();
+        }
+    }
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                READING(@Reading_Total)
+            </th>
+            @*<th style="color: black;">
+            PRONUNCIATION (@prpnou_Total)
+        </th>
+        <th style="color: black;">
+            FLUENCY (@fluency)
+        </th>*@
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+            <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                <td style="width:10%;">
+                    @count
+                </td>
+                <td style="width:50%;">
+                    @item.StudentName
+                </td>
+                <td style="width:40%;">
+                    @if (item._ReadingSkill.Pronun == null || item._ReadingSkill.Pronun == "")
+                    {
+                        <div>
+                            <input value="@item._ReadingSkill.Pronun" style="color:black;" type="number" maxlength="3" class="cls-mark-Reading" id="@count" />
+                        </div>
+                    }
+                    else
+                    {
+
+                        <div>
+                            @if (IsAdmin == true)
+                            {
+                                <input value="@item._ReadingSkill.Pronun" style="color:black;" type="number" maxlength="3" class="cls-mark-Reading" id="@count" />
+                            }
+                            else
+                            {
+                                <input value="@item._ReadingSkill.Pronun" style="color:black; " type="number" maxlength="3" class="cls-mark-Reading" readonly id="@count" />
+                            }
+                        </div>
+                    }
+                </td>
+                    @*<div>
+                <input value=" " style="color:black;" type="number" maxlength="3" class="cls-mark-Pronun" id="@count" />
+            </div>*@
+                    @*@if (item._ReadingSkill.Pronun.Trim() == "")
+            {
+                <div>
+                    <input value="@item._ReadingSkill.Pronun" style="color:black;" type="number" maxlength="3" class="cls-mark-Pronun" id="@count" />
+                </div>
+            }
+            else
+            {
+
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._ReadingSkill.Pronun" style="color:black;" type="number" maxlength="3" class="cls-mark-Pronun" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._ReadingSkill.Pronun" style="color:black; " type="number" maxlength="3" class="cls-mark-Pronun" readonly id="@count" />
+                    }
+                </div>
+            }
+
+                </td>*@
+                @*<td style="width:40%;">
+            @if (item._ReadingSkill.Fluency.Trim() == "")
+            {
+                <div>
+                    <input value="@item._ReadingSkill.Fluency" style="color:black; " type="number" maxlength="3" class="cls-mark-Fluency" id="@count" />
+                </div>
+            }
+            else
+            {
+
+                <div>
+                    @if (IsAdmin == true)
+                    {
+                        <input value="@item._ReadingSkill.Fluency" style="color:black; " type="number" maxlength="3" class="cls-mark-Fluency" id="@count" />
+                    }
+                    else
+                    {
+                        <input value="@item._ReadingSkill.Fluency" style="color:black; " type="number" maxlength="3" class="cls-mark-Fluency" readonly id="@count" />
+                    }
+                </div>
+            }
+
+        </td>*@
+            </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-reading-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

@@ -1,0 +1,57 @@
+﻿@model Satluj_Latest.Models.AddAccountHeadModel
+
+<form id="form-add-exam"
+      asp-action="SubmitAddSubLedger"
+      asp-controller="Journal"
+      method="post">
+
+    <div class="row">
+        <div id="new-account-div" class="dev-adj-style">
+
+            <div class="form-group">
+                <select asp-for="AccountHeadId"
+                        asp-items="@(new SelectList(ViewBag.store, "Value", "Text"))"
+                        class="form-control pv_class-drop-down"
+                        data-live-search="true"
+                        id="classDataDropdown">
+                    <option value="">--Choose--</option>
+                </select>
+                <span asp-validation-for="AccountHeadId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input asp-for="SubLedger"
+                       class="form-control"
+                       autocomplete="off"
+                       placeholder="Sub Ledger Name" />
+                <span asp-validation-for="SubLedger" class="text-danger"></span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn pay-now-btn" id="btn-addSubLedger">
+            Save
+        </button>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        $("#form-add-exam").on("submit", function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: "POST",
+                data: $(this).serialize(),
+                success: function (response) {
+                    AddAddSubLedgerSuccess(response);
+                },
+                error: function (xhr) {
+                    AddAddSubLedgerFailed(xhr);
+                }
+            });
+        });
+    });
+</script>

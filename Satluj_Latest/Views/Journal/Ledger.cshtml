@@ -1,0 +1,150 @@
+﻿@model Satluj_Latest.Models.AddDayBookModel
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+@*<h2>Ledger</h2>*@
+
+<div class="row">
+    <div class="form-group col-sm-2">
+        <label>Start</label>
+        <div class="with-icon">
+            <input type="text" class="form-control ledger-start-date date-Ledger" data-date-end-date="0d" value="@Model.startDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+
+    <div class="form-group col-sm-2">
+        <label>End</label>
+        <div class="with-icon">
+            <input type="text" class="form-control ledger-end-date date-Ledger" data-date-end-date="0d" value="@Model.endDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+    <div class="form-group col-sm-3">
+        <label>Accounts</label>
+        <div class="with-icon">
+            <select asp-for="HeadId"
+                    asp-items="ViewBag.AccountHeads"
+                    class="form-control accHead-drop-down"
+                    id="ledger-HeadId-id">
+                <option value="">All</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+        <button type="button" class="btn btn-sm btn-info btn-search" id="searchCashBookData">Search</button>
+    </div>
+
+    <div class="form-group col-sm-6" id="cash-book-status-id">
+    </div>
+
+</div>
+<div class="form-group col-sm-6">
+    <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+    <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+
+</div>
+<div class="row">
+    <div class="col-md-12" id="print-trial-bal">
+        <h3 style="text-align:center;">Ledger</h3><h5 style="text-align:center;" id="datecheck"></h5>
+        <table class="table custome-table" id="ledger-list"></table>
+    </div>
+</div>
+<script>
+    $('.date-Ledger').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    function IntializeDataTable() {
+        $("#ledger-list").dataTable().fnDestroy()
+        $("#ledger-list").dataTable();
+    }
+    $(document).ready(function () {
+        searchCashBookDataWithDate();
+    });
+
+    $(document).on('click', '#searchCashBookData', function () {
+
+        var date = $('.ledger-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.ledger-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        var head = $('#ledger-HeadId-id').val();
+        if ($('#ledger-HeadId-id option:selected').text() == "All") {
+            head = 0;
+        }
+        $.ajax({
+            url: '/Journal/SearchLedgerData/' + start + '~' + end + '~' + head,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#ledger-list').html('');
+                $('#ledger-list').html(data);
+                //IntializeDataTable();
+                var ss = $('.ledger-start-date').val() + " to " + $('.ledger-end-date').val();
+                $('#datecheck').text(ss);
+            }
+        });
+    });
+
+    function searchCashBookDataWithDate() {
+        //debugger;
+        var date = $('.ledger-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.ledger-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        $.ajax({
+            url: '/Journal/SearchLedgerData/' + start + '~' + end + '~' + 0,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#ledger-list').html('');
+                $('#ledger-list').html(data);
+                //IntializeDataTable();
+                var ss = $('.ledger-start-date').val() + " to " + $('.ledger-end-date').val();
+                $('#datecheck').text(ss);
+            }
+        });
+    }
+
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/Journal/Ledger';
+    }
+
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var date = $('.ledger-start-date').val() + " to " + $('.ledger-end-date').val();
+        $("#ledger-list").table2excel({
+            name: "Table2Excel",
+            filename: "Ledger as on " + date,
+            fileext: ".xls"
+        });
+    });
+</script>

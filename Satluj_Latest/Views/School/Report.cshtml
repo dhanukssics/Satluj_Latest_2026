@@ -1,0 +1,1079 @@
+﻿@model Satluj_Latest.Models.DateClass
+@{
+    ViewBag.Title = "Report";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var countincome = 1;
+    var countexpence = 1;
+
+    //  var  income= new Satluj_Latest.Data.WebsiteService().IncomeList().ToList();
+    // var totalincome = income.Sum(x => x.Amount);
+    // var expence = new Satluj_Latest.Data.WebsiteService().ExpenceList().ToList();
+    //  var totalexpence = expence.Sum(x => x.Amount);
+    // var balance = totalincome - totalexpence;
+    DateTime date = Model.Selecteddate;
+    var balanceBD = new Satluj_Latest.Data.WebsiteService().BalancebdDate(date, Model.SchoolId);
+    var CurrentincomeList = new Satluj_Latest.Data.WebsiteService().IncomelistOnDate(date, Model.SchoolId).ToList();
+    var totalincome = CurrentincomeList.Sum(x => x.Amount);
+
+    var CurrentExpenceList = new Satluj_Latest.Data.WebsiteService().ExpencelistOnDate(date, Model.SchoolId).ToList();
+    var totalexpence = CurrentExpenceList.Sum(x => x.Amount);
+    if (balanceBD > 0)
+    {
+        totalincome = totalincome + balanceBD;
+    }
+    else if (balanceBD < 0)
+    {
+        totalexpence = totalexpence + Math.Abs(balanceBD);
+    }
+
+    var balance = totalincome - totalexpence;
+    var balanceHead = "Balance: ";
+    if (balance > 0)
+    {
+        balanceHead = "Profit: ";
+    }
+    else if (balance < 0)
+    {
+        balanceHead = "Loss: ";
+    }
+    else
+    {
+        balanceHead = "Balance: ";
+    }
+
+    //Model.Selecteddate = DateTime.Now;
+
+
+}
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Account Book</title>
+    <style>
+        .empty_field {
+            border-color: red !important;
+            border: 1px solid;
+        }
+
+        .isPointer {
+            pointer-events: none;
+        }
+
+        .isClass {
+            cursor: pointer;
+        }
+
+        .isHide {
+            display: none;
+        }
+
+        .isborder {
+            border-color: #619bd8;
+        }
+        .easy-autocomplete.eac-square input {min-width:inherit !important; padding:inherit !important; border-radius: inherit !important; font-family: inherit; font-size: inherit !important; font-style: inherit !important; font-weight: inherit !important;}
+    </style>
+</head>
+<body>
+
+    <div class="main_container">
+        <input type="hidden" value="0" id="hdn-value-in-head" />
+        <input type="hidden" value="0" id="hdn-value-in-parti" />
+        <input type="hidden" value="0" id="hdn-value-ex-head" />
+        <input type="hidden" value="0" id="hdn-value-ex-parti" />
+        <div class="table_header" style="position:relative;">
+            <h5><i class="fa fa-calendar"></i> Please select a date</h5>
+            <input id="selecteddate" name="date" placeholder="Date" type="text" value="@Model.Selecteddate.ToString("dd-MM-yyyy")" />
+            <span style="position:absolute; right:30px; top:26px;" class="print-data"><a class="isClass"><i class="fa isClass fa-print print-data"></i> Print</a></span>
+        </div><!-- ./table_header -->
+        <div id="divpartial">
+            <div class="table_main">
+                <div class="table_left">
+                    <h3>Income</h3>
+                    <table class="table_left_content comm_table" id="income-table" cellpadding="8">
+                        <thead>
+                            <tr>
+                                <th width="40">Sl No</th>
+                                <th>A/c Head</th>
+                                <th>Account Type</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="income">
+                            @if (balanceBD > 0)
+                            {
+                            <tr>
+                                <td></td>
+                                <td>Balance b/d</td>
+                                <td></td>
+                                <td>@balanceBD</td>
+                            </tr>
+                            }
+                            @foreach (var s in CurrentincomeList)
+                            {
+                                <tr data-id="@s.Id">
+                                    <td>@countincome</td>
+                                    <td><input type="text" class="isPointer in-account-head" value="@s.AccountHead" /></td>
+                                    <td>
+                                        @*<input type="text" class="isPointer in-particular" value="@s.Particular" />*@
+                                        <select class="isPointer in-particular">
+                                            @*<option value=@s.Particular selected=selected>@s.Particular</option>*@
+                                            @* <option value="Indirect Income" @(s.Particular == "Indirect Income" ? "selected=selected" : "")=)>Indirect Income</option>
+                                            <option value="Direct Income" @(s.Particular == "Direct Income" ? "selected=selected" : "")=)>Direct Income</option>
+                                            <option value="Liabilities" @(s.Particular == "Liabilities" ? "selected=selected" : "")=)>Liabilities</option>
+                                            <option value="Cash" @(s.Particular == "Cash" ? "selected=selected" : "")=)>Cash</option>
+                                             <option value="Bank" @(s.Particular == "Bank" ? "selected=selected" : "")=)>Bank</option>*@
+<option value="Indirect Income" selected="@(s.Particular == "Indirect Income")">
+    Indirect Income
+</option>
+
+<option value="Direct Income" selected="@(s.Particular == "Direct Income")">
+    Direct Income
+</option>
+
+<option value="Liabilities" selected="@(s.Particular == "Liabilities")">
+    Liabilities
+</option>
+
+<option value="Cash" selected="@(s.Particular == "Cash")">
+    Cash
+</option>
+
+<option value="Bank" selected="@(s.Particular == "Bank")">
+    Bank
+</option>
+
+                                        </select>
+                                    </td>
+                                    <td class="td-submit-row-edit"><input type="text" class="isPointer in-amount" value="@s.Amount" /></td>
+                                    <td>
+                                        <input type="hidden" value="0" id="hdn-enter-income" />
+                                    </td>
+                                    <td class="edit-row"><a class="isClass"><i class="fa fa-pencil-square-o edit-income"></i></a></td>
+
+                                </tr>
+                                countincome = countincome + 1;
+                            }
+
+                            <tr>
+                                <td>@countincome</td>
+                                <td><input type="text" class="in-account-head" /></td>
+                                <td>
+                                    <select class="in-particular">
+                                        <option value="Indirect Income">Indirect Income</option>
+                                        <option value="Direct Income">Direct Income</option>
+                                        <option value="Liabilities">Liabilities</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Bank">Bank</option>
+
+                                    </select>
+                                    @*<input type="text" class="in-particular" />*@
+                                </td>
+                                <td class="td-submit-row"><input type="text" class="in-amount" /></td>
+                                <td>
+                                    <input type="hidden" value="0" id="hdn-enter-income" />
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    <input type="hidden" value="@countincome" id="hidden-income" />
+
+                    <!-- ./table_left_content comm_table -->
+
+                    <div class="add_inp_row2">
+                        @*  <strong class="add_more_tble"><i class="fa fa-plus-circle"></i> <span class="income-add">Add more</span></strong>*@
+                        @*<strong class="dlt_inp_row pull-right"><i class="fa fa-trash"></i> <span>Delete</span></strong>*@
+                    </div>
+
+                    <div class="table_total">
+                        <input type="hidden" id="income" value="@totalincome" />
+                        <h4>Total Income : <span id="newincome" value="@totalincome"> @totalincome INR</span></h4>
+                    </div><!-- ./table_total -->
+                </div><!-- ./table_left -->
+
+                <div class="table_right">
+                    <h3>Expense</h3>
+                    <table class="table_right_content comm_table" cellpadding="8" id="expence-table">
+                        <thead>
+                            <tr id="expence-tr">
+                                <th width="40">Sl No</th>
+                                <th>A/c Head</th>
+                                <th>Account Type</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="expence">
+                            @if (balanceBD < 0)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td>Balance b/d</td>
+                                    <td></td>
+                                    <td>@Math.Abs(balanceBD)</td>
+                                </tr>
+                            }
+                            @foreach (var exp in CurrentExpenceList)
+                            {
+                                <tr data-id="@exp.Id">
+                                    <td>@countexpence</td>
+                                    <td><input type="text" class="isPointer ex-account-head"  value="@exp.AccountHead" /></td>
+                                    <td>
+                                        @*<input type="text" class="isPointer ex-particular" value="@exp.Particular" />*@
+                                        <select class="isPointer ex-particular">
+                                            @*<option value="@exp.Particular" selected=selected>@exp.Particular</option>*@
+@*                                             <option value="Indirect Expense" @(exp.Particular == "Asset" ? "selected=selected" : "")>Indirect Expense</option>
+                                            <option value="Asset" @(exp.Particular == "Asset" ? "selected=selected" : "")> Asset</option>
+                                            <option value="Direct Expense" @(exp.Particular == "Direct Expense" ? "selected=selected" : "")>Direct Expense</option>
+ *@                                       
+
+     <option value="Indirect Expense" selected="@(exp.Particular == "Indirect Expense")">
+                                                Indirect Expense
+                                            </option>
+
+                                            <option value="Asset" selected="@(exp.Particular == "Asset")">
+                                                Asset
+                                            </option>
+
+                                            <option value="Direct Expense" selected="@(exp.Particular == "Direct Expense")">
+                                                Direct Expense
+                                            </option>
+
+</select>
+                                    </td>
+                                    <td class="td-submit-row-expnce-edit"><input type="text" class="isPointer ex-amount" value="@exp.Amount" /></td>
+                                    <td>
+                                        <input type="hidden" value="0" id="hdn-enter-expence" />
+                                    </td>
+                                    <td class="edit-row"><a class="isClass"><i class="fa fa-pencil-square-o edit-expence"></i></a></td>
+
+                                </tr>
+                                countexpence = countexpence + 1;
+                            }
+                            <tr>
+                                <td>@countexpence</td>
+                                <td><input type="text" class="ex-account-head" id="head" /></td>
+                                <td>
+                                    @*<input type="text" class="ex-particular" />*@
+                                    <select class="ex-particular">
+                                        <option value="Indirect Expense">Indirect Expense</option>
+                                        <option value="Asset">Asset</option>
+                                        <option value="Direct Expense">Direct Expense</option>
+                                    </select>
+                                </td>
+                                <td class="td-submit-row-expnce"><input type="text" class="ex-amount" /></td>
+                                <td>
+                                    <input type="hidden" value="0" id="hdn-enter-expence" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <input type="hidden" value="@countexpence" id="hidden-expence" />
+
+                    <!-- ./table_right_content comm_table -->
+
+                    <div class="add_inp_row2">
+                        @*<strong class="add_more_tble2"><i class="fa fa-plus-circle"></i> <span class="expence-add">Add more</span></strong>*@
+                        @*<strong class="dlt_inp_row2 pull-right"><i class="fa fa-trash"></i> <span>Delete</span></strong>*@
+                    </div>
+                    <div class="table_total">
+                        <input type="hidden" id="expn" value="@totalexpence" />
+                        <h4>Total Expense : <span id="newexpnce">@totalexpence</span> INR</h4>
+                    </div><!-- ./table_total -->
+                </div><!-- ./table_right -->
+            </div><!-- ./table_main -->
+
+            <div class="table_footer">
+                <input type="hidden" id="balan" value="@totalexpence" />
+                <h2><span id="balance-span-dev">@balanceHead</span><span id="newbalance"> @balance INR</span></h2>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="tablePrintData">
+    </div>
+    <!-- ./main_container -->
+    <script id="income-list-append-template" type="application/html-template">
+        <tr id="income-tr">
+            <td class="slno"></td>
+            <td><input type="text" class="in-account-head" /></td>
+            <td>
+                @*<input type="text" class="in-particular" />*@
+                <select class="in-particular">
+                    <option value="Indirect Income">Indirect Income</option>
+                    <option value="Liabilities">Liabilities</option>
+                    <option value="Direct Income">Direct Income</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Bank">Bank</option>
+                </select>
+            </td>
+            <td class="td-submit-row"><input type="text" class="in-amount" /></td>
+            <td>
+                <input type="hidden" value="0" id="hdn-enter-income" />
+            </td>
+        </tr>
+    </script>
+    <script id="expence-list-append-template" type="application/html-template">
+        <tr id="expence-tr">
+            <td class="slno"></td>
+            <td><input type="text" class="ex-account-head" /></td>
+            <td>
+                @*<input type="text" class="ex-particular" />*@
+                <select class="ex-particular">
+                    <option value="Indirect Expense">Indirect Expense</option>
+                    <option value="Asset">Asset</option>
+                    <option value="Direct Expense">Direct Expense</option>
+                </select>
+            </td>
+            <td class="td-submit-row-expnce"><input type="text" class="ex-amount" /></td>
+            <td>
+                <input type="hidden" value="0" id="hdn-enter-expence" />
+            </td>
+        </tr>
+    </script>
+
+
+</body>
+
+</html>
+<script>
+    $(document).ready(function () {
+        var date_input = $('input[name="date"]'); //our date input has the name "date"
+        var container = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
+        date_input.datepicker({
+            format: 'dd-mm-yyyy',
+            container: container,
+            todayHighlight: true,
+            autoclose: true,
+        })
+    })
+</script>
+
+<script>
+    $(document).ready(function () {
+        RefreshAllAccountSearchHead();
+    });
+    function RefreshAllAccountSearchHead(item) {
+        RefreshIncomeAccountSearchHead();
+        RefreshExpenceAccountSearchHead();
+    }
+    function RefreshIncomeAccountSearchHead() {
+        $.ajax({
+            url: '/School/GetAllIncomeAccountHeads',
+            type: "POST",
+            dataType: 'json',
+            global: false,
+            success: function (data) {
+                var options = {
+                    // data: ["blue", "green", "pink", "red", "yellow"]
+                    data: data.result,
+                    list: {
+                        match: {
+                            enabled: true
+                        }
+                    },
+
+
+                };
+                $(".in-account-head").easyAutocomplete(options);
+                console.log("inc");
+
+                //console.log(options)
+            }
+        });
+    }
+    function RefreshExpenceAccountSearchHead() {
+        $.ajax({
+            url: '/School/GetAllExpenceAccountHeads',
+            type: "POST",
+            dataType: 'json',
+            global: false,
+            success: function (data) {
+
+                var options = {
+                    // data: ["blue", "green", "pink", "red", "yellow"]
+                    data: data.result,
+                    list: {
+                        match: {
+                            enabled: true
+                        }
+                    },
+
+                    //theme: "square"
+                };
+
+                $(".ex-account-head").easyAutocomplete(options);
+
+                //$(".ex-account-head").each(function () {
+                //    $(this).easyAutocomplete(options);
+                console.log("exp");
+                //console.log(options);
+            }
+        });
+    }
+    $(document).on('keyup', '.in-account-head', function () {
+        var value = $(this).parent().parent().parent();
+        var tble = $('#income-table > tbody > tr').last()
+        //console.log(s.find('.in-account-head').val())
+        //console.log(s.find('.in-account-head').val())
+        var prevValue = $('#hdn-value-in-head').val();
+        var prevPartiValue = $('#hdn-value-in-parti').val();
+        // var tble= $('#income-table tr:last').attr('id');
+
+        var curretValue = $(this).val();
+        //if (prevValue == curretValue)
+        //{
+        //    //console.log(prevPartiValue)
+        //    tble.find(".in-particular").val(prevPartiValue)
+        //}
+        $.ajax({
+            url: '/School/GetLatestIncParticulr/' + curretValue,
+            type: "POST",
+            dataType: 'json',
+            global: false,
+            success: function (data) {
+            //    console.log(data)
+                if (data.msg == "Success") {
+                    value.find(".in-particular").val(data.value)
+                }
+                else {
+                    value.find(".in-particular").val('Indirect Income')
+
+                }
+
+            }
+        });
+
+    });
+
+    $(document).on('keyup', '.ex-account-head', function () {
+        var value = $(this).parent().parent().parent();
+     //   console.log(value);
+        var tble = $('#expence-table > tbody > tr').last()
+        //console.log(s.find('.in-account-head').val())
+        //console.log(s.find('.in-account-head').val())
+        var prevValue = $('#hdn-value-ex-head').val();
+        var prevPartiValue = $('#hdn-value-ex-parti').val();
+        // var tble= $('#income-table tr:last').attr('id');
+
+        var curretValue = $(this).val();
+        //if (prevValue == curretValue) {
+        //    //console.log(prevPartiValue)
+        //    tble.find(".ex-particular").val(prevPartiValue)
+        //}
+        // alert(curretValue)
+        $.ajax({
+            url: '/School/GetLatestExpParticulr/' + curretValue,
+            type: "POST",
+            dataType: 'json',
+            global: false,
+            success: function (data) {
+               // console.log(data)
+                if (data.msg == "Success") {
+                    value.find(".ex-particular").val(data.value)
+
+                }
+                else {
+
+                    value.find(".ex-particular").val('Indirect Expense')
+
+                }
+
+            }
+        });
+
+    });
+
+    $(document).on('keydown', ".in-amount", function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('keydown', ".ex-amount", function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('keyup', '.td-submit-row-expnce', function (event) {
+
+        var newsource = $(this);
+        var status = true;
+        var Date = $('#selecteddate').val();
+
+        var headValue = $(newsource).parent().find('.ex-account-head').val();
+        var particularValue = $(newsource).parent().find('.ex-particular').val();
+        var amount = $(newsource).parent().find('.ex-amount').val();
+
+        var obj = new Object();
+        obj.HeadValue = headValue;
+        obj.ParticularValue = particularValue;
+        obj.Amount = amount;
+        var res = Date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var ztoday = mm + '-' + dd + '-' + yyyy;
+        obj.SelectedDate = ztoday;
+        if (Date == "") {
+
+            $('#selecteddate').addClass('empty_field')
+        }
+        else {
+            $('#selecteddate').removeClass('empty_field')
+
+        }
+        if (headValue == "") {
+            $(newsource).parent().find('.ex-account-head').addClass('empty_field')
+        }
+        else {
+            $(newsource).parent().find('.ex-account-head').removeClass('empty_field')
+
+        }
+        if (particularValue == "") {
+            $(newsource).parent().find('.ex-particular').addClass('empty_field')
+        }
+        else {
+            $(newsource).parent().find('.ex-particular').removeClass('empty_field')
+
+        }
+        if (amount == "") {
+            $(newsource).parent().find('.ex-amount').addClass('empty_field')
+        }
+        else {
+            $(newsource).parent().find('.ex-amount').removeClass('empty_field')
+
+        }
+        if (headValue != "" && particularValue != "" && amount != "" && Date != "") {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            var hdnenter = $(newsource).parent().find('#hdn-enter-expence').val();
+            //console.log(hdnenter)
+            if (hdnenter == 0) {
+                if (keycode == '13') {
+                    $(newsource).parent().find('#hdn-enter-expence').val(1)
+                    $.ajax({
+                        url: '/School/SubmitExpenceData',
+                        type: "POST",
+                        dataType: 'json',
+                        global: false,
+                        data: obj,
+                        success: function (data) {
+                            if (data.message = "success") {
+                                var totalex = $('#expn').val();
+                                var finaltotal = parseFloat(totalex) + parseFloat(amount);
+                                $('#expn').val(finaltotal)
+                                $('#newexpnce').html(finaltotal)
+                                var bal = parseFloat($('#income').val()) - finaltotal;
+                                $('#newbalance').html(bal);
+                                if (bal > 0) {
+                                    $('#balance-span-dev').html("Profit: ");
+                                }
+                                else if (bal < 0) {
+                                    $('#balance-span-dev').html("Loss: ");
+                                }
+                                else {
+                                    $('#balance-span-dev').html("Balance: ");
+                                }
+
+
+                                var template = $('#expence-list-append-template').clone().html();
+                                //console.log(template)
+                                $('.expence').append(template);
+                                var hiddenvalue = $('#hidden-expence').val();
+                                var s = $('#expence-table tr:last').children("td:first").replaceWith('<td class="slno">' + parseInt(parseInt(hiddenvalue) + parseInt(1)) + '</td>');
+                                //.find('.slno').replaceWith('<td class="slno">' + parseInt(hiddenvalue) + parseInt(1) + '</td>');
+                                $('#hidden-expence').val(parseInt(parseInt(hiddenvalue) + parseInt(1)));
+                                $(newsource).parent().find('.td-submit-row-expnce').removeClass('td-submit-row-expnce').addClass('td-submit-row-expnce-edit')
+
+                                $(newsource).parent().find('.ex-amount').addClass('isPointer')
+                                $(newsource).parent().find('.ex-account-head').addClass('isPointer')
+                                $(newsource).parent().find('.ex-particular').addClass('isPointer')
+                                $(newsource).parent().append('<td><a class="isClass"><i class="fa fa-pencil-square-o edit-expence"></i></a></td>')
+
+                                $('#hdn-value-ex-head').val(headValue);
+                                $('#hdn-value-ex-parti').val(particularValue);
+                                RefreshExpenceAccountSearchHead();
+                                setTimeout(function () {
+                                    newsource.parent().parent().find('.ex-account-head').last().focus();
+                                }, 1000);
+
+                            }
+                            else {
+                                $(newsource).parent().find('#hdn-enter-expence').val(0)
+
+
+                            }
+                        }
+                    });
+
+                    RefreshExpenceAccountSearchHead();
+                }
+            }
+            //
+        }
+
+    });
+    $(document).on('keyup', '.td-submit-row', function (event) {
+        // console.log(100)
+        //$('#hdn-value-in-head').val('');
+        //$('#hdn-value-in-parti').val('');
+
+        var newsource = $(this);
+        var status = true;
+        var headValue = $(newsource).parent().find('.in-account-head').val();
+        var particularValue = $(newsource).parent().find('.in-particular').val();
+        var amount = $(newsource).parent().find('.in-amount').val();
+        var Date = $('#selecteddate').val();
+        var obj = new Object();
+        obj.HeadValue = headValue;
+        obj.ParticularValue = particularValue;
+        obj.Amount = amount;
+        var res = Date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var ztoday = mm + '-' + dd + '-' + yyyy;
+        obj.SelectedDate = ztoday;
+        if (Date == "") {
+
+            $('#selecteddate').addClass('empty_field')
+        }
+        else {
+            $('#selecteddate').removeClass('empty_field')
+
+        }
+        if (headValue == "") {
+            $(newsource).parent().find('.in-account-head').addClass('empty_field')
+        }
+        else {
+            $(newsource).parent().find('.in-account-head').removeClass('empty_field')
+
+        }
+        if (particularValue == "") {
+            $(newsource).parent().find('.in-particular').addClass('empty_field')
+        }
+        else {
+            $(newsource).parent().find('.in-particular').removeClass('empty_field')
+
+        }
+        if (amount == "") {
+            $(newsource).parent().find('.in-amount').addClass('empty_field')
+        }
+        else {
+            $(newsource).parent().find('.in-amount').removeClass('empty_field')
+
+        }
+        if (headValue != "" && particularValue != "" && amount != "" && Date != "") {
+
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            var hdnenter = $(newsource).parent().find('#hdn-enter-income').val();
+            if (hdnenter == 0) {
+                // console.log(hdnenter)
+                if (keycode == '13') {
+                    $(newsource).parent().find('#hdn-enter-income').val(1)
+                    //console.log("Enter")
+                    $.ajax({
+                        url: '/School/SubmitIncomeData',
+                        type: "POST",
+                        dataType: 'json',
+                        global: false,
+                        data: obj,
+                        success: function (data) {
+                            if (data.Message = "success") {
+                                var totalinc = $('#income').val();
+                                var finaltotal = parseFloat(totalinc) + parseFloat(amount);
+                                $('#income').val(finaltotal)
+                                $('#newincome').html(finaltotal)
+
+                                var bal = finaltotal - parseFloat($('#expn').val());
+                                $('#newbalance').html(bal);
+                                if (bal > 0) {
+                                    $('#balance-span-dev').html("Profit: ");
+                                }
+                                else if (bal < 0) {
+                                    $('#balance-span-dev').html("Loss: ");
+                                }
+                                else {
+                                    $('#balance-span-dev').html("Balance: ");
+                                }
+
+
+                                var template = $('#income-list-append-template').clone().html();
+                                $('.income').append(template);
+                                var hiddenvalue = $('#hidden-income').val();
+                                var s = $('#income-table tr:last').children("td:first").replaceWith('<td class="slno">' + parseInt(parseInt(hiddenvalue) + parseInt(1)) + '</td>');
+                                //.find('.slno').replaceWith('<td class="slno">' + parseInt(hiddenvalue) + parseInt(1) + '</td>');
+                                $('#hidden-income').val(parseInt(parseInt(hiddenvalue) + parseInt(1)));
+                                $(newsource).parent().find('.td-submit-row').removeClass('td-submit-row').addClass('td-submit-row-edit')
+                                $(newsource).parent().find('.in-amount').addClass('isPointer')
+                                $(newsource).parent().find('.in-account-head').addClass('isPointer')
+                                $(newsource).parent().find('.in-particular').addClass('isPointer')
+                                // $(newsource).parent().find('#hdn-enter-income').val(1);
+                                $(newsource).parent().append('<td><a class="isClass"><i class="fa fa-pencil-square-o edit-income"></i></a></td>')
+                                $(newsource).parent().attr('data-id', data.Id)
+
+                                $('#hdn-value-in-head').val(headValue);
+                                $('#hdn-value-in-parti').val(particularValue);
+                                setTimeout(function () {
+                                    newsource.parent().parent().find('.in-account-head').last().focus()
+                                }, 1000);
+                            }
+                            else {
+                                $(newsource).parent().find('#hdn-enter-income').val(0)
+
+                            }
+
+                        }
+                    });
+
+                    //$.ajax({
+                    //    url: '/School/GetAllIncomeAccountHeads',
+                    //    type: "POST",
+                    //    dataType: 'json',
+                    //    global: false,
+                    //    success: function (data) {
+                    //        var options = {
+                    //            // data: ["blue", "green", "pink", "red", "yellow"]
+                    //            data: data.result
+                    //        };
+                    //        $(".in-account-head").easyAutocomplete(options);
+                    //        //console.log(options)
+                    //    }
+                    //});
+                    RefreshIncomeAccountSearchHead();
+
+                }
+            }
+        }
+    });
+
+
+    $('#selecteddate').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+  
+    $(document).on('change', '#selecteddate', function () {
+        var datess = $('#selecteddate').val();
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+        var today = dd + '-' + mm + '-' + yyyy;
+
+        var res = datess.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var ztoday = mm + '-' + dd + '-' + yyyy;
+        if (datess == today) {
+            //console.log(today + "     ...         " + datess);
+            window.location.href = "/School/Report/";
+        }
+        else {
+            $.ajax({
+                url: '/School/GetAllReportOnDate/' + ztoday,
+                type: "GET",
+                dataType: 'html',
+                global: false,
+                success: function (data) {
+                    RefreshAllAccountSearchHead();
+                    $('#divpartial').html('');
+                    $('#divpartial').html(data);
+
+                }
+            });
+        }
+
+
+    });
+
+    $(document).on('click', '.edit-income', function () {
+        var source = $(this);
+        var sp = source.parent().parent().parent().attr('data-id');
+        source.parent().parent().parent().find('.in-account-head').removeClass('isPointer')
+        source.parent().parent().parent().find('.in-particular').removeClass('isPointer')
+        source.parent().parent().parent().find('.in-amount').removeClass('isPointer')
+        source.parent().parent().parent().find('.in-account-head').first().focus()
+        $(this).hide();
+
+    });
+
+    $(document).on('keyup', '.td-submit-row-edit', function (event) {
+        var newsource = $(this);
+        var Id = newsource.parent().attr('data-id');
+        var status = true;
+        var headValue = $(newsource).parent().find('.in-account-head').val();
+        var particularValue = $(newsource).parent().find('.in-particular').val();
+        var amount = $(newsource).parent().find('.in-amount').val();
+        var Date = $('#selecteddate').val();
+
+        var obj = new Object();
+        obj.HeadValue = headValue;
+        obj.ParticularValue = particularValue;
+        obj.Amount = amount;
+        var res = Date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var ztoday = mm + '-' + dd + '-' + yyyy;
+        obj.SelectedDate = ztoday;
+        obj.Id = Id;
+        // console.log(amount)
+        if (Date == "") {
+
+            $('#selecteddate').addClass('empty_field')
+        }
+        else {
+            $('#selecteddate').removeClass('empty_field')
+
+        }
+        if (headValue == "") {
+            $(newsource).parent().find('.in-account-head').addClass('empty_field')
+        }
+        else {
+            $(newsource).parent().find('.in-account-head').removeClass('empty_field')
+
+        }
+        if (particularValue == "") {
+            $(newsource).parent().find('.in-particular').addClass('empty_field')
+        }
+        else {
+            $(newsource).parent().find('.in-particular').removeClass('empty_field')
+
+        }
+        if (amount == "") {
+            $(newsource).parent().find('.in-amount').addClass('empty_field')
+        }
+        else {
+            // $('#income').val('');
+            $(newsource).parent().find('.in-amount').removeClass('empty_field')
+
+        }
+        if (headValue != "" && particularValue != "" && amount != "" && Date != "") {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                $.ajax({
+                    url: '/School/SubmitIncomeDataEdit',
+                    type: "POST",
+                    dataType: 'json',
+                    global: false,
+                    data: obj,
+                    success: function (data) {
+                        $(newsource).parent().find('.in-account-head').addClass('isPointer')
+                        $(newsource).parent().find('.in-particular').addClass('isPointer')
+                        $(newsource).parent().find('.in-amount').addClass('isPointer')
+                        $(newsource).parent().find('.edit-income').show()
+
+                        $(newsource).find('.in-amount').blur();
+                        newsource.parent().parent().find('.in-account-head').last().focus()
+
+                        var totalinc = $('#income').val();
+                        var prevamout = data.Amount;
+                        //console.log(data.Amount)
+                        var finaltotal = parseFloat(totalinc) + parseFloat(amount) - prevamout;
+                        $('#income').val(finaltotal)
+                        $('#newincome').html(finaltotal)
+
+                        var bal = finaltotal - parseFloat($('#expn').val());
+                        $('#newbalance').html(bal);
+                        if (bal > 0) {
+                            $('#balance-span-dev').html("Profit: ");
+                        }
+                        else if (bal < 0) {
+                            $('#balance-span-dev').html("Loss: ");
+                        }
+                        else {
+                            $('#balance-span-dev').html("Balance: ");
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    //$(document).on('keydown', '.in-account-head', function (event) {
+    //    var item = $(this);
+    //    GetIncomeAccountHead(item);
+    //});
+    //function GetIncomeAccountHead(item) {
+    //    var div = item;
+    //    var searchedText = item.val();
+    //    console.log(searchedText);
+    //    $(".in-account-head").easyAutocomplete("data:");
+    //    $.ajax({
+    //        url: '/School/GetIncomeAccountHeads/' + searchedText,
+    //        type: "POST",
+    //        dataType: 'json',
+    //        global: false,
+    //        success: function (data) {
+    //            var options = {
+    //                // data: ["blue", "green", "pink", "red", "yellow"]
+    //                data: data.result
+    //            };
+    //        $(".in-account-head").easyAutocomplete(options);
+    //        //div.parents('td').find(".easy-autocomplete-container > ul").css({'display': 'inline-block'});
+
+    //            //console.log(options)
+    //        }
+    //    });
+    //}
+
+    $(document).on('click', '.edit-expence', function () {
+        var source = $(this);
+        var sp = source.parent().parent().parent().attr('data-id');
+        source.parent().parent().parent().find('.ex-account-head').removeClass('isPointer')
+        source.parent().parent().parent().find('.ex-particular').removeClass('isPointer')
+        source.parent().parent().parent().find('.ex-amount').removeClass('isPointer')
+        source.parent().parent().parent().find('.ex-account-head').first().focus()
+
+        $(this).hide();
+
+    });
+
+    $(document).on('keyup', '.td-submit-row-expnce-edit', function (event) {
+        var newsource = $(this);
+        var Id = newsource.parent().attr('data-id');
+        var status = true;
+        var headValue = $(newsource).parent().find('.ex-account-head').val();
+        var particularValue = $(newsource).parent().find('.ex-particular').val();
+        var amount = $(newsource).parent().find('.ex-amount').val();
+        var Date = $('#selecteddate').val();
+       // console.log(Date)
+        var obj = new Object();
+        obj.HeadValue = headValue;
+        obj.ParticularValue = particularValue;
+        obj.Amount = amount;
+        var res = Date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var ztoday = mm + '-' + dd + '-' + yyyy;
+        obj.SelectedDate = ztoday;
+        obj.Id = Id;
+        // console.log(amount)
+        if (Date == "") {
+
+            $('#selecteddate').addClass('empty_field')
+        }
+        else {
+            $('#selecteddate').removeClass('empty_field')
+
+        }
+        if (headValue == "") {
+            $(newsource).parent().find('.ex-account-head').addClass('empty_field')
+        }
+        else {
+            $(newsource).parent().find('.ex-account-head').removeClass('empty_field')
+
+        }
+        if (particularValue == "") {
+            $(newsource).parent().find('.ex-particular').addClass('empty_field')
+        }
+        else {
+            $(newsource).parent().find('.ex-particular').removeClass('empty_field')
+
+        }
+        if (amount == "") {
+            $(newsource).parent().find('.ex-amount').addClass('empty_field')
+        }
+        else {
+            // $('#income').val('');
+            $(newsource).parent().find('.ex-amount').removeClass('empty_field')
+
+        }
+        if (headValue != "" && particularValue != "" && amount != "" && Date != "") {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                $.ajax({
+                    url: '/School/SubmitExpenceDataEdit',
+                    type: "POST",
+                    dataType: 'json',
+                    global: false,
+                    data: obj,
+                    success: function (data) {
+                        $(newsource).parent().find('.ex-account-head').addClass('isPointer')
+                        $(newsource).parent().find('.ex-particular').addClass('isPointer')
+                        $(newsource).parent().find('.ex-amount').addClass('isPointer')
+                        $(newsource).parent().find('.edit-expence').show()
+                        $(newsource).find('.ex-amount').blur();
+                        newsource.parent().parent().find('.ex-account-head').last().focus()
+
+                        var prevamout = data.Amount;
+
+                        var totalex = $('#expn').val();
+                        var finaltotal = parseFloat(totalex) + parseFloat(amount) - prevamout;
+                        $('#expn').val(finaltotal)
+                        $('#newexpnce').html(finaltotal)
+                        var bal = parseFloat($('#income').val()) - finaltotal;
+                        $('#newbalance').html(bal);
+                        if (bal > 0) {
+                            $('#balance-span-dev').html("Profit: ");
+                        }
+                        else if (bal < 0) {
+                            $('#balance-span-dev').html("Loss: ");
+                        }
+                        else {
+                            $('#balance-span-dev').html("Balance: ");
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    $(document).on('click', '.print-data', function () {
+        var Date = $('#selecteddate').val();
+        var res = Date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var ztoday = mm + '-' + dd + '-' + yyyy;
+        $.ajax({
+            url: '/School/PrintIncomeExpenceData/' + ztoday,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                //$('#tablePrintData').html('');
+                //$('#tablePrintData').html(data);
+                $('#tablePrintData').html(data);
+                //$.validator.unobtrusive.parse($("#tablePrintData"));
+                $('#tablePrintData').modal('show');
+            }
+        });
+
+    });
+
+</script>

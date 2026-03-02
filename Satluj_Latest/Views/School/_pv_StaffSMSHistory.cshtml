@@ -1,0 +1,125 @@
+﻿@model Satluj_Latest.Models.SMSHistoryModel
+@{
+    //var Currentcount = ViewBag.msgCount;
+    //var totalcount = ViewBag.TotalCount;
+    var item = Model.headId;
+    var data = new Satluj_Latest.Data.SmsHead(item).StaffSMSHistory;
+}
+<div class="form-group" id="myModalLabel">
+    <button class="btn btn-peek"  id="devivery-status" <i></i> Delivery Status </button>
+</div>
+<input type="hidden" value="@item"id="headt-Id" />
+        <div class="table-responsive">
+            <table class="table custome-table" id="smsList">
+                <thead>
+                    <tr>
+                        <th>
+                            Slno
+                        </th>
+                        <th>
+                            Date
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Position
+                        </th>
+                        <th>
+                            Contact
+                        </th>
+                        <th>
+                            Content
+                        </th>
+                        <th>
+                            Send Status
+                        </th>
+                        <th>
+                            Delivery Status
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        string User = "";
+                        string DevivaryStatus = "";
+                        string SendStatus = "";
+                        string Date = "";
+                        var index = 1;
+                        if (data.Count > 0)
+                        {
+                            foreach (var sms in data)
+                            {
+                                if (sms.UserType == 1)
+                                {
+                                    User = "Teacher";
+                                }
+                                else
+                                {
+                                    User = "Staff";
+                                }
+                                <tr class="ng-click" data-id="@sms.Id">
+                                    <td>
+                                        @index
+                                    </td>
+                                    <td>
+                                        @if (sms.MessageDate != null)
+                                        {
+                                            Date = Convert.ToDateTime(sms.MessageDate).ToString("dd/MM/yyyy");
+
+                                        }
+                                        @Date
+                                    </td>
+                                    <td>
+                                        @sms.Name
+                                    </td>
+                                    <td>
+                                        @User
+
+                                        @*@sms.UserName*@
+                                    </td>
+                                    <td>
+                                        @sms.ContactNumber
+
+                                    </td>
+                                    <td>
+                                        @sms.MessageContent
+                                    </td>
+                                    <td>
+                                        @if (sms.SendStatus == "1")
+                                        {
+                                            SendStatus = "Success";
+                                        }
+                                        else
+                                        {
+                                            SendStatus = "Failed";
+                                        }
+                                        @SendStatus
+                                    </td>
+                                    <td>
+                                        @if (sms.DelivaryStatus !=null)
+                                        {
+                                            DevivaryStatus = sms.DelivaryStatus;
+                                        }
+                                        else
+                                        {
+                                            DevivaryStatus = "Failed";
+                                        }
+                                        @DevivaryStatus
+
+                                    </td>
+                                </tr>
+                                index++;
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+<script>
+   
+
+</script>

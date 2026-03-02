@@ -1,0 +1,71 @@
+﻿@model Satluj_Latest.Models.ExamSubjectDetailsModel
+@{ 
+    var subjectList = new Satluj_Latest.Data.Exams(Model.ExamId).ExamSubjectsList.ToList();
+}
+
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Subject
+        </th>
+        <th>
+            Date
+        </th>
+        <th>
+            Theory
+        </th>
+        @*<th>
+           Practical
+        </th>
+        <th>
+            Total
+        </th>*@
+        <th width="15%">
+            #
+        </th>
+
+    </tr>
+</thead>
+<tbody>
+    @{
+        if (subjectList != null)
+        {
+            int i = 1;
+            foreach (var item in subjectList)
+            {
+                <tr style="cursor: pointer !important;">
+                    <td class="exam-row" data-id="@item.SubId">
+                        @i
+                    </td>
+                    <td class="exam-row" data-id="@item.SubId">
+                        @item.Subject
+                    </td>
+                    <td class="exam-row" data-id="@item.SubId">
+                        @item.ExamDate.ToString("dd/MM/yyyy")
+                    </td>
+                    <td class="exam-row" data-id="@item.SubId">
+                        @item.InternalMarks
+                    </td>
+                    @*<td class="exam-row" data-id="@item.SubId">
+                        @item.ExternalMark
+                    </td>
+                    <td class="exam-row" data-id="@item.SubId">
+                        @item.Mark
+                    </td>*@
+                    <td width="15%">
+                        <button class="delete-exam-tr btn btn-peek delete-subject-data" data-id="@item.SubId"><i class="fa fa-trash "></i></button>
+                        <button class="edit-exam-tr btn pay-now-btn edit-subject-data" data-id="@item.SubId"><i class="fa fa-edit "></i></button>
+                    </td>
+                </tr>
+                i++;
+            }
+        }
+        else
+        {
+
+        }
+    }
+</tbody>

@@ -1,0 +1,70 @@
+﻿@model Satluj_Latest.Models.VProgressCardList
+@{
+    // var studentList = new Satluj_Latest.Data.School(Model.SchoolId).Listing_V_ClassStudents(Model.DivisionId).ToList();
+    var data = Model.TempMo1;
+    
+
+}
+
+<div class="table-responsive" id="pv-previousprogress">
+    <table class="table custome-table">
+        <thead>
+            <tr>
+                <th style="width:100%;">
+                    Students
+                </th>
+                <th>
+                    Academic Year
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @if (data.Count > 0)
+            {
+                foreach (var a1 in data)
+                {
+                    // var studentId = a1.StudentId.ToString();
+                    <tr>
+                        <td data-id="@a1.studentId" style="width:70%;">
+                            @a1.studentName
+                        </td>
+                        <td class="academicyear_id">
+                            <input type="text" id="academicyear" value="@a1.AcademinYear" style="border:none;" readonly/> 
+                        </td>
+                        <td>
+                            @*<a href="/SpecialClass/VProgressCard_others/@a1.studentId" target="_blank" class="btn pay-now-btn " data-toggle="model" style="margin-left: 63px;" id="btn-student-Generate">Generate</a>*@
+                            <a href="" target="_blank" class="btn pay-now-btn Generate-Report" data-toggle="model" style="margin-left: 63px;" id="@a1.studentId">Generate</a>
+
+                        </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+<script>
+    // $(".Generate-Report").click(function () {
+    $(document).ready(function () {
+        IntializeDataTable();
+
+    });
+    function IntializeDataTable() {
+        $(".custome-table").dataTable().fnDestroy()
+        $(".custome-table").dataTable();
+    }
+
+
+    $(document).on('click', '.Generate-Report', function () {
+
+        //var dates = $("#StartDateString").val();
+        var Id_St = $(this).attr("id");
+        var academicyear = $("#academicyear").val();
+        var ids = Id_St + '~' + academicyear;
+        window.open("/SpecialClass/VPreviousYearCard_ONE_FOUR?ids=" + ids);
+
+    })
+</script>
+

@@ -1,0 +1,168 @@
+﻿@model Satluj_Latest.Models.AddDayBookModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    var dd = new Satluj_Latest.Data.DropdownData();
+}
+
+<form asp-action="EditDayBook"
+      asp-controller="Journal"
+      id="form-login"
+      method="post"
+      data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-success="EditDayBookSuccess"
+      data-ajax-failure="EditDayBookFailed">
+
+    @Html.HiddenFor(m => m.DayBookId)
+
+    <div class="col-md-6">
+
+        <!-- TYPE -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Type</label>
+            </div>
+            <div class="col-md-9">
+
+                @Html.DropDownListFor(
+                m => m.TypeId,
+                                new SelectList(Html.GetEnumSelectList<Satluj_Latest.BankType>(), "Value", "Text", Model.TypeId),
+                                "--Choose--",
+                                new { @class = "form-control pv_account-type", @data_live_search = "true", id = "day-book-type-id" }
+                                )
+
+                @Html.ValidationMessageFor(m => m.TypeId)
+            </div>
+        </div>
+
+        <!-- ENTRY DATE -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Date</label>
+            </div>
+            <div class="col-md-9 calendar-inp pos_icon_adj">
+                @Html.TextBoxFor(m => m.EntryDateString, new { @class = "form-control date-dayBook-add", placeholder = "" })
+                <i class="fa"></i>
+            </div>
+        </div>
+
+        <!-- VOUCHER NO -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Voucher No</label>
+            </div>
+            <div class="col-md-9">
+                @Html.TextBoxFor(m => m.VoucherNo, new { @readonly = "readonly", @class = "form-control", placeholder = "Voucher No" })
+            </div>
+        </div>
+
+        <!-- ACCOUNT HEAD -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Account Head</label>
+            </div>
+            <div class="col-md-9">
+                @Html.DropDownListFor(
+                                m => m.HeadId,
+                                dd.GetAccountHeads(Model.SchoolId),
+                                "--Choose--",
+                                new { @class = "form-control accHead-drop-down", @data_live_search = "true", id = "day-book-head-id" }
+                                )
+
+                @Html.ValidationMessageFor(m => m.HeadId)
+            </div>
+        </div>
+
+        <!-- SUBLEDGER -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>SubLedger</label>
+            </div>
+            <div class="col-md-9">
+
+                @Html.DropDownListFor(
+                                m => m.SubLedgerId,
+                                new SelectList(
+                                new List<Object> {
+                                new { value = 0, text = "--select division--" }
+                                },
+                                "value",
+                                "text"
+                                ),
+                                new { @class = "form-control", @disabled = "disabled", @data_live_search = "true" }
+                                )
+
+                @Html.ValidationMessageFor(m => m.SubLedgerId)
+            </div>
+        </div>
+
+        <!-- AMOUNT -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Amount</label>
+            </div>
+            <div class="col-md-9">
+                @Html.TextBoxFor(m => m.Amount, new { @class = "form-control", placeholder = "Amount" })
+                @Html.ValidationMessageFor(m => m.Amount)
+            </div>
+        </div>
+
+        <!-- NARRATION -->
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Narration</label>
+            </div>
+            <div class="col-md-9">
+                @Html.TextBoxFor(m => m.Narration, new { @class = "form-control", placeholder = "Narration" })
+                @Html.ValidationMessageFor(m => m.Narration)
+            </div>
+        </div>
+
+        <!-- FOOTER BUTTONS -->
+        <div class="form-group gap_bottom">
+            <div class="modal-footer">
+                <button type="button" id="btn-cancel-daybook" class="btn">Cancel</button>
+                <button type="submit" id="btn-edit-save-daybook" class="btn pay-now-btn">Edit</button>
+                <button type="button" id="btn-print-daybook-edit" class="btn pay-now-btn">Print</button>
+            </div>
+        </div>
+
+    </div>
+
+</form>
+
+
+<script>
+    $(document).ready(function () {
+
+        var headid = @Model.HeadId;
+        var subledgid = @Model.SubLedgerId;
+
+        $.ajax({
+            url: '/Data/LoadSubLedgerList?id=' + headid,
+            type: "GET",
+            success: function (result) {
+                if (result.list.length > 0) {
+                    $("#SubLedgerId").html("");
+                    $("#SubLedgerId").append($('<option></option>').val("").html('-- Select SubLedger --'));
+
+                    $.each(result.list, function (i, item) {
+                        $("#SubLedgerId").append($('<option></option>').val(item.Value).html(item.Text));
+                    });
+
+                    $("#SubLedgerId").val(subledgid);
+                    $("#SubLedgerId").prop("disabled", false);
+                    $("#day-book-type-id").attr("disabled", "disabled");
+                }
+                else {
+                    $("#SubLedgerId").html("");
+                    $("#SubLedgerId").append($('<option></option>').val("").html('-- No SubLedger Found --'));
+                    $("#SubLedgerId").prop("disabled", true);
+                    $("#day-book-type-id").attr("disabled", "disabled");
+                }
+            }
+        });
+
+    });
+</script>

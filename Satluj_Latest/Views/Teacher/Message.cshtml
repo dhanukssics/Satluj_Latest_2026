@@ -1,0 +1,424 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+
+}
+
+<style>
+    .nautybx {
+        background-color: #fff;
+        border-radius: 3px;
+        border-bottom: 2px solid #56c578;
+        margin-bottom: 15px;
+        padding: 15px;
+        padding-bottom: 0px;
+    }
+
+    .btn-green {
+        background-color: #56c578;
+        border-color: transparent;
+        color: #fff;
+    }
+
+        .btn-green:focus,
+        .btn-green:hover,
+        .btn-green:active {
+            background-color: #30af57;
+            border-color: transparent;
+            color: #fff;
+        }
+
+    .ca-custome-table thead > tr > th {
+        background-color: #56c578;
+        color: #fff;
+        vertical-align: middle;
+    }
+
+    .ca-custome-table tbody > tr > td {
+        background-color: #fff;
+        color: #000;
+        vertical-align: middle;
+    }
+
+    .btn-round {
+        border-radius: 50px;
+    }
+
+    .dz-message {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+</style>
+<link href=@Url.Content("~/Scripts/dropzone/dropzone.css") rel="stylesheet" />
+<script src=@Url.Content("~/Scripts/dropzone/dropzone.js")></script>
+
+
+<div class="container" style="width: 100%; padding: 0px 20px;">
+
+    <div class="nautybx col-sm-12">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="col-sm-12 form-group">
+                    Class : <b style="margin-left: 20px;">@Model.className</b>
+                </div>
+                <div class="col-sm-12 form-group">
+
+                    <select asp-for="division"
+                            class="form-control"
+                            data-live-search="true"
+                            id="division-drop-down"
+                            style="max-width: 80%; display: inline-block;">
+                        <option value="">-- Select Division --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <span>*Only upload image file</span>
+                    <div class="dropzone" style=" background: #e2e2e2 !important;" id="dropzone">
+                        <div class="fallback">
+                            <input name="file" type="file" id="file-upload" />
+                        </div>
+                    </div>
+                    @Html.TextBoxFor(m => m.fileData, new { value = "", type = "hidden", id = "hfUrlImage" })
+                    @Html.ValidationMessageFor(m => m.fileData)
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea class="form-control" style="height: 100px;" id="message-dev"></textarea>
+                </div>
+                <div class="form-group text-right">
+                    <button id="btn-homework" class="btn btn-green isDisabled">Assign Homework</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+
+
+
+        <div class="row">
+            <input type="hidden" value="@Model.classId" id="hfClassId" />
+            <input type="hidden" value="@Model.teacherId" id="hfTeacherId" />
+            <input type="hidden" value="0" id="hfBtnStatus" />
+
+
+
+
+
+            <div class="col-sm-12" id="partial-view">
+
+
+
+
+                <div class="container" style="width: 100%; padding: 0px 20px;">
+                    <div class="row">
+
+                        <div class="col-sm-12">
+                            <table class="table ca-custome-table" id="TeacherHomeworkListTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px; text-align: center;">
+                                            #
+                                        </th>
+                                        <th>
+                                            Date
+                                        </th>
+                                        <th>
+                                            Message
+                                        </th>
+                                        <th>
+                                            Image
+                                        </th>
+
+                                        <th>
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{var index1 = 1;
+                                        var homeworks = new Satluj_Latest.Data.HomeWorkSchool().GetAssignedHomework(Model.TeacherId);
+                                    }
+                                    @foreach (var homework in homeworks)
+                                    {
+                                        <tr>
+                                            <td style="width: 50px; text-align: center;">@index1</td>
+                                            <td>@homework.date</td>
+                                            <td>@homework.message</td>
+                                            <td>@homework.imageLink</td>
+                                            <td>
+                                                <button id="btn-report" class="btn btn-green btn-round" data-id="@homework.homeworkId">View</button>
+                                            </td>
+                                        </tr>
+                                        index1++;
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="all-student-list" class="isHidden">
+
+                <table class="table ca-custome-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 35px;">
+                                <input type="checkbox" id="chkBox-all" />
+                            </th>
+                            <th style="width: 50px; text-align: center;">
+                                #
+                            </th>
+                            <th>
+                                Student Name
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="studentList-tbody-dev">
+                        @{
+                            var index = 1;
+                            var students = new  Satluj_Latest.Data.Admin().GetUserList(Model.classId, Model.schoolId);
+                        }
+                        @foreach (var student in students)
+                        {
+                            <tr>
+                                <td><input id="chkBox-user" type="checkbox" data-id="@student.userId" data-emailId="@student.email" data-pnno="@student.contactNo" onchange="AddRemoveUser(this)" /></td>
+                                <td style="text-align: center;">@index</td>
+                                <td></td>
+                            </tr>
+                            index++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /pop up for validation-------------------------------------------------------------------------------------------------------------->
+
+<div class="modal fade my_model_success  bs-example-modal-sm" id="level-validation" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header wrong_ans">
+                <h4 class="modal-title" id="mySmallModalLabel"><span class="fa fa-warning"></span>&nbsp;Validation!</h4>
+            </div>
+            <div class="modal-body my_modle_txt">
+                <p>Message Field Is Empty!<br /></p>
+                <button class="close_popup time-out-ok" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#studentListTable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": true
+        });
+        $('#chkBox-all').trigger('click');
+
+
+    })
+
+
+
+
+
+    var array = [];
+    var phArray = [];
+    var emailArray = [];
+    function AddRemoveUser(source) {
+        var btnStatus = $('#hfBtnStatus').val();
+
+        if (array != null) {
+            $("#btn-homework").removeClass('isDisabled');
+        }
+        else {
+            $("#btn-homework").addClass('isDisabled');
+        }
+
+        var userId = $(source).attr("data-id");
+        var phNo = $(source).attr("data-pnNo");
+        var emailId = $(source).attr("data-emailId");
+        if ($(source).is(":checked")) {
+            // it is checked
+            array.push(userId);
+            phArray.push(phNo);
+            emailArray.push(emailId);
+
+            $('#btn-homework').attr('disabled', false);
+            console.log(JSON.stringify(array));
+            console.log(JSON.stringify(phArray));
+            console.log(JSON.stringify(emailArray));
+
+        }
+        else {
+            for (var i = array.length - 1; i >= 0; i--) {
+                if (array[i] === userId) {
+                    array.splice(i, 1);
+                }
+            }
+            if (array.length == 0) {
+                $('#btn-homework').attr('disabled', true);
+            }
+            console.log(JSON.stringify(array));
+            //------------------------------
+            for (var i = phArray.length - 1; i >= 0; i--) {
+                if (phArray[i] === phNo) {
+                    phArray.splice(i, 1);
+                }
+            }
+
+            console.log(JSON.stringify(phArray));
+//-----------------------------------
+            for (var i = emailArray.length - 1; i >= 0; i--) {
+                if (emailArray[i] === emailId) {
+                    emailArray.splice(i, 1);
+                }
+            }
+
+            console.log(JSON.stringify(emailArray));
+        }
+    }
+
+    $("#btn-homework").click(function () {
+        if ($('#message-dev').val() != '') {
+
+            var item = new Object();
+            var classId = $("#hfClassId").val();
+            item.Message = $("#message-dev").val();
+            item.File = $("#hfUrlImage").val();
+            item.ClassId = classId;
+            item.TeacherId = $("#hfTeacherId").val();
+            item.StudentsId = array.toString();
+            item.PhoneNo = phArray.toString();
+            item.EmailId = emailArray.toString();
+            $.post("/TeacherAdmin/AddSchoolHomework/", item, function (result) {
+                console.log(JSON.stringify(result))
+                if (result.status) {
+                    if (result.status) {
+                        toastrSuccess(result.msg);
+                        // window.location.href = '/TeacherAdmin/AssignHomework/' + classId;
+                        location.reload();
+                        // window.location.href = '/TeacherAdmin/HomeworkList';
+                    }
+                    else {
+                        toastrError(result.msg);
+                    }
+                }
+            });
+        }
+        else {
+            $('#level-validation').modal('show');
+        }
+    });
+
+    $(document).on('change', '#chkBox-all', function () {
+        if (array != null) {
+            $("#btn-homework").removeClass('isDisabled');
+        }
+        else {
+            $("#btn-homework").addClass('isDisabled');
+        }
+        if ($(this).is(":checked")) {
+            $('#studentList-tbody-dev input[type="checkbox"]').each(function (index) {
+                if ($(this).is(":checked")) {
+                    $(this).trigger('click');
+                }
+                $(this).trigger('click');
+            });
+        }
+        else {
+            $('#studentList-tbody-dev input[type="checkbox"]').each(function (index) {
+                if ($(this).is(":unchecked")) {
+                    $(this).trigger('click');
+                }
+                $(this).trigger('click');
+            });
+        }
+    });
+
+
+    $(document).on('click', '#btn-report', function () {
+
+        homeworkId = $(this).attr('data-id');
+        window.location.href = '/TeacherAdmin/HomeworkSchoolStudentList/' + homeworkId;
+    });
+
+    $('#TeacherHomeworkListTable').DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": true
+    });
+
+    $(document).on('change', '#division-drop-down', function () {
+        var divisionId = $(this).val();
+        $('#chkBox-all').trigger('click');
+        $('#all-student-list').html('');
+        $.ajax({
+            url: '/TeacherAdmin/BindStudentDetails/' + divisionId,
+            dataType: 'html',
+            success: function (data) {
+                $('#partial-view').html('');
+                $('#partial-view').html(data);
+                $.validator.unobtrusive.parse($('#partial-view'));
+                $('#chkBox-all').trigger('click');
+            },
+        });
+    });
+
+    function NewImageAddSuccess(result) {
+        if (result.status) {
+            $('#addImage').modal('hide');
+            toastrSuccess(result.msg);
+            refreshImageGrid();
+        }
+        else {
+            toastrError(result.msg);
+        }
+    }
+    function NewImageAddFailed() {
+        toastrError('Failed to add image!');
+    }
+
+    $("div#dropzone").dropzone({
+        url: "/TeacherAdmin/ProcessImage",
+        maxFiles: 1,
+        success: function (file, response) {
+            $('#hfUrlImage').val(response.baseString);
+        },
+        init: function () {
+            this.on("maxfilesexceeded", function (file) {
+                this.removeAllFiles();
+                this.addFile(file);
+            });
+        },
+        uploadMultiple: false,
+        autoDiscover: false,
+        maxFilesize: 0.5
+    });
+
+</script>

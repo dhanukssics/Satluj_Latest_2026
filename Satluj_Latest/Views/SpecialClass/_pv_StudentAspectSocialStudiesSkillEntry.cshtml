@@ -1,0 +1,169 @@
+﻿@model Satluj_Latest.Models.StudentSkillMarks
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+    var scoreDetails = new Satluj_Latest.Data.School(Model.SchoolId).Get_V_TotalScores(17);
+    var Activity_Project = "";
+    var Viva = "";
+    var Written_Work = "";
+    var WorkSheet = "";
+    if (scoreDetails != null && scoreDetails.Count > 0)
+    {
+        if (scoreDetails.Any(x => x.SubTitle == "Activity/VIVA"))
+        {
+            Activity_Project = scoreDetails.Where(x => x.SubTitle == "Activity/VIVA").FirstOrDefault().Mark.ToString();
+        }
+        //if (scoreDetails.Any(x => x.SubTitle == "Viva"))
+        //{
+        //    Viva = scoreDetails.Where(x => x.SubTitle == "Viva").FirstOrDefault().Mark.ToString();
+        //}
+        if (scoreDetails.Any(x => x.SubTitle == "Written Work"))
+        {
+            Written_Work = scoreDetails.Where(x => x.SubTitle == "Written Work").FirstOrDefault().Mark.ToString();
+        }
+        if (scoreDetails.Any(x => x.SubTitle == "Weekly Assessment"))
+        {
+            WorkSheet = scoreDetails.Where(x => x.SubTitle == "Weekly Assessment").FirstOrDefault().Mark.ToString();
+        }
+    }
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                ACTIVITY / VIVA (@Activity_Project)
+            </th>
+            @*<th style="color: black;">
+                VIVA (@Viva)
+            </th>*@
+            <th style="color: black;">
+                WRITTEN WORK (@Written_Work)
+            </th>
+            <th style="color: black;">
+                WEEKLY ASSESSMENT (@WorkSheet)
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td style="width:10%;">
+                        @count
+                    </td>
+                    <td style="width:50%;">
+                        @item.StudentName
+                    </td>
+                    <td style="width:40%;">
+                        @if (item._AspectsSocialStudies.ActivityProject=="" || item._AspectsSocialStudies.ActivityProject == null)
+                        {
+                            <div>
+                                <input value="@item._AspectsSocialStudies.ActivityProject" style="color:black;" type="number" maxlength="3" class="cls-mark-ActivityProject" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsSocialStudies.ActivityProject" style="color:black;" type="number" maxlength="3" class="cls-mark-ActivityProject" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsSocialStudies.ActivityProject" style="color:black; " type="number" maxlength="3" class="cls-mark-ActivityProject" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    @*<td style="width:40%;">
+                        @if (item._AspectsSocialStudies.Viva.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._AspectsSocialStudies.Viva" style="color:black; " type="number" maxlength="3" class="cls-mark-Viva" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsSocialStudies.Viva" style="color:black; " type="number" maxlength="3" class="cls-mark-Viva" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsSocialStudies.Viva" style="color:black; " type="number" maxlength="3" class="cls-mark-Viva" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>*@
+                    <td style="width:40%;">
+                        @if (item._AspectsSocialStudies.WrittenWork  == "" || item._AspectsSocialStudies.WrittenWork==null)
+                        {
+                            <div>
+                                <input value="@item._AspectsSocialStudies.WrittenWork" style="color:black;" type="number" maxlength="3" class="cls-mark-WrittenWork" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsSocialStudies.WrittenWork" style="color:black;" type="number" maxlength="3" class="cls-mark-WrittenWork" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsSocialStudies.WrittenWork" style="color:black; " type="number" maxlength="3" class="cls-mark-WrittenWork" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td style="width:40%;">
+                        @if (item._AspectsSocialStudies.WorkSheet == "" || item._AspectsSocialStudies.WorkSheet ==null)
+                        {
+                            <div>
+                                <input value="@item._AspectsSocialStudies.WorkSheet" style="color:black; " type="number" maxlength="3" class="cls-mark-WorkSheet" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsSocialStudies.WorkSheet" style="color:black; " type="number" maxlength="3" class="cls-mark-WorkSheet" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsSocialStudies.WorkSheet" style="color:black; " type="number" maxlength="3" class="cls-mark-WorkSheet" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-aspects-social-studies-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

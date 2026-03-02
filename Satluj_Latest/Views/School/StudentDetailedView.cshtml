@@ -1,0 +1,188 @@
+﻿@model Satluj_Latest.Models.StudentModel
+@{
+    ViewBag.Title = "StudentDetailedView";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var examDetails = new Satluj_Latest.Data.WebsiteService().GetFullMarkData(Model.classId).ToList();
+}
+@Html.HiddenFor(m => m.studentId, new { id = "student_Id" })
+@{var dataa = "No Details";}
+<div class="form-group">
+    <a href="/School/Student" class="btn btn-peek"><i class="fa fa-arrow-left"></i> Back</a>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="student_info_sec">
+
+            <img class="img-responsive" src="@Model.filePath" />
+            <div class="student_info">
+                <h4>
+                    <span>Name</span>
+                    <i>:</i>
+                    <b>@Model.studentName</b>
+                </h4>
+                <h4>
+                    <span>Division / Class</span>
+                    <i>:</i>
+                    <b>@Model.division / @Model.className </b>
+                </h4>
+                <h4>
+                    <span>Admission No</span>
+                    <i>:</i>
+                    <b>@Model.admissionNo</b>
+                </h4>
+                <h4>
+                    <span>Parent Name</span>
+                    <i>:</i>
+                    <b>@Model.parentName / @Model.contactNo </b>
+                </h4>
+                <h4>
+                    <span>Address</span>
+                    <i>:</i>
+                    <b>@Model.address</b>
+                </h4>
+            <h4>
+                <span>Certificates</span>
+                <i>:</i>
+                <a href="/School/DOCertificate/@Model.studentId" target="_blank" class="btn pay-now-btn" data-toggle="model" id="btn-student-dob">DOB</a>
+                <a href="/School/AadharCardForm/@Model.studentId" target="_blank" class="btn pay-now-btn" data-toggle="model" id="btn-student-aadhar">Aadhar</a>
+                <a href="/School/FeeRemittance/@Model.studentId" target="_blank" class="btn pay-now-btn" data-toggle="model" id="btn-student-FeeRemittance">Fee Remittance</a>
+                @*<a class="btn pay-now-btn" data-toggle="model" data-value="@Model.studentId" data-classId="@Model.classId" data-division="@Model.divisionId" id="btn-student-ProgressCard" >Progress Card</a>*@
+            </h4>
+            </div><!-- ./student_info -->
+
+           
+        </div><!-- ./student_info_sec -->
+
+        
+
+
+
+        <div class="attendance">
+            <h4>Attendance :</h4>
+            <select class="form-control" id="dateSelectionChange">
+                <option>January</option>
+                <option>February</option>
+                <option>March</option>
+                <option>April</option>
+                <option>May</option>
+                <option>June</option>
+                <option>July</option>
+                <option>August</option>
+                <option>September</option>
+                <option>October</option>
+                <option>November</option>
+                <option>December</option>
+            </select>
+            @*<span>Count/Total</span>*@
+            <h4 id="countDataFeild" class="data_field">@dataa</h4>
+        </div><!-- ./attendance -->
+
+
+        <div class="attendance">
+            <h4>Marks :</h4>
+            <div class="term_all">
+                @foreach (var item in examDetails)
+                {
+                    var data = new Satluj_Latest.Data.WebsiteService().GetStudentMarks(item.ExamId, Model.studentId).ToList();
+                        <div class="term_single">
+                            <div class="term_heading">
+                                <span>@item.ExamName</span>
+                                <i class="fa fa-caret-down"></i>
+                            </div>
+                            <div class="term_body">
+                                <div class="">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Subject</th>
+                                                <th>Internal Mark</th>
+                                                <th>External Mark</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item1 in data)
+                                            {
+                                            <tr>
+                                                <td>@item1.SubjectName</td>
+                                                <td>@item1.Internal</td>
+                                                <td>@item1.External</td>
+                                                <td>@item1.Total</td>
+                                            </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                }
+            </div>
+        </div><!-- ./attendance -->
+    </div>
+</div>
+
+<div class="modal fade" id="addDOBCertificateIssueModel">
+</div>
+
+<div class="modal fade" id="addProgresscardModel">
+</div>
+
+<script>
+    $('.term_heading').click(function () {
+        $(this).siblings().toggle();
+    });
+
+    $(document).on('change', '#dateSelectionChange', function () {
+        //debugger;
+        var Id = $('#dateSelectionChange').val();
+        var studentid = $('#student_Id').val().toString();
+        $.ajax({
+            url: '/School/GetAttendanceCountData/' + Id + '~' + studentid,
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                if (result.msg = "Success") {
+                    var xx = result.absentCount + " Absence / " + result.totalCount + " Total";
+                    $('#countDataFeild').html(xx);
+                }
+                else {
+                    var xx = "No Details";
+                    $('#countDataFeild').html(xx);
+                }
+            }
+        });
+    });
+
+    //function DOBCertificateIssue() {
+    //    var studentId = $('#student_Id').val();
+        //$.ajax({
+        //    url: '/School/DOBCertificateIssue/' + studentId,
+        //    dataType: 'html',
+        //    success: function (data) {
+        //        $('#addDOBCertificateIssueModel').html(data);
+        //        $.validator.unobtrusive.parse($('#addDOBCertificateIssueModel'));
+        //        $('#addDOBCertificateIssueModel').modal('show');
+        //    },
+        //});
+    //}
+    //$(document).on('click', '#btn-student-dob', function () {
+    //    var studentId = $('#student_Id').val();
+    //    window.location.href = "/School/DOBCertificateIssue/" + studentId;
+    //});
+
+    $(document).on('click', '#btn-student-ProgressCard', function () {
+    
+        var studentId = $(this).attr('data-value');
+        var classId = $(this).attr('data-classId');
+        var divisionId = $(this).attr('data-division');
+        $.ajax({
+            url: '/Student/ProgressCardView/' + studentId + '~' + classId + '~' + divisionId,
+            dataType: 'html',
+            success: function (data) {
+                $('#addProgresscardModel').html(data);
+                $('#addProgresscardModel').modal('show');
+            },
+        });
+    });
+
+</script>

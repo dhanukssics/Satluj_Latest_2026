@@ -1,0 +1,86 @@
+﻿@{
+    @model Satluj_Latest.Models.FeeModel
+    var specialFees = new Satluj_Latest.Data.School(Model.SchoolId).GetSpecialFeeStudentList(Model.FeeId).OrderBy(z => z.student.StundentName).ToList();
+
+}
+<div class="table-responsive">
+    <table class="table custome-table table-student-list">
+        <thead>
+            <tr>
+                @*<th>
+
+                </th>*@
+                <th>
+                    Name
+                </th>
+                @*<th>
+                        Parent Name
+                    </th>
+                    <th>
+                        Address
+                    </th>
+                    <th>
+                        Contact No.
+                    </th>*@
+
+                <th>
+                    Class/Division
+                </th>
+                <th>
+                    Fee Name
+                </th>
+                <th>
+                    Due Date
+                </th>
+                <th>
+                    Amount
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var specialFee in specialFees)
+            {
+
+                <tr data-studentid="@specialFee.studentId">
+                    @*@if (specialFee.student.FilePath != null)
+                    {
+                        <td class="ng-click-studentDiscount-details">
+                            <img src="@specialFee.student.FilePath" class="user-pic-tab" />
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="ng-click-studentDiscount-details">
+                            <img src="~/Content/img/children-1.gif" class="user-pic-tab" />
+                        </td>
+                    }*@
+                    <td class="ng-click-studentDiscount-details">
+                        @specialFee.student.StundentName
+                    </td>
+
+                    <td class="ng-click-studentDiscount-details">
+                        @specialFee.student.ClassName / @specialFee.student.DivisionName
+                    </td>
+                    <td class="ng-click-studentDiscount-details">
+                        @specialFee.feename
+                    </td>
+                    <td class="ng-click-studentDiscount-details">
+                        @String.Format("{0:y}", specialFee.DueDate)
+                    </td>
+
+
+                    <td class="ng-click-studentDiscount-details">
+                        @String.Format("{0:0.00}", specialFee.amount)
+
+                    </td>
+                    <td data-studentname="@specialFee.student.StundentName" data-amount="@specialFee.amount" data-feename="@specialFee.feename">
+                        <button class="delete-fee-tr btn" data-id="@specialFee.studentId" data-studfeeid="@specialFee.feeStudentId"><i class="fa fa-trash "></i></button>
+                        <button class="edit-fee-tr btn" data-id="@specialFee.studentId" data-studfeeid="@specialFee.feeStudentId"><i class="fa fa-edit "></i></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

@@ -1,0 +1,80 @@
+﻿@model Satluj_Latest.Models.TimetableModel
+@inject Satluj_Latest.Data.DropdownData DropdownData
+
+@using (Html.BeginForm("EditTimeTableData", "Student", FormMethod.Post, new { id = "form-login" }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(z => z.TableId)
+
+    <div class="col-md-4 col-md-offset-4" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Time Table</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row" style="width:100%; display:block; padding-left:20px;">
+
+                    <div class="form-group">
+                        <label style="color:black;">Teacher :</label>
+                        <br />
+
+                        <select asp-for="TeacherId"
+                                asp-items="@(DropdownData.GetTeachers(Model.SchoolId))"
+                                class="form-control"
+                                data-live-search="true"
+                                style="display:inline-block; width:100%; min-width:180px;">
+                            <option value="">-- Select --</option>
+                        </select>
+
+                        @Html.ValidationMessageFor(z => z.TeacherId)
+                    </div>
+
+                    <div class="form-group">
+                        <label style="color:black;">Subject :</label>
+                        <br />
+
+                        <select asp-for="SubjectId"
+                                asp-items="@(DropdownData.GetSubjectss(Model.SchoolId))"
+                                class="form-control"
+                                data-live-search="true"
+                                style="display:inline-block; width:100%; min-width:180px;">
+                            <option value="">-- Select --</option>
+                        </select>
+
+                        @Html.ValidationMessageFor(z => z.SubjectId)
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn pay-now-btn" id="btn-timetable-edit">Save</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $("#form-login").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: this.action,
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                EditTimeTableSuccess(response);
+            },
+            error: function (xhr) {
+                EditTimeTableFailure(xhr);
+            }
+        });
+    });
+</script>

@@ -1,0 +1,190 @@
+﻿@model Satluj_Latest.Models.BankBookModel
+@{
+    var dd = new Satluj_Latest.Data.DropdownData();
+}
+
+<!-- AJAX form for ASP.NET Core -->
+<form asp-action="EditBankBook"
+      asp-controller="Journal"
+      id="form-login"
+      method="post"
+      data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-success="EditBankBookSuccess"
+      data-ajax-failure="EditBankBookFailed">
+
+    @Html.HiddenFor(m => m.BankBookId)
+
+    <div class="col-md-6">
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Bank Name</label>
+            </div>
+            <div class="col-md-9">
+                @Html.DropDownListFor(
+                m => m.BankId,
+                                dd.GetBankLists(Model.SchoolId),
+                                "--Choose--",
+                                new { @class = "form-control", id = "day-bank-Name-id" }
+                                )
+                @Html.ValidationMessageFor(m => m.BankId)
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Type</label>
+            </div>
+            <div class="col-md-9">
+                @Html.DropDownListFor(
+                                m => m.TypeId,
+                                Html.GetEnumSelectList<BankType>(),  
+                                "--Choose--",
+                                new { @class = "form-control pv_account-type", id = "day-book-type-id" }
+                                )
+                @Html.ValidationMessageFor(m => m.TypeId)
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Date</label>
+            </div>
+            <div class="col-md-9 calendar-inp pos_icon_adj">
+                @Html.TextBoxFor(m => m.EntryDateString,
+                                new { @class = "form-control date-bankBook-add-date" })
+                <i class="fa "></i>
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Voucher No</label>
+            </div>
+            <div class="col-md-9">
+                @Html.TextBoxFor(m => m.VoucherNo,
+                                new { @class = "form-control", @readonly = true })
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Account Head</label>
+            </div>
+            <div class="col-md-9">
+                @Html.DropDownListFor(
+                                m => m.HeadId,
+                                dd.GetAccountHeads(Model.SchoolId),
+                                "--Choose--",
+                                new { @class = "form-control accHead-drop-down", id = "day-book-head-id" }
+                                )
+                @Html.ValidationMessageFor(m => m.HeadId)
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>SubLedger</label>
+            </div>
+            <div class="col-md-9">
+                @Html.DropDownListFor(
+                                m => m.SubLedgerId,
+                                new SelectList(new List<object> {
+                                new { value = 0, text = "--select division--" }
+                                }, "value", "text"),
+                                new { @class = "form-control", disabled = "disabled" }
+                                )
+                @Html.ValidationMessageFor(m => m.SubLedgerId)
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Amount</label>
+            </div>
+            <div class="col-md-9">
+                @Html.TextBoxFor(
+                                m => m.Amount,
+                                new { @class = "form-control", id = "bank-book-current-balance-check-edit" }
+                                )
+                <span id="spn-error-current-balance-check" style="color:red;"></span>
+                @Html.ValidationMessageFor(m => m.Amount)
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Narration</label>
+            </div>
+            <div class="col-md-9">
+                @Html.TextBoxFor(m => m.Narration,
+                                new { @class = "form-control", placeholder = "Narration" })
+                @Html.ValidationMessageFor(m => m.Narration)
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Cheque No</label>
+            </div>
+            <div class="col-md-9">
+                @Html.TextBoxFor(m => m.ChequeNo,
+                                new { @class = "form-control", placeholder = "Cheque No" })
+                @Html.ValidationMessageFor(m => m.ChequeNo)
+            </div>
+        </div>
+
+        <div class="form-group gap_bottom">
+            <div class="col-md-3">
+                <label>Cheque Date</label>
+            </div>
+            <div class="col-md-9 calendar-inp pos_icon_adj">
+                @Html.TextBoxFor(m => m.ChequeDateString,
+                                new { @class = "form-control date-bankBook-add-date" })
+                <i class="fa "></i>
+                @Html.ValidationMessageFor(m => m.ChequeDateString)
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" id="btn-cancel-bankbook" class="btn">Cancel</button>
+            <button type="submit" id="btn-edit-save-bankbook" class="btn pay-now-btn">Edit</button>
+            <button type="button" id="btn-print-bankbook-edit" class="btn pay-now-btn">Print</button>
+        </div>
+
+    </div>
+
+</form>
+
+<script>
+    $(document).ready(function () {
+
+        var headid = @Model.HeadId;
+        var subledgid = @Model.SubLedgerId;
+
+        $.ajax({
+            url: '/Data/LoadSubLedgerList?id=' + headid,
+            type: 'GET',
+            success: function (result) {
+
+                if (result.list.length > 0) {
+                    $("#SubLedgerId").prop("disabled", false).html("");
+                    $("#SubLedgerId").append(`<option value="">-- Select SubLedger --</option>`);
+
+                    $.each(result.list, function (i, item) {
+                        $("#SubLedgerId").append(`<option value="${item.Value}">${item.Text}</option>`);
+                    });
+
+                    $("#SubLedgerId").val(subledgid);
+                } else {
+                    $("#SubLedgerId").html(`<option>-- No SubLedger Found --</option>`);
+                    $("#SubLedgerId").prop("disabled", true);
+                }
+
+                $("#day-book-type-id").attr("disabled", "disabled");
+            }
+        });
+
+    });
+</script>

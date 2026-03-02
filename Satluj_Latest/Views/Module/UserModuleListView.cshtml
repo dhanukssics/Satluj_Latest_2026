@@ -1,0 +1,101 @@
+﻿@model Satluj_Latest.Models.UserTypeListData
+@{
+    ViewBag.Title = "UserModuleListView";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">User Module List</h3>
+        <div class="table-responsive ">
+
+            <table class="table custome-table module-list" id="myTable">
+                <thead>
+                    <tr>
+                        <th>
+                            Sl No
+                        </th>
+                        <th>
+                            User Name
+                        </th>
+                        <th>
+                           Type
+                        </th>
+                        <th>
+                            Main Module
+                        </th>
+                        <th>
+                            Sub Modules
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.list)
+                    {
+                        <tr>
+                            <td>@item.SlNo</td>
+                            <td>@item.UserType</td>
+                            <td>@item.Type</td>
+                            <td>@item.Main</td>
+                            <td>@item.Sub</td>
+                            <td data-SubId="@item.SubId">
+                                <button class="delete-module-tr btn-peek"><i class="fa fa-trash "></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).on('click', '.delete-module-tr', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Module/DeleteModule/' + $(source).parent().attr('data-SubId'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    setTimeout(function () {
+                        window.location.href = '/Module/Usermodulelistview/';
+                    }, 250);
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+
+    });
+
+    function IntializeDataTable() {
+        $("#myTable").dataTable().fnDestroy()
+        $("#myTable").dataTable();
+    }
+    $(document).ready(function () {
+        IntializeDataTable();
+    });
+</script>

@@ -1,0 +1,20 @@
+﻿
+
+@model Satluj_Latest.Models.DayBookReportModel
+@{
+    long bankId = Model.BankId;
+    int sourceId = 2;//From Status Cash ...0:Cash,1:Bill,2:Bank
+    var data = new Satluj_Latest.Data.School(Model.SchoolId).GetClosingBalance(Model.ToDate, bankId, sourceId);
+}
+<div class="row">
+    @if (data != null)
+    {
+        <span>
+            <label style="margin-right:50px;">Closing Balance: @data /- </label>
+        </span>
+    }
+    else
+    {
+
+    }
+</div>

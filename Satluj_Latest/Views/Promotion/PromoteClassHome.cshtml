@@ -1,0 +1,137 @@
+﻿@model Satluj_Latest.Models.SchoolValue
+@{
+    ViewBag.Title = "PromoteClassHome";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(m => m.schoolId, new { @value = Model.schoolId })
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">Class</h3>
+        <div class="row">
+            <div class="form-group col-sm-6">
+                <label>Class : </label>
+                <select asp-for="className"
+                        asp-items="Model.UnPublishedClasses"
+                        class="form-control slct-class-dropdwn"
+                        data-live-search="true"
+                        style="display:inline-block; width:auto; min-width:180px;">
+                    <option value="">All</option>
+                </select>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group text-right">
+                    <button class="btn pay-now-btn" id="btn-add-class"><i class="fa fa-plus"></i> Add Class</button>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="table-responsive">
+                <table class="table custome-table" id="class-list"></table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalClassAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+    </div>
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        var classId = 0;
+        ListingDownClasses(classId);
+    });
+
+    $(document).on('change', '.slct-class-dropdwn', function () {
+        var classId = $(".slct-class-dropdwn option:selected").val();
+        if (classId == '')
+            classId = 0;
+        ListingDownClasses(classId);
+    });
+
+    function IntializeDataTable() {
+        $("#class-list").dataTable().fnDestroy()
+        $("#class-list").dataTable();
+    }
+
+    function ListingDownClasses(classId) {
+        var id = classId;
+        $.ajax({
+            url: '/Promotion/UnpublishedClasses/' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#class-list').html('');
+                $('#class-list').html(data);
+                IntializeDataTable();
+            }
+        });
+    }
+
+    $(document).on('click', '#btn-add-class', function () {
+        $.ajax({
+            url: '/Promotion/AddUnPublishedClassParialView',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalClassAdd').html(data);
+                $.validator.unobtrusive.parse($("#modalClassAdd"));
+                $('#modalClassAdd').modal('show');
+            }
+        });
+    });
+
+    function AddClassSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#modalClassAdd').modal('hide');
+            window.location.href = '/Promotion/PromoteClassHome';
+        }
+    }
+
+    $(document).on('click', '.publish-class-tr', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure want to Publish this class?",
+            text: "Previous academic year class will be unpublished after this!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, do it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Promotion/PublishUnPublishedClass/' + $(source).attr('data-divid'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    //var options = $(".slct-class-dropdwn");
+                    //options.children("option").remove();
+                    //options.append($("<option />").val(0).text("--Choose--"));
+                    //$.each(data.list, function () {
+                    //    options.append($("<option />").val(this.Value).text(this.Text));
+                    //});
+                    //setTimeout(function () {
+                    //    RefreshClassGrid();
+                    //}, 250);
+                    window.location.href = '/Promotion/PromoteClassHome';
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+    });
+
+
+
+</script>

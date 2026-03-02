@@ -1,0 +1,192 @@
+﻿@model Satluj_Latest.Models.StudentModel
+
+<form id="form-login"
+      asp-action="AddNewStudent"
+      asp-controller="School"
+      method="post"
+      enctype="multipart/form-data">
+
+    <div class="row">
+        <div class="col-sm-12">
+
+            <!-- Profile Picture -->
+            <div class="form-group col-sm-6 text-center">
+                <label>Upload Profile Picture</label>
+                <div id="dummyId"></div>
+
+                <div class="upload-box" id="file_preview_grid"
+                     style="background-image:url(/Content/img/default-placeholder-1024x1024-960x960.png);">
+                    <input id="default-pic-browse" type="file" class="uploder-controler" />
+                    <input type="hidden" asp-for="profilePic" />
+                    <input type="hidden" asp-for="bloodGroup" />
+                </div>
+            </div>
+
+            <!-- Class / Division -->
+            <div class="col-sm-6">
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <label>Class</label><span style="color:red">***</span>
+                        <select asp-for="classId"
+                                asp-items="ViewBag.Classlist"
+                                class="form-control pv_class-drop-down"
+                                id="classDataDropdown">
+                            <option value="">--Choose--</option>
+                        </select>
+                        <span asp-validation-for="classId"></span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label>Division</label><span style="color:red">***</span>
+                        <select asp-for="divisionId"
+                                class="form-control division_Select"
+                                disabled>
+                            <option value="">--select division--</option>
+                        </select>
+                        <span asp-validation-for="divisionId"></span>
+                    </div>
+
+                </div>
+
+                <!-- Admission / Roll -->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label>Admission No.</label><span style="color:red">***</span>
+                        <input asp-for="admissionNo" class="form-control" placeholder="Admission No." />
+                        <span asp-validation-for="admissionNo"></span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label>Roll No.</label>
+                        <input asp-for="RollNo1" class="form-control" placeholder="Roll No." />
+                        <span asp-validation-for="RollNo1"></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Info -->
+    <div class="row">
+        <div class="col-sm-4">
+            <label>Name</label><span style="color:red">***</span>
+            <input asp-for="studentName" class="form-control" />
+            <span asp-validation-for="studentName"></span>
+        </div>
+
+        <div class="col-sm-4">
+            <label>Email</label><span style="color:red">***</span>
+            <input asp-for="parentEmail" class="form-control" />
+            <span asp-validation-for="parentEmail"></span>
+        </div>
+
+        <div class="col-sm-4">
+            <label>Gender</label><span style="color:red">***</span><br />
+            <input type="radio" asp-for="gender" value="M" checked /> Male
+            <input type="radio" asp-for="gender" value="F" /> Female
+            <span asp-validation-for="gender"></span>
+        </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="row">
+        <div class="col-sm-4">
+            <label>Mobile No.</label>
+            <input asp-for="MobileNo" class="form-control" />
+            <span asp-validation-for="MobileNo"></span>
+        </div>
+
+        <div class="col-sm-4">
+            <label>Contact No.</label><span style="color:red">***</span>
+            <input asp-for="contactNo" class="form-control" type="number" />
+            <span asp-validation-for="contactNo"></span>
+        </div>
+
+        <div class="col-sm-4">
+            <label>DOB</label>
+            <input asp-for="DOBstring" class="form-control" />
+        </div>
+    </div>
+
+    <!-- Joining / Category / Blood -->
+    <div class="row">
+        <div class="col-sm-4">
+            <label>Date of Joining</label>
+            <input asp-for="DateOfJoiningString" class="form-control" />
+        </div>
+
+        <div class="col-sm-4">
+            <label>Category</label>
+            <select asp-for="CategoryId"
+                    asp-items="Html.GetEnumSelectList<StudentCategory>()"
+                    class="form-control">
+                <option value="">--Choose--</option>
+            </select>
+            <span asp-validation-for="CategoryId"></span>
+        </div>
+
+        <div class="col-sm-4">
+            <label>Blood Group</label>
+            <select id="slct-bloodGroup" class="form-control">
+                <option value="">--Choose--</option>
+                <option>O+</option>
+                <option>O-</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Address -->
+    <div class="row">
+        <div class="col-sm-4">
+            <label>Address</label>
+            <textarea asp-for="address" class="form-control"></textarea>
+        </div>
+
+        <div class="col-sm-4">
+            <label>City</label>
+            <input asp-for="city" class="form-control" />
+        </div>
+
+        <div class="col-sm-4">
+            <label>State</label>
+            <input asp-for="state" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <label>Pin</label>
+            <input asp-for="Pincode" class="form-control" type="number" maxlength="6" />
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Clear</button>
+        <button type="submit" class="btn pay-now-btn">Save & Continue</button>
+    </div>
+
+</form>
+<script>
+    $("#form-login").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: this.action,
+            type: "POST",
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            success: StudentAddSuccess,
+            error: StudentAddFailed
+        });
+    });
+</script>

@@ -1,0 +1,59 @@
+﻿@model Satluj_Latest.Models.ListFee
+@{
+    var school = new Satluj_Latest.Data.School(Model.SchoolId);
+}
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            FeeName
+        </th>
+        <th>
+            Fee Type
+        </th>
+        <th>
+
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        if (school != null)
+        {
+            int i = 1;
+            foreach (var item in school.GetAllFees())
+            {
+                <tr class="" data-feeid="@item.FeeId">
+                    <td class="ng-click-feeDetails" data-feeid="@item.FeeId" data-feetype="@item.FeeType">
+                        @i
+                    </td>
+                    <td class="ng-click-feeDetails" data-feeid="@item.FeeId" data-feetype="@item.FeeType">
+                        @item.FeeName
+                    </td>
+                    <td class="ng-click-feeDetails" data-feeid="@item.FeeId" data-feetype="@item.FeeType">
+                        @if (item.FeeType == 1)
+                        {
+                            <p>Common Fee</p>
+                        }
+                        else
+                        {
+                            <p>Special Fee</p>
+                        }
+                    </td>
+                    <td>
+                        <button class="delete-fee-tr btn btn-peek" data-feeid="@item.FeeId" data-feetype="@item.FeeType"><i class="fa fa-trash "></i></button>
+                        <button class="edit-fee-tr btn pay-now-btn" data-feeid="@item.FeeId" data-feetype="@item.FeeType"><i class="fa fa-edit "></i></button>
+                        @*<button>View</button>*@
+                    </td>
+                </tr>
+                i++;
+            }
+        }
+        else
+        {
+
+        }
+    }
+</tbody>

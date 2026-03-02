@@ -1,0 +1,74 @@
+﻿@model Satluj_Latest.Models.TeacherSubjectRelationModel
+@{
+    ViewBag.Title = "TeacherDetails";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <a href="/School/TeacherList" class="btn btn-peek"><i class="fa fa-arrow-left"></i> Back</a>
+        </div>
+        <h3>Teacher Details </h3>
+
+        <div class="table-responsive">
+            <table class="table custome-table">
+                <tr>
+                    <th>
+                        Slno
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Class In charge
+                    </th>
+                        @*<th>
+                        Subject
+                            </th>*@
+                    <th>
+                        Contact No.
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        1
+                    </td>
+                    <td>
+                        Vishnu Pramod MV
+                    </td>
+                    <td>
+                        IX/A, X/C
+                    </td>
+                        @*<td>
+                        English
+                            </td>*@
+                    <td>
+                        9645167960
+                    </td>
+                    <td>
+                        vishnupramod@school.com
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <h4>Teacher Period Details</h4>
+            @{
+                var model = new Satluj_Latest.Models.TeacherId();
+                model.teacherId = Model.TeacherId;
+            }
+        <div class="table-responsive">
+                <table class="table account-table" id="table-teacher-detail-periods">
+                    @Html.Partial("~/Views/School/_pv_Teacher_periodlist.cshtml", model)
+            </table>
+        </div>
+        <div class="form-group text-right">
+            <button class="btn pay-now-btn"><i class="fa fa-save"></i> Save</button>
+            <button class="btn pay-now-btn"><i class="fa fa-print"></i> Print</button>
+        </div>
+
+    </div><!-- end of col md 8 -->
+</div>

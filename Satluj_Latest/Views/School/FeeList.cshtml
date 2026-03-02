@@ -1,0 +1,182 @@
+﻿@model Satluj_Latest.Models.Common
+@{
+    ViewBag.Title = "FeeList";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    .ng-click-feeDetails {
+        cursor: pointer;
+    }
+</style>
+
+<h3>Fee List</h3>
+<div class="form-group text-right">
+    <button class="btn pay-now-btn btn-add-fee">Add Fee</button>
+</div>
+<div class="table-responsive">
+    <table class="table custome-table" id="table-feelist">
+        @Html.Partial("~/Views/School/_pv_Feelist.cshtml", Model)
+    </table>
+</div>
+
+
+<div class="modal fade" id="modalFeeEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>
+
+<script>
+
+
+    $(document).on('click', '.btn-add-fee', function () {
+
+        $.ajax({
+            url: '/School/AddFeePartialView',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalFeeEdit').html(data);
+                $.validator.unobtrusive.parse($("#modalFeeEdit"));
+                $('#modalFeeEdit').modal('show');
+            }
+        });
+
+    });
+
+
+    $(function () {
+        $("#table-feelist").dataTable();
+    });
+
+    function RefreshFeelistGrid() {
+        $.ajax({
+            url: '/School/RefreshFeelistPartial',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $("#table-feelist").dataTable().fnDestroy()
+                $('#table-feelist').html(data);
+                $("#table-feelist").dataTable();
+            }
+        });
+    }
+
+    function AddFeeSuccess(result) {
+        if (result.status) {
+            //console.log(result.list)
+            toastrSuccess(result.msg);
+            $('#modalFeeEdit').modal('hide');
+            setTimeout(function () {
+                RefreshFeelistGrid();
+            }, 250);
+        }
+        else {
+            toastrError(result.msg);
+            $('#modalFeeEdit').modal('hide');
+        }
+    }
+
+
+    function radioOnclick(data) {
+
+        $('#feeType').val(data);
+    }
+
+    $(document).on('click', '.delete-fee-tr', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+
+
+        $.ajax({
+            url: '/School/DeleteFee/' + $(source).attr('data-feeid'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+
+                if (data.status) {
+                    toastrSuccess(data.msg);
+
+                    setTimeout(function () {
+                        RefreshFeelistGrid();
+                    }, 250);
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+
+        //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+    }
+    //else {
+    //    swal("Cancelled", "Your imaginary file is safe :)", "error");
+    //}
+});
+    });
+
+    $(document).on('click', '.edit-fee-tr', function () {
+        var source = $(this);
+        $.ajax({
+            url: '/School/EditFeePartial/' + $(source).attr('data-feeid'),
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalFeeEdit').html(data);
+                $.validator.unobtrusive.parse($("#modalFeeEdit"));
+                $('#modalFeeEdit').modal('show');
+            }
+        });
+
+    });
+
+    function radioOnclick(data) {
+
+        $('#feeType').val(data);
+    }
+
+    function EditFeeSuccess(result) {
+
+        if (result.status) {
+            //console.log(result.list)
+            toastrSuccess(result.msg);
+
+            setTimeout(function () {
+                RefreshFeelistGrid();
+            }, 250);
+            $('#modalFeeEdit').modal('hide');
+        }
+        else {
+            $('#modalFeeEdit').modal('hide');
+            toastrError(result.msg);
+        }
+
+    }
+
+    $(document).on('click', '.ng-click-feeDetails', function () {
+        var feeType=$(this).attr('data-feetype');
+        if (feeType == 1) {
+
+        window.location.href = "/School/FeeClassList/" + $(this).attr('data-feeid');
+        }
+        else {
+            window.location.href = "/School/SpecialFeeStudent/" + $(this).attr('data-feeid');
+
+        }
+
+    });
+
+</script>

@@ -1,0 +1,198 @@
+﻿
+@model Satluj_Latest.Models.StudentSkillMarks
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+    var scoreDetails = new Satluj_Latest.Data.School(Model.SchoolId).Get_V_TotalScores(9);
+    var It = "";
+    var GeneralStudies = "";
+    var ValueEducation = "";
+    var French = "";
+    if (scoreDetails != null && scoreDetails.Count > 0)
+    {
+        if (scoreDetails.Any(x => x.SubTitle == "IT"))
+        {
+            It = scoreDetails.Where(x => x.SubTitle == "IT").FirstOrDefault().Mark.ToString();
+        }
+        if (scoreDetails.Any(x => x.SubTitle == "GeneralStudies"))
+        {
+            GeneralStudies = scoreDetails.Where(x => x.SubTitle == "GeneralStudies").FirstOrDefault().Mark.ToString();
+        }
+        if (scoreDetails.Any(x => x.SubTitle == "ValueEducation"))
+        {
+            ValueEducation = scoreDetails.Where(x => x.SubTitle == "ValueEducation").FirstOrDefault().Mark.ToString();
+        }
+        if (scoreDetails.Any(x => x.SubTitle == "French"))
+        {
+            French = scoreDetails.Where(x => x.SubTitle == "French").FirstOrDefault().Mark.ToString();
+        }
+    }
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                IT (@It)
+            </th>
+            @*<th style="color: black;">
+           COMPUTER <br />SCIENCE ( @Computer_Science )
+        </th>*@
+            <th style="color: black;">
+                GENERAL <br /> STUDIES ( @GeneralStudies )
+            </th>
+            <th style="color: black;">
+                VALUE EDUCATION <br />( @ValueEducation )
+            </th>
+            <th style="color: black;">
+                FRENCH ( @French )
+            </th>
+            <th style="color: black;">
+                SMART CLASS <br /> ( GRADE )
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td style="width:10%;">
+                        @count
+                    </td>
+                    <td style="width:20%;">
+                        @item.StudentName
+                    </td>
+                    <td>
+                        @if (item._AspectsRelativeAreas.ComputerScience.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._AspectsRelativeAreas.ComputerScience" style="color:black;" type="number" maxlength="3" class="cls-mark-ComputerScience" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsRelativeAreas.ComputerScience" style="color:black;" type="number" maxlength="3" class="cls-mark-ComputerScience" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsRelativeAreas.ComputerScience" style="color:black; " type="number" maxlength="3" class="cls-mark-ComputerScience" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._AspectsRelativeAreas.GeneralStudies.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._AspectsRelativeAreas.GeneralStudies" style="color:black; " type="number" maxlength="3" class="cls-mark-GeneralStudies" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsRelativeAreas.GeneralStudies" style="color:black; " type="number" maxlength="3" class="cls-mark-GeneralStudies" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsRelativeAreas.GeneralStudies" style="color:black; " type="number" maxlength="3" class="cls-mark-GeneralStudies" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._AspectsRelativeAreas.Valueeducation.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._AspectsRelativeAreas.Valueeducation" style="color:black;" type="number" maxlength="3" class="cls-mark-Valueeducation" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsRelativeAreas.Valueeducation" style="color:black;" type="number" maxlength="3" class="cls-mark-Valueeducation" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsRelativeAreas.Valueeducation" style="color:black; " type="number" maxlength="3" class="cls-mark-Valueeducation" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._AspectsRelativeAreas.French.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._AspectsRelativeAreas.French" style="color:black; " type="number" maxlength="3" class="cls-mark-French" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsRelativeAreas.French" style="color:black; " type="number" maxlength="3" class="cls-mark-French" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsRelativeAreas.French" style="color:black; " type="number" maxlength="3" class="cls-mark-French" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._AspectsRelativeAreas.SmartClass.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._AspectsRelativeAreas.SmartClass" style="color:black; "  maxlength="2" class="cls-mark-SmartClass" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._AspectsRelativeAreas.SmartClass" style="color:black; "  maxlength="2" class="cls-mark-SmartClass" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._AspectsRelativeAreas.SmartClass" style="color:black; "  maxlength="2" class="cls-mark-SmartClass" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-aspects-relative-studies-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

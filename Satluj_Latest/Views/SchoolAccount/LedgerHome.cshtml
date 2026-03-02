@@ -1,0 +1,194 @@
+﻿
+@model Satluj_Latest.Models.LedgerReportModel
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="form-group col-sm-2">
+        <label>Start</label>
+        <div class="with-icon">
+            <input type="text" class="form-control ledger-start-date date-ledgerReport" data-date-end-date="0d" value="@Model.FromDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+
+    <div class="form-group col-sm-2">
+        <label>End</label>
+        <div class="with-icon">
+            <input type="text" class="form-control ledger-end-date date-ledgerReport" data-date-end-date="0d" value="@Model.ToDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+    <div class="form-group col-sm-2">
+        <label>Account Head</label>
+        <div class="with-icon">
+            <select asp-for="HeadId"
+                    asp-items="ViewBag.AccountHeadsWithFeeHead"
+                    class="form-control accHead-drop-down"
+                    data-live-search="true"
+                    name="classDropdown"
+                    id="day-book-head-id">
+                <option value="">-- All --</option>
+            </select>
+
+        </div>
+    </div>
+    <div class="form-group col-sm-2">
+        <label>Sub Ledger</label>
+        <div class="with-icon">
+            @Html.DropDownListFor(m => m.SubId, new SelectList(
+                  new List<Object>{
+                       new { value = 0 , text = "-- Select Subledger --"  }
+                    },
+                  "value",
+                  "text"
+                   ), new { @class = "form-control ", @data_live_search = "true", @disabled = "disabled" })
+            @Html.ValidationMessageFor(m => m.SubId)
+        </div>
+    </div>
+    <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+        <button type="button" class="btn btn-sm btn-info btn-search" id="searchrvData">Search</button>
+    </div>
+</div>
+<div class="row">
+    <div class="form-group col-sm-2" style="margin-top: 26px;">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+        <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12" id="print-trial-bal">
+        <h3 style="text-align:center;">Ledger</h3><h5 style="text-align:center;" id="datecheck"></h5>
+        <table class="table custome-table" id="ledger-list"></table>
+    </div>
+</div>
+
+
+<script>
+    $('.date-ledgerReport').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    function IntializeDataTable() {
+        $("#ledger-list").dataTable().fnDestroy()
+        $("#ledger-list").dataTable();
+    }
+
+    $(document).ready(function () {
+        searchLedgerDataWithDate();
+        var ss = $('.ledger-start-date').val() + " to " + $('.ledger-end-date').val() +" All";
+        $('#datecheck').text(ss);
+    });
+
+    function searchLedgerDataWithDate() {
+        //debugger;
+        var date = $('.ledger-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.ledger-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+
+        var headId = $('#day-book-head-id').val();
+        var subId = $('#SubId').val();
+        if (headId == '')
+            headId = 0;
+        if (subId == '')
+            subId = 0;
+        //-------------------------------
+        var headData = $('#day-book-head-id option:selected').text();;
+        var subData = $('#SubId option:selected').text();;
+        if (subData == "-- Select Subledger --")
+            subData = "";
+        else if (subData == "Select")
+            subData = "";
+        else if (subData == "-- No Data Found --")
+            subData = "";
+        else if (subData == "All")
+            subData = "";
+        var ss = $('.ledger-start-date').val() + " to " + $('.ledger-end-date').val() + " of " + headData + " - " + subData;
+        //--------------------------------------
+        $.ajax({
+            url: '/SchoolAccount/LedgerReport/' + start + '~' + end + '~' + headId + '~' + subId+'~'+ss,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#ledger-list').html('');
+                $('#ledger-list').html(data);
+            }
+        });
+    }
+
+    $(document).on('click', '#searchrvData', function () {
+        searchLedgerDataWithDate();
+        var headData = $('#day-book-head-id option:selected').text();;
+        var subData = $('#SubId option:selected').text();;
+        if (subData == "-- Select Subledger --")
+            subData = "";
+        else if (subData == "Select")
+            subData = "";
+        var ss = $('.ledger-start-date').val() + " to " + $('.ledger-end-date').val() + " of " + headData + " - " + subData;
+        $('#datecheck').text(ss);
+    });
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var date = $('.ledger-start-date').val() + " to " + $('.ledger-end-date').val();
+        $("#ledger-list").table2excel({
+
+            name: "Table2Excel",
+            filename: "Ledger as on " + date,
+            fileext: ".xls"
+        });
+    });
+
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/SchoolAccount/LedgerHome';
+    }
+
+    $(document).on('change', '.accHead-drop-down', function () {
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/SchoolAccount/LoadSubLedgerListWithFee?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#SubId").html("");
+                        $.each(result.list, function (i, item) {
+                            $("#SubId").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#SubId").prop("disabled", false);
+                    }
+                    else {
+                        $("#SubId").html("");
+                        $("#SubId").append($('<option></option>').val("").html('-- No Data Found --'));
+                        $("#SubId").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            $("#SubId").html("");
+            $("#SubId").append($('<option></option>').val("").html('-- No Data Found --'));
+            $("#SubId").prop("disabled", true);
+        }
+    });
+
+
+
+</script>

@@ -1,0 +1,79 @@
+﻿@model Satluj_Latest.Models.CircularList
+@{
+    var circular = new Satluj_Latest.Data.School(Model.schoolId);
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Date
+        </th>
+        <th>
+            Circular Head
+        </th>
+        <th>
+            Description
+        </th>
+        <th>
+            File Path
+        </th>
+        @if (IsAdmin == true)
+        {
+            <th>
+                #
+            </th>
+        }
+    </tr>
+</thead>
+<tbody>
+    @{
+        if (circular != null)
+        {
+            int i = 1;
+            foreach (var item in circular.AllCircularList())
+            {
+                var url = "http://satluj.schoolman.in" + item.FilePath;
+        <tr class="" data-feeid="@item.CircularId">
+            <td class="ng-click-feeDetails" data-circularid="@item.CircularId">
+                @i
+            </td>
+            <td class="ng-click-feeDetails" data-circularid="@item.CircularId">
+                @item.CircularDate.ToString("dd/MM/yyyy")
+            </td>
+            <td class="ng-click-feeDetails" data-circularid="@item.CircularId">
+                @item.CircularHead
+            </td>
+            <td class="ng-click-feeDetails" data-circularid="@item.CircularId">
+                @item.Description
+            </td>
+            <td class="ng-click-feeDetails" data-circularid="@item.CircularId">
+
+                @if (item.FilePath == null)
+                {
+                    <p>No Files</p>
+                }
+                else
+                {
+                    <a href="@url" target="_blank">Click Here</a>
+                }
+            </td>
+            @if (IsAdmin == true)
+            {
+                <td>
+                    <button class="delete-fee-tr btn btn-peek delete-circular-data" data-id="@item.CircularId"><i class="fa fa-trash "></i></button>
+                    <button class="edit-fee-tr btn pay-now-btn edit-circular-data" data-id="@item.CircularId"><i class="fa fa-edit "></i></button>
+                </td>
+            }
+        </tr>
+                i++;
+            }
+        }
+        else
+        {
+
+        }
+    }
+</tbody>

@@ -1,0 +1,290 @@
+﻿@model Satluj_Latest.Models.PerformanceModel
+@{
+    ViewBag.Title = "TeacherRoleManagement";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<style>
+    .popup-btn {
+        margin-top: 10px;
+        margin: auto;
+        display: block;
+    }
+    .toggleable-div {
+        margin-bottom: 10px;
+    }
+    .toggle-heading {
+        background: #03a9f4;
+        color: #fff;
+        padding: 5px 15px;
+        border: 1px solid #f9f9f9;
+    }
+        .toggle-heading i {
+            cursor: pointer;
+            font-size: 20px;
+        }
+    .toggle-body {
+        background: #ccc;
+        padding: 15px;
+        display: none;
+        float: left;
+        width: 100%;
+    }
+        .toggle-body ul {
+            padding: 0;
+        }
+            .toggle-body ul li {
+                display: block;
+                float: left;
+                margin-right: 30px;
+                width: 22%;
+                margin-bottom: 10px;
+            }
+    .sub-menu ul li > a > i {
+        font-size: 9px !important;
+    }
+    .toggle-body ul li input[type=checkbox] {
+        margin-right: 5px;
+        margin-top: 7px;
+        float: left;
+    }
+    .toggle-body ul li span {
+        float: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: calc(100% - 25px);
+        overflow: hidden;
+    }
+    .toggle-class-width {
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+    .full-loader-dev {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 19999;
+        background: url(/Content/img/preloader.gif) center no-repeat rgb(255, 255, 255) !important;
+        background-size: 350px;
+        background-position: center;
+        content: '';
+    }
+</style>
+<div class="se-pre-con"></div>
+<div class="full-loader-dev"></div>
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">TEACHER & SUBJECTS </h3>
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Teacher </label>
+                    <br />
+                    <select asp-for="TeacherId"
+                            asp-items="ViewBag.Teacherlist"
+                            class="form-control slct-teacher-dropdown1"
+                            data-live-search="true"
+                            style="display:inline-block; width:100%; min-width:180px;">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="TeacherId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <br />
+                    <select asp-for="SubjectId"
+                            asp-items="ViewBag.subjectlist"
+                            class="form-control"
+                            id="subject-id"
+                            data-live-search="true"
+                            style="display:inline-block; width:100%; min-width:180px;">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="SubjectId" class="text-danger"></span>
+
+                </div>
+            </div>
+        </div>
+        <div class="row toggle-class-width">
+            @foreach (var main in Model.ClassList)
+            {
+                <div class="maindiv">
+                    <div class="toggle-heading">
+                        <input type="checkbox" class="checklist-sub" data-sub-id-list="@main.DivisionListIdString" data-main-id="@main.ClassId" />
+                        <span>
+                            @main.ClassName
+                        </span>
+                        <i class="fa fa-caret-down pull-right"></i>
+                    </div>
+                    <div class="toggle-body">
+                        <ul>
+                            @foreach (var sub in main.DivisionList)
+                            {
+                                <li>
+                                    <input type="checkbox" class="chk" value="@sub.DivisionName" name="chkphone" data-id="@sub.DivId" onchange="AddRemoveUser(this)" /><span>@sub.DivisionName</span>
+                                </li>
+                            }
+
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <button class="btn pay-now-btn" data-toggle="modal" id="saveTeacherSubject-data-id" style="margin-left:1.5%;"><i class="fa fa-save"></i> Save </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+
+    $(".check-all").change(function () {
+        $("[type=checkbox]").prop('checked', $(this).prop("checked"));
+    });
+
+    $(".checklist-sub").change(function () {
+        debugger;
+        var source = $(this).parent();
+        source.parent().children().eq(1).find('.chk').prop('checked', true);
+        if (false == $(this).prop("checked")) {
+            source.parent().children().eq(1).find('.chk').prop('checked', false);
+
+            var subListString = $(this).attr("data-sub-id-list");
+            var subArray = subListString.split(",");
+            $.each(subArray, function (key, value) {
+                for (var i = array.length - 1; i >= 0; i--) {
+                    if (array[i] === value) {
+                        array.splice(i, 1);
+                    }
+                }
+            });
+
+        }
+        else {
+            var subListString = $(this).attr("data-sub-id-list");
+            var subArray = subListString.split(",");
+            $.each(subArray, function (key, value) {
+                var isExits = false;
+                for (var i = array.length - 1; i >= 0; i--) {
+                    if (array[i] === value) {
+                        isExits = true;
+                    }
+                }
+                if (isExits == false) {
+                    array.push(value);
+                }
+            });
+        }
+    });
+
+    $(".chk").change(function () {
+        if (false == $(this).prop("checked")) {
+            console.log($(this).parent().parent().parent().parent().find('.checklist-sub'))
+            var source = $(this).parent().parent().parent().parent();
+            source.find('.checklist-sub').prop('checked', false);
+        }
+    });
+
+    $('[type=checkbox]').change(function () {
+        //uncheck "select all", if one of the listed checkbox item is unchecked
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            $(".check-all").prop('checked', false); //change "select all" checked status to false
+            chkArray = [];
+        }
+        //check "select all" if all checkbox items are checked
+        if ($('[type=checkbox]:checked').length == $('[type=checkbox]').length) {
+            $(".check-all").prop('checked', true);
+        }
+    });
+
+    $('.toggle-heading i').click(function () {
+        $(this).parent().siblings().toggle();
+    });
+
+    var array = [];
+
+    function AddRemoveUser(source) {
+        var typeId = $(source).attr("data-id");
+        if ($(source).is(":checked")) {
+            array.push(typeId);
+        }
+        else {
+            for (var i = array.length - 1; i >= 0; i--) {
+                if (array[i] === typeId) {
+                    array.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    $(window).load(function () {
+        $(".se-pre-con").fadeOut("slow");
+        $(".full-loader-dev").hide();
+
+    });
+
+    function ajaxLoaderStart() {
+        $(".se-pre-con").show();
+    }
+
+    function ajaxLoaderStop() {
+        $(".se-pre-con").hide()
+
+    }
+
+    $(document).ajaxStart(function () {
+        $(":submit").attr("disabled", true);
+        ajaxLoaderStart();
+    });
+
+    $(document).ajaxComplete(function () {
+        $(":submit").attr("disabled", false);
+        ajaxLoaderStop();
+    });
+
+    $(document).on('click', '#saveTeacherSubject-data-id', function () {
+        $('#saveTeacherSubject-data-id').prop('disabled', true);
+            if (array.length > 0) {
+                var ob = new Object();
+                ob.TeacherId = $('#teacher-id').val();
+                ob.SubjectId = $('#subject-id').val();
+                ob.ClassList = [];
+                $.each(array, function (key, value) {
+                    var data = new Object();
+                    data.ClassId = value;
+                    ob.ClassList.push(data);
+                });
+                $.ajax({
+                    url: "/Performance/SubmitAddTeacherClassSubject",
+                    type: "POST",
+                    dataType: 'json',
+                    data: ob,
+                    global: false,
+                    success: function (response) {
+                        if (response.status) {
+                            toastrSuccess(response.msg);
+                            window.location.href = '/Performance/TeacherRoleManagement/';
+                        }
+                        else {
+                            toastrError(response.msg);
+                            window.location.href = '/Performance/TeacherRoleManagement/';
+                        }
+                    },
+                });
+            }
+            else {
+                toastrWarning("Please select Classes and Divisions ");
+                $('#saveTeacherSubject-data-id').prop('disabled', false);
+            }
+    });
+
+
+
+</script>

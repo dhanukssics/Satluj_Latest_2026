@@ -1,0 +1,165 @@
+﻿@model Satluj_Latest.Models.ExamSubjectDetailsModel
+@{
+    ViewBag.Title = "ExamSubjectDetails";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<div class="form-group">
+    <a href="/School/CurriculumDetails" class="btn btn-peek"><i class="fa fa-arrow-left"></i> Back</a>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">@Model.ExamName</h3>
+        <div class="row">
+            <div class="form-group text-right">
+                <button class="btn pay-now-btn" id="btn-add-subjects"><i class="fa fa-plus"></i> Add Subjects</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table custome-table" id="subject-list">
+                @Html.Partial("~/Views/School/_pv_ExamSubjectList.cshtml", Model)
+            </table>
+        </div>
+
+        <div class="modal fade" id="modalAddSubjects" tabindex="-1" role="dialog" aria-labelledby="myModalLabel6">
+
+        </div>
+        <div class="modal fade" id="modalEditSubjects" tabindex="-1" role="dialog" aria-labelledby="myModalLabel6">
+
+        </div>
+
+    </div><!-- end of col md 12 -->
+</div>
+<!-- Modal -->
+<script>
+    $('.checkbox-css').click(function(){
+        $(this).toggleClass('active fa fa-check');
+
+        if($(this).siblings('.hidden-checkbox').prop('checked'))
+        {
+            $(this).siblings('.hidden-checkbox').prop('checked', false);
+        }
+        else{$(this).siblings('.hidden-checkbox').prop('checked', true);}
+    });
+
+    $('.term_heading').click(function(){
+        $(this).siblings().toggle();
+    });
+
+    $(document).on('click', '#btn-add-subjects', function () {
+        var examId =@Model.ExamId;
+        $.ajax({
+            url: '/School/AddNewSubjects/'+examId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#modalAddSubjects').html(data);
+                $.validator.unobtrusive.parse($("#modalAddSubjects"));
+                $('#modalAddSubjects').modal('show');
+            }
+        });
+    });
+    function SubjectAddSuccess(result) {
+        if (result.status == true) {
+            $('#modalAddSubjects').modal('hide');
+            toastrSuccess(result.message);
+            var data = result.UserData;
+            $(@Model.ExamId).val(data);
+            RefreshTable();
+        }
+        else {
+            toastrError(result.msg)
+        }
+    }
+    function SubjectAddFailed() {
+        $('#modalAddSubjects').modal('hide');
+        toastrError('Failed!');
+    }
+
+    function RefreshTable() {
+        $.ajax({
+            url: '/School/ExamSubjectList/'+@Model.ExamId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $("#subject-list").dataTable().fnDestroy()
+                $('#subject-list').html(data);
+                $("#subject-list").dataTable();
+            }
+        });
+    }
+
+
+    $(document).on('click', '.delete-subject-data', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/School/DeleteSchoolSubject/' + $(source).attr('data-id'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    var IdData = data.UserData;
+                    $(@Model.ExamId).val(IdData);
+                    RefreshTable();
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+    });
+
+
+    $(document).on('click', '.edit-subject-data', function () {
+        var id = $(this).attr('data-id');
+        $.ajax({
+            url: '/School/EditSubjects/' + id,
+            dataType: 'html',
+            success: function (data) {
+                $('#modalEditSubjects').html('');;
+                $('#modalEditSubjects').html(data);
+                $.validator.unobtrusive.parse($("#modalEditSubjects"));
+                $('#modalEditSubjects').modal('show');
+            },
+        });
+    });
+
+
+
+    function SubjectEditSuccess(result) {
+        if (result.status == true) {
+            $('#modalEditSubjects').modal('hide');
+            toastrSuccess(result.msg);
+            var data = result.UserData;
+            $(@Model.ExamId).val(data);
+            RefreshTable();
+        }
+        else {
+            toastrError("No changes made!")
+        }
+    }
+
+    function SubjectEditFailed() {
+        //alert('hi');
+        $('#modalEditSubjects').modal('hide');
+        toastrError('No changes made!');
+    }
+
+   
+    
+</script>

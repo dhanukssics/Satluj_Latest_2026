@@ -1,0 +1,71 @@
+﻿
+@model Satluj_Latest.Models.AddDayBookModel
+@{
+    DateTime startDate = Model.startDate;
+    DateTime endDate = Model.endDate;
+    long schoolId = Model.SchoolId;
+    var data = new Satluj_Latest.Data.School(schoolId).GetCashBookDate(startDate, endDate);
+}
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Date
+        </th>
+        <th>
+            Account Head
+        </th>
+        <th>
+            Voucher No / Bill No
+        </th>
+        <th>
+            Income
+        </th>
+
+        <th>
+            Expense
+        </th>
+        <th>
+            Narration
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        foreach (var one in await data)
+        {
+            <tr>
+                @*<td class="ng-teacherDetails-click" data-staffid="@staff.UserId">*@
+                <td>
+                    @i
+                </td>
+                <td>
+                    @*@one.EntryDate.ToString("dd-MM-yyyy")*@
+                    @Convert.ToDateTime(one.EntryDate).ToString("dd-MM-yyyy")
+                </td>
+                <td>
+                    @one.AccHeadName
+                </td>
+
+                <td>
+                    @one.VoucherNo
+                </td>
+                <td>
+                    @String.Format("{0:0.00}", one.Income)
+                    @*@one.Income*@
+                </td>
+                <td>
+                    @String.Format("{0:0.00}", one.Expense)
+                    @*@one.Expense*@
+                </td>
+                <td>
+                    @one.Narration
+                </td>
+            </tr>
+            i++;
+        }
+    }
+</tbody>

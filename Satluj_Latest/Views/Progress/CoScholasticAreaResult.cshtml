@@ -1,0 +1,294 @@
+﻿
+@model Satluj_Latest.Models.ExamResultMainModel
+@{
+    ViewBag.Title = "ExamDeclaration";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+@Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
+@Html.HiddenFor(z => z.ExamId, new { Value = 0 })
+@Html.HiddenFor(z => z.SubjectId, new { Value = 0 })
+@Html.HiddenFor(z => z.ScholasticAreaId, new { Value = 0 })
+@Html.HiddenFor(z => z.CoScholasticAreaId, new { Value = 0 })
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">Co-Scholastic Area Result</h3>
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Class : </label>
+                    <br />
+                    <select asp-for="ClassId"
+                            asp-items="ViewBag.Classes"
+                            class="form-control pv_class-drop-down class-drop-down"
+                            data-live-search="true"
+                            id="classDataDropdown"
+                            name="classDropdown">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="ClassId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group col-sm-3">
+                <label>Division</label>
+                <br />
+                <select id="division-drop-down" class="form-control 
+                </select>
+                <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>slct-free-div-dropdown" disabled>
+                    <option>--Select Division --</option>
+            </div>
+
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Exam :</label>
+                    <select class="form-control slct-exam-dropdown1" disabled></select>
+                    <span id="exam-required-examlist-add" style="display:none; color:red;"></span>
+                </div>
+            </div>
+
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Co-Scholastic Area :</label>
+                    <select class="form-control slct-ScholasticAreaResult-dropdown1" disabled></select>
+                    <span id="exam-required-examlist-add" style="display:none; color:red;"></span>
+                </div>
+            </div>
+
+            @*/--------------------------------------*@
+        </div>
+        <div class="table-responsive">
+            <table class="table custome-table" id="declaed-coSo-student-mark-list"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    //Division listing -- Class Change
+    $(document).on('change', '.class-drop-down', function () {
+        var id = $(this).val();
+        $('#ClassId').val($(this).val());
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html("");
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                        $(".slct-exam-dropdown1").html(""); // Exam
+                        $(".slct-exam-dropdown1").append($('<option></option>').val("").html('---'));
+                        $(".slct-exam-dropdown1").prop("disabled", true);
+                        $(".slct-ScholasticAreaResult-dropdown1").html("");// Scholastic Area
+                        $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val("").html('---'));
+                        $(".slct-ScholasticAreaResult-dropdown1").prop("disabled", true);
+
+                        $('#declaed-coSo-student-mark-list').html('');
+                    }
+                    else {
+                        $("#division-drop-down").html(""); //Division
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+
+                        $(".slct-exam-dropdown1").html(""); // Exam
+                        $(".slct-exam-dropdown1").append($('<option></option>').val("").html('---'));
+                        $(".slct-exam-dropdown1").prop("disabled", true);
+
+                        $(".slct-ScholasticAreaResult-dropdown1").html("");// Scholastic Area
+                        $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val("").html('---'));
+                        $(".slct-ScholasticAreaResult-dropdown1").prop("disabled", true);
+
+                        $('#declaed-coSo-student-mark-list').html('');
+                    }
+                }
+            });
+        }
+        else {
+            $("#division-drop-down").html(""); //Division
+            $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+            $("#division-drop-down").prop("disabled", true);
+
+            $(".slct-exam-dropdown1").html(""); // Exam
+            $(".slct-exam-dropdown1").append($('<option></option>').val("").html('---'));
+            $(".slct-exam-dropdown1").prop("disabled", true);
+
+            $(".slct-ScholasticAreaResult-dropdown1").html("");// Scholastic Area
+            $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val("").html('---'));
+            $(".slct-ScholasticAreaResult-dropdown1").prop("disabled", true);
+
+            $(".slct-subject-dropdown1").html("");// Subject
+            $(".slct-subject-dropdown1").append($('<option></option>').val("").html('---'));
+            $(".slct-subject-dropdown1").prop("disabled", true);
+
+            $('#declaed-coSo-student-mark-list').html('');
+        }
+    });
+
+    //Exam listing -- Division Change
+    $(document).on('change', '.slct-free-div-dropdown', function () {
+        $('#declaed-coSo-student-mark-list').html('');
+        $('#DivisionId').val($(this).val());
+        var classId = $('#ClassId').val();
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadAllExams?id=' + id + '&schoolid=' + $('#SchoolId').val() + '&classId=' + classId,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-exam-dropdown1").html("");
+                        $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- Select Exam --'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-exam-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-exam-dropdown1").prop("disabled", false);
+
+                        $(".slct-ScholasticAreaResult-dropdown1").html("");// Scholastic Area
+                        $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val("").html('---'));
+                        $(".slct-ScholasticAreaResult-dropdown1").prop("disabled", true);
+
+                        $('#declaed-coSo-student-mark-list').html('');
+                    }
+                    else {
+                        $(".slct-exam-dropdown1").html(""); // Exam
+                        $(".slct-exam-dropdown1").append($('<option></option>').val("").html('---'));
+                        $(".slct-exam-dropdown1").prop("disabled", true);
+
+                        $(".slct-ScholasticAreaResult-dropdown1").html("");// Scholastic Area
+                        $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val("").html('---'));
+                        $(".slct-ScholasticAreaResult-dropdown1").prop("disabled", true);
+
+                        $('#declaed-coSo-student-mark-list').html('');
+
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-exam-dropdown1").html(""); // Exam
+            $(".slct-exam-dropdown1").append($('<option></option>').val("").html('---'));
+            $(".slct-exam-dropdown1").prop("disabled", true);
+
+            $(".slct-ScholasticAreaResult-dropdown1").html("");// Scholastic Area
+            $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val("").html('---'));
+            $(".slct-ScholasticAreaResult-dropdown1").prop("disabled", true);
+
+            $('#declaed-coSo-student-mark-list').html('');
+
+        }
+    });
+
+    //Scolastic Area listing -- Exam Change
+    $(document).on('change', '.slct-exam-dropdown1', function () {
+        $('#declaed-coSo-student-mark-list').html('');
+        $('#ExamId').val($(this).val());
+        var classId = $('#ClassId').val();
+        var id = $('#SchoolId').val() + '~' + classId;
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadAllCoScholasticAreas?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-ScholasticAreaResult-dropdown1").html("");
+                        $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val("0").html('-- Select Co-Scholastic Area --'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-ScholasticAreaResult-dropdown1").prop("disabled", false);
+
+                        $('#declaed-coSo-student-mark-list').html('');
+                    }
+                    else {
+                        $(".slct-ScholasticAreaResult-dropdown1").html(""); // Scholastic Area
+                        $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val("").html('---'));
+                        $(".slct-ScholasticAreaResult-dropdown1").prop("disabled", true);
+
+                        $('#declaed-coSo-student-mark-list').html('');
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-ScholasticAreaResult-dropdown1").html(""); // Scholastic Area
+            $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val("").html('---'));
+            $(".slct-ScholasticAreaResult-dropdown1").prop("disabled", true);
+
+            $('#declaed-Sco-Exam-student-mark-list').html('');
+        }
+    });
+
+    //List Students -- Co-Scholastic Area Change
+    $(document).on('change', '.slct-ScholasticAreaResult-dropdown1', function () {
+        $('#declaed-coSo-student-mark-list').html('');
+        $('#ScholasticAreaId').val($(this).val());
+        var classId = $('#ClassId').val();
+        var divisionId = $('#DivisionId').val();
+        var examId = $('#ExamId').val();
+        var Scholastic = $('#ScholasticAreaId').val();
+        if (classId != '' && divisionId != '' && examId != '' && Scholastic != '') {
+            $.ajax({
+                url: '/Progress/SudentListForEnterCoScolasticAreaResult/' + examId + '~' + classId + '~' + divisionId + '~' + Scholastic,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#declaed-coSo-student-mark-list').html(data);
+                }
+            });
+        }
+        else {
+            $('#declaed-coSo-student-mark-list').html('');
+        }
+    });
+
+    //Save marks
+    $(document).on('click', '#students-Mark-Save_btn', function () {
+        var source = $(this);
+        getFullData(source);
+    });
+
+    function getFullData(source) {
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.ClassId = $('#ClassId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.ExamId = $('#ExamId').val();
+        dataList.IsEntered = $('#IsEntered').val();
+        dataList.CoScholasticId = $('#CoScholasticId').val();
+        dataList.ListData = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data.Mark = $(this).find('.cls-mark').val();
+            data.StudentName = '';
+            dataList.ListData.push(data);
+        });
+        console.log(dataList);
+        $.ajax({
+            url: "/Progress/SubmitStudentsCoScholasticAreaMarks",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    window.location.href = '/Progress/CoScholasticAreaResult/';
+                }
+                else {
+                    toastrError(response.msg);
+                    window.location.href = '/Progress/CoScholasticAreaResult/';
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+</script>

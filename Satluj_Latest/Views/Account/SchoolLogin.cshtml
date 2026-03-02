@@ -1,0 +1,115 @@
+﻿@model Satluj_Latest.Models.LoginModel
+
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+    ViewData["Title"] = "School Login";
+}
+
+<section class="login-body">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-7">
+                <img src="~/Content/img/child.png"
+                     class="img-responsive visible-lg visible-md child-img" />
+            </div>
+
+            <div class="col-md-5">
+                <div class="login">
+                    <h2 style="margin-bottom:37px;">School Login</h2>
+
+                    <div class="login-form">
+                        <h3>Login</h3>
+
+                        <form id="login-form">
+                            <input asp-for="userType" type="hidden" value="1" />
+
+                            <div class="form-group">
+                                <input asp-for="Email"
+                                       class="form-control"
+                                       id="username"
+                                       placeholder="Username"
+                                       maxlength="60" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input asp-for="Password"
+                                       class="form-control"
+                                       id="password"
+                                       type="password"
+                                       placeholder="Password"
+                                       maxlength="60" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="submit">Submit</button>
+                            </div>
+
+                            <div class="form-group">
+                                <a href="/Account/ForgotPassword" class="forgot-pass">
+                                    Forgot password?
+                                </a>
+
+                                <a href="/Account/SchoolRegistration"
+                                   class="forgot-pass"
+                                   style="margin-left:100px;">
+                                    Register Now
+                                </a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(".se-pre-con").hide();
+            $('#userType').val(1);
+        });
+
+        $('#login-form').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '@Url.Action("CheckLogin", "Account")',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (result) {
+                    CheckLoginSuccess(result);
+                },
+                error: function () {
+                    toastrError("Login failed. Please try again.");
+                }
+            });
+        });
+
+        function CheckLoginSuccess(result) {
+            if (result.status) {
+                $(".se-pre-con").show();
+
+                if (result.userType == 1 || result.userType == 5) {
+                    window.location.href = '/School/Home';
+                }
+                else if (result.userType == 4) {
+                    window.location.href = '/Parent/ParentHome';
+                }
+            }
+            else {
+                toastrError(result.msg);
+            }
+        }
+
+        $(document).on('keypress', '#password', function (e) {
+            if (e.which === 32)
+                return false;
+        });
+    </script>
+}

@@ -1,0 +1,162 @@
+﻿@model Satluj_Latest.Models.StudentModel
+@{
+    ViewBag.Title = "StudentList";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(z => z.schoolId, new { Value = @Model.schoolId })
+@Html.HiddenFor(z => z.classId, new { Value = 0 })
+@Html.HiddenFor(z => z.divisionId, new { Value = 0 })
+<div class="row">
+    <div class="col-md-12">
+        @*<h3 style="margin-top: 5px;">Outstanding Report</h3>*@
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Class : </label>
+                    <br />
+                    <select asp-for="classId"
+                            asp-items="ViewBag.classlist"
+                            class="form-control slct-mark-dropdwn1"
+                            data-live-search="true"
+                            style="display:inline-block; width:100%; min-width:180px;">
+                        <option value="">-- Choose --</option>
+                    </select>
+
+                    <span asp-validation-for="classId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Division :</label>
+                    <select class="form-control slct-free-div-dropdown" disabled></select>
+                    <span id="division-required-exam-add" style="display:none; color:red;"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3" style="margin-top: 26px;">
+                <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+                <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+                @*<button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>*@
+            </div>
+        </div>
+        <div class="table-responsive">
+            <div class="col-md-12" id="print-trial-bal">
+                <h3 style="text-align:center;">@Model.SchoolName</h3><h5 style="text-align:center;"></h5>
+                <h4 style="text-align:center;" id="studentList-head"></h4><h5 style="text-align:center;"></h5>
+                <table class="table custome-table" id="student-report-list" style="border-left: 0.5px solid #d2cece;border-right: 0.5px solid #d2cece;border-bottom: 0.5px solid #d2cece;"></table>
+            </div>
+        </div>
+
+        <script>
+            $(document).on('change', '.slct-mark-dropdwn1', function () {
+                //debugger;
+                $('#classId').val($(this).val());
+                var id = $(this).val();
+                if (id != '') {
+                    $.ajax({
+                        url: '/Data/LoadAllSchoolDivision?id=' + id + '&schoolid=' + $('#schoolId').val(),
+                        type: "GET",
+                        success: function (result) {
+                            //debugger;
+                            if (result.list.length > 0) {
+                                $(".slct-free-div-dropdown").html("");
+                                $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                                $.each(result.list, function (i, item) {
+                                    $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                                });
+                                $(".slct-free-div-dropdown").prop("disabled", false);
+                                ListStudents();
+                            }
+                            else {
+                                $(".slct-free-div-dropdown").html("");
+                                $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- No Division Found --'));
+                                $(".slct-free-div-dropdown").prop("disabled", true);
+                                $('#divisionId').val("0");
+                                ListStudents();
+                            }
+                        }
+                    });
+                }
+                else {
+                    $(".slct-free-div-dropdown").html("");
+                    $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                    $(".slct-free-div-dropdown").prop("disabled", true);
+                    ListStudents();
+                }
+            });
+
+
+            function ListStudents() {
+
+                var head = $(".slct-mark-dropdwn1 option:selected").text();
+                if (head != "-- Choose --")
+                    $('#studentList-head').text(head);
+                else
+                    $('#studentList-head').text('');
+                var classId = $(".slct-mark-dropdwn1 option:selected").val();
+                if (classId != '') {
+                    var dataId = classId + '~' + 0;
+                    $.ajax({
+                        url: '/Report/DatatableStudentsListReport/' + dataId,
+                        type: "GET",
+                        dataType: 'html',
+                        success: function (data) {
+                            $('#student-report-list').html(data);
+                        }
+                    });
+                }
+                else {
+                    $('#student-report-list').html('');
+                }
+            }
+
+            $(document).on('change', '.slct-free-div-dropdown', function () {
+                var head = $(".slct-mark-dropdwn1 option:selected").text();
+                head = head + " / " + $(".slct-free-div-dropdown option:selected").text();
+                $('#studentList-head').text(head);
+
+
+                var classId = $('#classId').val();
+                $('#divisionId').val($(this).val());
+                var divisionId = $(this).val();
+                if (classId != '' && divisionId != '') {
+                    var dataId = classId + '~' + divisionId;
+                    $.ajax({
+                        url: '/Report/DatatableStudentsListReport/' + dataId,
+                        type: "GET",
+                        dataType: 'html',
+                        success: function (data) {
+                            $('#student-report-list').html(data);
+                        }
+                    });
+                }
+                else {
+
+                }
+            });
+
+
+            function printContent(el) {
+                //debugger;
+                var div = $('#divisionId').val();
+                if (div == 0) {
+                    $('.hideColumn').show();
+                }
+                else {
+                    $('.hideColumn').hide();
+                }
+                var restorepage = document.body.innerHTML;
+                var printcontent = document.getElementById(el).innerHTML;
+                document.body.innerHTML = printcontent;
+                window.print();
+                document.body.innerHTML = restorepage;
+                //window.location.href = '/Report/StudentList';
+            }
+
+            $(document).on('click', '#btn-excel-trial-bal', function () {
+                $("#student-report-list").table2excel({
+                    name: "Table2Excel",
+                    filename: "Student List" ,
+                    fileext: ".xls"
+                });
+            });
+        </script>

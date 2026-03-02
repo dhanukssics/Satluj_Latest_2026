@@ -1,0 +1,436 @@
+﻿@model Satluj_Latest.Models.BankBookModel
+@{
+    ViewBag.Title = "BankBook";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<style>
+    .gap_bottom {
+        padding-bottom: 35px;
+    }
+
+        .gap_bottom label {
+            padding-top: 8px;
+        }
+</style>
+<div>
+    <div col-lg-12>
+        <h2>Bank Book</h2>
+    </div>
+    <div col-lg-12 id="current-bank-balance">
+        @*@Html.Partial("~/Views/Journal/_pv_BankBalance.cshtml", Model)*@
+    </div>
+</div>
+<div>
+    <div id="add-bank-book-Id">
+        @*@Html.Partial("~/Views/Journal/_pv_BankBalance.cshtml", Model)*@
+    </div>
+    <div class="modal fade" id="get-VoucherNo-for-edit">
+    </div>
+    <div class="modal fade" id="tablePrintData">
+    </div>
+</div>
+<script>
+    $('.date-bankBook-add-date').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).ready(function () {
+        //debugger;
+        RefreshPage();
+
+    });
+
+    $(document).on('change', '.accHead-drop-down', function () {
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadSubLedgerList?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#SubLedgerId").html("");
+                        $.each(result.list, function (i, item) {
+                            $("#SubLedgerId").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#SubLedgerId").prop("disabled", false);
+                    }
+                    else {
+                        $("#SubLedgerId").html("");
+                        $("#SubLedgerId").append($('<option></option>').val("").html('-- No SubLedger Found --'));
+                        $("#SubLedgerId").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+        }
+    });
+
+    $(document).on('change', '.pv_bank-type', function () {
+        //debugger;
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Journal/GetBankVoucherNo?id=' + id,
+                type: "GET",
+                success: function (response) {
+                    if (response.status > 0) {
+                        $("#VoucherNo").val('');
+                        $("#VoucherNo").val(response.result);
+                        $('#spn-error-current-balance-check').hide();
+                        $('#btn-save-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                        $('#btn-print-bankbook-add').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                    }
+                    else {
+                        $("#VoucherNo").val('');
+                        $('#spn-error-current-balance-check').hide();
+                        $('#btn-save-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                        $('#btn-print-bankbook-add').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                    }
+                }
+            });
+        }
+        else {
+        }
+    });
+
+    $(document).on('click', '#btn-edit-bankbook', function () {
+        $.ajax({
+            url: '/Journal/SearchVoucherNoForBank/',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#get-VoucherNo-for-edit').html('');
+                $('#get-VoucherNo-for-edit').html(data);
+                $.validator.unobtrusive.parse($("#get-VoucherNo-for-edit"));
+                $('#get-VoucherNo-for-edit').modal('show');
+            }
+        });
+    });
+
+    function AddBankBookSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.msg);
+            RefreshPage();
+        }
+        else {
+            toastrError("Please enter the all  data!")
+        }
+    }
+    function AddBankBookFailed() {
+        RefreshPage();
+        toastrError('No changes made !');
+    }
+
+    function GetVoucherNumber() {
+        var id = 0;
+        $.ajax({
+            url: '/Journal/GetBankVoucherNo?id=' + id,
+            type: "GET",
+            success: function (response) {
+                if (response.status > 0) {
+                    $("#VoucherNo").val('');
+                    $("#VoucherNo").val(response.result);
+                }
+                else {
+                    $("#VoucherNo").val('');
+
+                }
+            }
+        });
+    }
+
+    function RefreshPage() {
+        //debugger;
+        $.ajax({
+            url: '/Journal/AddBankBookReaload',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#add-bank-book-Id').html('');
+                $('#add-bank-book-Id').html(data);
+                $.validator.unobtrusive.parse($('#add-bank-book-Id'));
+                GetVoucherNumber();
+                $('.date-bankBook-add-date').datepicker({
+                    format: 'dd-mm-yyyy',
+                    autoclose: true,
+                    todayHighlight: true
+                });
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                var todayy = dd + '-' + mm + '-' + yyyy;
+                $('.display-currentDate').val(todayy);
+                CurrentBankBalance();
+            }
+        });
+    }
+
+    $(document).on('click', '#btn-voucher-search', function () {
+        //debugger;
+        var obj = new Object();
+        obj.TypeId = $('#bank-book-type-id').val();
+        obj.SearchVoucherNo = $('#SearchVoucherNo').val();
+        if ($('#SearchVoucherNo').val() != '') {
+            $.ajax({
+                url: '/Journal/SearchVoucherForBank',
+                type: "GET",
+                dataType: 'html',
+                data: obj,
+                success: function (data) {
+                    $('#add-bank-book-Id').html('');
+                    $('#add-bank-book-Id').html(data);
+                    $.validator.unobtrusive.parse($("#add-bank-book-Id"));
+                    $('#get-VoucherNo-for-edit').modal('hide');
+                    ReloadDetailsEdit();
+                    //$("#EntryDateString").focus();
+                }
+            });
+        }
+        else {
+            var message = "Please enter a Voucher No!";
+            $('#spn-error-voucher-number').text(message);
+            $('#spn-error-voucher-number').show();
+            $('#btn-voucher-search').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+    });
+
+    function ReloadDetailsEdit() {
+        $('.date-bankBook-add-date').datepicker({
+            format: 'dd-mm-yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+    }
+
+    function EditBankBookSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.message);
+            RefreshPage();
+        }
+        else {
+            toastrError("No changes made!")
+        }
+    }
+
+    function EditBankBookFailed() {
+        RefreshPage();
+        toastrError('Failed!');
+    }
+    function CurrentBankBalance() {
+        //debugger;
+        var bankId = $('#day-bank-Name-id').val();
+        if (bankId != null) {
+            $.ajax({
+                url: '/Journal/CurrentBankBalance?id=' + bankId,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#current-bank-balance').html(data);
+                }
+            });
+        }
+    }
+
+    $(document).on('click', '#btn-voucher-search-dummy', function () {
+        //debugger;
+        var data = $('#SearchVoucherNo').val();
+        var type = $('#bank-book-type-id').val();
+        var dataSet = data + '~' + type;
+        $.ajax({
+            url: '/Journal/CheckVoucherNumberForBank?text=' + dataSet,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.Status) {
+                    var message = "No such Voucher number!";
+                    $('#spn-error-voucher-number').text(message);
+                    $('#spn-error-voucher-number').show();
+                    $('#btn-voucher-search').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                }
+                else {
+                    $('#spn-error-voucher-number').hide();
+                    $('#btn-voucher-search').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                    $('#btn-voucher-search').trigger('click');
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-cancel-bankbook', function () {
+        RefreshPage();
+    });
+
+    $(document).on('change', '#day-book-type-id', function () {
+        var x = $(this).val();
+        if (x == "1") {
+            $('#chkDiv').removeClass('isHidden');
+        }
+        else {
+            $('#chkDiv').addClass('isHidden');
+        }
+    });
+    $(document).on('click', '#btn-print-bankbook-add', function () {
+        //debugger;
+        var obj = new Object();
+        obj.TypeId = $('#day-book-type-id').val();
+        obj.EntryDateString = $('#EntryDateString').val();
+        obj.VoucherNo = $('#VoucherNo').val();
+        obj.HeadId = $('#day-book-head-id').val();
+        obj.SubLedgerId = $('#SubLedgerId').val();
+        obj.Amount = $('#Amount').val();
+        obj.Narration = $('#Narration').val();
+        obj.BankId = $('#day-bank-Name-id').val();
+        obj.ChequeNo = $('#ChequeNo').val();
+        obj.ChequeDateString = $('#ChequeDateString').val();
+        $.ajax({
+            url: '/Journal/AddBankBook',
+            type: "GET",
+            dataType: 'json',
+            data: obj,
+            success: function (result) {
+                if (result.status) {
+                    PrintData();
+                }
+                else {
+                    AddBankBookFailed();
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-print-bankbook-edit', function () {
+        //debugger;
+        var obj = new Object();
+        obj.TypeId = $('#day-book-type-id').val();
+        obj.EntryDateString = $('#EntryDateString').val();
+        obj.VoucherNo = $('#VoucherNo').val();
+        obj.HeadId = $('#day-book-head-id').val();
+        obj.SubLedgerId = $('#SubLedgerId').val();
+        obj.Amount = $('#Amount').val();
+        obj.Narration = $('#Narration').val();
+        obj.Id = $('#BankBookId').val();
+        obj.BankId = $('#day-bank-Name-id').val();
+        obj.ChequeNo = $('#ChequeNo').val();
+        obj.ChequeDateString = $('#ChequeDateString').val();
+        $.ajax({
+            url: '/Journal/EditBankBook',
+            type: "GET",
+            dataType: 'json',
+            data: obj,
+            success: function (result) {
+                if (result.status) {
+                    PrintData();
+                }
+                else {
+                    PrintData();
+                }
+            }
+        });
+    });
+
+
+    function PrintData() {
+        var obj = new Object();
+        obj.TypeId = $('#day-book-type-id').val();
+        obj.EntryDateString = $('#EntryDateString').val();
+        obj.VoucherNo = $('#VoucherNo').val();
+        obj.HeadId = $('#day-book-head-id').val();
+        obj.SubLedgerId = $('#SubLedgerId').val();
+        obj.Amount = $('#Amount').val();
+        obj.Narration = $('#Narration').val();
+        obj.Id = $('#BankBookId').val();
+        obj.BankId = $('#day-bank-Name-id').val();
+        obj.ChequeNo = $('#ChequeNo').val();
+        obj.ChequeDateString = $('#ChequeDateString').val();
+        $.ajax({
+            url: '/Journal/BankBookPrint',
+            type: "GET",
+            dataType: 'html',
+            data: obj,
+            success: function (data) {
+                $('#tablePrintData').html(data);
+                $('#tablePrintData').modal('show');
+            }
+        });
+    }
+
+    $(document).on('keyup', '#bank-book-current-balance-check', function () { //Archana : For check deposit validation // from add
+        var source = $(this);
+        var type = $('#day-book-type-id').val();
+        var bankId = $('#day-bank-Name-id').val();
+        var dataSet = $(source).val() + '~' + bankId;
+        if (type == 1) { // Withdraw
+            $.ajax({
+                url: '/Journal/CheckWithdrawAmount?text=' + dataSet,
+                type: "GET",
+                global: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.Status) {
+                        $('#spn-error-current-balance-check').text(data.Message);
+                        $('#spn-error-current-balance-check').show();
+                        $('#btn-save-bankbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' }); //Avoid Save Buttion Click Vishnu-Button
+                        $('#btn-print-bankbook-add').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' }); //Avoid Save Buttion Click Vishnu-Button
+                    }
+                    else {
+                        $('#spn-error-current-balance-check').hide();
+                        $('#btn-save-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                        $('#btn-print-bankbook-add').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                    }
+                }
+            });
+        }
+        else {
+
+        }
+    });
+
+
+    $(document).on('keyup', '#bank-book-current-balance-check-edit', function () { //Archana : For check deposit validation // from edit
+        //debugger;
+        var source = $('#bank-book-current-balance-check-edit').val();
+        var type = $('#day-book-type-id').val();
+        var bankDataId = $('#BankBookId').val();
+        var accountbankId = $('#day-bank-Name-id').val();
+        var dataSet = source + '~' + bankDataId + '~' + accountbankId;
+        if (type == 1) { // Withdraw
+            $.ajax({
+                url: '/Journal/CheckWithdrawAmountEdit?text=' + dataSet,
+                type: "GET",
+                global: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.Status) {
+                        $('#spn-error-current-balance-check').text(data.Message);
+                        $('#spn-error-current-balance-check').show();
+                        $('#btn-edit-save-bankbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' }); //Avoid Save Buttion Click Vishnu-Button
+                        $('#btn-print-bankbook-edit').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' }); //Avoid Save Buttion Click Vishnu-Button
+                    }
+                    else {
+                        $('#spn-error-current-balance-check').hide();
+                        $('#btn-edit-save-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                        $('#btn-print-bankbook-edit').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                    }
+                }
+            });
+        }
+        else {
+
+        }
+    });
+    $(document).on('change', '#day-bank-Name-id', function () {
+        CurrentBankBalance();
+        //$('#bank-book-current-balance-check').val() = '';
+        $('#bank-book-current-balance-check').val = '';
+    });
+</script>

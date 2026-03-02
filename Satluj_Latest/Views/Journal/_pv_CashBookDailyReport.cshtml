@@ -1,0 +1,134 @@
+﻿
+
+@model Satluj_Latest.Models.AddDayBookModel
+@{
+    DateTime startDate = Model.startDate;
+    DateTime endDate = Model.endDate;
+    long schoolId = Model.SchoolId;
+    var school = new Satluj_Latest.Data.School(schoolId);
+    var data_1 = await school.GetCashBookDailyReportDate(startDate, endDate);
+    var data=data_1.OrderBy(z => z.EntryDate).ToList().GroupBy(z => z.EntryDate).ToList();
+    var pre = school.GetCashBookStatus(startDate, endDate);
+}
+<thead>
+    <tr>
+        @*<th>
+                Slno
+            </th>
+            <th>
+                Date
+            </th>*@
+        <th>
+            Voucher No / Bill No
+        </th>
+        <th>
+            Account Head
+        </th>
+        <th>
+            Income
+        </th>
+
+        <th>
+            Expense
+        </th>
+        <th>
+            Narration
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        decimal? ClosingBalance = 0;
+
+        foreach (var next in data)
+        {
+            decimal? totInc = 0;
+            decimal? totExp = 0;
+            var nextList = next.OrderBy(z => z.VoucherNo).ToList();
+            if (nextList.Count > 0)
+            {
+                if (nextList.Count > 0)
+                {
+                    <tr>
+                        <td colspan="3" style="color:red">
+                            <b>  Day book for @Convert.ToDateTime(nextList[0].EntryDate).ToString("dd-MM-yyyy")</b>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+                if (i > 1)
+                {
+                    <tr>
+                        <td></td>
+                        <td>
+                            <b>Opening Balance B/F</b>
+                        </td>
+                        <td><b>@ClosingBalance</b></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+                else
+                {
+                    if (pre.Count > 0)
+                    {
+                        ClosingBalance = pre[0].OpeningBalance;
+                        <tr>
+                            <td></td>
+                            <td>
+                                <b>Opening Balance B/F</b>
+                            </td>
+                            <td><b>@pre[0].OpeningBalance</b></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    }
+                }
+
+
+                foreach (var one in nextList)
+                {
+
+
+                    <tr>
+                        <td>
+                            @one.VoucherNo
+                        </td>
+                        <td>
+                            @one.AccHeadName
+                        </td>
+
+                        <td>
+                            @String.Format("{0:0.00}", one.Income)
+                        </td>
+                        <td>
+                            @String.Format("{0:0.00}", one.Expense)
+                        </td>
+                        <td>
+                            @one.Narration
+                        </td>
+                    </tr>
+                }
+                if (nextList.Count > 0)
+                {
+                    totInc = nextList.Sum(z => z.Income);
+                    totExp = nextList.Sum(z => z.Expense);
+                    decimal? totss= totInc - totExp;
+                    ClosingBalance = ClosingBalance + totss;
+                    <tr>
+                        <td></td>
+                        <td>
+                            <b>Closing Balance C/F</b>
+                        </td>
+                        <td><b>@ClosingBalance</b></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    }
+                    i++;
+                }
+            }
+        }
+                </tbody>

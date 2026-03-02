@@ -1,0 +1,151 @@
+﻿
+@model Satluj_Latest.Models.Chart
+@{
+    ViewBag.Title = "PerformanceHome";
+        bool IsAdmin = ViewBag.IsAdmin;
+    int count = 1;
+
+}
+
+<style>
+    .chartdiv {
+        width: 250px;
+        height: 250px;
+        float: left;
+        border: 1px solid #eee;
+        margin-right: 10px;
+    }
+
+    #legenddiv {
+        height: 250px !important;
+        overflow: auto;
+    }
+    .headStyle{
+            text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 15px 0 25px;
+    padding: 0;
+    display: block;
+    border:0;
+}
+    }
+</style>
+<script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+<script src="https://www.amcharts.com/lib/3/pie.js"></script>
+<script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+@Html.HiddenFor(m => m.fullList, new { Value = Model.fullList, id = "jsonId" })
+<style>
+    .amcharts-chart-div > a {
+        display: none !important;
+    }
+</style>
+<h3 class="headStyle">@Model.Heading</h3>
+<div class="row">
+    <div class="col-sm-12">
+        @foreach (var item in Model.list)
+        {
+            var aa = "chartdiv" + "" + count;
+            <div id="@aa" class="chartdiv"></div>
+            count = count + 1;
+        }
+
+    </div>
+    <div class="col-sm-12">
+        <div class="row form-group">
+            <div style="width:15px;height:15px;border:1px solid; background-color:rgb(204, 71, 72); margin-left:20px; display:inline-block; margin-bottom:2px;float:left;"></div><span style="margin-left:10px;margin-top:-2px;float:left;">NTP(Not to perform) 40% below</span>
+            <br />
+            <div style="width:15px;height:15px;border:1px solid; background-color:rgb(132, 183, 97); margin-left:20px; display:inline-block; margin-bottom:2px;float:left;"></div><span style="margin-left:10px;margin-top:-2px;float:left;">Average (40% -70%)</span>
+            <br />
+            <div style="width:15px;height:15px;border:1px solid; background-color:rgb(253, 212, 0); margin-left:20px; display:inline-block; margin-bottom:2px;float:left;"></div><span style="margin-left:10px;margin-top:-2px;float:left;">Merit (70% - 90 %)</span>
+            <br />
+            <div style="width:15px;height:15px;border:1px solid; background-color:rgb(103, 183, 220); margin-left:20px; display:inline-block; margin-bottom:2px;float:left;"></div><span style="margin-left:10px;margin-top:-2px;float:left;">Super Merit (90% Above)</span>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(document).ready(function () {
+        var myData = $('#jsonId').val();
+        var obj = JSON.parse(myData);
+        console.log(myData);
+        console.log(obj);
+        var count = 1;
+        $.each(obj, function () {
+            var chartDatacount = [{
+                "title": "Super Merit",
+                "value": this.Super
+            }, {
+                "title": "Merit",
+                "value": this.Merit
+            }, {
+                "title": "Average",
+                "value": this.Average
+            }, {
+                "title": "NTP",
+                "value": this.NTP
+            }];
+
+            var chartName = "chartdiv" + count;
+            AmCharts.makeChart(chartName, {
+                "type": "pie",
+                "theme": "light",
+                "dataProvider": chartDatacount,
+                "valueField": "value",
+                "titleField": this.ChartName,
+                "labelsEnabled": false,
+                "pullOutRadius": 20,
+                "ChartName": this.ChartName,
+                "titles": [
+		{
+		    "text": this.ChartName
+		}]
+                });
+            count = count + 1;
+        });
+    });
+    
+    var suspendHovers = false;
+
+    for (var i = 0; i < AmCharts.charts.length; i++) {
+        var chart = AmCharts.charts[i];
+
+        chart.addListener("rollOverSlice", function (event) {
+            replicateAction(chart, "rollOverSlice", event.dataItem.index);
+        });
+
+        chart.addListener("rollOutSlice", function (event) {
+            replicateAction(chart, "rollOutSlice", event.dataItem.index);
+        });
+
+        chart.addListener("clickSlice", function (event) {
+            replicateAction(chart, "clickSlice", event.dataItem.index);
+        });
+
+        if (chart.legend !== undefined) {
+            chart.addListener("init", function () {
+                chart.legend.addListener("hideItem", function (event) {
+                    replicateAction(chart, "hideSlice", event.dataItem.index);
+                });
+                chart.legend.addListener("showItem", function (event) {
+                    replicateAction(chart, "showSlice", event.dataItem.index);
+                });
+            })
+        }
+    }
+
+    function replicateAction(chart, action, index) {
+        if (suspendHovers)
+            return;
+        suspendHovers = true;
+        for (var x = 0; x < AmCharts.charts.length; x++) {
+            if (AmCharts.charts[x] == chart)
+                continue;
+            AmCharts.charts[x][action](index);
+        }
+        suspendHovers = false;
+    }
+
+
+</script>		

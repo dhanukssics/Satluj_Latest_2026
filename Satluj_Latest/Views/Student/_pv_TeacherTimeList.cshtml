@@ -1,0 +1,47 @@
+﻿@inject Satluj_Latest.Data.DropdownData DropdownData
+
+@model Satluj_Latest.Models.TimetableModel
+
+@using (Html.BeginForm("SubmitTimetable", "Student", FormMethod.Post, new { id = "form-add-exam" }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(z => z.DivisonId, new { Value = 0 })
+
+    <div class="row" style="width:100%; padding-left: 10px;">
+        <div class="form-group col-sm-3">
+            <div class="form-group">
+                <label style="color:black;">Teacher :</label>
+                <br />
+
+                <select asp-for="TeacherId"
+                        asp-items="@(DropdownData.GetTeachers(Model.SchoolId))"
+                        class="form-control"
+                        data-live-search="true"
+                        id="teacher-drop-Id"
+                        style="display:inline-block; width:100%; min-width:180px;">
+                    <option value="">-- Select --</option>
+                </select>
+
+                @Html.ValidationMessageFor(z => z.TeacherId)
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $("#form-add-exam").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: this.action,
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                AddTimetableSuccess(response);
+            },
+            error: function (xhr) {
+                AddTimetableFailed(xhr);
+            }
+        });
+    });
+</script>

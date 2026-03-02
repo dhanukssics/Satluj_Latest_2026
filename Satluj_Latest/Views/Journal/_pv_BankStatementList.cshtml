@@ -1,0 +1,129 @@
+﻿
+@model Satluj_Latest.Models.BankStatementModel
+@{
+    //decimal closing = new Satluj_Latest.Data.School(Model.SchoolId).CurrentBankBalance(Model.StartDate, Model.EndDate);
+    var bankStatement = new Satluj_Latest.Data.School(Model.SchoolId).GetBankStatementList(Model.StartDate, Model.EndDate, Model.BankId);
+    Tuple<decimal, int, int, decimal, decimal> statement = await new Satluj_Latest.Data.School(Model.SchoolId).Statements(Model.StartDate, Model.EndDate, Model.BankId);
+    decimal open = statement.Item1;
+    decimal currentOpen= statement.Item1;
+}
+<div class="row">
+    @Html.HiddenFor(m => m.StartDate, new { Value = Model.StartDate })
+    @Html.HiddenFor(m => m.EndDate, new { Value = Model.EndDate })
+    <div class="col-md-12" id="print-trial-bal">
+        <table class="table custome-table table-bordered" id="table-trial-balance">
+            <thead>
+                <tr>
+                    <th style="text-align: center;">
+                        Date
+                    </th>
+                    <th style="text-align: center;">
+                        Narration
+                    </th>
+                    <th style="text-align: center;">
+                        Cheq/RefNo.
+                    </th>
+                    <th style="text-align: center;">
+                        Value Date
+                    </th>
+                    <th style="text-align: center;">
+                        Withdraw Amount
+                    </th>
+                    <th style="text-align: center;">
+                        Deposit Amount
+                    </th>
+                    <th style="text-align: center;">
+                        Closing Balance 
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var item in await bankStatement)
+                    {
+                        if (item.Deposit != 0)
+                        {
+                            open = open + item.Deposit ?? 0;
+                        }
+                        else
+                        {
+                            open = open - item.Withdraw ?? 0;
+                        }
+                        <tr>
+                            <td style="text-align: center;">
+                                @item.EntryDate.ToString("dd-MM-yyyy")
+                            </td>
+                            <td style="text-align: center;">
+                                @item.Narration
+                            </td>
+                            <td style="text-align: center;">
+                                @item.ChequeNo
+                            </td>
+                            <td style="text-align: center;">
+                                @if (item.ChequeDate != null)
+                                {
+                                    @Convert.ToDateTime(item.ChequeDate).ToString("dd-MM-yyyy")
+                                }
+                                else
+                                {
+
+                                }
+                            </td>
+                            <td style="text-align: center;">
+                                @String.Format("{0:0.00}", item.Withdraw)
+                            </td>
+                            <td style="text-align: center;">
+                                @String.Format("{0:0.00}", item.Deposit)
+                            </td>
+                            <td style="text-align: center;">
+                                @open
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr style="font-weight:bold">
+                    <td></td>
+                    <td style="text-align: center;">
+                        Opening Balance
+                    </td>
+
+                    <td style="text-align: center;">Dr Count</td>
+
+                    <td style="text-align: center;">Cr Count</td>
+
+                    <td style="text-align: center;">Debits</td>
+
+                    <td style="text-align: center;">Credits</td>
+
+                    <td style="text-align: center;">Closing Balance</td>
+                   
+
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="text-align: center;">
+                        @currentOpen
+                    </td>
+                    <td style="text-align: center;">
+                        @statement.Item2
+                    </td>
+                    <td style="text-align: center;">
+                        @statement.Item3
+                    </td>
+                    <td style="text-align: center;">
+                        @statement.Item4
+                    </td>
+                    <td style="text-align: center;">
+                        @statement.Item5
+                    </td>
+                    <td  style="text-align: center;">
+                        @open
+                    </td>
+                    
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

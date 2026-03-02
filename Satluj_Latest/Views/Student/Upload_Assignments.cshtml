@@ -1,0 +1,328 @@
+﻿@model Satluj_Latest.Models.ExamResultMainModel
+
+@{
+    ViewBag.Title = "Upload_Assignments";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+@Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
+@Html.HiddenFor(z => z.SubjectId, new { Value = 0 })
+@Html.HiddenFor(z => z.TeacherId, new { Value = @Model.TeacherId })
+
+@*<style type="text/css">
+
+
+            #temp {
+
+              background-color: lawngreen;
+
+              max-width: 500px;
+              margin: auto;
+              border: 3px solid #73AD21;
+       }
+    </style>*@
+
+
+
+
+@using (Html.BeginForm())
+
+{
+
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <h3 style="margin-top: 5px;"> Assign Assessment</h3>
+
+            <div class="row">
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Subjects : </label>
+                        <br />
+                        <select asp-for="SubjectId"
+                                asp-items="ViewBag.Subjectlist"
+                                class="form-control"
+                                id="subjectId"
+                                name="classDropdown"
+                                data-live-search="true">
+                            <option value="">--Choose--</option>
+                        </select>
+
+                        <span asp-validation-for="SubjectId" class="text-danger"></span>
+
+
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Class : </label>
+                        <br />
+                        <select asp-for="ClassId"
+                                asp-items="ViewBag.classlist"
+                                class="form-control pv_class-drop-down class-drop-down"
+                                id="classDataDropdown"
+                                data-live-search="true">
+                            <option value="">--Choose--</option>
+                        </select>
+
+                        <span asp-validation-for="ClassId" class="text-danger"></span>
+                    </div>
+                </div>
+
+
+                <div class="form-group col-sm-3">
+                    <label>Division</label>
+                    <br />
+                    <select id="division-drop-down" class="form-control slct-free-div-dropdown" disabled>
+                        <option>--Select Division --</option>
+                    </select>
+                    <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+                </div>
+
+
+
+
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <br />
+
+                        @Html.TextArea("description", "", new { @class = "form-control date-add", placeholder = "Description", id = "description" })
+
+                    </div>
+                </div>
+
+
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <br />
+                        @*@Html.TextBox("TrackFile", "", new { @type = "file", @multiple = "multiple" }) <br />*@
+                        <input id="fileInput" type="file" multiple>
+
+                    </div>
+                </div>
+
+
+                <div class="form-group col-sm-3">
+                    <div>
+                        <br />
+                        <button class="btn pay-now-btn " data-toggle="modal" id="saveSubject"><i class="fa fa-save"></i> Save</button>
+                    </div>
+                </div>
+
+
+                <div class="btn fa-pull-right " id="temp">
+                    <hi>     @TempData["alertMessage"]</hi>
+                </div>
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="table-responsive">
+
+                        <table class="table custome-table table-bordered table-hover" id="divtest"></table>
+                    </div>
+
+
+                </div>
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+
+        //jibin 9/16/2020
+        var seen = {};
+        jQuery('#subjectId').children().each(function () {
+            var txt = jQuery(this).attr('value');
+            if (seen[txt]) {
+                jQuery(this).remove();
+            } else {
+                seen[txt] = true;
+            }
+        });
+
+//jibin 9/16/2020
+
+
+
+
+
+        $(document).on('change', '.class-drop-down', function (e) {
+
+            array = [];
+            $('#divtest').html('');
+            classId = $('#classDataDropdown').val();
+
+            if (classId != '') {
+                $.ajax({
+                    url: '/Student/ListAssessment/' + classId,
+                    type: "POST",
+
+                    dataType: 'html',
+                    success: function (data) {
+
+                        $('#divtest').html(data);
+                    }
+                });
+
+            }
+            else {
+                toastrError('Please select all details!');
+                $('#divtest').html('');
+            }
+        });
+
+        $(document).on('change', '.class-drop-down', function () {
+            array = [];
+            var id = $(this).val();
+            $('#ClassId').val($(this).val());
+            if (id != '') {
+                $.ajax({
+                    url: '/Data/LoadDivision?id=' + id,
+                    type: "GET",
+                    success: function (result) {
+                        if (result.list.length > 0) {
+                            $("#division-drop-down").html("");
+                            $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                            $.each(result.list, function (i, item) {
+                                $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                            });
+                            $("#division-drop-down").prop("disabled", false);
+                            $('#optional-subjects-student-mark-list').html('');
+                        }
+                        else {
+                            $(".slct-free-div-dropdown").html(""); // Division
+                            $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
+                            $(".slct-free-div-dropdown").prop("disabled", true);
+                            $('#optional-subjects-student-mark-list').html('');
+                        }
+                    }
+                });
+            }
+            else {
+                $(".slct-free-div-dropdown").html(""); // Division
+                $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
+                $(".slct-free-div-dropdown").prop("disabled", true);
+                $('#optional-subjects-student-mark-list').html('');
+            }
+        });
+
+
+
+
+
+        function Refresh() {
+
+            array = [];
+            $('#divtest').html('');
+
+            classId = $('#classDataDropdown').val();
+
+            if (classId != '') {
+                $.ajax({
+                    url: '/Student/ListAssessment/' + classId,
+                    type: "POST",
+                    dataType: 'html',
+                    success: function (data) {
+
+                        $('#divtest').html(data);
+                    }
+                });
+            }
+            else {
+                toastrError('Please select all details!');
+                $('#divtest').html('');
+            }
+        }
+
+
+
+
+        $(document).ready(function () {
+            $("#saveSubject").click(function () {
+                var formData = new FormData();
+                var totalFiles = document.getElementById("fileInput").files.length;
+                if (totalFiles != 0) {
+
+                    for (var i = 0; i < totalFiles; i++) {
+                        var file = document.getElementById("fileInput").files[i];
+                        var subid = $('#subjectId').val().trim();
+                        var clsid = $('#classDataDropdown').val().trim();
+                        var division = $('#division-drop-down').val().trim();
+                        var des = $('#description').val().trim();
+
+                        formData.append("FileUpload", file);
+                        formData.append("subjectId", subid);
+                        formData.append("classid", clsid);
+                        formData.append("division", division);
+                        formData.append("Description", des);
+                    }
+                }
+
+                else
+                {
+
+
+                    var subid = $('#subjectId').val().trim();
+                    var clsid = $('#classDataDropdown').val().trim();
+                    var division = $('#division-drop-down').val().trim();
+                    var des = $('#description').val().trim();
+
+
+                    formData.append("subjectId", subid);
+                    formData.append("classid", clsid);
+                    formData.append("division", division);
+
+                    formData.append("Description", des);
+
+                }
+                $.ajax({
+                    type: "POST",
+                    url: '/Student/UploadFile',
+                    data: formData,
+                    dataType: 'json',
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+
+
+
+
+                        $("#temp").load(" #temp");
+
+
+                    },
+                    error: function (error) {
+
+                    }
+                });
+            });
+        });
+
+
+
+
+
+
+    </script>
+
+
+
+
+
+
+
+}
+
+

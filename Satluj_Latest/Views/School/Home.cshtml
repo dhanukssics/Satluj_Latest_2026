@@ -1,0 +1,342 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-9">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="top_quick_info_sec">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="quick_info">
+                                    <div class="quick_info_texts">
+                                        <h5>Total Attendance</h5>
+                                        <h3 id="tot-pie-atnd">0</h3>
+                                    </div><!-- ./quick_info_texts -->
+                                    <div class="quick_info_progress">
+                                        <div class="progress green">
+                                            <span class="progress-left">
+                                                <span class="progress-bar"></span>
+                                            </span>
+                                            <span class="progress-right">
+                                                <span class="progress-bar"></span>
+                                            </span>
+                                            <div id="pie-per-atnd" class="progress-value"></div>
+                                        </div><!-- ./progress -->
+                                    </div><!-- ./quick_info_progress -->
+                                </div><!-- ./quick_info -->
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="quick_info">
+                                    <div class="quick_info_texts">
+                                        <h5>Total Books</h5>
+                                        <h3>0</h3>
+                                    </div><!-- ./quick_info_texts -->
+                                    <div class="quick_info_progress">
+                                        <div class="progress yellow">
+                                            <span class="progress-left">
+                                                <span class="progress-bar"></span>
+                                            </span>
+                                            <span class="progress-right">
+                                                <span class="progress-bar"></span>
+                                            </span>
+                                            <div class="progress-value">0%</div>
+                                        </div><!-- ./progress -->
+                                    </div><!-- ./quick_info_progress -->
+                                </div><!-- ./quick_info -->
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 isHidden">
+                                <div class="quick_info">
+                                    <div class="quick_info_texts">
+                                        <h5>Total Fee Collected</h5>
+                                        <h3>0</h3>
+                                    </div><!-- ./quick_info_texts -->
+                                    <div class="quick_info_progress">
+                                        <div class="progress pink">
+                                            <span class="progress-left">
+                                                <span class="progress-bar"></span>
+                                            </span>
+                                            <span class="progress-right">
+                                                <span class="progress-bar"></span>
+                                            </span>
+                                            <div id="" class="progress-value">0%</div>
+                                        </div><!-- ./progress -->
+                                    </div><!-- ./quick_info_progress -->
+                                </div><!-- ./quick_info -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="pan">
+                    <div class="head-pan">
+                        Class Count And Attendance
+                    </div>
+                    @*<div class="body-pan">
+                            <ul>
+                                <li>
+                                    @{
+                                    var classes = new Satluj_Latest.Data.School(Model.schoolId).Divisions.ToList().OrderBy(z => z.ClassName);
+                                    var schoolAtnd = 0;
+                                    }
+                                    @foreach (var clas in classes)
+                                {
+                                    var attendance = new Satluj_Latest.Data.Division(clas.DivisionId).GetAttendanceCount(0).ToList();
+                                    var totCount = attendance.Count;
+                                    var present = attendance.Where(z => z.AttendanceData == true).ToList().Count();
+                                    schoolAtnd = schoolAtnd + present;
+                                    if (totCount != 0)
+                                    {     <div> <span><b>Class </b>@clas.ClassName @clas.DivisionName: </span> <span>@present/@totCount</span></div>}
+                                    else
+                                    {<div> <span><b>Class </b>@clas.ClassName @clas.DivisionName: </span> <span>NA</span></div> }
+                                }
+                                </li>
+                                <li>
+                                    <div style="width:100%; display:block; border-top: 1px solid #ccc;padding-top: 15px;">
+                                        <b>Total student in School</b> @schoolAtnd
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>*@
+                    @{
+                        var currenttime = Model.Currenttime;
+                        var school = new Satluj_Latest.Data.School(Model.schoolId);
+                        var classes = school.Divisions.Where(z => z.Class.PublishStatus == true).ToList().OrderBy(z => z.Class.ClassOrder);
+                        var schoolAtnd = 0;
+                        var totStudent = 0;
+                        var todayTotStrength = 0;
+                        var feeCollectionHome = school.GetDailyFeeCollectionHome().ToList().OrderBy(z => z.ClassOrder);
+                        var libraryBookHome = school.GetLibraryBookountHome().ToList().OrderBy(z => z.Category);
+
+                    }
+                    <div class="table-responsive">
+                        <table class="table table-no-border text-center table-text-center">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Division</th>
+                                    <th>Strength</th>
+                                    <th>Attendance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var clas in classes)
+                                {
+                                    var divisionDetail = new Satluj_Latest.Data.Division(clas.DivisionId);
+                                    var attendance = divisionDetail.GetAttendanceCount(0).ToList();
+                                    var strength = divisionDetail.GetStudentCount();
+                                    //var totCount = attendance.Count;
+                                    var present = attendance.Where(z => z.AttendanceData == true).ToList().Count();
+                                    schoolAtnd = schoolAtnd + present;
+                                    totStudent = totStudent + strength;
+                                    <tr>
+                                        <td>@clas.ClassName</td>
+                                        <td>@clas.DivisionName</td>
+                                        <td>@strength</td>
+
+                                        @if (present != 0)
+                                        {
+                                            <td>@present</td>
+                                            todayTotStrength = todayTotStrength + strength;
+                                        }
+                                        else
+                                        {
+                                            <td>Not Taken</td>
+                                        }
+                                    </tr>
+                                }
+                                <tr>
+                                    <td colspan="2"><b class="ttl-strgth">Total Strength</b></td>
+                                    <td><b>@totStudent</b></td>
+                                    <td><b>@schoolAtnd</b></td>
+                                    <input type="hidden" value="@schoolAtnd" id="hfTotAtnd" />
+                                    <input type="hidden" value="@totStudent" id="hfTotStud" />
+                                    <input type="hidden" value="@todayTotStrength" id="hfTodayTotStr" />
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            @*<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="pan">
+                    <div class="head-pan">
+                        Fee Collection
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-no-border text-center table-text-center">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Division</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (feeCollectionHome.Count() >= 1)
+                                {
+                                    foreach (var data in feeCollectionHome)
+                                    {
+                                        <tr>
+                                            <td>@data.Class</td>
+                                            <td>@data.Division</td>
+                                            <td>@String.Format("{0:0.00}", data.Amount)</td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td colspan="2"><b class="ttl-strgth">Total Amount</b></td>
+                                        <td><b>@String.Format("{0:0.00}", feeCollectionHome.Sum(o => o.Amount))</b></td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td>NA</td>
+                                        <td>NA</td>
+                                        <td>NA</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2"><b class="ttl-strgth">Total Amount</b></td>
+                                        <td><b>0</b></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>*@
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="pan">
+                    <div class="head-pan">
+                        Library Details
+                    </div>
+                    @*<div class="body-pan">
+                            <ul>
+                                <li>
+                                    @*Account Collected: <b>120397 INR</b>
+                                </li>
+                            </ul>
+                        </div>*@
+                    <div class="table-responsive">
+                        <table class="table table-no-border text-center table-text-center">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Books Available</th>
+                                    <th>Total Books</th>
+                                </tr>
+                            </thead>
+                            @if (libraryBookHome.Count() >= 1)
+                            {
+                                foreach (var data in libraryBookHome)
+                                {
+                                    <tr>
+                                        <td>@data.Category</td>
+                                        <td>@data.BookCount</td>
+                                        <td>@data.AvailableBook</td>
+        </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>NA</td>
+                                    <td>NA</td>
+                                    <td>NA</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><b class="ttl-strgth">Total Books</b></td>
+                                    <td><b>0</b></td>
+                                </tr>
+                            }
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- end of col md 9 -->
+
+    <div class="col-lg-3">
+        <div class="upcoming_events">
+            <h3>Upcoming Events</h3>
+            <ul>
+                @foreach (var cal in school.GetCalendarUpcomingEvent())
+                {
+                    <li>
+                        <span data-id="@cal.EventId" class="event-dev">
+                            <p>@cal.EventHead</p>
+                            <h6>@cal.EventDate.ToString("dd-MM-yyyy")</h6>
+                        </span>
+                    </li>
+                }
+                @*<li>
+                        <a href="#">
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <h6>12/-0/2018</h6>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <h6>12/-0/2018</h6>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <h6>12/-0/2018</h6>
+                        </a>
+                    </li>*@
+            </ul>
+        </div>
+    </div>
+    <div class="modal fade" id="modalEventView" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        var totAtnd = $('#hfTotAtnd').val();
+        var totStudent = $('#hfTodayTotStr').val();
+        $('#tot-pie-atnd').html(totAtnd);
+        var per = (parseInt(totAtnd) / parseInt(totStudent)) * 100;
+        var roundPer = Math.ceil(per);
+        console.log(per);
+        console.log(roundPer);
+        if ((totAtnd == 0) && (totStudent == 0)) {
+            $('#pie-per-atnd').html("0%");
+        }
+        else {
+            $('#pie-per-atnd').html(parseInt(roundPer) + "%");
+        }
+    });
+    //function EventView() {
+    $(document).on('click', '.event-dev', function () {
+        //debugger;
+        //var id = $('#event-id').val();
+        var id = $(this).attr('data-id');
+        console.log(id);
+        $.ajax({
+            url: '/School/UpcomingEventView/' + id,
+            dataType: 'html',
+            success: function (data) {
+                $('#modalEventView').html('');
+                $('#modalEventView').html(data);
+                $('#modalEventView').modal('show');
+            },
+        });
+    });
+</script>

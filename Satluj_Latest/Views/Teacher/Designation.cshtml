@@ -1,0 +1,80 @@
+﻿@model Satluj_Latest.Models.DesignationModel
+
+@{
+    ViewData["Title"] = "CoScholasticArea";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<input type="hidden" asp-for="SchoolId" />
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top:5px;">Designation</h3>
+
+        <div class="row">
+            <form id="form-teacher-add"
+                  asp-action="AddDesignation"
+                  asp-controller="Teacher"
+                  method="post">
+
+                <div class="form-group col-sm-3">
+                    <label>Designation Name :</label>
+                    <input asp-for="DesignationName"
+                           class="form-control"
+                           placeholder="Designation Name" />
+                    <span asp-validation-for="DesignationName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-sm-3">
+                    <label></label><br />
+                    <button type="submit"
+                            class="btn pay-now-btn"
+                            style="margin-top:9%;">
+                        <i class="fa fa-save"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            @await Html.PartialAsync("~/Views/Teacher/_pv_DesignationList.cshtml", Model)
+        </div>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="modalDesignationEdit"
+     tabindex="-1"
+     role="dialog"></div>
+<script>
+    $(function () {
+
+        $(".designation-list").DataTable();
+
+        $("#form-teacher-add").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: "POST",
+                data: $(this).serialize(),
+                success: AddDesignationSuccess,
+                error: AddDesignationFailure
+            });
+        });
+    });
+
+    function AddDesignationSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+        } else {
+            toastrError(result.msg);
+        }
+        window.location.href = '/Teacher/Designation/';
+    }
+
+    function AddDesignationFailure() {
+        toastrError("Failed!");
+    }
+</script>

@@ -1,0 +1,181 @@
+﻿@model Satluj_Latest.Models.DayBookReportModel
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+<div class="row">
+    <div class="form-group col-sm-2">
+        <label>Start</label>
+        <div class="with-icon">
+            <input type="text" class="form-control bankbook-start-date date-bankBookReport" data-date-end-date="0d" value="@Model.FromDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+
+    <div class="form-group col-sm-2">
+        <label>End</label>
+        <div class="with-icon">
+            <input type="text" class="form-control bankbook-end-date date-bankBookReport" data-date-end-date="0d" value="@Model.ToDate.ToString("dd-MM-yyyy")">
+            <i class="fa fa-calendar"></i>
+        </div>
+    </div>
+    <div class="form-group col-sm-3">
+        <label>Bank</label>
+        <div class="with-icon">
+            <select asp-for="BankId"
+                    asp-items="ViewBag.BankList"
+                    class="form-control accHead-drop-down"
+                    id="bank-Name-id">
+                <option value="">All</option>
+            </select>
+
+
+        </div>
+    </div>
+    <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+        <button type="button" class="btn btn-sm btn-info btn-search" id="searchBankBookData">Search</button>
+    </div>
+    <div class="form-group col-sm-2" style="margin-top: 26px;">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-trial-bal')"><i class="fa fa-print"></i> Print</button>
+        <button class="btn pay-now-btn" id="btn-excel-trial-bal"><i class="fa fa-table"></i> Excel</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12" id="print-trial-bal">
+        <h3 style="text-align:center;">Bank Book Report</h3><h5 style="text-align:center;" id="datecheck"></h5>
+        <div class="form-group col-sm-12" id="bank-book-status-id">        </div>
+        <table class="table custome-table" id="bank-book-list"></table>
+        <div class="form-group col-sm-12" id="bank-book-closing-status"></div>
+    </div>
+</div>
+
+
+<script>
+    $('.date-bankBookReport').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    function IntializeDataTable() {
+        $("#bank-book-list").dataTable().fnDestroy()
+        $("#bank-book-list").dataTable();
+    }
+
+    $(document).ready(function () {
+        searchBankBookDataWithDate();
+        GetOpeningBalance();
+        GetClosingBalance();
+        var ss = $('.bankbook-start-date').val() + " to " + $('.bankbook-end-date').val();
+        $('#datecheck').text(ss);
+    });
+
+    function searchBankBookDataWithDate() {
+        var date = $('.bankbook-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.bankbook-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+
+        var bankid = $('#bank-Name-id').val();
+
+        $.ajax({
+            url: '/SchoolAccount/BankBookReport/' + start + '~' + end + '~' + bankid,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#bank-book-list').html('');
+                $('#bank-book-list').html(data);
+            }
+        });
+    }
+
+    $(document).on('click', '#searchBankBookData', function () {
+        searchBankBookDataWithDate();
+        GetOpeningBalance();
+        GetClosingBalance();
+        var ss = $('.bankbook-start-date').val() + " to " + $('.bankbook-end-date').val();
+        $('#datecheck').text(ss);
+    });
+
+    $(document).on('click', '#btn-excel-trial-bal', function () {
+        var date = $('.bankbook-start-date').val() + " to " + $('.bankbook-end-date').val();
+        $("#bank-book-list").table2excel({
+            name: "Table2Excel",
+            filename: "Bank Book Report as on " + date,
+            fileext: ".xls"
+        });
+    });
+
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        window.location.href = '/SchoolAccount/BankEntryReportHome';
+    }
+
+    function GetOpeningBalance() {
+        var date = $('.bankbook-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.bankbook-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        var bankid = $('#bank-Name-id').val();
+        $.ajax({
+            url: '/SchoolAccount/GetOpenBallanceByBank/' + start + '~' + end + '~' + bankid,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#bank-book-status-id').html('');
+                $('#bank-book-status-id').html(data);
+            }
+        });
+    }
+
+    function GetClosingBalance() {
+        //debugger;
+        var date = $('.bankbook-start-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var start = mm + '-' + dd + '-' + yyyy;
+
+        date = $('.bankbook-end-date').val();
+        res = date.split("-");
+        dd = res[0];
+        mm = res[1];
+        yyyy = res[2];
+        var end = mm + '-' + dd + '-' + yyyy;
+        var bankid = $('#bank-Name-id').val();
+        $.ajax({
+            url: '/SchoolAccount/GetClosingBallanceByBank/' + start + '~' + end + '~' + bankid,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#bank-book-closing-status').html('');
+                $('#bank-book-closing-status').html(data);
+            }
+        });
+    }
+
+</script>

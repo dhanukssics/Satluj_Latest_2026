@@ -1,0 +1,825 @@
+﻿@model Satluj_Latest.Models.SubjectScoreModel
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
+@Html.HiddenFor(z => z.UserId, new { Value = @Model.UserId })
+@Html.HiddenFor(z => z.IsAdminCheck, new { Value = @Model.IsAdminCheck })
+
+<div class="row">
+    <div class="col-lg-12">
+        <h3 style="margin-top: 5px;"> V Class Result</h3>
+        @if (IsAdmin)
+        {
+            <div class="row">
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Assesments : </label>
+                        <br />
+                        <select asp-for="AssesmentTableId"
+                                asp-items="ViewBag.Vassessments"
+                                class="form-control assesment-id"
+                                data-live-search="true"
+                                name="classDropdown">
+                            <option value="">--Choose--</option>
+                        </select>
+
+                        <span asp-validation-for="AssesmentTableId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Division : </label>
+                        <br />
+                        <select asp-for="DivisionId"
+                                asp-items="ViewBag.VClassDivisinLists"
+                                class="form-control division-drop-down class-drop-down"
+                                data-live-search="true"
+                                name="classDropdown">
+                            <option value="">--Choose--</option>
+                        </select>
+
+                        <span asp-validation-for="DivisionId" class="text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Skill : </label>
+                        <br />
+                        <select asp-for="VSpecialMarksId"
+                                asp-items="Html.GetEnumSelectList<VSpecialMarks>()"
+                                class="form-control skill_selction"
+                                data-live-search="true"
+                                name="classDropdown">
+                        </select>
+
+                        <span asp-validation-for="VSpecialMarksId" class="text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Subject :</label>
+                        <select class="form-control slct-subject-dropdown" disabled></select>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Assesments : </label>
+                        <br />
+  <select asp-for="AssesmentTableId"
+                                asp-items="ViewBag.Vassessments"
+                                class="form-control assesment-id"
+                                data-live-search="true"
+                                name="classDropdown">
+                            <option value="">--Choose--</option>
+                        </select>
+
+                        <span asp-validation-for="AssesmentTableId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Division : </label>
+                        <br />
+                        <select asp-for="DivisionId"
+                                asp-items="ViewBag.Vdivisionlistuser"
+                                class="form-control division-drop-down class-drop-down"
+                                data-live-search="true"
+                                name="classDropdown">
+                            <option value="">--Choose--</option>
+                        </select>
+
+                        <span asp-validation-for="DivisionId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Skill : </label>
+                        <br />
+                        <select asp-for="VSpecialMarksId"
+                                asp-items="Html.GetEnumSelectList<VSpecialMarks>()"
+                                class="form-control skill_selction"
+                                data-live-search="true"
+                                name="classDropdown">
+                        </select>
+
+                        <span asp-validation-for="VSpecialMarksId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Subject :</label>
+                        <select class="form-control slct-subject-dropdown" disabled></select>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+<div class="row col-lg-3">
+    <button type="button" id="students-Mark-Search_btn" style="width: 100%;" class="btn pay-now-btn">Search</button>
+</div>
+<div class="row col-lg-12" id="result-entry-div-id" style="margin-top:10px;">
+
+</div>
+
+<script>
+
+    $(document).on('change', '.skill_selction', function () {
+        $('#result-entry-div-id').html('');
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadSpecialSubjects?id=' + id + '~' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-subject-dropdown").html("");
+                        $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-subject-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-subject-dropdown").prop("disabled", false);
+                    }
+                    else {
+
+                        $(".slct-subject-dropdown").html("");
+                        $(".slct-subject-dropdown").append($('<option></option>').val("").html('---'));
+                        $(".slct-subject-dropdown").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-subject-dropdown").html("");
+            $(".slct-subject-dropdown").append($('<option></option>').val("").html('---'));
+            $(".slct-subject-dropdown").prop("disabled", true);
+        }
+    });
+
+    $(document).ready(function () {
+        debugger;
+        var admin = $('#IsAdminCheck').val();
+        if (admin==1) {
+            $.ajax({
+                url: '/Data/LoadSpecialSubjects?id=' + 0 + '~' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-subject-dropdown").html("");
+                        $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-subject-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-subject-dropdown").prop("disabled", false);
+                    }
+                    else {
+                        $(".slct-subject-dropdown").html("");
+                        $(".slct-subject-dropdown").append($('<option></option>').val("").html('---'));
+                        $(".slct-subject-dropdown").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //var id = $('.skill_selctionByTeacher  option:selected').val();
+            //if (id != '') {
+            //    $.ajax({
+            //        url: '/Data/LoadSpecialSubjectsByTeacher?id=' + id + '~' + $('#SchoolId').val() + '~' + $('#UserId').val() + '~' + 0,
+            //        type: "GET",
+            //        success: function (result) {
+            //            if (result.list.length > 0) {
+            //                $(".slct-subject-dropdown").html("");
+            //                $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
+            //                $.each(result.list, function (i, item) {
+            //                    $(".slct-subject-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+            //                });
+            //                $(".slct-subject-dropdown").prop("disabled", false);
+            //            }
+            //            else {
+            //                $(".slct-subject-dropdown").html("");
+            //                $(".slct-subject-dropdown").append($('<option></option>').val("").html('---'));
+            //                $(".slct-subject-dropdown").prop("disabled", true);
+            //            }
+            //        }
+            //    });
+            //}
+            //else {
+            //    $(".slct-subject-dropdown").html("");
+            //    $(".slct-subject-dropdown").append($('<option></option>').val("").html('---'));
+            //    $(".slct-subject-dropdown").prop("disabled", true);
+            //}
+        }
+    });
+
+    function LoadDetails() {
+        var admin = $('#IsAdminCheck').val();
+        if (admin == 0) {
+            LoadAsNonAdmin();
+        }
+        else {
+            LoadAsAdmin();
+        }
+      
+    };
+
+    //For admin 
+    function LoadAsAdmin() {
+        var divisionId = $(".division-drop-down option:selected").val();
+        var subjectId = $(".slct-subject-dropdown option:selected").val();
+        var skillId = $(".skill_selction option:selected").val();
+        var assesmentId = $(".assesment-id option:selected").val();
+        var id = divisionId + '~' + subjectId + '~' + skillId + '~' + assesmentId;
+        $.ajax({
+            url: '/SpecialClass/LoadAllStudentsWithSkillsMarks?id=' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#result-entry-div-id').html('');
+                $('#result-entry-div-id').html(data);
+            }
+        });
+    }
+
+    //For non admin
+    function LoadAsNonAdmin() {
+        var divisionId = $(".division-drop-down option:selected").val();
+        var subjectId = $(".slct-subject-dropdown option:selected").val();
+        var skillId =  $(".skill_selctionByTeacher option:selected").val();
+        var assesmentId = $(".assesment-id option:selected").val();
+        var id = divisionId + '~' + subjectId + '~' + skillId + '~' + assesmentId;
+        $.ajax({
+            url: '/SpecialClass/LoadAllStudentsWithSkillsMarks?id=' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#result-entry-div-id').html('');
+                $('#result-entry-div-id').html(data);
+            }
+        });
+    }
+
+    $("#students-Mark-Search_btn").click(function () {
+        var assesmentId = $(".assesment-id option:selected").val();
+        if (assesmentId == 0) {
+            toastrError('Please select the Assesment!');
+        }
+        else {
+            var divisionId = $(".division-drop-down option:selected").val();
+            if (divisionId == 0) {
+                toastrError('Please select the division!');
+            }
+            else {
+                var subjectId = $(".slct-subject-dropdown option:selected").val();
+                if (subjectId == 0) {
+                    toastrError('Please select the subject!');
+                }
+                else {
+                    LoadDetails();
+                }
+            }
+        }
+    });
+
+    $(document).on('change', '.slct-subject-dropdown', function () {
+        var id = $(this).val();
+        $('#SubjectId').val(id);
+    });
+
+    //READING SKILL SAVE
+    $(document).on('click', '#students-reading-skill-Save_btn', function () {
+        var source = $(this);
+        storeReadingSkills(source);
+    });
+
+    function storeReadingSkills(source) {
+        debugger;
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList.SubjectId = $('#SubjectId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._ReadingSkill = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            //data._ReadingSkill.Pronun = $(this).find('.cls-mark-Pronun').val();
+            //data._ReadingSkill.Fluency = $(this).find('.cls-mark-Fluency').val();
+            data._ReadingSkill.Pronun = $(this).find('.cls-mark-Reading').val();
+            data.StudentName = '';
+            dataList._SkillModel.push(data);
+        });
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentReadingSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //WRITING SKILL SAVE
+    $(document).on('click', '#students-writing-skill-Save_btn', function () {
+        var source = $(this);
+        storeWritingSkills(source);
+    });
+
+    function storeWritingSkills(source) {
+        debugger;
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList.SubjectId = $('#SubjectId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._WritingSkill = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data.StudentName = '';
+            //data._WritingSkill.CreativeThinking = $(this).find('.cls-mark-CreativeThinking').val();
+            //data._WritingSkill.HandWriting = $(this).find('.cls-mark-HandWriting').val();
+            //data._WritingSkill.Grammer = $(this).find('.cls-mark-Grammer').val();
+            //data._WritingSkill.Spelling = $(this).find('.cls-mark-Spelling').val();
+            //data._WritingSkill.Vocabulary = $(this).find('.cls-mark-Vocabulary').val();
+            data._WritingSkill.UnitTest = $(this).find('.cls-mark-Writing_Skill').val();
+            data._WritingSkill.WorkSheet = $(this).find('.cls-mark-WorkSheet').val();
+            dataList._SkillModel.push(data);
+        });
+        console.log(dataList);
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentWritingSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //SPEAKING SKILL  SAVE
+    $(document).on('click', '#students-speaking-skills-Save_btn', function () {
+        var source = $(this);
+        storeSpeakingSkills(source);
+    });
+
+    function storeSpeakingSkills(source) {
+        debugger;
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList.SubjectId = $('#SubjectId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._SpeakingSkill = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data.StudentName = '';
+            data._SpeakingSkill.Conversation = $(this).find('.cls-mark-Speaking_Skill').val();
+            //data._SpeakingSkill.Recitation = $(this).find('.cls-mark-Recitation').val();
+            dataList._SkillModel.push(data);
+        });
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentSpeakingSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //LISTENNING SKILL  SAVE
+    $(document).on('click', '#students-Listening-skill_btn', function () {
+        var source = $(this);
+        storeListeningSkills(source);
+    });
+
+    function storeListeningSkills(source) {
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList.SubjectId = $('#SubjectId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._ListenningSkill = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data.StudentName = '';
+            data._ListenningSkill.Comprehension = $(this).find('.cls-mark-listening').val();
+            dataList._SkillModel.push(data);
+        });
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentListeningSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //ASPECTS MATHS SKILL  SAVE
+    $(document).on('click', '#students-Aspect-maths_btn', function () {
+        var source = $(this);
+        storeAspectsMathsSkills(source);
+    });
+
+    function storeAspectsMathsSkills(source) {
+        debugger;
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList.SubjectId = $('#SubjectId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._AspectsMaths = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data.StudentName = '';
+            data._AspectsMaths.Concepts = $(this).find('.cls-mark-Concepts').val();
+            //data._AspectsMaths.Activity = $(this).find('.cls-mark-Activity').val();
+            //data._AspectsMaths.Tables = $(this).find('.cls-mark-Tables').val();
+            //data._AspectsMaths.MentalAbility = $(this).find('.cls-mark-MentalAbility').val();
+            data._AspectsMaths.WrittenWork = $(this).find('.cls-mark-WrittenWork').val();
+            data._AspectsMaths.WorkSheet = $(this).find('.cls-mark-WorkSheet').val();
+            dataList._SkillModel.push(data);
+        });
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentAspectsMathsSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //ASPECTS NATURALSCIENCE SKILL  SAVE
+    $(document).on('click', '#students-aspects-natural-science-Save_btn', function () {
+        var source = $(this);
+        storeAspectsNaturalScienceSkills(source);
+    });
+
+    function storeAspectsNaturalScienceSkills(source) {
+        debugger;
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList.SubjectId = $('#SubjectId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._AspectsNaturalScience = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data.StudentName = '';
+            data._AspectsNaturalScience.ActivityProject = $(this).find('.cls-mark-ActivityProject').val();
+            //data._AspectsNaturalScience.GroupDiscussion = $(this).find('.cls-mark-GroupDiscussion').val();
+            data._AspectsNaturalScience.WrittenWork = $(this).find('.cls-mark-WrittenWork').val();
+            data._AspectsNaturalScience.WorkSheet = $(this).find('.cls-mark-WorkSheet').val();
+            dataList._SkillModel.push(data);
+            console.log(dataList);
+        });
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentAspectsNaturalScienceSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //ART CRAFT SKILL  SAVE
+    $(document).on('click', '#students-ArtCraft-Save_btn', function () {
+        var source = $(this);
+        storeArtCraftSkills(source);
+    });
+
+    function storeArtCraftSkills(source) {
+        debugger;
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList.SubjectId = $('#SubjectId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._ArtCraft = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data.StudentName = '';
+            data._ArtCraft.Interest = $(this).find('.cls-mark-Interest').val();
+            //data._ArtCraft.Creativity = $(this).find('.cls-mark-Creativity').val();
+            dataList._SkillModel.push(data);
+        });
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentArtCraftSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //MUSIC DANCE SKILL  SAVE
+    $(document).on('click', '#students-Music-Dance-Save_btn', function () {
+        var source = $(this);
+        storeMusicDanceSkills(source);
+    });
+
+    function storeMusicDanceSkills(source) {
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList.SubjectId = $('#SubjectId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._MusicDance = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data.StudentName = '';
+            data._MusicDance.Interest = $(this).find('.cls-mark-Interest').val();//music
+            data._MusicDance.Rhythm = $(this).find('.cls-mark-Rhythm').val();//Dance
+            dataList._SkillModel.push(data);
+        });
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentMusicDanceSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //SOCIAL STUDIES ASPECTS  SAVE
+    $(document).on('click', '#students-aspects-social-studies-skill-Save_btn', function () {
+        var source = $(this);
+        storeSocialStudiesAspectsSkills(source);
+    });
+
+    function storeSocialStudiesAspectsSkills(source) {
+        debugger;
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList.SubjectId = $('#SubjectId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._AspectsSocialStudies = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data.StudentName = '';
+            data._AspectsSocialStudies.ActivityProject = $(this).find('.cls-mark-ActivityProject').val();
+            //data._AspectsSocialStudies.Viva = $(this).find('.cls-mark-Viva').val();
+            data._AspectsSocialStudies.WrittenWork = $(this).find('.cls-mark-WrittenWork').val();
+            data._AspectsSocialStudies.WorkSheet = $(this).find('.cls-mark-WorkSheet').val();
+            dataList._SkillModel.push(data);
+        });
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentAspectSocialStudiesSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //SOCIAL STUDIES ASPECTS  SAVE
+    $(document).on('click', '#students-aspects-relative-studies-skill-Save_btn', function () {
+        var source = $(this);
+        storeRelativeStudiesAspectsSkills(source);
+    });
+
+    function storeRelativeStudiesAspectsSkills(source) {
+        debugger;
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList.SubjectId = $('#SubjectId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._AspectsRelativeAreas = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data.StudentName = '';
+            data._AspectsRelativeAreas.ComputerScience = $(this).find('.cls-mark-ComputerScience').val();
+            data._AspectsRelativeAreas.GeneralStudies = $(this).find('.cls-mark-GeneralStudies').val();
+            data._AspectsRelativeAreas.Valueeducation = $(this).find('.cls-mark-Valueeducation').val();
+            data._AspectsRelativeAreas.French = $(this).find('.cls-mark-French').val();
+            data._AspectsRelativeAreas.SmartClass = $(this).find('.cls-mark-SmartClass').val();
+            dataList._SkillModel.push(data);
+        });
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentAspectRelativeStudiesSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //LIST SUBJECT BY USER
+    $(document).on('change', '.skill_selctionByTeacher', function () {
+        $('#result-entry-div-id').html('');
+        var divisionId = $(".division-drop-down option:selected").val();
+        if (divisionId == 0) {
+            //toastrError('Please select the division!');
+        }
+        else {      
+            var id = $(this).val();
+            if (id != '') {
+                $.ajax({
+                    url: '/Data/LoadSpecialSubjectsByTeacher?id=' + id + '~' + $('#SchoolId').val() + '~' + $('#UserId').val() + '~' + divisionId,
+                    type: "GET",
+                    success: function (result) {
+                        if (result.list.length > 0) {
+                            $(".slct-subject-dropdown").html("");
+                            $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
+                            $.each(result.list, function (i, item) {
+                                $(".slct-subject-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            });
+                            $(".slct-subject-dropdown").prop("disabled", false);
+                        }
+                        else {
+
+                            $(".slct-subject-dropdown").html("");
+                            $(".slct-subject-dropdown").append($('<option></option>').val("").html('---'));
+                            $(".slct-subject-dropdown").prop("disabled", true);
+                        }
+                    }
+                });
+            }
+            else {
+                $(".slct-subject-dropdown").html("");
+                $(".slct-subject-dropdown").append($('<option></option>').val("").html('---'));
+                $(".slct-subject-dropdown").prop("disabled", true);
+            }
+        }
+    });
+
+    //For non admin teachers , then division change wants to select the subjects 
+    $(document).on('change', '.division-drop-down', function () {
+        $('#result-entry-div-id').html('');
+        var admin = $('#IsAdminCheck').val();
+        if (admin==1) {
+        }
+        else {
+            var id = $(".skill_selctionByTeacher option:selected").val();
+            if (id != '') {
+                var divisionId = $(".division-drop-down option:selected").val();
+                $.ajax({
+                    url: '/Data/LoadSpecialSubjectsByTeacher?id=' + id + '~' + $('#SchoolId').val() + '~' + $('#UserId').val() + '~' + divisionId,
+                    type: "GET",
+                    success: function (result) {
+                        if (result.list.length > 0) {
+                            $(".slct-subject-dropdown").html("");
+                            $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
+                            $.each(result.list, function (i, item) {
+                                $(".slct-subject-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            });
+                            $(".slct-subject-dropdown").prop("disabled", false);
+                        }
+                        else {
+
+                            $(".slct-subject-dropdown").html("");
+                            $(".slct-subject-dropdown").append($('<option></option>').val("").html('---'));
+                            $(".slct-subject-dropdown").prop("disabled", true);
+                        }
+                    }
+                });
+            }
+            else {
+                $(".slct-subject-dropdown").html("");
+                $(".slct-subject-dropdown").append($('<option></option>').val("").html('---'));
+                $(".slct-subject-dropdown").prop("disabled", true);
+            }
+        }
+    });
+
+
+
+</script>

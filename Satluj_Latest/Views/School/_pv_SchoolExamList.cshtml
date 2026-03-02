@@ -1,0 +1,79 @@
+﻿@model Satluj_Latest.Models.FilterModel
+@{
+
+    var examList = new Satluj_Latest.Data.School(Model.schoolId);
+}
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Class
+        </th>
+        <th>
+            Exam Name
+        </th>
+        <th>
+            Start Date
+        </th>
+        <th>
+            End Date
+        </th>
+        <th width="15%">
+            #
+        </th>
+
+    </tr>
+</thead>
+<tbody>
+    @{
+        if (examList != null)
+        {
+            int i = 1;
+            foreach (var item in examList.AllExamList(Model.ClassName))
+            {
+                <tr style="cursor: pointer !important;">
+                    <td class="exam-row" data-id="@item.ExamId">
+                        @i
+                    </td>
+                    <td class="exam-row" data-id="@item.ExamId">
+                        @item.Class
+                    </td>
+                    <td class="exam-row" data-id="@item.ExamId">
+                        @item.ExamName
+                    </td>
+                    @if (item.StartDate != null)
+                    {
+                        <td class="exam-row" data-id="@item.ExamId">
+                            @item.StartDate.Value.ToShortDateString()
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="exam-row" data-id="@item.ExamId"></td>
+                    }
+                    @if (item.EndDate != null)
+                    {
+                        <td class="exam-row" data-id="@item.ExamId">
+                            @item.EndDate.Value.ToShortDateString()
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="exam-row" data-id="@item.ExamId"></td>
+                    }
+                    <td width="15%">
+                        <button class="delete-exam-tr btn btn-peek delete-exam-data" data-id="@item.ExamId"><i class="fa fa-trash "></i></button>
+                        <button class="edit-exam-tr btn pay-now-btn edit-exam-data" data-id="@item.ExamId"><i class="fa fa-edit "></i></button>
+                    </td>
+                </tr>
+                i++;
+            }
+        }
+        else
+        {
+
+        }
+    }
+</tbody>

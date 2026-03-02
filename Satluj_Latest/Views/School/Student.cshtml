@@ -1,0 +1,547 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    ViewBag.Title = "Student";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var students = new Satluj_Latest.Data.School(Model.schoolId).GetStudentDetails().OrderBy(z => z.StundentName).ToList();
+}
+
+<style>
+    span {
+        color: red;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">Student</h3>
+        <div class="row">
+            <div class="form-group col-sm-4 ">
+                <label>Class</label>
+                <select asp-for="classId"
+                        asp-items="ViewBag.Classes"
+                        class="form-control class-drop-down"
+                        data-live-search="true">
+                    <option value="">--List All Student--</option>
+                </select>
+
+
+            </div>
+            <div class="form-group col-sm-4 ">
+                <label>Division</label>
+                <select id="division-drop-down" class="form-control" disabled>
+                    <option>-- Please select division --</option>
+                </select>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group text-right" style="margin-top: 24px;">
+                    <button class="btn pay-now-btn" id="addStudent" onclick="AddStudentNewStyle()"><i class="fa fa-plus"></i> Add Student</button>
+                </div>
+            </div>
+        </div>
+        <div id="pv-table">
+
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="addStudentModel">
+</div>
+<div class="modal fade" id="editStudentModel">
+</div>
+
+
+
+
+<script>
+
+    //$.ajax({
+    //    url: '/Admin/RefreshCareerGrid',
+    //    type: "GET",
+    //    dataType: 'html',
+    //    success: function (data) {
+    //        $('#carrier-list-grid-dev').html(data);
+    //    }
+    //});
+
+    $(document).ready(function () {
+        //debugger;
+        $(".se-pre-con").fadeOut("slow");
+        var classId = $(".class-drop-down option:eq(1)").val();
+        $(".class-drop-down").val(classId);
+        //Archana Changing section
+        if (classId != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + classId,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+        //-----------------------------------------
+        $.ajax({
+            url: '/School/GetUserListByClassDiv/' + classId + '~' + 0,
+            dataType: 'html',
+            success: function (data) {
+                $('#pv-table').html('');
+                $('#pv-table').html(data);
+                IntializeDataTable();
+            },
+        });
+    });
+    $(document).on('click', '.delete-student-td', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+
+
+        $.ajax({
+            url: '/School/DeleteStudent/' + $(source).attr('data-studentid'),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+
+                if (data.status) {
+                    toastrSuccess(data.msg);
+
+                    setTimeout(function () {
+                        $.ajax({
+                            url: '/School/GetUserListByClassDiv/' + '0' + '~' + data.division,
+                            dataType: 'html',
+                            success: function (data) {
+                                $('#pv-table').html('');
+                                $('#pv-table').html(data);
+                                IntializeDataTable();
+                            },
+                        });
+                    }, 250);
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+
+        //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+    }
+    //else {
+    //    swal("Cancelled", "Your imaginary file is safe :)", "error");
+    //}
+});
+    });
+
+    function EditStudentSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#editStudentModel').modal('hide');
+            //alert($('#division-drop-down option:selected').val());
+            var divisionId = result.division;
+            $.ajax({
+                url: '/School/GetUserListByClassDiv/' + '0' + '~' + divisionId,
+                dataType: 'html',
+                success: function (data) {
+                    $('#pv-table').html('');
+                    $('#pv-table').html(data);
+                    IntializeDataTable();
+                },
+            });
+        }
+        else {
+            $('#editStudentModel').modal('hide');
+            toastrError(result.msg);
+        }
+    }
+
+    $(document).on('click', '.edit-student-td', function () {
+        var source = $(this);
+        $.ajax({
+            url: '/School/EditStudentModel/' + $(source).attr('data-studentid'),
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#editStudentModel').html(data);
+                $.validator.unobtrusive.parse($("#editStudentModel"));
+                $('#editStudentModel').modal('show');
+                $('#DOBstring').datepicker({
+                    format: "dd-mm-yyyy",
+                    autoclose: true,
+                    todayHighlight: true,
+                    endDate: '+d'
+                });
+                $('#DateOfJoiningString').datepicker({
+                    format: "dd-mm-yyyy",
+                    autoclose: true,
+                    todayHighlight: true,
+                    endDate: '+d'
+                });
+            }
+        });
+    });
+
+    $(document).on('change', '.class-drop-down', function () {
+        //debugger;
+        // $('#division-drop-down').val('0');
+        var classid = $(this).val();
+        var classId = 0;
+        if (classid != '') {
+            classId = classid;
+        }
+        $.ajax({
+            url: '/School/GetUserListByClassDiv/' + classId + '~' + 0,
+            dataType: 'html',
+            success: function (data) {
+                $(".se-pre-con").fadeOut("slow");
+                $('#pv-table').html('');
+                $('#pv-table').html(data);
+                IntializeDataTable();
+            },
+        });
+        if (classid != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + classid,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+
+    $(function () {
+        $(".table-student-list").dataTable();
+    })
+
+    function IntializeDataTable() {
+        $(".table-student-list").dataTable().fnDestroy()
+        $(".table-student-list").dataTable();
+    }
+
+    $(document).on('change', '#division-drop-down', function () {
+        var id = $(this).val();
+        if (id != '' || id != 0) {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/School/GetUserListByClassDiv/' + '0' + '~' + id,
+                dataType: 'html',
+                success: function (data) {
+                    $(".se-pre-con").fadeOut("slow");
+                    $('#pv-table').html('');
+                    $('#pv-table').html(data);
+                    IntializeDataTable();
+                },
+            });
+        }
+        else {
+            //   resetDropDown('Class');
+        }
+    });
+
+    function AddStudent() {
+        $.ajax({
+            url: '/School/AddStudentView',
+            dataType: 'html',
+            success: function (data) {
+                $('#addStudentModel').html(data);
+                $.validator.unobtrusive.parse($('#addStudentModel'));
+                $('#addStudentModel').modal('show');
+                $('#DOBstring').datepicker({
+                    format: "dd-mm-yyyy",
+                    autoclose: true,
+                    todayHighlight: true,
+                    //startDate: '-3d'
+                    endDate: '+d'
+                });
+            },
+        });
+    }
+
+    $(document).on('change', '#default-pic-browse', function () {
+        var source = $(this);
+        var selectedFile = this.files[0];
+        var input = this;
+        if (input.files && input.files[0]) {
+            var url = input.value;
+            var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+            if (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg" || ext == "bmp") {
+                selectedFile.convertToBase64(function (base64) {
+                    var h = $(document).find('#file_preview_grid').html();
+                    //alert(h);
+                    $(document).find('#file_preview_grid').remove();
+                    $(document).find('#dummyId').html("<div class='upload-box'style='background-image:url(" + base64 + ");'id='file_preview_grid'>" + h + "</div>");
+                    //alert(f);
+                    $('#profilePic').val(base64);
+                });
+                var reader = new FileReader();
+            }
+            else {
+                //alert('23');
+                $(source).val('');
+                toastrWarning('Invalid Filetype');
+            }
+        }
+    });
+
+    $(document).on('change', '#default-editpic-browse', function () {
+        var source = $(this);
+        var selectedFile = this.files[0];
+        var input = this;
+        if (input.files && input.files[0]) {
+            var url = input.value;
+            var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+            if (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg" || ext == "bmp") {
+                selectedFile.convertToBase64(function (base64) {
+                    var h = $(document).find('#file_preview_grid_edit').html();
+                    //alert(h);
+                    $(document).find('#file_preview_grid_edit').remove();
+                    $(document).find('#dummyId').html("<div class='upload-box'style='background-image:url(" + base64 + ");'id='file_preview_grid'>" + h + "</div>");
+                    //alert(f);
+                    $('#profilePic').val(base64);
+                });
+                var reader = new FileReader();
+            }
+            else {
+                //alert('23');
+                $(source).val('');
+                toastrWarning('Invalid Filetype');
+            }
+        }
+    });
+
+    File.prototype.convertToBase64 = function (callback) {
+        var FR = new FileReader();
+        FR.onload = function (e) {
+            callback(e.target.result)
+        };
+        FR.readAsDataURL(this);
+    }
+
+
+    $(document).on('click', '.student-row', function () {
+        var id = $(this).attr('data-id');
+        window.location.href = "/School/StudentDetailedView/" + id;
+    });
+
+
+
+    $(document).on('change', '#slct-bloodGroup', function () {
+        $('#bloodGroup').val($(this).val());
+    });
+
+
+
+    $('#DOBstring').datepicker({
+        format: "dd-mm-yyyy",
+        autoclose: true,
+        todayHighlight: true,
+        //startDate: '-3d'
+        endDate: '+d'
+    });
+    $(document).ready(function () {
+        $('select[class^="pv_bus-drop-down"] option[Text="--Select Bus--"]').attr("selected", "selected");
+        $('#BusId').val($(".slct-class-dropdwn option:selected").val());
+        $('#DOBstring').val('');
+
+    });
+
+
+    $(document).on('change', '.pv_class-drop-down', function () {
+        var id = $(this).val();
+        if (id != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#divisionId").html(""); // clear before appending new list
+                        $("#divisionId").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#divisionId").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#divisionId").prop("disabled", false);
+
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#divisionId").html(""); // clear before appending new list
+                        $("#divisionId").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#divisionId").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+
+
+
+
+    $(document).on('change', '#divisionId', function () {
+        //alert($("#divisionId option:selected").text());
+        $('#divisionId').val($("#divisionId option:selected").val());
+        //var id = $(this).val();
+        //if (id != '' || id != 0) {
+        //    // resetDropDown('Class');
+        //    $.ajax({
+        //        url: '/School/GetUserListByDivision/' + id,
+        //        dataType: 'html',
+        //        success: function (data) {
+        //            $('#user-list-view').html('');
+        //            $('#user-list-view').html(data);
+        //            IntializeDataTable();
+        //        },
+        //    });
+        //}
+        //else {
+        //    //   resetDropDown('Class');
+        //}
+    });
+
+    function StudentAddSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            $('#addStudentModel').modal('hide');
+            var divisionId = result.division;
+            var classId = result.classId;
+            //alert(divisionId)
+            //alert( classId)
+            $.ajax({
+                url: '/School/GetUserListByDivGrid/' + divisionId,
+                dataType: 'html',
+                success: function (data) {
+                    //$(document).find(".pv_class-drop-down")
+                    //$(document).find(".pv_class-drop-down").val(classId);
+                    //$("select[name^='classDropdown'] option[value="+classId+"]").attr("selected", "selected");
+                    //$(document).find(".division_Select").val(divisionId);
+                    $("#classDataDropdown").val(classId);
+                    $('#pv-table').html('');
+                    $('#pv-table').html(data);
+                    IntializeDataTable();
+                },
+            });
+        }
+        else {
+            $('#addStudentModel').modal('hide');
+            toastrError(result.msg);
+        }
+    }
+
+    function StudentAddFailed(result) {
+        console.log(result);
+
+        console.log(result.msg);
+        $('#addStudentModel').modal('hide');
+        toastrError(result.msg);
+
+    }
+
+    $(document).on('keyup', '#studentAdmissionNo', function () { //Archana : For check admission number 09-Aug-17
+        var source = $(this);
+        $.ajax({
+            url: '/School/CheckAdmissionNo?text=' + $(source).val(),
+            type: "GET",
+            global: false,     // this makes sure ajaxStart is not triggered
+            dataType: 'json',
+            success: function (data) {
+                if (data.Status) {
+                    $('#spn-error-admissionNo').text(data.Message);
+                    $('#ValidateForm').val(true);
+                    $('#spn-error-admissionNo').show();
+                    $('#studentStudentAdd').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' }); //Avoid Save Buttion Click Vishnu-Button
+                }
+                else {
+                    $('#ValidateForm').val(false);
+                    $('#spn-error-admissionNo').hide();
+                    $('#studentStudentAdd').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                }
+            }
+        });
+    });
+
+
+    function AddStudentNewStyle() {
+        window.location.href = '/School/AddNewStudentsFullDetails/';
+    }
+
+    function EditStudentFailed() {
+        toastrError(result.msg);
+    }
+
+    $(document).on('click', '.edit-student-parents-td', function () {
+        var source = $(this);
+        $.ajax({
+            url: '/School/EditStudentParentsInfo/' + $(source).attr('data-studentid'),
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#editStudentModel').html(data);
+                $.validator.unobtrusive.parse($("#editStudentModel"));
+                $('#editStudentModel').modal('show');
+                $('#DOBstring').datepicker({
+                    format: "dd-mm-yyyy",
+                    autoclose: true,
+                    todayHighlight: true,
+                    endDate: '+d'
+                });
+                $('#DateOfJoiningString').datepicker({
+                    format: "dd-mm-yyyy",
+                    autoclose: true,
+                    todayHighlight: true,
+                    endDate: '+d'
+                });
+            }
+        });
+    });
+
+</script>
+

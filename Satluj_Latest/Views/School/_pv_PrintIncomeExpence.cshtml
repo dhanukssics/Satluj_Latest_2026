@@ -1,0 +1,290 @@
+﻿@model Satluj_Latest.Models.DateClass
+@{
+    var countincome = 1;
+    var countexpence = 1;
+    DateTime date = Model.Selecteddate;
+    // var income = new Satluj_Latest.Data.WebsiteService().IncomelistOnDate(Model.Selecteddate).ToList();
+    // var ExpencelistOnDate = new Satluj_Latest.Data.WebsiteService().ExpencelistOnDate(Model.Selecteddate).ToList();
+    //var totalexpence = ExpencelistOnDate.Sum(x => x.Amount);
+    var balanceBD = new Satluj_Latest.Data.WebsiteService().BalancebdDate(date, Model.SchoolId);
+
+    var CurrentincomeList = new Satluj_Latest.Data.WebsiteService().IncomelistOnDate(date, Model.SchoolId).ToList();
+    var totalincome = CurrentincomeList.Sum(x => x.Amount);
+    var CurrentExpenceList = new Satluj_Latest.Data.WebsiteService().ExpencelistOnDate(date, Model.SchoolId).ToList();
+    var totalexpence = CurrentExpenceList.Sum(x => x.Amount);
+    if (balanceBD > 0)
+    {
+        totalincome = totalincome + balanceBD;
+    }
+    else if (balanceBD < 0)
+    {
+        totalexpence = totalexpence + Math.Abs(balanceBD);
+    }
+
+    var balance = totalincome - totalexpence;
+    var balanceHead = "Balance: ";
+    if (balance > 0)
+    {
+        balanceHead = "Profit: ";
+    }
+    else if (balance < 0)
+    {
+        balanceHead = "Loss: ";
+    }
+    else
+    {
+        balanceHead = "Balance: ";
+    }
+}
+<style>
+    body {
+        font-family: 'Lato', sans-serif;
+    }
+
+    .main_container {
+        width: 100%;
+        margin: auto;
+        background: #fafafa;
+        padding: 30px 30px;
+    }
+
+    .table_header {
+        width: 100%;
+        margin: 20px 0px;
+    }
+
+        .table_header h5 {
+            text-align: center;
+            font-size: 16px;
+            font-weight: normal;
+            margin-bottom: 15px;
+        }
+
+            .table_header h5 i {
+                padding-right: 6px;
+            }
+
+    .table_main {
+        border-top: 1px solid #ccc;
+        float: left;
+        width: 100%;
+    }
+
+    .table_header input {
+        margin: auto;
+        display: table;
+        padding: 8px 13px;
+        width: 200px;
+    }
+
+
+    .word_breaking {word-break:break-all;}
+
+
+    /*.table_left_2 {
+        width: 50%;
+        float: left;
+        padding: 10px 15px 30px 15px;
+        border-right: 1px solid #ccc;
+    }
+
+    .table_right_2 {
+        width: 50%;
+        float: left;
+        padding: 10px 15px 30px 15px;
+    }
+
+    .comm_table_2 {
+        display: block;
+    }
+
+    .table_left_2 h3, .table_right_2 h3 {
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    .table_left_2 h3 {
+        color: green;
+    }
+
+    .table_right_2 h3 {
+        color: red;
+    }
+
+    .comm_table_2 {
+        width: 100%;
+    }
+
+        .comm_table_2 thead {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .comm_table_2 tbody {
+            margin-top: 20px;
+        }*/
+
+    .table_footer {
+        margin: auto;
+        display: table;
+        padding: 25px 0px;
+        border-top: 1px solid #ccc;
+        width: 100%;
+        text-align: center;
+    }
+
+    .table_main input[type=text] {
+        width: 87%;
+        height: 20px;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .add_inp_row, .add_inp_row2 {
+        padding-top: 20px;
+    }
+
+        .add_inp_row strong, .add_inp_row2 strong {
+            cursor: pointer;
+        }
+</style>
+<div class="modal-dialog modal-lg" id="printPopUp" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Print Data</h4>
+        </div>
+        <div class="main_container" id="print-inc&exp">
+            <div style="text-align:center;font-size: 19px;"><b>Day Book report as on @date.ToString("dd-MM-yyyy")</b></div>
+            <div class="table_main" id="divpartial_newTable">
+                <div class="table_left" style="width:50%;">
+                    <h3>Income</h3>
+                    @if (CurrentincomeList.Count == 0)
+                    {
+                        <div><span>No data found</span></div>
+                    }
+                    else
+                    {
+                        <table class="table_left_content comm_table" cellpadding="8" style="height:auto; overflow:auto; width:100%; display:table;">
+                            <thead>
+                                <tr>
+                                    <th width="40">Sl No</th>
+                                    <th>A/c Head</th>
+                                    <th>Account Type</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (balanceBD > 0)
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td>Balance b/d</td>
+                                        <td></td>
+                                        <td>@balanceBD</td>
+                                    </tr>
+                                }
+                                @foreach (var s in CurrentincomeList)
+                                {
+                                    <tr data-id="@s.Id">
+                                        <td>@countincome</td>
+                                        <td class="word_breaking">@s.AccountHead</td>
+                                        <td class="word_breaking">@s.Particular</td>
+                                        <td>@s.Amount</td>
+
+                                    </tr>
+                                    countincome = countincome + 1;
+                                }
+
+                            </tbody>
+
+                        </table><!-- ./table_left_content comm_table -->
+
+                        <div class="table_total">
+                            <input type="hidden" id="income" value="@totalincome" />
+                            <h4>Total Income : <span id="newincome" value="@totalincome"> @totalincome INR</span></h4>
+                        </div><!-- ./table_total -->
+                    }
+                </div><!-- ./table_left -->
+
+                <div class="table_right" style="width:50%;">
+                    <h3>Expense</h3>
+                    @if (CurrentExpenceList.Count == 0)
+                    {
+                        <div><span>No data found</span></div>
+                    }
+                    else
+                    {
+                        <table class="table_right_content comm_table" cellpadding="8" style="height:auto; overflow:auto; width100%; display:table;">
+                            <thead>
+                                <tr id="expence-tr">
+                                    <th width="40">Sl No</th>
+                                    <th>A/c Head</th>
+                                    <th>Account Type</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @if (balanceBD < 0)
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td>Balance b/d</td>
+                                        <td></td>
+                                        <td>@Math.Abs(balanceBD)</td>
+                                    </tr>
+                                }
+                                @foreach (var exp in CurrentExpenceList)
+                                {
+                                    <tr data-id="@exp.Id">
+                                        <td>@countexpence</td>
+                                        <td class="word_breaking">@exp.AccountHead</td>
+                                        <td class="word_breaking">@exp.Particular</td>
+                                        <td>@exp.Amount</td>
+
+                                    </tr>
+                                    countexpence = countexpence + 1;
+                                }
+
+                            </tbody>
+                        </table>
+                        <input type="hidden" value="@countexpence" id="hidden-expence" />
+
+
+                        <div class="table_total">
+
+                            <input type="hidden" id="expn" value="@totalexpence" />
+                            <h4>Total Expense : <span id="newexpnce">@totalexpence</span> INR</h4>
+                        </div><!-- ./table_total -->
+                    }
+                </div><!-- ./table_right -->
+            </div><!-- ./table_main -->
+
+            <div class="table_footer">
+                <input type="hidden" id="balan" value="@totalexpence" />
+                <h2>@balanceHead<span id="newbalance"> @balance INR</span></h2>
+            </div>
+        </div><!-- ./main_container -->
+        <div class="form-group text-center">
+            <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-inc&exp')"><i class="fa fa-print"></i> Print</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        //   var id =@Model.Selecteddate
+        window.location.href = '/School/Report';
+    }
+
+    $(document).on('click', '.ng-click', function () {
+        //  var id = $(this).attr('data-id');
+        // window.location.href = '/School/BillingDetails/' + id;
+    });
+</script>

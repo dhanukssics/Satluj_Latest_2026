@@ -1,0 +1,94 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Peekabu - Fees</title>
+
+    <!-- Bootstrap -->
+    <link href="~/Content/css/bootstrap.css" rel="stylesheet" />
+    <!-- Custom style -->
+    <link href="~/Content/css/styles.css" rel="stylesheet" />
+    <!-- Google font Droid sans-->
+    <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
+    <!-- Font awesome icons css -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="se-pre-con"></div>
+    <div class="main-section">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="header-main">
+
+                    </div><!-- end of header main -->
+                </div>
+            </div><!-- end of row -->
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="sidebar-menu">
+                        <div class="logo">
+                            <img class="img-responsive" src="/Content/img/logo.png" alt="Peekabu" />
+                        </div><!-- end of logo -->
+                        <div class="side-menu">
+                            <label class="mobile-label">Menu</label>
+                            <ul class="responsive-menu">
+                                <li>Navigations</li>
+                                <li><a href="#"><i class="fa fa-navicon"></i> Class</a></li>
+                                <li><a href="#"><i class="fa fa-user"></i> Teacher</a></li>
+                                <li><a href="#"><i class="fa fa-bus"></i> Bus</a></li>
+                                <li><a href="#"><i class="fa fa-graduation-cap"></i> Student</a></li>
+                                <li><a href="#"><i class="fa fa-id-card-o"></i> Driver</a></li>
+                                <li class="active"><a href="#"><i class="fa fa-money"></i> Fees</a></li>
+                                <li><a href="#"><i class="fa fa-calendar"></i> Time Table</a></li>
+                                <li><a href="#"><i class="fa fa-compass"></i> Track Bus</a></li>
+                                <li><a href="#"><i class="fa fa-history"></i> Travel History</a></li>
+                            </ul>
+                        </div>
+                    </div><!-- end of sidebar-menu-->
+                </div><!-- end of col md 3 -->
+
+                <div class="col-md-9">
+                    <div class="main-section-header">
+                        <ul>
+                            <li><img class="img-responsive" src="/Content/img/school-logo.png" /></li>
+                            <li>Whitney High School</li>
+                            <li>|</li>
+                            <li><a href="/Logout/Logout"><i class="fa  fa-power-off"></i></a></li>
+                        </ul>
+                    </div>
+                    @RenderBody();
+                </div>
+            </div><!-- end of row -->
+        </div><!-- end of container fluid -->
+    </div><!-- end of main section -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="~/Content/js/bootstrap.js"></script>
+
+    <script>
+        $('.mobile-label').click(function () {
+            $('.responsive-menu').slideToggle();
+        });
+
+        $(window).load(function () {
+            // Animate loader off screen
+            $(".se-pre-con").fadeOut("slow");;
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+﻿
+@model Satluj_Latest.Models.StudentNonSubjectSkillMarks
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                PHYSICAL EDUCATION
+            </th>
+            @*
+            <th style="color: black;">
+                ENTHUSIASM
+            </th>
+            <th style="color: black;">
+            DISCIPLINE
+        </th>
+        <th style="color: black;">
+            TEAM SPIRIT
+        </th>*@
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td style="width:10%;">
+                        @count
+                    </td>
+                    <td style="width:50%;">
+                        @item.StudentName
+                    </td>
+                    <td style="width:40%;">
+                        @if (item._GamesScore.Enthusiasm.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._GamesScore.Enthusiasm" style="color:black;"  maxlength="2" class="cls-mark-Enthusiasm" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._GamesScore.Enthusiasm" style="color:black;"  maxlength="2" class="cls-mark-Enthusiasm" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._GamesScore.Enthusiasm" style="color:black; "  maxlength="2" class="cls-mark-Enthusiasm" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    @*<td style="width:40%;">
+                        @if (item._GamesScore.Discipline.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._GamesScore.Discipline" style="color:black; "  maxlength="2" class="cls-mark-Discipline" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._GamesScore.Discipline" style="color:black; " maxlength="2" class="cls-mark-Discipline" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._GamesScore.Discipline" style="color:black; "  maxlength="2" class="cls-mark-Discipline" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td style="width:40%;">
+                        @if (item._GamesScore.TeamSpirit.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._GamesScore.TeamSpirit" style="color:black; "  maxlength="2" class="cls-mark-TeamSpirit" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._GamesScore.TeamSpirit" style="color:black; " maxlength="2" class="cls-mark-TeamSpirit" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._GamesScore.TeamSpirit" style="color:black; "  maxlength="2" class="cls-mark-TeamSpirit" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>*@
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-game-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

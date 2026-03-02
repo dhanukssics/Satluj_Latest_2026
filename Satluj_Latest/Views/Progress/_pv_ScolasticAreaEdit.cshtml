@@ -1,0 +1,101 @@
+﻿@model Satluj_Latest.Models.ScholasticAreaModel
+
+<div class="modal-dialog modal-lg" role="document">
+
+    <form id="form-teacher-edit"
+          asp-action="EditScholasticArea"
+          asp-controller="Progress"
+          method="post">
+
+        <input type="hidden" asp-for="SchoolId" />
+        <input type="hidden" asp-for="Id" />
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <h4 class="modal-title" id="myModalLabel">
+                    Edit Scholastic Area
+                </h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Region :</label><br />
+
+                            <input asp-for="RegionName"
+                                   class="form-control"
+                                   placeholder="Region Name"
+                                   readonly />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Item :</label>
+
+                            <input asp-for="AreaName"
+                                   class="form-control"
+                                   placeholder="Scholastic Area" />
+
+                            <span asp-validation-for="AreaName"
+                                  class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Total Score :</label>
+
+                            <input asp-for="Score"
+                                   class="form-control"
+                                   type="number"
+                                   placeholder="Total Score" />
+
+                            <span asp-validation-for="Score"
+                                  class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        id="btn-editteacher"
+                        class="btn pay-now-btn">
+                    Edit
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $("#form-teacher-edit").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: EditScholasticAreaSuccess,
+            error: ajaxFailure
+        });
+    });
+</script>

@@ -1,0 +1,79 @@
+﻿
+@model Satluj_Latest.Models.SchoolModel
+@{
+    var timeTable = new Satluj_Latest.Data.School(Model.schoolId).GetMyTimetable(Model.userId);
+}
+
+
+<thead>
+    <tr>
+        <th>
+            Day
+        </th>
+        <th>
+            1
+        </th>
+        <th>
+            2
+        </th>
+        <th>
+            3
+        </th>
+        <th>
+            4
+        </th>
+        <th>
+            5
+        </th>
+        <th>
+            6
+        </th>
+        <th>
+            7
+        </th>
+        <th>
+            8
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        foreach (var table in timeTable)
+        {
+            <tr style="color:black;">
+                <td style="font-weight:bold;">
+                    @table.DayName
+                </td>
+                <td>
+                    @table.One
+                </td>
+                <td>
+                    @table.two
+                </td>
+                <td>
+                    @table.three
+                </td>
+                <td>
+                    @table.four
+                </td>
+                <td>
+                    @table.five
+                </td>
+                <td>
+                    @table.six
+                </td>
+                <td>
+                    @table.seven
+                </td>
+                <td>
+                    @table.eight
+                </td>
+            </tr>
+            i++;
+        }
+    }
+    
+</tbody>
+
+

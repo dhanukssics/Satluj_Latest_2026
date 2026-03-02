@@ -1,0 +1,8 @@
+﻿@model Satluj_Latest.Models.StudentModel
+@{
+    var data = Model.studentId + "~"+Model.Data;
+}
+<div>
+    <button type="button" class="btn btn-default" style="margin-left: 10px; background-color:#d4c7c7" data-dismiss="modal">Clear</button>
+    <a href="/Student/ProgressCardGeneration/@data" target="_blank" class="btn pay-now-btn " data-toggle="model" style="margin-left: 63px;" id="btn-student-Generate">Generate</a>
+</div>

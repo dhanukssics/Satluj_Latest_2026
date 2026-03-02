@@ -1,0 +1,108 @@
+﻿
+@model Satluj_Latest.Models.AttendanceModels
+@{
+    var studentList = new Satluj_Latest.Data.Division(Model.divisionId).GetStudentDetails();
+    var markedAttendances = new Satluj_Latest.Data.Division(Model.divisionId).GetAttendance(Model.maxDate, Model.minDate, Model.shift);
+    var studentCount = studentList.Count();
+    //    bool IsAdmin = ViewBag.IsAdmin;
+}
+
+<style>
+    img {
+        width: 100px;
+    }
+
+    .select-box {
+        border-radius: 5px;
+        border: 2px solid green;
+        width: 120px;
+        /*height: 120px;*/
+        text-align: center;
+        z-index: 99;
+        float: left;
+        /*padding: 5px;*/
+        margin-right: 10px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        min-height: 192px;
+    }
+
+        .select-box.active {
+            border: 2px solid red;
+        }
+
+            .select-box.active span {
+                color: red;
+            }
+
+        .select-box input[type=checkbox] {
+            display: none;
+        }
+
+        .select-box span {
+            padding: 5px;
+            display: inline-block;
+            font-weight: bold;
+        }
+</style>
+<input type="hidden" id="hfStdCount" value="@studentCount" />
+@Html.HiddenFor(m => m.IsAdminUser, new { @value = Model.IsAdminUser, id="isAdminIddd" })
+<div class="select-box-all">
+    @foreach (var student in markedAttendances)
+    {
+        <div class="select-box">
+            @if (student.Student.FilePath != null)
+            {
+                <img style="max-height:118px" src="@student.Student.FilePath" />
+            }
+            else
+            {
+                <img src="~/Content/img/children-1.gif" />
+            }
+
+            <input class="checkboxAttendance" data-studentId="@student.StudentId" data-status="@student.AttendanceData" type="checkbox" name="openings" value="@student.StudentId"><span>@student.Student.StundentName</span>
+        </div>
+    }
+</div>
+
+<script>
+    $(document).ready(function () {
+        debugger;
+        if ($('#isAdminIddd').val() == "True") {
+            $('#btn-save-attendance').removeClass('isHidden');
+            $('#btn-save-attendance').html('Edit');
+        }
+        $('.checkboxAttendance').each(function () {
+            var status = $(this).attr('data-status');
+            if (status == "False") {
+                if ($(this).prop("checked")) {
+                    $(this).prop("checked", false);
+                    $(this).parent().removeClass('active');
+                }
+                else {
+                    $(this).prop("checked", true);
+                    $(this).parent().addClass('active');
+                }
+            }
+        });
+        sumTotal();
+    })
+
+    $('.select-box').click(function (e) {
+        if ($(this).children('input').prop("checked")) {
+            $(this).children('input').prop("checked", false);
+            $(this).removeClass('active');
+            $(this).children('input').attr("data-status", "True");
+            console.log($(this).children('input').attr("data-status"));
+        }
+        else {
+            $(this).children('input').prop("checked", true);
+            $(this).addClass('active');
+            $(this).children('input').attr("data-status", "False");
+            console.log($(this).children('input').attr("data-status"));
+        }
+        sumTotal();
+    });
+
+   
+</script>

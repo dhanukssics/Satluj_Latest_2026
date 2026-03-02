@@ -1,0 +1,86 @@
+﻿@model Satluj_Latest.Models.CoScholasticAreaModel
+
+<div class="modal-dialog modal-lg" role="document">
+
+    <form id="form-teacher-edit"
+          asp-action="EditCoScholasticArea"
+          asp-controller="Progress"
+          method="post">
+
+        <input type="hidden" asp-for="SchoolId" />
+        <input type="hidden" asp-for="Id" />
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <h4 class="modal-title" id="myModalLabel">
+                    Edit Co-Scholastic Area
+                </h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Region :</label><br />
+
+                            <input asp-for="RegionName"
+                                   class="form-control"
+                                   placeholder="Region Name"
+                                   readonly />
+
+                            <span asp-validation-for="RegionName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Item :</label>
+
+                            <input asp-for="Item"
+                                   class="form-control"
+                                   placeholder="Co-Scholastic Area" />
+
+                            <span asp-validation-for="Item" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        id="btn-editteacher"
+                        class="btn pay-now-btn">
+                    Edit
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $("#form-teacher-edit").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: EditCoScholasticAreaSuccess,
+            error: ajaxFailure
+        });
+    });
+</script>

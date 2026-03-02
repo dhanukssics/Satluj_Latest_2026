@@ -1,0 +1,229 @@
+﻿@model Satluj_Latest.Models.ExamResultMainModel
+@{
+    ViewBag.Title = "ExamDeclaration";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+@Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
+@Html.HiddenFor(z => z.SubjectId, new { Value = 0 })
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;"> Student List - Optional Subjects</h3>
+        <div class="row">
+
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Subjects : </label>
+                    <br />
+                    <select asp-for="SubjectId"
+                            asp-items="Model.OptionalSubjectList"
+                            class="form-control"
+                            id="subjectId">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="SubjectId" class="text-danger"></span>
+
+                </div>
+            </div>
+
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Class : </label>
+                    <br />
+                    <select asp-for="ClassId"
+                            asp-items="Model.ClassList"
+                            class="form-control pv_class-drop-down class-drop-down"
+                            id="classDataDropdown">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="ClassId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group col-sm-3">
+                <label>Division</label>
+                <br />
+                <select id="division-drop-down" class="form-control slct-free-div-dropdown" disabled>
+                    <option>--Select Division --</option>
+                </select>
+                <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+            </div>
+
+            <div class="form-group col-sm-3">
+                <br />
+                <button class="btn pay-now-btn" data-toggle="modal" id="filter-btn"><i class="fa fa-search"></i> Search </button>
+            </div>
+
+            @*/--------------------------------------*@
+        </div>
+
+        <div class="table-responsive">
+            <table class="table custome-table" id="optional-subjects-student-mark-list"></table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    //Division listing -Class Change
+    $(document).on('change', '.class-drop-down', function () {
+        var id = $(this).val();
+        $('#ClassId').val($(this).val());
+        $('#DivisionId').val('');
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html("");
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                        $('#optional-subjects-student-mark-list').html('');
+                    }
+                    else {
+                        $(".slct-free-div-dropdown").html(""); // Division
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
+                        $(".slct-free-div-dropdown").prop("disabled", true);
+                        $('#optional-subjects-student-mark-list').html('');
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-free-div-dropdown").html(""); // Division
+            $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
+            $(".slct-free-div-dropdown").prop("disabled", true);
+            $('#optional-subjects-student-mark-list').html('');
+        }
+    });
+
+    $(document).on('change', '.slct-free-div-dropdown', function () {
+        $('#DivisionId').val($(this).val());
+        //$('#optional-subjects-student-mark-list').html('');
+        //$('#DivisionId').val($(this).val());
+        //$('#SubjectId').val($('#subjectId').val());
+        //var classId = $('#ClassId').val();
+        //var divisionId = $('#DivisionId').val();
+        //var SchoolId = $('#SchoolId').val();
+        //var subjectId = $('#SubjectId').val();
+        //if (classId != '' && divisionId != '' && subjectId != '0') {
+        //    $.ajax({
+        //        url: '/Progress/SudentListForOptionalStubjectsListing/' + subjectId + '~' + SchoolId + '~' + classId + '~' + divisionId,
+        //        type: "GET",
+        //        dataType: 'html',
+        //        success: function (data) {
+        //            $('#optional-subjects-student-mark-list').html(data);
+        //        }
+        //    });
+        //}
+        //else {
+        //    toastrError('Please select all details!');
+        //    $('#optional-subjects-student-mark-list').html('');
+        //}
+    });
+
+    $("#filter-btn").click(function () {
+        Search();
+    });
+    function Search() {
+        $('#optional-subjects-student-mark-list').html('');
+        $('#SubjectId').val($('#subjectId').val());
+        var classId = $('#ClassId').val();
+        var divisionId = $('#DivisionId').val();
+        var SchoolId = $('#SchoolId').val();
+        var subjectId = $('#SubjectId').val();
+        if (classId != '' && divisionId != '' && subjectId != '0') {
+            $.ajax({
+                url: '/Progress/SudentListForOptionalStubjectsListing/' + subjectId + '~' + SchoolId + '~' + classId + '~' + divisionId,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                    $('#optional-subjects-student-mark-list').html(data);
+                }
+            });
+        }
+        else {
+            toastrError('Please select all details!');
+            $('#optional-subjects-student-mark-list').html('');
+        }
+    }
+
+    $(document).on('click', '.delete-class-tr', function () {
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        var id = $(source).attr('data-student') + '~' + $(source).attr('data-subjectId');
+        $.ajax({
+            url: '/Progress/DeleteOptionalSubjects/' + id,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    setTimeout(function () {
+                        Search();
+                    }, 250);
+                }
+                else {
+                    YesDelete($(source).attr('data-student'), $(source).attr('data-subjectId'));
+                }
+            }
+        });
+    }
+});
+    });
+
+
+    function YesDelete(studentId, subjectId) {
+        var id = studentId + '~' + subjectId;
+        swal({
+            title: "This child has marks in the exam held on this subject,Are you sure? ",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Progress/DeleteResultEnteredOptionalSubjects/' + id,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    setTimeout(function () {
+                        Search();
+                    }, 250);
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+    };
+</script>

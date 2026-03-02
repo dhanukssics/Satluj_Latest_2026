@@ -1,0 +1,105 @@
+﻿@model Satluj_Latest.Models.StudentModel
+@{
+    var data = new Satluj_Latest.Data.School(Model.schoolId).GetProgressData(Model.studentId, Model.classId);
+}
+<div class="modal-dialog" role="document" style="background-color: #fff;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Select Exams</h4>
+        </div>
+    </div>
+    @Html.HiddenFor(z => z.Data)
+    @Html.HiddenFor(z => z.studentId, new { Value = @Model.studentId })
+    @if (data.Count != 0)
+    {
+        <div class="toggleable-div">
+            <ul>
+                @foreach (var item in data)
+                {
+                    <li><input type="checkbox" class="chk checkboxCheck" name="chkphone" data-id="@item.ExamId" /><span style="margin-left:10%; margin-bottom:10px; font-size: 20px;">@item.ExamName</span></li>
+                }
+            </ul>
+        </div>
+      
+        <div style="height:10%;" id="dev-generate-view">
+            @*<a href="/Student/ProgressCardGeneration/@Model.Data" target="_blank" class="btn pay-now-btn " data-toggle="model" style="margin-left: 63px;"  id="btn-student-Generate">Generate</a>*@
+            @*<a class="btn pay-now-btn isHidden" id="btn-student-Generate-dummy" style="margin-left: 63px;">Generate</a>*@
+        </div>
+        
+    }
+    else
+    {
+        <div style="height:10%; margin-top:6%;">
+            <li><span>No data found</span></li>
+        </div>
+    }
+</div>
+
+<script>
+    var item = new Object();
+
+    $(".checkboxCheck").change(function () {
+      
+        var studentId = $('#studentId').val();
+        var exams;
+        var ischecked = $(this).is(':checked');
+        var i = 0;
+        $(".chk:checked").each(function () {
+            if (i < 2) {
+                //debugger;
+                //if (i == 1) {
+                if (i > 0) {
+                    exams = exams + ',' + $(this).attr('data-id');
+                }
+                else
+                {
+                    exams = $(this).attr('data-id');
+                }
+                    $.ajax({
+                        url: '/Student/ProgressCardButton/' + studentId + '~' + exams,
+                        dataType: 'html',
+                        success: function (data) {
+                            $('#dev-generate-view').html(data);
+                            $('#dev-generate-view').modal('show');
+                        },
+                    });
+                //commented by basheer on 28/01/2019 to remove the condition of viewing progress report s
+                //}
+                //else {
+                //    exams = $(this).attr('data-id');
+                //    $('#dev-generate-view').html('');
+                //}
+                $('#Data').val();
+                $('#Data').val(exams);
+            }
+            else {
+                $(this).prop('checked', false);
+                toastrError("You can select 2 exams only !");
+            }
+            i = i + 1;
+        });
+        
+    });
+
+    @*$(document).on('click', '#btn-student-Generate-dummy', function () {
+        //debugger;
+        var exams;
+        var i = 0
+        $(".chk:checked").each(function () {
+            if (i == 0) {
+                exams = $(this).attr('data-id');
+            }
+            else {
+                exams = exams + ',' + $(this).attr('data-id');
+            }
+            i = i + 1;
+        });
+        var studentId = $('#studentId').val();
+        var exam = $(this).attr('data-classId');
+        var xx = studentId + '~' + exam;
+        window.location = "/Student/ProgressCardGeneration/@Model.Data";
+        var url = "/Student/ProgressCardGeneration/" + xx;
+        window.open(url, '_blank');
+    });*@
+</script>

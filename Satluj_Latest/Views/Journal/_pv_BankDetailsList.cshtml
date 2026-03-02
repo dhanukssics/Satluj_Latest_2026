@@ -1,0 +1,40 @@
+﻿
+@model Satluj_Latest.Models.BankDetailsModel
+@{
+    var bankDetails = new Satluj_Latest.Data.School(Model.SchoolId).GetBanksDetails();
+}
+
+
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Bank Name
+        </th>
+        <th>
+
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        foreach (var bank in bankDetails)
+        {
+            <tr>
+                <td class="ng-teacherDetails-click" data-bankid="@bank.BankId">
+                    @i
+                </td>
+                <td class="ng-teacherDetails-click" data-bankid="@bank.BankId">
+                    @bank.BankName
+                </td>
+                <td data-teacherid="@bank.BankId">
+                    <button class="delete-bank-tr btn-peek" data-bankid="@bank.BankId"><i class="fa fa-trash "></i></button>
+                </td>
+            </tr>
+            i++;
+        }
+    }
+</tbody>

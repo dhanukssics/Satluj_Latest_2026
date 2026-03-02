@@ -1,0 +1,79 @@
+﻿@model Satluj_Latest.Models.PaymentModels
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+
+@*<html>
+    <head>*@
+<script>
+	window.onload = function() {
+		var d = new Date().getTime();
+		document.getElementById("tid").value = d;
+	};
+</script>
+@*</head>
+    <body>*@
+<form method="post" name="customerData" action="/Account/CCAVRequestHandler">
+    Parameter Name:
+    Parameter Value:
+    Compulsory information
+    TID	:
+    <input type="text" name="tid" id="tid" readonly />
+    Merchant Id
+    <input type="text" name="merchant_id" id="merchant_id" value="163782" />
+    Order Id
+    <input type="text" name="order_id" value="@Model.ReferenceNo" />
+    Amount
+    <input type="text" name="amount" value="@Model.Amount" />
+    Currency
+    <input type="text" name="currency" value="INR" />
+    Redirect URL
+    <input type="text" name="redirect_url" value="@Model.ReturnUrl" />
+    Cancel URL
+    <input type="text" name="cancel_url" value="http://192.168.0.96/mcpg_new/iframe/ccavResponseHandler.php" />
+    Billing information(optional):
+    Billing Name
+    <input type="text" name="billing_name" value="@Model.Name" />
+    Billing Address:
+    <input type="text" name="billing_address" value="@Model.Address" />
+    Billing City:
+    <input type="text" name="billing_city" value="@Model.City" />
+    Billing State:
+    <input type="text" name="billing_state" value="@Model.State" />
+    Billing Zip:
+    <input type="text" name="billing_zip" value="@Model.PostalCode" />
+    Billing Country:
+    <input type="text" name="billing_country" value="India" />
+    Billing Tel:
+    <input type="text" name="billing_tel" value="@Model.PhoneNo" />
+    Billing Email:
+    <input type="text" name="billing_email" value="@Model.Email" />
+    Integration Type:
+
+    <select name="integration_type">
+        <option value="iframe_normal">iframe_normal</option>
+    </select>
+
+    Promo Code
+    <input type="text" name="promo_code" />
+    Customer Id:
+    <input type="text" name="customer_identifier" />
+    <input class="submit-trigger" type="submit" value="Checkout" />
+</form>
+@*</body>
+    </html>*@
+
+
+<script>
+    $(document).ready(function () {
+        //ajaxLoaderStop();
+        //$('body').pleaseWait();
+        $(".full-loader-dev").show();
+        //$('.se-pre-con').addClass('full-loader');
+        //$('.footer_main').addClass('isHidden');
+        $('.submit-trigger').hide();
+        $('.submit-trigger').trigger('click');
+    });
+</script>
+

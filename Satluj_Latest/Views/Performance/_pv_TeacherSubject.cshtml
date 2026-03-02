@@ -1,0 +1,77 @@
+﻿@model Satluj_Latest.Models.TeacherSubjectRelationModel
+@{
+    int count = 1;
+    int i = 0;
+}
+<table class="table custome-table table-student-list">
+    <thead>
+        <tr>
+            <th>
+                Sl No
+            </th>
+            <th>
+                Teacher Name
+            </th>
+            <th>
+                Subject
+            </th>
+            <th>
+                Class List
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.TeacherListModel)
+        {
+            foreach (var item2 in item.TeacherSubjectList)
+            {
+                var listCount = item.TeacherSubjectList.ToList().Count();
+                if (i == 0)
+                {
+                    if (i+1 == listCount)
+                    {
+                    <tr>
+                        <td style="border-bottom: 1px solid #000000;border-top:none;">@count</td>
+                        <td style="border-bottom: 1px solid #000000;border-top:none;">@item.TeacherName</td>
+                        <td style="border-bottom: 1px solid #000000;border-top:none;">@item2.Subject</td>
+                        <td style="border-bottom: 1px solid #000000;border-top:none;">@item2.ClassList</td>
+                    </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td style="border:none">@count</td>
+                            <td style="border:none">@item.TeacherName</td>
+                            <td style="border:none">@item2.Subject</td>
+                            <td style="border:none">@item2.ClassList</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    if (i+1 == listCount)
+                    {
+                    <tr>
+                        <td  style="border-bottom: 1px solid #000000;border-top:none;"></td>
+                        <td  style="border-bottom: 1px solid #000000;border-top:none;"></td>
+                        <td  style="border-bottom: 1px solid #000000;border-top:none;">@item2.Subject</td>
+                        <td  style="border-bottom: 1px solid #000000;border-top:none;">@item2.ClassList</td>
+                    </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td style="border:none"></td>
+                            <td style="border:none"></td>
+                            <td style="border:none">@item2.Subject</td>
+                            <td style="border:none">@item2.ClassList</td>
+                        </tr>
+                    }
+                }
+                i = i + 1;
+            }
+            i = 0;
+            count = count + 1;
+        }
+    </tbody>
+</table>

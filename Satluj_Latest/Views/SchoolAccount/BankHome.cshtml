@@ -1,0 +1,364 @@
+﻿@model Satluj_Latest.Models.BankEntryModel
+@{
+    ViewBag.Title = "BankBook";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<style>
+    .gap_bottom {
+        padding-bottom: 35px;
+    }
+
+        .gap_bottom label {
+            padding-top: 8px;
+        }
+</style>
+<h2>Bank entry</h2>
+
+<div class="parent-div">
+    <div col-lg-12 id="add-bank-entry-Id">
+        @Html.Partial("~/Views/SchoolAccount/_pv_AddBankEntryData.cshtml", Model)
+    </div>
+    <div col-lg-12 id="edit-cancel-bank-entry-Id">
+
+    </div>
+    <div class="modal" id="search-bank-entry-Id" z-index="99999" role="dialog" aria-labelledby="myModalLabel6">
+
+    </div>
+</div>
+
+<script>
+    $('.date-bankEntry-add-date').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).on('change', '.accHead-drop-down', function () {
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadSubLedgerList?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#SubLedgerId").html("");
+                        $.each(result.list, function (i, item) {
+                            $("#SubLedgerId").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#SubLedgerId").prop("disabled", false);
+                    }
+                    else {
+                        $("#SubLedgerId").html("");
+                        $("#SubLedgerId").append($('<option></option>').val("").html('-- No SubLedger Found --'));
+                        $("#SubLedgerId").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+        }
+    });
+
+    $(document).ready(function () {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var today = dd + '-' + mm + '-' + yyyy;
+        $('.date-bankEntry-add-date').val(today);
+        GetVoucherNumber();
+        $('#book-entry-mode-id').val(0);
+        $('#spn-error-ChequeNo').text("Please enter the Cheque Number!");
+        $('#spn-error-ChequeNo').show();
+        $('#btn-save-bankbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+    });
+
+    function GetVoucherNumber() {
+        var typeId = $('.pv_bank-type').val();
+        if (typeId == '') {
+            typeId = 0;
+        }
+        var cash = 0;
+        if ($('#cash-check-id').prop("checked") == true) {
+            cash = 1;
+        }
+        else if ($('#cash-check-id').prop("checked") == false) {
+            cash = 0;
+        }
+        var id = typeId + "~" + cash;
+
+        $.ajax({
+            url: '/SchoolAccount/GetVoucherNoFromBank?id=' + id,
+            type: "GET",
+            success: function (response) {
+                if (response.status > 0) {
+                    $("#VoucherNo").val('');
+                    $("#VoucherNo").val(response.result);
+                }
+                else {
+                    $("#VoucherNo").val('');
+                }
+            }
+        });
+    }
+
+    $('#cash-check-id').change(function () {
+        if ($(this).is(":checked")) {
+            GetVoucherNumber();
+            $('#spn-error-ChequeNo').hide();
+            $('#btn-save-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+        }
+        else {
+            GetVoucherNumber();
+            $('#book-entry-mode-id').val(0);
+            $('#spn-error-ChequeNo').text("Please enter the Cheque Number!");
+            $('#spn-error-ChequeNo').show();
+            $('#btn-save-bankbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+    });
+
+    $(document).on('change', '.pv_bank-type', function () {
+        GetVoucherNumber();
+    });
+
+    function AddBankEntrySuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.msg);
+            RefreshPage();
+        }
+        else {
+            toastrError(result.msg)
+        }
+    }
+
+    function AddBankEntryFailed() {
+        toastrError(result.msg);
+        RefreshPage();
+    }
+
+    function RefreshPage() {
+        setTimeout(function () {
+            window.location.href = "/SchoolAccount/BankHome/";
+        }, 250);
+
+    }
+
+    $(document).on('change', '#book-entry-mode-id', function () {
+        var mode = $(this).val();
+        if (mode == 0) {
+            var chqNo = $('#book-entry-ChequeNo-id').val();
+            if (chqNo == '') {
+                $('#spn-error-ChequeNo').text("Please enter the Cheque Number!");
+                $('#spn-error-ChequeNo').show();
+                $('#btn-save-bankbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+            }
+            else {
+                $('#spn-error-ChequeNo').hide();
+                $('#btn-save-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+            }
+        }
+        else {
+            $('#book-entry-ChequeNo-id').val('');
+            $('#spn-error-ChequeNo').hide();
+            $('#btn-save-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+        }
+    });
+
+    //$('#book-entry-ChequeNo-id').keyup(function () {
+    $(document).on('keyup', '#book-entry-ChequeNo-id', function () {
+        if ($('#book-entry-ChequeNo-id').val() != '') {
+            $('#spn-error-ChequeNo').hide();
+            $('#btn-save-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+        }
+        else {
+            var mode = $('#book-entry-mode-id').val();
+            if (mode == 0) {
+                $('#spn-error-ChequeNo').text("Please enter the Cheque Number!");
+                $('#spn-error-ChequeNo').show();
+                $('#btn-save-bankbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+            }
+            else {
+                $('#spn-error-ChequeNo').hide();
+                $('#btn-save-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+            }
+        }
+    });
+
+    //********************************************SEARCH STARTED ************************************************************
+    $(document).on('click', '#btn-search-bankbook', function () {
+        $.ajax({
+            url: '/SchoolAccount/LoadBankEntrySearchView/',
+            dataType: 'html',
+            success: function (data) {
+                $('#search-bank-entry-Id').html('');
+                $('#search-bank-entry-Id').html(data);
+                $('#search-bank-entry-Id').modal('show');
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-cancel-bankbook', function () {
+        window.location.href = "/SchoolAccount/BankHome/";
+    });
+
+    $(document).on('keyup', '#bank-search-voucher-bank-id', function () {
+        if ($('#bank-search-voucher-bank-id').val() != 0) {
+            var voucherNo = $('#bank-search-voucher-bank-id').val();
+            var type = $('#book-entry-type-serarch-id').val();
+            var contra = 0;
+            if ($('#cash-check-search-id').prop("checked") == true) {
+                contra = 1;
+            }
+            else if ($('#cash-check-search-id').prop("checked") == false) {
+                contra = 0;
+            }
+            var item = new Object();
+            item.bankTypeId = type;
+            item.contra = contra;
+            item.voucher = voucherNo.toString();
+
+            $.post("/SchoolAccount/SearchVoucherExistance/", item, function (result) {
+                if (result.status) {
+                    $('#spn-error-serach-voucher').text("");
+                    $('#spn-error-serach-voucher').hide();
+                    $('#btn-Search-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                }
+                else {
+                    $('#spn-error-serach-voucher').text(result.msg);
+                    $('#spn-error-serach-voucher').show();
+                    $('#btn-Search-bankbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                }
+            });
+        }
+        else {
+            $('#spn-error-serach-voucher').text("Please enter the Voucher Number!");
+            $('#spn-error-serach-voucher').show();
+            $('#btn-Search-bankbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+    });
+
+    $(document).on('click', '#btn-Search-bankbook', function () {
+        var voucherNo = $('#bank-search-voucher-bank-id').val();
+        if (voucherNo == 0) {
+            $('#spn-error-serach-voucher').text("Please enter the Voucher Number!");
+            $('#spn-error-serach-voucher').show();
+            $('#btn-Search-bankbook').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+        else {
+            $('#spn-error-serach-voucher').text("");
+            $('#spn-error-serach-voucher').hide();
+            $('#btn-Search-bankbook').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+            var type = $('#book-entry-type-serarch-id').val();
+            var contra = 0;
+            if ($('#cash-check-search-id').prop("checked") == true) {
+                contra = 1;
+            }
+            else if ($('#cash-check-search-id').prop("checked") == false) {
+                contra = 0;
+            }
+            var id = type + '~' + contra + '~' + voucherNo;
+
+            $.ajax({
+                url: '/SchoolAccount/LoadBankEntryEditView/' + id,
+                dataType: 'html',
+                success: function (data) {
+                    $('#search-bank-entry-Id').modal('hide')
+                    $('#add-bank-entry-Id').html('');
+                    $('#edit-cancel-bank-entry-Id').html('');
+                    $('#edit-cancel-bank-entry-Id').html(data);
+                    $('#add-bank-entry-Id').modal('hide');
+                    $('#search-bank-entry-Id').modal('hide');
+                }
+            });
+        }
+    });
+
+    $(document).on('change', '#book-entry-type-serarch-id', function () {
+        $('#bank-search-voucher-bank-id').val('');
+    });
+
+    $('#cash-check-id').change(function () {
+        $('#bank-search-voucher-bank-id').val('');
+    });
+
+
+    $(document).on('change', '.accHead-drop-down_Edit', function () {
+        var id = $(this).val();
+        if (id != '') {
+            $('#sub-view-through-head').removeClass('isHidden');
+            $('#sub-view-through-search').addClass('isHidden');
+            $.ajax({
+                url: '/Data/LoadSubLedgerList?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#SubLedgerId_Edit").html("");
+                        $.each(result.list, function (i, item) {
+                            $("#SubLedgerId_Edit").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#SubLedgerId_Edit").prop("disabled", false);
+                    }
+                    else {
+                        $("#SubLedgerId_Edit").html("");
+                        $("#SubLedgerId_Edit").append($('<option></option>').val("").html('-- No SubLedger Found --'));
+                        $("#SubLedgerId_Edit").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+        }
+    });
+
+    $(document).on('click', '#btn-bankbook-Clear-Feild', function () {
+        window.location.href = "/SchoolAccount/BankHome/";
+    });
+
+    $(document).on('click', '#btn-edit-cancel-bankbook', function () {
+        var id = $('#edit-bankData-id').val();
+        if (id != 0) {
+            var source = $(this);
+            swal({
+                title: "Are you sure?",
+                text: "You will not be able to undo this !",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Cancel The Bank Voucher!",
+                cancelButtonText: "No, Leave it!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+    function (isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: '/SchoolAccount/CancelBankEntry/' + id,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status) {
+                        toastrSuccess(data.msg);
+                        window.location.href = "/SchoolAccount/BankHome/";
+                    }
+                    else {
+                        toastrError(data.msg);
+                        window.location.href = "/SchoolAccount/BankHome/";
+                    }
+                }
+            });
+
+        }
+    });
+        }
+        else {
+            toastrError("You can't be edit this data !");
+        }
+    });
+
+</script>

@@ -1,0 +1,113 @@
+﻿@model Satluj_Latest.Models.DeclaredExamSubjectModel
+
+<div class="modal-dialog modal-lg" role="document">
+
+    <form id="form-teacher-edit"
+          asp-action="EditDeclaredSubjectExam"
+          asp-controller="Progress"
+          method="post">
+
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ExamId" />
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <h4 class="modal-title" id="myModalLabel">
+                    Edit Exam Subjects
+                </h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Subject :</label><br />
+
+                            <input asp-for="SubjectName"
+                                   class="form-control"
+                                   placeholder="Subject Name"
+                                   readonly />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Exam Date :</label><br />
+
+                            <input asp-for="ExamTimeString"
+                                   class="form-control date-cashentry-add" />
+
+                            <i class="fa"></i>
+
+                            <span asp-validation-for="ExamTimeString"
+                                  class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Total Score :</label>
+
+                            <input asp-for="TotalScore"
+                                   type="number"
+                                   class="form-control"
+                                   placeholder="Total Score" />
+
+                            <span asp-validation-for="TotalScore"
+                                  class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Remark :</label><br />
+
+                            <input asp-for="Remark"
+                                   class="form-control"
+                                   placeholder="Remark" />
+
+                            <span asp-validation-for="Remark"
+                                  class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        id="btn-editteacher"
+                        class="btn pay-now-btn">
+                    Edit
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $("#form-teacher-edit").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: EditDeclareExamSubjectSuccess,
+            error: ajaxFailure
+        });
+    });
+</script>

@@ -1,0 +1,71 @@
+﻿
+@model Satluj_Latest.Models.SubjectsModel
+@{
+    var subjectDetails = new Satluj_Latest.Data.School(Model.SchoolId).GetAllSubjects();
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Subjects
+        </th>
+        <th>
+            Abbreviation
+        </th>
+        <th>
+            Code
+        </th>
+        <th>
+            Optional Status
+        </th>
+        @if (IsAdmin == true)
+        {
+            <th></th>
+        }
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        foreach (var sub in subjectDetails)
+        {
+            <tr>
+                <td class="ng-teacherDetails-click" data-staffid="@sub.SubId">
+                    @i
+                </td>
+                <td class="ng-teacherDetails-click" data-staffid="@sub.SubId">
+                    @sub.SubjectName
+                </td>
+                <td class="ng-teacherDetails-click" data-staffid="@sub.SubId">
+                    @sub.Abbreviation
+                </td>
+                <td class="ng-teacherDetails-click" data-staffid="@sub.SubId">
+                    @sub.Code
+                </td>
+                @if (sub.IsOptonal)
+                {
+                    <td class="ng-teacherDetails-click" data-staffid="@sub.SubId">
+                        Optional
+                    </td>
+                }
+                else
+                {
+                    <td class="ng-teacherDetails-click" data-staffid="@sub.SubId">
+                        Compulsory
+                    </td>
+                }
+                @if (IsAdmin == true)
+                {
+                    <td data-teacherid="@sub.SubId">
+                        <button class="delete-subject-tr btn btn-peek" data-SubId="@sub.SubId"><i class="fa fa-trash "></i></button>
+                        <button class="edit-class-tr btn btn-peek" data-SubId="@sub.SubId"><i class="fa fa-edit"></i></button>
+                    </td>
+                }
+            </tr>
+            i++;
+        }
+    }
+</tbody>

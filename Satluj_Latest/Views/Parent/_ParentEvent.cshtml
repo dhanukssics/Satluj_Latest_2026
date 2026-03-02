@@ -1,0 +1,39 @@
+﻿@model Satluj_Latest.Models.ParentStudentClassModel
+@{
+    var Events = new Satluj_Latest.Data.Parent(Model.ParentId).ParentEventList();
+}
+
+<style>
+    .time_date {
+        margin: 0 10px;
+    }
+
+    .cust_listing ul li a {
+        margin: 0 15px;
+    }
+
+        .cust_listing ul li a:hover {
+            text-decoration: none;
+            color: #000;
+        }
+        .head-dsign{
+            font-weight:bold;
+            font-size:16px;
+        }
+</style>
+
+<div class="col-12" style="margin-top: 3%;">
+    <div class="cust_listing">
+        <ul>
+            @foreach (var item in Events)
+            {
+                <li style="border-bottom: 1px solid black;">
+                    <span class="time_date head-dsign">@item.EventDate.ToShortDateString()</span> <label class="head-dsign"> @item.EventHead</label>
+                    <div class="Details_sec">
+                        <p>@item.Description</p>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

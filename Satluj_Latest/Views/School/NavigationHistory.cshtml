@@ -1,0 +1,216 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<style>
+    .green-round {
+        border-radius: 50px;
+        background: #007b04;
+        padding: 3px 11px 3px 11px;
+        width: 10px;
+        height: 10px;
+    }
+
+    .red-round {
+        border-radius: 50px;
+        background: #cc1104;
+        padding: 3px 11px 3px 11px;
+        width: 10px;
+        height: 10px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <button class="btn btn-peek isHidden" id="back-history"><i class="fa fa-arrow-left"></i> Back</button>
+        </div>
+        <h3>Navigation History</h3>
+
+        <div class="row" id="div-datepickr">
+
+
+            <div class="form-group col-sm-3">
+                <label>Date</label>
+                <div class="with-icon">
+                    <input type="text" class="form-control history-date" data-date-end-date="0d" value="@Model.curredntDateTime.ToString("dd-MM-yyyy")">
+                    <i class="fa fa-calendar"></i>
+                </div>
+            </div>
+
+            <div class="col-sm-2 col-md-2" style="margin-top: 26px;">
+                <button type="button" class="btn btn-sm btn-info btn-search" id="searchAttendance">Search</button>
+            </div>
+        </div>
+        <div class="table-responsive" id="history-list-view">
+
+        </div>
+
+    </div><!-- end of col md 8 -->
+</div>
+<button type="button" class="btn btn-sm btn-info isHidden" id="btn-save-attendance" style="margin-top: 20px;width: 200px;">Save</button>
+<script>
+    $('.history-date').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+    $(document).on('click', '#searchAttendance', function () {
+        var date = $('.history-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var today = mm + '-' + dd + '-' + yyyy;
+        $.ajax({
+            url: '/School/GpsHistoryGrid/' + today,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#history-list-view').html(data);
+            }
+        });
+
+    });
+    $(document).on('change', '.class-drop-down', function () {
+        var id = $(this).val();
+        if (id != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+    $(document).on('change', '.class-teacher-drop-down', function () {
+        var classId = $(this).val();
+        var userId = $('#hfUserId').val();
+        if (classId != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadTeacherDivision?id=' + classId + '&userid=' + userId,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+    $("#btn-save-attendance").click(function () {
+        var item = new Object();
+        item.classId = $("#hfClassId").val();
+        item.divisionId = $("#hfDivisionId").val();
+        item.attendanceDate = $("#hfAttendanceDate").val();
+        item.shiftStatus = $("#hfShiftStatus").val();
+        //item.FeeDetails = saveArray.toString();
+        item.studentList = [];
+        $(".checkboxAttendance").each(function () {
+            var studentObj = new Object();
+            studentObj.studentId = $(this).attr('data-studentId');
+            studentObj.attendaneStatus = $(this).attr('data-status');
+            item.studentList.push(studentObj);
+
+        });
+        console.log(JSON.stringify(item));
+
+
+
+        $.post("/Teacher/Attendance/", item, function (result) {
+            console.log(JSON.stringify(result))
+            if (result.status) {
+                if (result.status) {
+
+                    //toastrSuccess(result.msg);
+                    //location.reload();
+                    //printViewData();
+                    $('#btn-save-attendance').addClass('isHidden');
+                    $('.select-box-all').addClass('isDisabled');
+
+                    toastrSuccess(result.msg);
+                    //showNewPageForPrint(result.serialNo);
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.ng-click', function () {
+        var date = $('.history-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var today = mm + '-' + dd + '-' + yyyy;
+        var id = $(this).attr('data-id');
+        $.ajax({
+            url: '/School/NavigationHistoryDetails/' + id + '~' + today,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#history-list-view').html(data);
+                $('#back-history').removeClass('isHidden');
+                $('#div-datepickr').addClass('isHidden');
+
+            }
+        });
+    });
+
+    $(document).on('click', '#back-history', function () {
+        var date = $('.history-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var today = mm + '-' + dd + '-' + yyyy;
+        $.ajax({
+            url: '/School/GpsHistoryGrid/' + today,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#history-list-view').html(data);
+                $('#back-history').addClass('isHidden');
+                $('#div-datepickr').removeClass('isHidden');
+
+            }
+        });
+
+    });
+</script>

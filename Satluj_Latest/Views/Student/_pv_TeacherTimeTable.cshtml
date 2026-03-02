@@ -1,0 +1,95 @@
+﻿
+
+@model Satluj_Latest.Models.SchoolModel
+@{
+    var subject = "";
+    var timeTable = new Satluj_Latest.Data.School(Model.schoolId).GetMyTimetable(Model.userId);
+    var subjects = new Satluj_Latest.Data.School(Model.schoolId).GetAllSubjects();
+}
+
+
+<thead>
+    <tr>
+        <td colspan="9" align="center" style="text-align:center; font-size: large;">
+            @Model.TeacherName
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Day
+        </th>
+        <th>
+            1
+        </th>
+        <th>
+            2
+        </th>
+        <th>
+            3
+        </th>
+        <th>
+            4
+        </th>
+        <th>
+            5
+        </th>
+        <th>
+            6
+        </th>
+        <th>
+            7
+        </th>
+        <th>
+            8
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        int i = 1;
+        foreach (var table in timeTable)
+        {
+            <tr style="color:black;">
+                <td style="font-weight:bold;">
+                   @*@subject=subjects.Where(x=>x.SubId==table)*@
+                    @table.DayName
+                </td>
+                <td>
+                    @table.One
+                </td>
+                <td>
+                    @table.two
+                </td>
+                <td>
+                    @table.three
+                </td>
+                <td>
+                    @table.four
+                </td>
+                <td>
+                    @table.five
+                </td>
+                <td>
+                    @table.six
+                </td>
+                <td>
+                    @table.seven
+                </td>
+                <td>
+                    @table.eight
+                </td>
+            </tr>
+            i++;
+        }
+    }
+
+</tbody>
+<tfoot>
+    <tr>
+        <td colspan="9">
+            <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('time-table')"><i class="fa fa-print"></i> Print</button>
+        </td>
+    </tr>
+</tfoot>
+
+

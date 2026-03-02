@@ -1,0 +1,46 @@
+﻿@model Satluj_Latest.Models.SchoolData
+
+
+<thead>
+    <tr>
+        <th style="width:10%;">
+            Slno.
+        </th>
+        <th>
+            Name
+        </th>
+        <th style="width:15%;">
+           Role No.
+            @*Admission No.*@
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        var StudentList = Model.Data.GetStudentDetails().Where(z => z.ClassId == Model.value.classId && z.DivisionId == Model.value.divId).ToList();
+        if (StudentList.Count > 0)
+        {
+            int i = 1;
+            foreach (var item in StudentList)
+            {
+                <tr>
+                    <td>
+                        @i
+                    </td>
+                    <td>
+                        @item.StundentName
+                    </td>
+                    <td>
+                        @*@item.StudentSpecialId*@
+                        @item.ClasssNumber
+                    </td>
+                </tr>
+                i++;
+            }
+        }
+        else
+        { 
+        
+        }
+    }
+</tbody>

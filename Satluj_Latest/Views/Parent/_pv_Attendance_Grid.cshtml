@@ -1,0 +1,67 @@
+﻿@model Satluj_Latest.Models.AttendanceModels
+
+<thead>
+    <tr>
+        <th>
+            Date
+        </th>
+        <th>
+            Morning
+        </th>
+
+        @*<th>
+            Evening
+        </th>*@
+
+    </tr>
+</thead>
+<tbody>
+    @{
+
+        int i = 1;
+        foreach (var data in new Satluj_Latest.Data.Admin().GeteMonthlyAttendance(Model.studentId, Model.month, Model.year))
+        {
+            <tr>
+                <td>
+                    @Convert.ToDateTime(data.AttendanceDate).ToString("dddd, dd MMMM yyyy")
+                </td>
+                <td>
+                    @if (data.Morning == 1)
+                    {
+                        <span>
+                            <img src="~/Content/img/present.png" style="max-width: 30px;"/>
+                        </span>
+                    }
+                    else if (data.Morning == 0)
+                    {
+                        <span>
+                            <img src="~/Content/img/absent.png" style="max-width: 30px;"/>
+                        </span>
+                    }
+                    else if (data.Morning == 2)
+                    {
+                    }
+                </td>
+                @*<td>
+                    @if (data.Afternoon == 1)
+                    {
+                        <span>
+                            <img src="~/Content/img/present.png" style="max-width: 30px;"/>
+                        </span>
+                    }
+                    else if (data.Afternoon == 0)
+                    {
+                        <span>
+                            <img src="~/Content/img/absent.png" style="max-width: 30px;"/>
+                        </span>
+                    }
+                    else if (data.Afternoon == 2)
+                    {
+                    }
+                </td>*@
+            </tr>
+            i = i + 1;
+
+        }
+    }
+</tbody>

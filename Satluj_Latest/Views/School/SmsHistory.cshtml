@@ -1,0 +1,110 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    ViewBag.Title = "SmsHistory";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    string allowedsms = ViewBag.Allowedsms;
+    string extraSms = ViewBag.ExtraSms;
+    string extraCost = ViewBag.ExtraCost;
+}
+<style>
+    .message_count {
+        text-align: center;
+    }
+        .message_count span {
+            font-size: 30px;
+        }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <h3>History</h3>
+    <div>
+        <b>Allowed Sms:</b> @allowedsms <b style="margin-left:15px">Extra Sms:</b> @extraSms <b style="margin-left:15px">Extra Cost:</b> @extraCost
+
+    </div>
+        <div class="table_header" style="float:left;">
+            <div class="" style="float:left;">
+                <h5><i class="fa fa-calendar"></i> Please select a date</h5>
+                <input id="selecteddate_From" name="date" placeholder="Date" type="text" value="@Model.Selecteddate.ToString("dd-MM-yyyy")" />
+            </div>
+
+            <div style="float:left; margin-left: 10px;">
+                <h5><i class="fa fa-calendar"></i> Please select a date</h5>
+                <input id="selecteddate_To" name="date" placeholder="Date" type="text" value="@Model.Selecteddate.ToString("dd-MM-yyyy")" />
+            </div>
+
+            <div style="float: left; margin-top: 43px; margin-left: 10px;">
+                <input type="submit" id="btn-search" class="btn btn-primary" value="GO" />
+            </div>
+
+            @*<div class="message_count" style="width:20%; float:left;">
+                    <h4>Message Count</h4>
+                    <span>320</span>
+                </div>
+
+                <div class="message_count" style="width:20%; float:left;">
+                    <h4>Total Message Count</h4>
+                    <span>320</span>
+                </div>*@
+        </div>
+
+        <div class="row">
+        </div>
+        <div class="table-responsive" id="user-list-view">
+            @Html.Partial("~/Views/School/_pv_SmsHistory.cshtml", Model)
+        </div>
+
+    </div><!-- end of col md 8 -->
+</div>
+<script>
+
+    $(document).ready(function () {
+        $("#SMSHeadGridList").dataTable();
+    });
+
+    $('#selecteddate_From').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $('#selecteddate_To').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).on('click', '#btn-search', function () {
+        var Selecteddate_From = $('#selecteddate_From').val();
+        var Selecteddate_To = $('#selecteddate_To').val();
+
+        var res = Selecteddate_From.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        Selecteddate_From = mm + '-' + dd + '-' + yyyy;
+
+        var zres = Selecteddate_To.split("-");
+        var zdd = zres[0];
+        var zmm = zres[1];
+        var zyyyy = zres[2];
+        Selecteddate_To = zmm + '-' + zdd + '-' + zyyyy;
+
+        var obj = new Object();
+        $.ajax({
+            url: '/School/GetAllSmsHistoryReportOnDate?Selecteddate_From=' + Selecteddate_From + '&&Selecteddate_To=' + Selecteddate_To,
+            type: "GET",
+            dataType: 'html',
+            global: false,
+            success: function (data) {
+
+                $('#user-list-view').html('');
+                $('#user-list-view').html(data);
+            }
+        });
+    });
+
+    $(document).on('click', '.ng-click', function () {
+        var id = $(this).attr('data-id');
+        window.location.href = "/School/SmsHistoryDetail/" + id;
+    });
+</script>

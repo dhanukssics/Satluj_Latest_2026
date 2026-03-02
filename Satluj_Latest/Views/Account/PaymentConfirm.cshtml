@@ -1,0 +1,148 @@
+﻿@model Satluj_Latest.Models.PaymentModels
+@using Microsoft.AspNetCore.Http
+@{
+    ViewBag.Title = "PaymentConfirm";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+
+}
+
+<style>
+    .asp112-1 {
+        padding: 10px 22px;
+        /* display: block; */
+        width: 100%;
+        float: left;
+    }
+
+    .asp112-0 {
+        margin: auto;
+    }
+
+    .fieldName {
+        text-align: left;
+        padding: 3px 70px;
+    }
+
+    .aps-table-112 {
+        max-width: 1000px;
+        float: none;
+        display: block;
+        margin: auto;
+        border: 1px dashed #147753;
+        padding: 1%;
+        margin-bottom: 15px;
+        margin-top: 15px;
+    }
+
+    .pract_1 {
+        background-color: #ff5852;
+    }
+
+        .pract_1:hover, .pract_1:active, .pract_1:focus {
+            color: #fff;
+            text-decoration: none;
+            background-color: #f35d58;
+        }
+
+    .aps-table-112 > div > .aps-tnk-112 {
+        border-right: 1px dashed #147753;
+    }
+
+    .aps-table-112-r {
+        border: 1px dashed #ff5852;
+    }
+
+        .aps-table-112-r > div > .aps-tnk-112 {
+            border-right: 1px dashed #ff5852;
+        }
+
+    .aps-tnk-112 > p {
+        text-align: left;
+    }
+
+    .aps-table-112 > div > .aps-tnk-112 > p:nth-child(1) {
+        padding: 10px 22px 10px 0px;
+        /* display: block; */
+        width: 100%;
+        float: left;
+        font-size: 21px;
+        color: #147753;
+        font-weight: bold;
+    }
+
+    .aps-table-112-r > div > .aps-tnk-112 > p:nth-child(1) {
+        color: #ff5852;
+    }
+
+    .aps-tnk-112 > p:nth-child(2); {
+        text-align: justify;
+    }
+</style>
+
+@{
+
+    if (Context.Session.GetString("paymentStatus") == "SUCCESS")
+    {
+
+        <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center pract proced_to_pay">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pmzero aps-table-112">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pmzero">
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 pmzero aps-tnk-112" style="">
+                        <p class="pmzero">
+                            Thank you for making the payment!!
+                        </p>
+                        <p class="pmzero">
+                            We appreciate your prompt payment. It has been a pleasure working with you. You have got what it takes to make it to the top. So, go for it. Good luck on your exams!!
+                        </p>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 pmzero">
+                        <table class="asp112-0">
+                            <tr class="asp112-1">
+                                <th width="100%">Transaction Response</th>
+                            </tr>
+                        </table>
+                        <table class="asp112-0">
+                            @foreach (KeyValuePair<string, string> p in Model.sortedDict)
+                            {
+                                if (p.Key.ToString() != "secure_hash" && p.Key.ToString() != "paymentStatus" && !p.Key.ToString().ToLower().StartsWith("__") && p.Key.ToString() != "secretkey" && p.Key.ToString() != "submitted")
+                                {
+                                    <tr class="@(p.Key.ToString() == "SecureHash"?"isHidden":"") asp112-2">
+                                        <td class="fieldName">@p.Key.ToString()</td>
+                                        <td class="fieldName">@p.Value.ToString()</td>
+                                    </tr>
+
+                                }
+                            }
+                        </table>
+                    </div>
+                </div>
+                <a class="pract_1 pay_nxt_btn isPointer" href="~/Student/Index">Start Practicing</a>
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <p>Payment Status: <b class="isRed">Failed!</b></p>
+        <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center pract proced_to_pay">
+            <a class="pract_1 pay_nxt_btn isPointer" href="~/Student/AlertPayment">Try Again!</a>
+            @*<a class="pract_1 pay_nxt_btn isPointer">Pay Now</a>*@
+        </div>
+    }
+}
+@*@foreach (KeyValuePair<string, string> p in @Model.sortedDict)
+    {
+    if (p.Key.ToString() != "secure_hash" && p.Key.ToString() != "paymentStatus" && !p.Key.ToString().ToLower().StartsWith("__") && p.Key.ToString() != "secretkey" && p.Key.ToString() != "submitted")
+    {
+
+        <input type="hidden" value="p.Key.ToString()" name="p.Key.ToString()" />
+    <input type="hidden" value="p.Value.ToString()" name="p.Key.ToString()" />
+
+
+           }*@
+
+
+
+
+
+

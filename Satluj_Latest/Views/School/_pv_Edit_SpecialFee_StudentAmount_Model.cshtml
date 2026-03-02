@@ -1,0 +1,77 @@
+﻿@model Satluj_Latest.Models.FeeModel
+
+<div class="modal-dialog modal-sm" role="document">
+
+    <style>
+        span {
+            color: red;
+        }
+    </style>
+
+    <form id="form-login"
+          asp-controller="School"
+          asp-action="EditFeeStudentAmount"
+          method="post">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Special Fee</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <p>@Model.StudentName</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Fee</label>
+                    <p>@Model.FeeName</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Amount</label>
+                    <input asp-for="Amount"
+                           class="form-control"
+                           autocomplete="off"
+                           type="number" />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+
+                <input type="hidden" asp-for="SpecialFeeId" />
+                <input type="hidden" asp-for="StudentId" />
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn pay-now-btn">Save</button>
+            </div>
+
+        </div>
+
+    </form>
+</div>
+
+<script>
+    $("#form-login").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (res) {
+                EditSpecialFeeAmtSuccess(res);
+            },
+            error: function (err) {
+                ajaxFailure(err);
+            }
+        });
+    });
+</script>

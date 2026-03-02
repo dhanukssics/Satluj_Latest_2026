@@ -1,0 +1,477 @@
+﻿@model Satluj_Latest.Models.PerformanceGraphModel
+@{
+    ViewBag.Title = "PerformanceHome";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+<script src="https://www.amcharts.com/lib/3/pie.js"></script>
+<script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+
+<h2>Teacher Performance Chart</h2>
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+@Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
+@Html.HiddenFor(z => z.ExamId, new { Value = 0 })
+@Html.HiddenFor(z => z.SubjectId, new { Value = 0 })
+@Html.HiddenFor(z => z.UserId, new { Value = @Model.UserId })
+@Html.HiddenFor(z => z.TeacherId, new { Value = 0 })
+
+<div>
+    @if (IsAdmin == true)
+    {
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Teacher : </label>
+                    <br />
+                    <select asp-for="TeacherId"
+                            asp-items="ViewBag.Teacherlist"
+                            class="form-control slct-teacher-dropdown1"
+                            data-live-search="true"
+                            style="display:inline-block; width:100%; min-width:180px;">
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="TeacherId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Class :</label>
+                    <select class="form-control slct-class-dropdown1" style="display:inline-block; width:100%;min-width:180px;" disabled></select>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Division :</label>
+                    <select class="form-control slct-div-dropdown1" style="display:inline-block; width:100%;min-width:180px;" disabled></select>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Exam :</label>
+                    <select class="form-control slct-exam-dropdown1" disabled></select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Subject :</label>
+                    <select class="form-control slct-sub-dropdown1" disabled></select>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label></label>
+                    <br />
+                    <button class="dropdown-toggle" id="btn-performance-Generate" type="button" data-toggle="dropdown" style="background:#0394d1;color:#fff;width:100%;height:34px;">
+                        Generate
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+
+    }
+    <div class="row">
+        <div id="performance-id">
+        </div>
+    </div>
+</div>
+
+<script>
+
+    //ADMIN TEACHER PERFORMANCE VIEW SECTION
+
+    //Teacher Dropdown selection change
+    $(document).on('change', '.slct-teacher-dropdown1', function () {
+        $('#TeacherId').val($(this).val());
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadAllClassesTeacherWise?id=' + id + '&schoolid=' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-class-dropdown1").html("");
+                        $(".slct-class-dropdown1").append($('<option></option>').val("0").html('All'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-class-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-class-dropdown1").prop("disabled", false);
+
+
+                        $(".slct-div-dropdown1").html("");
+                        $(".slct-div-dropdown1").append($('<option></option>').val("0").html('All'));
+
+                        $(".slct-exam-dropdown1").html("");
+                        $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('All'));
+
+                        $(".slct-sub-dropdown1").html("");
+                        $(".slct-sub-dropdown1").append($('<option></option>').val("0").html('All'));
+
+                        $('#DivisionId').val("0");
+                        $('#ExamId').val("0");
+                        $('#SubjectId').val("0");
+
+                    }
+                    else {
+                        $(".slct-class-dropdown1").html("");
+                        $(".slct-class-dropdown1").append($('<option></option>').val("0").html('-- No Class Found --'));
+                        $(".slct-class-dropdown1").prop("disabled", true);
+
+                        $(".slct-div-dropdown1").html("");
+                        $(".slct-div-dropdown1").append($('<option></option>').val("0").html('-- No Division Found --'));
+                        $(".slct-div-dropdown1").prop("disabled", true);
+
+                        $(".slct-exam-dropdown1").html("");
+                        $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- No Exam Found --'));
+                        $(".slct-exam-dropdown1").prop("disabled", true);
+
+                        $(".slct-sub-dropdown1").html("");
+                        $(".slct-sub-dropdown1").append($('<option></option>').val("0").html('-- No Subject Found --'));
+                        $(".slct-sub-dropdown1").prop("disabled", true);
+
+                        $('#ClassId').val("0");
+                        $('#DivisionId').val("0");
+                        $('#ExamId').val("0");
+                        $('#SubjectId').val("0");
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-class-dropdown1").html("");
+            $(".slct-class-dropdown1").append($('<option></option>').val("0").html('-- Select Class --'));
+            $(".slct-class-dropdown1").prop("disabled", true);
+            $('#ClassId').val("0");
+            $('#DivisionId').val("0");
+            $('#ExamId').val("0");
+            $('#SubjectId').val("0");
+
+            $(".slct-div-dropdown1").html("");
+            $(".slct-div-dropdown1").append($('<option></option>').val("0").html('-- No Division Found --'));
+            $(".slct-div-dropdown1").prop("disabled", true);
+
+            $(".slct-exam-dropdown1").html("");
+            $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- No Exam Found --'));
+            $(".slct-exam-dropdown1").prop("disabled", true);
+
+            $(".slct-sub-dropdown1").html("");
+            $(".slct-sub-dropdown1").append($('<option></option>').val("0").html('-- No Subjects Found --'));
+            $(".slct-sub-dropdown1").prop("disabled", true);
+        }
+    });
+
+
+    //Class Dropdown selection change
+    $(document).on('change', '.slct-class-dropdown1', function () {
+        $('#ClassId').val($(this).val());
+        var id = $(this).val();
+        if (id != '' && id != "0") {
+            $.ajax({
+                url: '/Data/LoadAllDivisionTeacherWise?id=' + id + '&schoolid=' + $('#SchoolId').val() + '&TeacherId=' + $('#TeacherId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-div-dropdown1").html("");
+                        $(".slct-div-dropdown1").append($('<option></option>').val("0").html('All'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-div-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-div-dropdown1").prop("disabled", false);
+                        FillExam();
+                    }
+                    else {
+                        $(".slct-div-dropdown1").html("");
+                        $(".slct-div-dropdown1").append($('<option></option>').val("0").html(' All '));
+                        $(".slct-div-dropdown1").prop("disabled", true);
+
+                        $(".slct-exam-dropdown1").html("");
+                        $(".slct-exam-dropdown1").append($('<option></option>').val("0").html(' All'));
+                        $(".slct-exam-dropdown1").prop("disabled", true);
+
+                        $(".slct-sub-dropdown1").html("");
+                        $(".slct-sub-dropdown1").append($('<option></option>').val("0").html(' All '));
+                        $(".slct-sub-dropdown1").prop("disabled", true);
+
+                        $('#DivisionId').val("0");
+                        $('#ExamId').val("0");
+                        $('#SubjectId').val("0");
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-div-dropdown1").html("");
+            $(".slct-div-dropdown1").append($('<option></option>').val("0").html('-- Select Division --'));
+            $(".slct-div-dropdown1").prop("disabled", true);
+
+            $('#DivisionId').val("0");
+            $('#ExamId').val("0");
+            $('#SubjectId').val("0");
+
+            $(".slct-exam-dropdown1").html("");
+            $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- No Exam Found --'));
+            $(".slct-exam-dropdown1").prop("disabled", true);
+
+            $(".slct-sub-dropdown1").html("");
+            $(".slct-sub-dropdown1").append($('<option></option>').val("0").html('-- No Subjects Found --'));
+            $(".slct-sub-dropdown1").prop("disabled", true);
+        }
+    });
+
+
+    // Fill the exams in after the division selection change
+    function FillExam() {
+        var ClassId = $('#ClassId').val();
+        if (ClassId != '' && ClassId != "0") {
+            $.ajax({
+                url: '/Data/LoadExams?classId=' + $('#ClassId').val() + '&schoolid=' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-exam-dropdown1").html("");
+                        $.each(result.list, function (i, item) {
+                            $(".slct-exam-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-exam-dropdown1").prop("disabled", false);
+
+                        FillSubjects();
+                    }
+                    else {
+                        $(".slct-exam-dropdown1").html("");
+                        $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- No Exam Found --'));
+                        $(".slct-exam-dropdown1").prop("disabled", true);
+
+                        $(".slct-sub-dropdown1").html("");
+                        $(".slct-sub-dropdown1").append($('<option></option>').val("0").html('-- No Subject Found --'));
+                        $(".slct-sub-dropdown1").prop("disabled", true);
+
+                        $('#ExamId').val("0");
+                        $('#SubjectId').val("0");
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-exam-dropdown1").html("");
+            $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- Select Exam --'));
+            $(".slct-exam-dropdown1").prop("disabled", true);
+
+            $('#ExamId').val("0");
+            $('#SubjectId').val("0");
+
+            $(".slct-sub-dropdown1").html("");
+            $(".slct-sub-dropdown1").append($('<option></option>').val("0").html('-- No Subjects Found --'));
+            $(".slct-sub-dropdown1").prop("disabled", true);
+        }
+    }
+
+
+    // Fill the subjects in after the exam selection change
+    function FillSubjects() {
+        debugger;
+        var ClassId = $('#ClassId').val();
+        var TeacherId = $('#TeacherId').val();
+        var ExamId = $('.slct-exam-dropdown1 option:selected').val();
+        var divisionId = $('.slct-div-dropdown1 option:selected').val();
+        $('#ExamId').val(ExamId);
+        if (ClassId != '' && ClassId != "0" && TeacherId != '' && TeacherId != "0" && ExamId != '' && ExamId != "0" && divisionId != '') {
+            $.ajax({
+                url: '/Data/GetAllSubjectsOfExamInTeacherWise?ClassId=' + $('#ClassId').val() + '&SchoolId=' + $('#SchoolId').val() + '&TeacherId=' + $('#TeacherId').val() + '&ExamId=' + $('#ExamId').val() + '&DivisionId=' + divisionId,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $(".slct-sub-dropdown1").html("");
+                        $.each(result.list, function (i, item) {
+                            $(".slct-sub-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-sub-dropdown1").prop("disabled", false);
+
+                    }
+                    else {
+                        $(".slct-sub-dropdown1").html("");
+                        $(".slct-sub-dropdown1").append($('<option></option>').val("0").html('-- No Subjects Found --'));
+                        $(".slct-sub-dropdown1").prop("disabled", true);
+                        $('#SubjectId').val("0");
+                    }
+                }
+            });
+        }
+        else {
+            $(".slct-sub-dropdown1").html("");
+            $(".slct-sub-dropdown1").append($('<option></option>').val("0").html('-- Select Subjects --'));
+            $(".slct-sub-dropdown1").prop("disabled", true);
+
+            $('#SubjectId').val("0");
+        }
+    }
+
+    // Exam Dropdown selection change , will change the subject
+    $(document).on('change', '.slct-exam-dropdown1', function () {
+        FillSubjects();
+    });
+
+    $(document).on('click', '#btn-performance-Generate', function () {
+        debugger;
+        var TeacherId = $('#TeacherId').val();
+        var classId = $('.slct-class-dropdown1 option:selected').val();
+        var DivId = $('.slct-div-dropdown1 option:selected').val();
+        var ExamId = $('.slct-exam-dropdown1 option:selected').val();
+        var SubjectId = $('.slct-sub-dropdown1 option:selected').val();
+        if (TeacherId != '' && classId != '' && DivId != '' && ExamId != '' && SubjectId != '') {
+            id = TeacherId + '~' + classId + '~' + DivId + '~' + ExamId + '~' + SubjectId;
+            $.ajax({
+                url: '/Performance/TeacherPieChartPartial/' + id,
+                dataType: 'html',
+                success: function (data) {
+                    $('#performance-id').html('');
+                    $('#performance-id').html(data);
+                }
+            });
+        }
+        else {
+            toastrError('Please select all details !');
+        }
+    });
+
+    //Division pdown selection change
+    $(document).on('change', '.slct-div-dropdown1', function () {
+        FillSubjects();
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>

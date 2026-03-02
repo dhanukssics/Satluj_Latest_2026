@@ -1,0 +1,140 @@
+﻿
+
+@model Satluj_Latest.Models.StudentNonSubjectSkillMarks
+@{
+    int count = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })
+@Html.HiddenFor(z => z.AssesmentId, new { Value = @Model.AssesmentId })
+<div class="table-responsive">
+    <table class="table account-table" id="tbstdMarkList">
+        <tr id="thead">
+            <th style="color: black;">
+                Sl.No
+            </th>
+            <th style="color: black;">
+                Student Name
+            </th>
+            <th style="color: black;">
+                HEIGHT (CMS)
+            </th>
+            <th style="color: black;">
+                WEIGHT (KGS)
+            </th>
+            <th style="color: black;">
+                WORKING DAYS
+            </th>
+            <th style="color: black;">
+                PRESENT
+            </th>
+        </tr>
+        <tbody id="bodyTable">
+
+            @foreach (var item in Model._SkillModel)
+            {
+                <tr data-id="tbRowAmount" style="color:black;" data-StudentId="@item.StudentId" class="cls-tr-class">
+                    <td style="width:10%;">
+                        @count
+                    </td>
+                    <td style="width:30%;">
+                        @item.StudentName
+                    </td>
+                    <td>
+                        @if (item._HealthScore.Height.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._HealthScore.Height" style="color:black;" type="number" maxlength="4" class="cls-mark-Height" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._HealthScore.Height" style="color:black;"  type="number" maxlength="4" class="cls-mark-Height" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._HealthScore.Height" style="color:black; "  type="number" maxlength="4" class="cls-mark-Height" readonly id="@count" />
+                                }
+                            </div>
+                        }
+
+                    </td>
+                    <td>
+                        @if (item._HealthScore.Weight.Trim() == "")
+                        {
+                            <div>
+                                <input value="@item._HealthScore.Weight" style="color:black; "  type="number" maxlength="4" class="cls-mark-Weight" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._HealthScore.Weight" style="color:black; "  type="number" maxlength="4" class="cls-mark-Weight" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._HealthScore.Weight" style="color:black; "  type="number" maxlength="4" class="cls-mark-Weight" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @if (item._HealthScore.WorkingDays==0)
+                        {
+                            <div>
+                                <input value="@item._HealthScore.WorkingDays" style="color:black; " type="number" maxlength="4" class="cls-mark-WorkingDays" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._HealthScore.WorkingDays" style="color:black; " type="number" maxlength="4" class="cls-mark-WorkingDays" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._HealthScore.WorkingDays" style="color:black; " type="number" maxlength="4" class="cls-mark-WorkingDays" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @if (item._HealthScore.Present==0)
+                        {
+                            <div>
+                                <input value="@item._HealthScore.Present" style="color:black; " type="number" maxlength="4" class="cls-mark-Present" id="@count" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @if (IsAdmin == true)
+                                {
+                                    <input value="@item._HealthScore.Present" style="color:black; " type="number" maxlength="4" class="cls-mark-Present" id="@count" />
+                                }
+                                else
+                                {
+                                    <input value="@item._HealthScore.Present" style="color:black; " type="number" maxlength="4" class="cls-mark-Present" readonly id="@count" />
+                                }
+                            </div>
+                        }
+                    </td>
+                </tr>
+                count = count + 1;
+            }
+
+        </tbody>
+    </table>
+    <div class="modal-footer">
+        <button type="button" id="students-health-skill-Save_btn" style="width: 100%;" class="btn pay-now-btn">Save</button>
+    </div>
+
+</div>

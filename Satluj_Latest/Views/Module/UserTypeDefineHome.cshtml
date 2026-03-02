@@ -1,0 +1,337 @@
+﻿@model Satluj_Latest.Models.UserModuleModel
+@{
+    ViewBag.Title = "ExamDeclaration";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<style>
+    .popup-btn {
+        margin-top: 10px;
+        margin: auto;
+        display: block;
+    }
+
+    .toggleable-div {
+        margin-bottom: 10px;
+    }
+
+    .toggle-heading {
+        background: #03a9f4;
+        color: #fff;
+        padding: 5px 15px;
+        border: 1px solid #f9f9f9;
+    }
+
+        .toggle-heading i {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+    .toggle-body {
+        background: #ccc;
+        padding: 15px;
+        display: none;
+        float: left;
+        width: 100%;
+    }
+
+        .toggle-body ul {
+            padding: 0;
+        }
+
+            .toggle-body ul li {
+                display: block;
+                float: left;
+                margin-right: 30px;
+                width: 22%;
+                margin-bottom: 10px;
+            }
+
+    .sub-menu ul li > a > i {
+        font-size: 9px !important;
+    }
+
+    .toggle-body ul li input[type=checkbox] {
+        margin-right: 5px;
+        margin-top: 7px;
+        float: left;
+    }
+
+    .toggle-body ul li span {
+        float: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: calc(100% - 25px);
+        overflow: hidden;
+    }
+    .toggle-class-width{
+        margin-left:2px;
+        margin-right:2px;
+    }
+     .full-loader-dev {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 19999;
+            background: url(/Content/img/preloader.gif) center no-repeat rgb(255, 255, 255) !important;
+            /*background: url(/Content/img/school.png) !important;*/
+            background-size: 350px;
+            background-position: center;
+            content: '';
+        }
+</style>
+<div class="se-pre-con"></div>
+<div class="full-loader-dev"></div>
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">USER TYPE ADD</h3>
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Type </label>
+                    <br />
+                    <select asp-for="userType"
+                            asp-items="Html.GetEnumSelectList<UserTypeModule>()"
+                            class="form-control"
+                            id="user-type-type">
+                    </select>
+
+                    <span asp-validation-for="userType" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <div class="form-group">
+                    <label>Type Name </label>
+                    <br />
+                    @Html.TextBoxFor(m => m.UserTypeName, new { autocomplete = "off", @class = "form-control", id = "user-type-name", style = "border: 1px solid #337ab7; height:5%;" })
+                    @Html.ValidationMessageFor(m => m.UserTypeName)
+                </div>
+            </div>
+            <div class="form-group col-md-3" id="chkDiv">
+                <label> </label>
+                <br />
+                @Html.CheckBoxFor(m => m.IsAdmin, new { @class = "", id = "isAdmin-check-id" })
+                <span>Admin </span>
+            </div>
+        </div>
+        <div class="row toggle-class-width">
+            @foreach (var main in Model.mainList)
+            {
+                <div class="maindiv">
+                    <div class="toggle-heading">
+                        <input type="checkbox" class="checklist-sub" data-sub-id-list="@main.subIdListString" data-main-id="@main.Id" />
+                        <span>
+                            @main.ModuleName
+                        </span>
+                        <i class="fa fa-caret-down pull-right"></i>
+                    </div>
+                    <div class="toggle-body">
+                        <ul>
+                            @foreach (var sub in main.subList)
+                            {
+                                <li>
+                                    <input type="checkbox" class="chk" value="@sub.SubMosule" name="chkphone" data-id="@sub.Id" onchange="AddRemoveUser(this)" /><span>@sub.SubMosule</span>
+                                </li>
+                            }
+
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <button class="btn pay-now-btn" data-toggle="modal" id="saveUserType-data-id" style="margin-left:1.5%;"><i class="fa fa-save"></i> Save </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+
+    $(".check-all").change(function () {
+        $("[type=checkbox]").prop('checked', $(this).prop("checked"));
+    });
+
+    $(".checklist-sub").change(function () {
+        debugger;
+        var source = $(this).parent();
+        source.parent().children().eq(1).find('.chk').prop('checked', true);
+        if (false == $(this).prop("checked")) {
+            source.parent().children().eq(1).find('.chk').prop('checked', false);
+
+            var subListString = $(this).attr("data-sub-id-list");
+            var subArray = subListString.split(",");
+            $.each(subArray, function (key, value) {
+                for (var i = array.length - 1; i >= 0; i--) {
+                    if (array[i] === value) {
+                        array.splice(i, 1);
+                    }
+                }
+            });
+
+        }
+        else {
+            var subListString = $(this).attr("data-sub-id-list");
+            var subArray = subListString.split(",");
+            $.each(subArray, function (key, value) {
+                var isExits = false;
+                for (var i = array.length - 1; i >= 0; i--) {
+                    if (array[i] === value) {
+                        isExits = true;
+                    }
+                }
+                if (isExits == false) {
+                    array.push(value);
+                }
+            });
+        }
+    });
+
+    $(".chk").change(function () {
+        if (false == $(this).prop("checked")) {
+            console.log($(this).parent().parent().parent().parent().find('.checklist-sub'))
+            var source = $(this).parent().parent().parent().parent();
+            source.find('.checklist-sub').prop('checked', false);
+        }
+    });
+
+    $('[type=checkbox]').change(function () {
+        //uncheck "select all", if one of the listed checkbox item is unchecked
+        if (false == $(this).prop("checked")) { //if this item is unchecked
+            $(".check-all").prop('checked', false); //change "select all" checked status to false
+            chkArray = [];
+        }
+        //check "select all" if all checkbox items are checked
+        if ($('[type=checkbox]:checked').length == $('[type=checkbox]').length) {
+            $(".check-all").prop('checked', true);
+        }
+    });
+
+    $('.toggle-heading i').click(function () {
+        $(this).parent().siblings().toggle();
+    });
+
+    var array = [];
+
+    function AddRemoveUser(source) {
+        var typeId = $(source).attr("data-id");
+        if ($(source).is(":checked")) {
+            array.push(typeId);
+        }
+        else {
+            for (var i = array.length - 1; i >= 0; i--) {
+                if (array[i] === typeId) {
+                    array.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    $(document).on('click', '#saveUserType-data-id', function () {
+        $('#saveUserType-data-id').prop('disabled', true);
+        //ajaxLoaderStart();
+        debugger;
+        if ($('#user-type-name').val() != '') {
+            if (array.length > 0) {
+                var ob = new Object();
+                ob.userType = $('#user-type-type').val();
+                ob.UserTypeName = $('#user-type-name').val();
+                //ob.IsAdmin = $('#isAdmin-check-id').val();
+                if ($('#isAdmin-check-id').prop("checked") == true) {
+                    ob.IsAdmin = true;
+                }
+                else if ($('#isAdmin-check-id').prop("checked") == false) {
+                    ob.IsAdmin = false;
+                }
+                ob.subListOnly = [];
+                $.each(array, function (key, value) {
+                    var data = new Object();
+                    data.Id = value;
+                    ob.subListOnly.push(data);
+                });
+                $.ajax({
+                    url: "/Module/SubmitAddUserModule",
+                    type: "POST",
+                    dataType: 'json',
+                    data: ob,
+                    global: false,
+                    success: function (response) {
+                        if (response.status) {
+                            toastrSuccess(response.msg);
+                            window.location.href = '/Module/UserTypeDefineHome/';
+                        }
+                        else {
+                            toastrError(response.msg);
+                            window.location.href = '/Module/UserTypeDefineHome/';
+                        }
+                    },
+                });
+            }
+            else {
+                toastrWarning("Please select Modules ");
+                $('#saveUserType-data-id').prop('disabled', false);
+            }
+        }
+        else {
+            toastrWarning("Please enter the User Type name !");
+            $('#saveUserType-data-id').prop('disabled', false);
+            $("#user-type-name").focus();
+        }
+        //ajaxLoaderStop();
+    });
+
+    $('#isAdmin-check-id').change(function () {
+        if ($(this).is(":checked")) {
+            $("[type=checkbox]").prop('checked', $(this).prop("checked"));
+        }
+        else {
+            $("[type=checkbox]").prop('checked', false);
+        }
+        AddOrRemoveAllCheckBoxDetails();
+    });
+
+
+    function AddOrRemoveAllCheckBoxDetails() {
+        array = [];
+        $('.chk').each(function () {
+            var typeId = $(this).attr("data-id");
+            if ($(this).is(":checked")) {
+                array.push(typeId);
+            }
+            else {
+                for (var i = array.length - 1; i >= 0; i--) {
+                    if (array[i] === typeId) {
+                        array.splice(i, 1);
+                    }
+                }
+            }
+        });
+    };
+
+    $(window).load(function () {
+        $(".se-pre-con").fadeOut("slow");
+        $(".full-loader-dev").hide();
+
+    });
+
+    function ajaxLoaderStart() {
+        $(".se-pre-con").show();
+    }
+
+    function ajaxLoaderStop() {
+        $(".se-pre-con").hide()
+
+    }
+
+    $(document).ajaxStart(function () {
+        $(":submit").attr("disabled", true);
+        ajaxLoaderStart();
+    });
+    $(document).ajaxComplete(function () {
+        $(":submit").attr("disabled", false);
+        ajaxLoaderStop();
+    });
+</script>

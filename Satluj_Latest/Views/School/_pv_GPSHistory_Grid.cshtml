@@ -1,0 +1,60 @@
+﻿
+@model Satluj_Latest.Models.SchoolModel
+@{
+    var trips = new Satluj_Latest.Data.WebsiteService().GetTripByDate(Model.curredntDateTime, Model.schoolId);
+    var x = 0;
+}
+
+<table class="table custome-table">
+    <thead>
+        <tr>
+            <th>
+                Slno
+            </th>
+            <th>
+                Bus Name
+            </th>
+            <th>
+                Trip No
+            </th>
+            <th>
+                Shift Status
+            </th>
+            <th>
+                Start Location
+            </th>
+            <th>
+                End Locatoin
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 1;
+            foreach (var trip in trips)
+            {
+                <tr class="ng-click" data-id="@trip.BusId">
+                    <td class="">
+                        @i
+                    </td>
+                    <td class="">
+                        @trip.BusName
+                    </td>
+                    <td class="">
+                        @trip.TripNo
+                    </td>
+                    <td class="">
+                        @trip.ShiftStatus
+                    </td>
+                    <td class="">
+                        @trip.LocationStart
+                    </td>
+                    <td class="">
+                        @trip.LocationEnd
+                    </td>
+                </tr>
+                i++;
+            }
+        }
+    </tbody>
+</table>

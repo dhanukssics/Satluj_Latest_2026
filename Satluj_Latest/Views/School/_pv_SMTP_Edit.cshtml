@@ -1,0 +1,60 @@
+﻿@model Satluj_Latest.Models.SMTPDetailsModel
+
+<div class="col-md-12">
+    <div class="email-setup-main">
+
+        <form id="form-login" asp-controller="School" asp-action="EditEmailerSetup" method="post">
+
+            <div class="form-group">
+                <span class="col-md-6">
+                    <label class="cust-label">Email</label>
+                    <input asp-for="email" class="form-control cust-inp" placeholder="Email" />
+                    <span asp-validation-for="email" class="text-danger"></span>
+                </span>
+            </div>
+
+            <div class="form-group">
+                <span class="col-md-6">
+                    <label class="cust-label">Password</label>
+                    <input asp-for="password"
+                           type="password"
+                           class="form-control cust-inp"
+                           placeholder="Password" />
+                    <span asp-validation-for="password" class="text-danger"></span>
+                </span>
+            </div>
+
+            <div class="form-group">
+                <span class="col-md-12" style="float: left; margin-top:15px;">
+                    <button type="submit" class="btn pay-now-btn">Save</button>
+                </span>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+    $("#form-login").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                } else {
+                    toastrError(result.msg);
+                    setTimeout(function () { location.reload(); }, 1000);
+                }
+            },
+            error: function () {
+                toastrError("Failed");
+                setTimeout(function () { location.reload(); }, 1000);
+            }
+        });
+    });
+</script>

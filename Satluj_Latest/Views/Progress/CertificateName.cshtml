@@ -1,0 +1,94 @@
+﻿@model Satluj_Latest.Models.CertificateNameModel
+@using Microsoft.AspNetCore.Http
+@{
+    ViewBag.Title = "CertificateName";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    bool IsAdmin = ViewBag.IsAdmin;
+
+}
+
+@Html.HiddenFor(z => z.SchoolId)
+
+@if (Model.Id != 0)
+{
+    @Html.HiddenFor(z => z.Id)
+
+    <form asp-action="EditCertificateName"
+          asp-controller="Progress"
+          method="post"
+          id="form-teacher-add">
+
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Certificate Name</h3>
+
+                <div class="form-group col-sm-6">
+                    <label>Name :</label>
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Certificate Name" })
+                    @Html.ValidationMessageFor(m => m.Name)
+                </div>
+
+                @if (ViewBag.IsAdmin == true)
+                {
+                    <div class="form-group col-sm-3">
+                        <button type="submit" class="btn pay-now-btn" style="margin-top:9%">
+                            <i class="fa fa-save"></i> Edit
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </form>
+}
+else
+{
+    <form asp-action="AddCertificateName"
+          asp-controller="Progress"
+          method="post"
+          id="form-teacher-add">
+
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Certificate Name</h3>
+
+                <div class="form-group col-sm-6">
+                    <label>Item :</label>
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Certificate Name" })
+                    @Html.ValidationMessageFor(m => m.Name)
+                </div>
+
+                <div class="form-group col-sm-3">
+                    <button type="submit" class="btn pay-now-btn" style="margin-top:9%">
+                        <i class="fa fa-save"></i> Add
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+<script>
+    $(document).on("submit", "#form-teacher-add", function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                } else {
+                    toastrError(result.msg);
+                }
+                window.location.href = '/Progress/CertificateName/';
+            },
+            error: function () {
+                toastrError("Something went wrong");
+            }
+        });
+    });
+</script>

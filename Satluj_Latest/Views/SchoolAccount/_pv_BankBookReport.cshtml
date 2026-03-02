@@ -1,0 +1,108 @@
+﻿
+
+@model Satluj_Latest.Models.DayBookReportModel
+@{
+    DateTime startDate = Model.FromDate;
+    DateTime endDate = Model.ToDate;
+    long schoolId = Model.SchoolId;
+    long bankId = Model.BankId;
+    var school = new Satluj_Latest.Data.School(schoolId);
+    var data = school.GetBankBookReport(startDate, endDate, schoolId, bankId).ToList();
+    string schoolName = Model.SchoolName;
+    string heading = Model.Heading;
+}
+<thead>
+    <tr>
+        <td colspan="8" style="text-align:center; font-weight:bold;font-size:22; display:none;">
+            @schoolName
+        </td>
+    </tr>
+    <tr>
+        <td colspan="8" style="text-align:center; font-weight:normal;font-size:18; display:none;">
+            Bank Book Report
+        </td>
+    </tr>
+    <tr>
+        <td colspan="8" style="text-align:center; font-weight:normal;font-size:12; display:none;">
+            @heading
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Date
+        </th>
+        <th>
+            VoucherNo / BillNo
+        </th>
+        <th>
+            Type
+        </th>
+        <th>
+            Bank
+        </th>
+        <th>
+            Acc.Head
+        </th>
+        <th>
+            Income
+        </th>
+        <th>
+            Expense
+        </th>
+        <th>
+            Narration
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        foreach (var one in data)
+        {
+            <tr>
+                <td>
+                    @one.EnterDate.ToShortDateString()
+                </td>
+                <td>
+                    @one.VoucherNumber
+                </td>
+                <td>
+                    @one.TransactionType
+                </td>
+                <td>
+                    @one.BankName
+                </td>
+                <td>
+                    @one.AccHeadName
+                </td>
+                <td>
+                    @one.Deposit
+                </td>
+                <td>
+                    @one.Withdraw
+                </td>
+                <td>
+                    @one.Narration
+                </td>
+            </tr>
+        }
+    }
+</tbody>
+<tfoot>
+    <tr>
+        <td style="font-weight:bold">
+            Total
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="font-weight:bold">
+            @data.Sum(x => x.Deposit)
+        </td>
+        <td style="font-weight:bold">
+            @data.Sum(x => x.Withdraw)
+        </td>
+        <td></td>
+    </tr>
+</tfoot>
+

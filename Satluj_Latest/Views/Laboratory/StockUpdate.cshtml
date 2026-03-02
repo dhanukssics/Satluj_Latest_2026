@@ -1,0 +1,163 @@
+﻿@model Satluj_Latest.Models.StockUpdateModel
+@{
+    ViewBag.Title = "StockUpdate";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<div class="ndiv page-holder">
+    <div class="ndiv Content-section">
+        <h3 style="margin-top: 5px;"> Stock Update</h3>
+        <div class="ndiv stb-stock-table-holder">
+            <div>
+                @Html.Partial("~/Views/Laboratory/_pv_Add_StockUpdate.cshtml", Model)
+            </div>
+            <div>
+                @Html.Partial("~/Views/Laboratory/_pv_StockUpdateList.cshtml", Model)
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalStockUpdate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        SupplierNameAutoComplete();
+    });
+    function SupplierNameAutoComplete() {
+        $.ajax({
+            url: '/Laboratory/GetAllSupplierName',
+            type: "POST",
+            dataType: 'json',
+            global: false,
+            success: function (data) {
+                var options = {
+                    // data: ["blue", "green", "pink", "red", "yellow"]
+                    data: data.result,
+                    list: {
+                        match: {
+                            enabled: true
+                        }
+                    },
+                };
+                $("#supplier-auto-complete").easyAutocomplete(options);
+                IntializeDataTable();
+            }
+        });
+    };
+
+    function AddStockUpdateSuccess(result) {
+        if (result.Status == true) {
+            toastrSuccess(result.Message);
+            window.location.href = '/Laboratory/StockUpdate';
+        }
+        else {
+            toastrError(result.Message);
+            window.location.href = '/Laboratory/StockUpdate';
+        }
+    };
+
+    function AddStockUpdateFailed(result) {
+        toastrError(result.Message);
+        window.location.href = '/Laboratory/StockUpdate';
+    };
+
+    function IntializeDataTable() {
+        $(".stockupdate-list-space").dataTable().fnDestroy()
+        $(".stockupdate-list-space").dataTable();
+    };
+
+    $(function () {
+        $(".table-student-list").dataTable();
+    });
+
+    $(document).on('click', '.delete-stock-data', function () {
+        var id = $(this).attr('data-id');
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+        $.ajax({
+            url: '/Laboratory/DeleteStock/' + id,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.status) {
+                    toastrSuccess(data.msg);
+                    window.location.href = '/Laboratory/StockUpdate';
+                }
+                else {
+                    toastrError(data.msg);
+                }
+            }
+        });
+    }
+});
+    });
+
+    $(document).on('click', '.edit-stock-data', function () {
+        var id = $(this).attr('data-id');
+        $.ajax({
+            url: '/Laboratory/EditStock/' + id,
+            dataType: 'html',
+            success: function (data) {
+                $.ajax({
+                    url: '/Laboratory/GetAllSupplierName',
+                    type: "POST",
+                    dataType: 'json',
+                    global: false,
+                    success: function (data) {
+                        var options = {
+                            // data: ["blue", "green", "pink", "red", "yellow"]
+                            data: data.result,
+                            list: {
+                                match: {
+                                    enabled: true
+                                }
+                            },
+                        };
+                        $("#supplier-auto-complete-edit").easyAutocomplete(options);
+                    }
+                });
+
+                $('#modalStockUpdate').html('');;
+                $('#modalStockUpdate').html(data);
+                $.validator.unobtrusive.parse($("#modalEditExams"));
+                $('#modalStockUpdate').modal('show');
+            },
+        });
+    });
+
+    function EditStockUpdateSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.msg);
+            window.location.href = '/Laboratory/StockUpdate';
+        }
+        else {
+            toastrError(result.msg);
+            $('#modalStockUpdate').html('');;
+            $('#modalStockUpdate').modal('hide');
+        }
+    };
+
+    function EditStockUpdateFailed(result) {
+        toastrError(result.msg);
+        $('#modalStockUpdate').html('');;
+        $('#modalStockUpdate').modal('hide');
+    };
+
+
+
+
+
+
+
+</script>

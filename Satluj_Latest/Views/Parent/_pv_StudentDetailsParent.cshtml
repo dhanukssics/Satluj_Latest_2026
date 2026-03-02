@@ -1,0 +1,55 @@
+﻿@model Satluj_Latest.Models.StudentModel
+@{
+    var student = new Satluj_Latest.Data.School(Model.schoolId).GetStudentForParent(Model.admissionNo).FirstOrDefault();
+}
+<style>
+    .login-without .login-form p span {
+        font-weight: normal;
+        margin-left: 10px;
+    }
+
+    .login-without .login-form p {
+        font-weight: bold;
+    }
+</style>
+
+@if (student != null)
+{
+    <div class="form-group">
+        <div style="height:150px;padding-top:10px;" class="newDes">
+            <div> <p>Name: <span>@student.StundentName</span></p></div>
+            <div> <p>Class:<span>@student.Class</span></p> </div>
+            <div> <p>Div:  <span>@student.Division</span></p></div>
+        </div>
+    </div>
+    <div class="form-group">
+        <input id="proceed-detail" type="button" value="Add" class="submit" data-studentId="@student.StudentId" data-admission="@Model.admissionNo" />
+    </div>
+}
+else
+{
+    <span id="val-admission">Wrong admission number</span>
+}
+
+
+<script>
+
+    //$(document).on('click', '#proceed-detail', function () {
+    //    var studentId = $(this).attr("data-studentId");
+    //    $.ajax({
+    //        url: '/Parent/AddChildToParent/' + studentId,
+    //        type: "GET",
+    //        dataType: 'json',
+    //        success: function (result) {
+    //            if (result.status) {
+    //                toastrSuccess(result.msg);
+    //                $('#addChild').modal('hide');
+    //                window.location.reload();
+    //            }
+    //            else {
+    //                toastrError(result.msg);
+    //            }
+    //        }
+    //    });
+    //});
+</script>

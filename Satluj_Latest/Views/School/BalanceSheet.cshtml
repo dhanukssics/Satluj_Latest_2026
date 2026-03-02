@@ -1,0 +1,179 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{
+    ViewBag.Title = "Balance Sheet";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+
+    var balanceSheet = new Satluj_Latest.Data.School(Model.schoolId).GetBalanceSheet();
+    //var liab = balanceSheet.Where(z => z.accountType == 4).ToList();
+    //var asst = balanceSheet.Where(z => z.accountType == 3).ToList();
+    //var count = liab.Count >= asst.Count ? liab.Count : asst.Count;
+}
+
+@*<style>
+        .ng-teacherDetails-click {
+            cursor: pointer;
+        }
+    </style>*@
+<style>
+    .slash {
+        content: '/';
+    }
+
+    td {
+        height: 37px;
+    }
+</style>
+<div class="row">
+<div class="form-group text-center">
+        <button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('print-bal-sheet')"><i class="fa fa-print"></i> Print</button>
+    
+        <button class="btn pay-now-btn" id="btn-excel-bal-sheet"><i class="fa fa-table"></i> Excel</button>
+        <input id="todatDate" type="hidden" value="@Model.curredntDateTime.ToString("dd-MMM-yyyy")" />
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Balance Sheet as on @Model.curredntDateTime.ToString("dd-MMM-yyyy")</h3>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                    @*<div class="input-group" style="max-width: 300px;">
+                            <input type="text" class="form-control" placeholder="Search" aria-describedby="basic-addon2">
+                            <span class="input-group-btn" id="basic-addon2"><button class="btn pay-now-btn">Search</button></span>
+                        </div>*@
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-5">
+                @*<div class="form-group text-right">
+                        <button class="btn pay-now-btn" id="btn-add-Teacher"><i class="fa fa-plus"></i> Add Teacher</button>
+                    </div>*@
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="print-bal-sheet">
+                <div class="table-responsive row" style="padding: 0px 50px 0px 50px;">
+                    <div class="row" style="background: #fff; padding: 0; margin: 0;">
+                        <table class="table custome-table table-bordered" id="table-trial-balance" style="margin-bottom:0px;width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="width:34%;">
+                                        Liabilities
+                                    </th>
+                                    <th style="text-align:center;  width:16%;">
+                                        Amount
+                                    </th>
+                                    <th style="width:34%;">
+                                        Asset
+                                    </th>
+                                    <th style="text-align:center;  width:16%;">
+                                        Amount
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int i = 1;
+                                    foreach (var item in balanceSheet)
+                                    {
+                                       var labala = item.LiabilitiesAmount == "" ? "0" : item.LiabilitiesAmount;
+                                       var assbal = item.AssetAmount == "" ? "0" : item.AssetAmount;
+                                                
+                                        <tr>
+                                            <td>
+                                                @item.Liabilities
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <span class="span-liability" data-amt="@Convert.ToDouble(labala)"> @string.Format("{0:0.00}", item.LiabilitiesAmount)</span>
+                                            </td>
+                                            <td>
+                                                @item.Asset
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <span class="span-asset" data-amt="@assbal"> @string.Format("{0:0.00}", item.AssetAmount)</span>
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                    @*if (liab.Count < count)
+                                            {
+                                                var balRow = count - liab.Count;
+                                                for (int j = 1; j <= balRow; j++)
+                                                {
+                                        <tr><td></td><td></td></tr>
+                                                }
+                                            }*@
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr style="font-weight:bold">
+                                    <td>Total</td>
+                                    <td id="tdLiabilityTotal" class="text-right"></td>
+                                    <td>Total</td>
+                                    <td id="tdAssetTotal" class="text-right"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*
+            <div class="row" style="padding: 0px 60px 0px 60px; margin-top: -25px;">
+                <div class="col-md-6">
+                    <h4 id="tdLiabilityTotal" class="text-right">Total</h4>
+                </div>
+                <div class="col-md-6">
+                    <h4 id="tdAssetTotal" class="pull-right">Total</h4>
+                </div>
+            </div>
+        *@
+    </div><!-- end of col md 12 -->
+</div>
+
+
+
+<script>
+
+    $(document).ready(function () {
+        sumTotal();
+    });
+    function sumTotal() {
+        //alert();
+        var Aval = 0;
+        $('.span-asset').each(function () {
+            Aval = parseFloat(Aval) + parseFloat($(this).attr('data-amt'));
+        });
+        $('#tdAssetTotal').html(parseFloat(Aval));
+
+        var Lval = 0;
+        $('.span-liability').each(function () {
+            Lval = parseFloat(Lval) + parseFloat($(this).attr('data-amt'));
+            console.log(Lval);
+        });
+        $('#tdLiabilityTotal').html(parseFloat(Lval));
+        console.log(Lval);
+    }
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+        //window.location.href = '/School/Report';
+    }
+    $(document).on('click', '#btn-excel-bal-sheet', function () {
+        var date = $('#todatDate').val();
+        $("#table-trial-balance").table2excel({
+            name: "Table2Excel",
+            filename: "BalanceSheet as on " + date,
+            fileext: ".xls"
+        });
+    });
+</script>

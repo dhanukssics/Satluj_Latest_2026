@@ -1,0 +1,24 @@
+﻿@media print {
+ body {font-family: Verdana, Geneva, sans-serif;}
+ .main_wrapper {width: 800px; height: auto;  margin: auto; background: #f1f1f1; padding: 20px 50px;}
+ .logoHead {text-align: center; margin-bottom: 30px; margin: auto; display: table; margin-bottom: 50px;}
+ .logoHead img, .logoTxt {float: left;}
+ .logoTxt {padding-top: 20px;}
+ .logoHead h1, .logoHead h2, .logoHead h3, .logoHead h4, .logoHead h5 {margin: 0; padding: 0;}
+ .vouchHead ul {padding: 0;  margin: 0; display: inline-block;  width: 100%; margin-bottom: 30px; }
+ .vouchHead ul li {width: calc(100% / 3); float: left; display: block;}
+ .vouchHead ul li:last-child { float: right; width: 183px; }
+ .vouchHead ul li input { border: none;  outline: none; border-bottom: 2px dotted #000; width: 130px;  background: none; font-weight: bold; font-size: 18px;}
+ .centerTxt { text-align: center; text-transform: uppercase; font-weight: bold;}
+ .vouchBdy input[type=text] { width: 100%;border: none; border-bottom: 2px dotted #000; outline: none; padding-bottom: 3px; font-size: 20px; font-weight: bold;background: none;}
+ .first, .second { margin-bottom: 15px;display: inline-block; width: 100%;}
+ .first span {float: left; margin-right: 10px;}
+ .second span { float: left; margin-right: 10px;}
+ .second span:last-child { margin-right: 0px; margin-left: 10px;}
+ .price span {font-size: 26px; font-weight: bold; }
+ .price input[type=text] { border: none; border-bottom: 2px solid #000;  height: 17px; padding: 10px 5px;  font-size: 26px;  font-weight: bold; outline: none; width: 200px; background: none;}
+ .footTwo {margin-top: 15px;}
+ .footTwo span:last-child {float: right;font-weight: bold;}
+ .footThree {margin-top: 70px;}
+ .footThree span {font-weight: bold;}
+}

@@ -1,0 +1,85 @@
+﻿@model Satluj_Latest.Models.PaymentModels
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+
+}
+<input type="hidden" value="@Model.StudentId" id="hfStudentId" />
+<input type="hidden" value="@Model.BillNo" id="hfBillNo" />
+
+<section class="paymentSuccess">
+    <div class="container">
+        <div class="login">
+            @if (Model.PaymentStatus == "Failure")
+            {
+                <div class="succBox">
+                    <img src="../Content/img/error.png">
+                    <h3>Payment Failed!</h3>
+                    <p style="font-size:18px;" align="left"> Sorry,</p>
+                    <p align="left">We Cannot complete your payment at this time.</p>
+                    <p align="left">Your payment has failed.</p>
+                    <p style="margin:20px 0;">
+                        @*<a class="bckbtn" href="/Parent/Home">Go Back</a>*@
+                        <a class="bckbtn" href="/Parent/ParentHome">Go Back</a>
+                    </p>
+                    <div class="clear"></div>
+                </div>
+                <input type="hidden" value="0" id="hfStatus" />
+            }
+            else if (Model.PaymentStatus == "Fraud")
+            {
+                <div class="succBox">
+                    <img src="../Content/img/error.png">
+                    <h3>Payment Failed!</h3>
+                    <p style="font-size:18px;" align="left"> Sorry,</p>
+                    <p align="left">Fraud transaction detected.</p>
+                    <p align="left">Your payment has failed.</p>
+                    <p style="margin:20px 0;">
+                        @*<a class="bckbtn" href="/Parent/Home">Go Back</a>*@
+                        <a class="bckbtn" href="/Parent/ParentHome">Go Back</a>
+                    </p>
+                    <div class="clear"></div>
+                </div>
+                <input type="hidden" value="0" id="hfStatus" />
+            }
+            else
+            {
+                <div class="succBox">
+                    <img src="../Content/img/success-icon-2.png" />
+                    <h3>Payment Successful</h3>
+                    <p>Your Payment of <span>₹@Model.Amount</span> was successfully completed for <span> @Model.CourseName</span></p>
+                    <p style="margin:20px 0;">
+                        @*<a class="bckbtn" href="/Parent/Home">Go Back</a>*@
+                        <a class="bckbtn" href="/Parent/ParentHome">Go Back</a>
+                    </p>
+                    <div class="clear"></div>
+                </div>
+                <input type="hidden" value="1" id="hfStatus" />
+            }
+
+        </div>
+    </div><!-- /container -->
+</section>
+
+<div class="modal fade" id="tablePrintData">
+</div>
+
+<script>
+    $(document).ready(function () {
+        var stat = $('#hfStatus').val();
+        if (stat == 1) {
+            setTimeout(function () {
+                var slno = $('#hfBillNo').val();
+                var studentMainId =$('#hfStudentId').val();
+                $.ajax({
+                    url: '/Account/PrintAccountBillData/' + studentMainId + '~' + slno,
+                    type: "GET",
+                    dataType: 'html',
+                    success: function (data) {
+                        $('#tablePrintData').html(data);
+                        $('#tablePrintData').modal('show');
+                    }
+                });
+            }, 200);
+        }
+    });
+</script>

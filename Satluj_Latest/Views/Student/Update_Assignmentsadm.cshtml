@@ -1,0 +1,42 @@
+﻿
+@model Satluj_Latest.Models.AssementUpload
+
+@{
+
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+<h2>Update_AssessmentFile</h2>
+<br />
+<br />
+
+@using (Html.BeginForm("Update_Assignmentsadm", "Student", FormMethod.Post, new { enctype = "multipart/form-data" }))
+
+
+{
+
+
+
+    <input type="hidden" id="FileId" name="FileId" value=" @Model.FileId" />
+
+
+
+
+
+    <div class="form-group col-sm-3">
+        <div class="form-group">
+            <br />
+            @Html.TextBox("TrackFile", "", new { @type = "file", @multiple = "multiple" }) <br />
+
+        </div>
+    </div>
+
+
+    <div class="form-group col-sm-3">
+        <div>
+            <br />
+            <button class="btn pay-now-btn" data-toggle="modal" id="saveSubject"><i class="fa fa-save"></i> Save </button>
+        </div>
+    </div>
+}

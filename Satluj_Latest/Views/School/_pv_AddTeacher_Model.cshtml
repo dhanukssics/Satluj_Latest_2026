@@ -1,0 +1,370 @@
+﻿@model Satluj_Latest.Models.SchoolValue.TeacherAddModel
+
+@{
+  
+}
+<div class="modal-dialog modal-lg" role="document">
+
+    <style>
+        span {
+            color: red;
+        }
+
+        div.checkbox_select {
+            width: 200px;
+        }
+
+        .checkbox_select_anchor {
+            display: block;
+            background: firebrick;
+            color: white;
+            cursor: pointer;
+            padding: 10px 5px 5px;
+            position: relative;
+        }
+
+            .checkbox_select_anchor:after {
+                width: 0;
+                height: 0;
+                border-left: 10px solid transparent;
+                border-right: 10px solid transparent;
+                border-top: 10px solid darkred;
+                content: "";
+                position: absolute;
+                right: 10px;
+                top: 15px;
+            }
+
+        .expanded .checkbox_select_anchor:after {
+            border-top: 0;
+            border-bottom: 10px solid firebrick;
+        }
+
+
+        .checkbox_select_anchor:hover {
+            background: #FF3030 !important;
+        }
+
+        .expanded .checkbox_select_anchor {
+            background: #7C1818;
+        }
+
+        div.checkbox_select .select_input {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .checkbox_select_dropdown {
+            display: none;
+            background: whitesmoke;
+        }
+
+            .checkbox_select_dropdown.show {
+                display: block;
+            }
+
+            .checkbox_select_dropdown ul {
+                max-height: 150px;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                padding: 0;
+                margin: 0;
+                border: 1px solid #999;
+                border-top: 0;
+                border-bottom: 0;
+            }
+
+                .checkbox_select_dropdown ul li {
+                    list-style: none;
+                    position: relative;
+                    color: #666;
+                }
+
+                    .checkbox_select_dropdown ul li label {
+                        position: relative;
+                        padding: 10px 5px 5px 40px;
+                        display: block;
+                        cursor: pointer;
+                    }
+
+                        .checkbox_select_dropdown ul li label:hover {
+                            background: #cbcbcb;
+                            color: white;
+                        }
+
+                    .checkbox_select_dropdown ul li input:checked + label {
+                        background: #bbb;
+                        color: white;
+                        text-shadow: 0px 1px 1px rgba(150, 150, 150, 1);
+                    }
+
+                    .checkbox_select_dropdown ul li input {
+                        position: absolute;
+                        left: 0;
+                        z-index: 1;
+                        display: inline-block;
+                        height: 100%;
+                        width: 30px;
+                    }
+
+        .checkbox_select_search {
+            width: 200px;
+            padding: 10px 5px 5px;
+            border: 1px solid #999;
+            border-top: 0;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        .checkbox_select_submit {
+            background: #00A600;
+            color: white;
+            padding: 10px 5px 5px;
+            border: 0;
+            width: 100%;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .hide {
+            display: none;
+        }
+    </style>
+
+   <form id="form-teacher-add"
+      method="post"
+      asp-action="AddTeacher"
+      asp-controller="School">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add Teacher</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Name</label>
+                            @Html.TextBoxFor(m => m.teacherName, new { autocomplete = "off", placeholder = "Name", @class = "form-control" })
+                            @Html.ValidationMessageFor(z => z.teacherName)
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Email</label>
+                            @Html.TextBoxFor(m => m.emailId, new { autocomplete = "off", placeholder = "E-mail", @class = "form-control" })
+                      @*   <span id="spn-error-email-teacher" data-val="0" data-myval="10" style="color:red;"></span>*@
+    @Html.ValidationMessageFor(z => z.emailId)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Contact No.</label>
+                            @Html.TextBoxFor(m => m.contactNumber, new { autocomplete = "off", placeholder = "Contact Number", @class = "form-control", id = "teacherContactNumber" })
+                            <span id="spn-error-contactNumber" data-val="0" data-myval="10" style="color:red;"></span>
+                            @Html.ValidationMessageFor(z => z.contactNumber)
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label>Designation</label>
+                                @Html.DropDownListFor(m => m.DesignationId, ViewBag.Designations as List<SelectListItem>, "--Choose--", new { @class = "form-control", @data_live_search = "true" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    @*<div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Roles</label>
+                                <div class="dropdown_main">
+                                    <span class="dropdown_btn">Roles <i class="fa fa-caret-down"></i></span>
+                                    <ul class="dropdown_lists">
+                                        @foreach (var item in rolesList)
+                                        {
+                                            <li>
+                                                <label class="label_container">
+                                                    @item.RoleName
+                                                    <input type="checkbox" value="@item.Id" class="chk-roles-cls">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>*@
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Class</label>
+                            @Html.DropDownListFor(m => m.classId, ViewBag.Classes as List<SelectListItem>, "--Choose--", new { @class = "form-control slct-teacherclass-dropdwn", @data_live_search = "true" })
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Division</label>
+                            <select asp-for="divisionId"
+                                    class="form-control slct-free-div-dropdown"
+                                    disabled>
+                            </select>
+
+                            <span id="division-required-teacher-add" style="display:none;"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label>Department</label>
+                                @Html.DropDownListFor(m => m.DepartmentId, ViewBag.Departments as List<SelectListItem>, "--Choose--", new { @class = "form-control", @data_live_search = "true" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Roles</label>
+                            <div class="dropdown_main">
+                                <span class="dropdown_btn">Roles <i class="fa fa-caret-down"></i></span>
+                                <ul class="dropdown_lists">
+                                    @foreach (var item in ViewBag.Roles as List<SelectListItem>)
+                                    {
+                                        <li>
+                                            <label class="label_container">
+                                                @item.Text
+                                                <input type="checkbox"
+                                                       class="chk-roles-cls"
+                                                       value="@item.Value" />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </li>
+                                    }
+                                </ul>
+
+                                <input type="hidden" asp-for="RolesData" id="RolesData" />
+
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>User Type</label>
+                            @Html.DropDownListFor(m => m.UserTypeId, ViewBag.UserTypes as List<SelectListItem>, "--Choose--", new { @class = "form-control", @data_live_search = "true" })
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Class</label>
+                                @Html.DropDownListFor(m => m.classId, new Satluj_Latest.Data.DropdownData().GetFreeClasses(Model.schoolId), "--Choose--", new { @class = "form-control slct-teacherclass-dropdwn", @data_live_search = "true" })
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Division</label>
+                                <select class="form-control slct-free-div-dropdown" disabled></select>
+                                <span id="division-required-teacher-add" style="display:none;"></span>
+                            </div>
+                        </div>
+                    </div>*@
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                @* <button type="submit" style="display:none;" id="btn-addteacher" class="btn pay-now-btn">Add Teacher</button> *@
+                <button type="button" id="btn-dummy-addteacher" class="btn pay-now-btn">Save</button>
+            </div>
+        </div>
+        </form>
+    }
+</div>
+
+
+
+<script>
+    $('.dropdown_btn').click(function () {
+        $(this).siblings().toggle();
+    });
+        $('#btn-dummy-addteacher').click(function () {
+
+        var selectedRoles = [];
+
+        $('.chk-roles-cls:checked').each(function () {
+            selectedRoles.push($(this).val());
+        });
+
+        $('#RolesData').val(selectedRoles.join(','));
+
+        var formData = $('#form-teacher-add').serialize();
+
+        $.ajax({
+            url: '/School/AddTeacher',
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+
+                if (response.status) {
+
+                    toastr.success(response.msg, "Success");
+
+                    $('#myModal').modal('hide');
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1200);
+                }
+                else {
+                    toastr.error(response.msg, "Error");
+                }
+            },
+            error: function () {
+                toastr.error("Something went wrong", "Error");
+            }
+        });
+
+    });
+        $('.slct-teacherclass-dropdwn').change(function () {
+
+        var classId = $(this).val();
+
+        if (classId != "") {
+
+            $.ajax({
+                url: '/School/GetFreeDivision',
+                type: 'GET',
+                data: { classId: classId },
+                success: function (data) {
+
+                    var divisionDropdown = $('.slct-free-div-dropdown');
+                    divisionDropdown.empty();
+
+                    divisionDropdown.append('<option value="">--Choose--</option>');
+
+                    $.each(data, function (i, item) {
+                        divisionDropdown.append(
+                            $('<option>', {
+                                value: item.value,
+                                text: item.text
+                            })
+                        );
+                    });
+
+                    divisionDropdown.prop('disabled', false);
+                }
+            });
+        }
+    });
+
+
+</script>

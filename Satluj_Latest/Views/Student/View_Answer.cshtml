@@ -1,0 +1,70 @@
+﻿@model Satluj_Latest.Models.AssementUpload
+@{
+
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+
+    <table class="table table-bordered table-responsive table-hover">
+
+     
+        <tr>
+
+            <th>
+                StudentName
+            </th>
+
+            <th>
+               Description
+            </th>
+
+            <th>
+                UploadedDate
+            </th>
+
+
+            <th>
+                filename
+            </th>
+
+
+            <th>
+                Actions
+            </th>
+
+
+        </tr>
+
+
+            @foreach (var student in Model.Data)
+            {
+    <tr class="ng-click-studentDiscount-details">
+        <td>
+            @student.StudentName
+        </td>
+
+        <td>
+            @student.Description
+        </td>
+
+        <td>
+            @Convert.ToDateTime(student.File_Uploaded_Date).ToString("dddd, dd MMMM yyyy")
+        </td>
+
+        <td>
+            @student.FileName <span style="margin-right:5px;"></span> :
+        </td>
+
+        <td>
+            @Html.ActionLink("View", "DownloadFiles", "Student", new { Filename = @student.FileName }, null)
+            @*@Html.ActionLink("Edit", "Update_AssessmentFile", "Student", new { id = @student.FileId }, null)
+            @Html.ActionLink("Delete", "Delete_Assignments", "Student", new { id = @student.FileId }, new { onclick = "return confirm('Are sure wants to delete?');" })*@
+        </td>
+
+
+
+    </tr>
+            }
+
+
+    </table>

@@ -1,0 +1,9 @@
+﻿
+@model Satluj_Latest.Models.ReceiptPaymentModel
+@{
+    var cashInHand = new Satluj_Latest.Data.School(Model.SchoolId).GetCashBookStatus(Model.StartDate, Model.EndDate);
+}
+<div class="row">
+    <h5 style="text-align:left;  margin-left: 5%; font-weight:bold;">Cash in hand</h5>
+    <h5 style="text-align:left;  margin-left: 5%;">@cashInHand[0].ClosingBalance</h5>
+</div>

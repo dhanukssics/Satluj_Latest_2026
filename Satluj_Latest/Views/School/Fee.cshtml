@@ -1,0 +1,135 @@
+﻿@model Satluj_Latest.Models.AddClassFees
+
+@{
+    ViewData["Title"] = "Fee";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<style>
+    span {
+        color: red;
+    }
+</style>
+
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-sm-12">
+            <h3>Fee</h3>
+
+            <div class="form-group text-right">
+                <button type="button" class="btn pay-now-btn btn-add-fee">Add Fee</button>
+            </div>
+
+            <form id="form-feeclass">
+                <input type="hidden" id="DataList" name="DataList" />
+                <input type="hidden" name="SchoolId" value="@Model.SchoolId" />
+
+                <div class="center-block-sm">
+                    <div class="form-group">
+                        <label>Fee Name</label>
+
+                        @Html.DropDownListFor(
+                        m => m.FeeId,
+                                                ViewBag.CommonFees as List<SelectListItem>,
+                                                "--Choose--",
+                                                new { @class = "form-control slct-fee-dropdwn" }
+                                                )
+                        @Html.ValidationMessageFor(m => m.FeeId)
+                    </div>
+
+                    @{
+                        var obj = new Satluj_Latest.Models.ViewFeeClass
+                        {
+                            SchoolId = Model.SchoolId,
+                            FeeId = 0
+                        };
+                    }
+
+                    <div id="div-load-class">
+                        @await Html.PartialAsync("~/Views/School/_pv_ViewFeeClass.cshtml", obj)
+                    </div>
+
+                    <div class="form-group text-center">
+                        <button type="submit" id="btn-submit-feeclass" style="display:none" class="btn pay-now-btn">
+                            Add Fee
+                        </button>
+
+                        <button type="button" class="btn pay-now-btn" disabled id="btn-dummysubmit-feeclass">
+                            Add Fee Amount
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalFeeAdd" tabindex="-1" role="dialog"></div>
+<script>
+    $(document).on('submit', '#form-feeclass', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '/School/AddFeeClass',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: AddFeeClassSuccess,
+            error: ajaxFailure
+        });
+    });
+
+    $(document).on('click', '.btn-add-fee', function () {
+        $.get('/School/AddFeePartialView', function (data) {
+            $('#modalFeeAdd').html(data);
+            $.validator.unobtrusive.parse('#modalFeeAdd');
+            $('#modalFeeAdd').modal('show');
+        });
+    });
+
+    $(document).on('change', '.slct-fee-dropdwn', function () {
+        RefreshFeeclassView();
+        $('#btn-dummysubmit-feeclass').prop('disabled', true);
+    });
+
+    function RefreshFeeclassView() {
+        $.get('/School/ViewFeeClass/' + $('.slct-fee-dropdwn').val(), function (data) {
+            $('#div-load-class').html(data);
+        });
+    }
+
+    $(document).on('click', '#btn-dummysubmit-feeclass', function () {
+        var list = [];
+
+        $('.feeclass-div').each(function () {
+            var amount = $(this).find('.loop-class-amount').val();
+            if (amount) {
+                list.push({
+                    classId: $(this).data('classid'),
+                    amount: amount
+                });
+            }
+        });
+
+        $('#DataList').val(JSON.stringify(list));
+        $('#btn-submit-feeclass').click();
+    });
+
+    $(document).on('keyup', '.loop-class-amount', function () {
+        let enabled = false;
+
+        $('.loop-class-amount').each(function () {
+            if ($(this).val()) enabled = true;
+        });
+
+        $('#btn-dummysubmit-feeclass').prop('disabled', !enabled);
+    });
+
+    function AddFeeClassSuccess(result) {
+        if (result.status) {
+            toastrSuccess(result.msg);
+            setTimeout(RefreshFeeclassView, 250);
+        } else {
+            toastrError(result.msg);
+        }
+    }
+</script>

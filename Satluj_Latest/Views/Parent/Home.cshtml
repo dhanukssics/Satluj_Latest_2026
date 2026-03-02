@@ -1,0 +1,178 @@
+﻿@model Satluj_Latest.Models.ParentRegisterModel
+
+@{
+    Layout = "~/Views/Shared/_ParentLayout.cshtml";
+
+    var children = new Satluj_Latest.Data.Parent(Model.parentId).GetChildren();
+}
+<section class="login-body parentLogin">
+    <div class="parentbottom">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-md-12">
+                    <div class="login">
+                        <div class="parent-home fullWid">
+                            <div class="row">
+                                @foreach (var child in children)
+                                {
+                                    var diary = child.School.GetSchoolDiaryLink();
+                                    <div class="form-group col-sm-6">
+                                        <div class="bord-lne" style="border:1px solid rgba(0,0,0,0.2); padding:12px; background:rgba(0,0,0,0.2); text-align:center;">
+                                            <p><i class="fa fa-graduation-cap" aria-hidden="true"></i> @child.StundentName</p>
+                                            <ul class="listhome" style="margin-bottom: 10px; margin:auto;">
+                                                <li><a class="prtvbtn" data-childId="@child.StudentId" data-admission="@child.StudentSpecialId" href="/Parent/Attendance/@child.StudentId"><span><i class="fa fa-user-times" aria-hidden="true"></i></span> Attendence</a></li>
+                                                <li><a id="btn-payment" class="prtvbtn" data-childId="@child.StudentId" data-admission="@child.StudentSpecialId"><span><i class="fa fa-credit-card" aria-hidden="true"></i></span>  Payments</a></li>
+                                                <li><a id="btn-progressCard" class="prtvbtn" data-childId="@child.StudentId" data-admission="@child.StudentSpecialId"><span><i class="fa fa-line-chart" aria-hidden="true"></i></span>  Progress Card</a></li>
+                                                @if (diary != null)
+                                                {
+                                                    <li><a class="prtvbtn" data-childId="@child.StudentId" data-admission="@child.StudentSpecialId" href="..@child.School.GetSchoolDiaryLink().FilePath" target="_blank"><span><i class="fa fa-book" aria-hidden="true"></i></span>  View Diary</a></li>
+                                                }
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                }
+                                @if (children.Count <= 0)
+                                {
+                                    <div style="background:rgba(0,0,0,0.5); padding:20px; text-align:center; color:red;"><h1>No Student</h1></div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fullWid" style="margin-top:-90px">
+                        <a id="btn-addChild" class="addStdnts" style="margin-right:20px;"><img src="~/Content/img/add.png"> ADD YOUR CHILD</a>
+                        <a id="btn-payChild" class="addStdnts" href="/Parent/ChildAcademyPayment" style="margin-right:20px;"> CHILD ACADEMY</a>
+                        <a id="btn-payChild" class="addStdnts" href="/Parent/CoursesOffered"> COURSES OFFERED</a>
+                    </div>
+                </div><!-- /col-md-4 -->
+            </div><!-- /row -->
+        </div><!-- /container -->
+    </div>
+</section>
+
+<div class="modal fade" id="enterSmsOtpModel" style="z-index: 1055;">
+
+</div>
+
+<div class="modal fade" id="addChild">
+</div>
+
+
+<script>
+
+    $(document).on('click', '#btn-addChild', function () {
+        $('#addChild').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+
+        $.ajax({
+            url: '/Parent/AddChildView/',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#addChild').html('');
+                $('#addChild').html(data);
+                $('#addChild').modal('show');
+            }
+        });
+
+    });
+
+    $(document).on('click', '#btn-payment', function () {
+        var studentId = $(this).attr("data-childId");
+        var admission = $(this).attr("data-admission");
+        window.location.href = '/Parent/BillingDetails/' + studentId + '~' + admission;
+    });
+
+    (function ($) {
+        $.fn.delayKeyup = function (callback, ms) {
+            var timer = 0;
+            $(this).keyup(function () {
+                clearTimeout(timer);
+                timer = setTimeout(callback, ms);
+            });
+            return $(this);
+        };
+    })(jQuery);
+
+    $('#admission').delayKeyup(function () {
+        var searchText = $('#admission').val();
+        var schoolId = $('#classId').val();
+
+        if (searchText.length > 2) {
+
+            $.ajax({
+                url: '/Parent/SearchAdmission/' + searchText + '~' + schoolId,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+
+                    $('#std-detail-3').html(data);
+                }
+            });
+        }
+        else {
+            $('#search-suggestion-no-result').hide();
+        }
+    }, 500);
+
+    $(document).on('click', '#proceed-detail', function () {
+        $(this).addClass('isHidden');
+
+        $('#enterSmsOtpModel').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        var studentId = $(this).attr('data-studentId');
+
+        $.ajax({
+            url: '/Parent/OtpModelView/' + studentId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#enterSmsOtpModel').html(data);
+                $.validator.unobtrusive.parse($("#enterSmsOtpModel"));
+                $('#enterSmsOtpModel').modal('show');
+
+            }
+        });
+    });
+
+    $(document).on('click', '#proceed-otp', function () {
+        var studentId = $(this).attr('data-studentId');
+        var otp = $("#OTP-value").val();
+
+        if (otp != "") {
+            $.ajax({
+                url: '/Parent/OtpSubmit/' + studentId + '~' + otp,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status) {
+
+                        toastrSuccess(data.msg);
+                        $('#addChild').modal('hide');
+                        $('#enterSmsOtpModel').modal('hide');
+
+                        window.location.reload();
+                    }
+                    else {
+                        toastrError(data.msg);
+                    }
+
+                }
+            });
+        }
+        else {
+            toastrWarning("Please enter OTP");
+        }
+    });
+
+    $(document).on('click', '#btn-progressCard', function () {
+        var studentId = $(this).attr("data-childId");
+        window.location.href = '/Parent/ProgressCard/' + studentId;
+    });
+
+</script>

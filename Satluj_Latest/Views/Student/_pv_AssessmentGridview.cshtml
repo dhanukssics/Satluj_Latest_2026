@@ -1,0 +1,59 @@
+﻿@Model Satluj_Latest.Models.AssementUpload
+
+<thead>
+    <tr>
+        <th>
+            Date
+        </th>
+
+
+        <th>
+            StudentName
+        </th>
+
+        <th>
+            Classname
+        </th>
+
+        <th>
+            FileName
+        </th>
+
+    </tr>
+</thead>
+<tbody>
+    @{
+
+
+        int i = 1;
+        foreach (var data in new Satluj_Latest.Data.Admin().GetAssessmentMonthlyandYear(Model.classId, Model.month, Model.year))
+        {
+
+        <tr>
+            <td>
+                @Convert.ToDateTime(data.AttendanceDate).ToString("dddd, dd MMMM yyyy")
+            </td>
+
+            <td>
+                @data.StudentName
+            </td>
+
+            <td>
+                @data.Class
+            </td>
+
+            <td>
+                @data.Filename &nbsp;&nbsp;&nbsp;
+
+                @Html.ActionLink("View", "DownloadFiles", "Student", new { Filename = @data.Filename }, null)
+            </td>
+
+
+
+
+        </tr>
+            i = i + 1;
+
+        }
+    }
+</tbody>

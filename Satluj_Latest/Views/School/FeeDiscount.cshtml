@@ -1,0 +1,295 @@
+﻿    @model Satluj_Latest.Models.SchoolModel
+@{
+    ViewBag.Title = "FeeDiscount";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+    var discounts = new Satluj_Latest.Data.School(Model.schoolId).GetStudentDiscountList().OrderBy(z => z.Student.StundentName).ToList();
+}
+
+
+<style>
+    .ng-click-studentDiscount-details {
+        cursor: pointer;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Fee Discount</h3>
+        <div class="row">
+            <div class="form-group col-sm-4 ">
+                <label>Class</label>
+                <select asp-for="classId"
+                        asp-items="ViewBag.Classlist"
+                        class="form-control class-drop-down"
+                        data-live-search="true">
+                    <option value="">--Choose--</option>
+                </select>
+
+            </div>
+            <div class="form-group col-sm-4 ">
+                <label>Division</label>
+                <select id="division-drop-down" class="form-control" disabled>
+                    <option value="">-- Please select division --</option>
+                </select>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group text-right" style="margin-top: 24px;">
+                    @*<button class="btn pay-now-btn" data-toggle="modal" data-target="#modalStudent"><i class="fa fa-plus"></i> Add Student</button>*@
+                    <button class="btn pay-now-btn" data-toggle="modal" id="addDiscount"><i class="fa fa-plus"></i> Add Discount</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="pv-table">
+            <div class="table-responsive">
+                <table class="table custome-table table-student-list">
+                    <thead>
+                        <tr>
+                            <th>
+
+                            </th>
+                            <th>
+                                Name
+                            </th>
+                            @*<th>
+                                    Parent Name
+                                </th>
+                                <th>
+                                    Address
+                                </th>
+                                <th>
+                                    Contact No.
+                                </th>*@
+
+                            <th>
+                                Class/Division
+                            </th>
+                            <th>
+                                Fee Name
+                            </th>
+                            <th>
+                                Discounted Amount
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var discount in discounts)
+                        {
+
+                            <tr data-studentid="@discount.StudentId">
+                                @if (discount.Student.FilePath != null)
+                                {
+                                    <td class="ng-click-studentDiscount-details">
+                                        <img src="@discount.Student.FilePath" class="user-pic-tab" />
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="ng-click-studentDiscount-details">
+                                        <img src="~/Content/img/children-1.gif" class="user-pic-tab" />
+                                    </td>
+                                }
+                                <td class="ng-click-studentDiscount-details">
+                                    @discount.Student.StundentName
+                                </td>
+
+                                <td class="ng-click-studentDiscount-details">
+                                    @discount.Student.Class / @discount.Student.Division
+                                </td>
+                                <td class="ng-click-studentDiscount-details">
+                                    @discount.Fee
+                                </td>
+                                <td class="ng-click-studentDiscount-details">
+                                    @String.Format("{0:0.00}", discount.DiscountAmount)
+
+                                </td>
+                                <td data-studentname="@discount.Student.StundentName" data-amount="@discount.DiscountAmount" data-feename="@discount.Fee">
+                                    <button class="delete-fee-tr btn btn-peek" data-id="@discount.StudentId" data-feeid="@discount.FeeId"><i class="fa fa-trash "></i></button>
+                                    <button class="edit-fee-tr btn pay-now-btn" data-id="@discount.StudentId" data-feeid="@discount.FeeId"><i class="fa fa-edit "></i></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div><!-- end of col md 12 -->
+</div>
+
+<div class="modal fade" id="editStudentDiscountModel">
+</div>
+
+<div class="modal fade" id="ValidationStudentDivision">
+    <div class="modal-dialog" role="document" style="background-color: #fff;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#f72222;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Oops!</h4>
+            </div>
+        </div>
+   
+            <div class="modal-body">
+                <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>Please Select A Division</p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+
+    </div>
+</div>
+<script>
+
+    //$(document).on('click', '.ng-click-studentDiscount-details', function () {
+
+    //    window.location.href = "/School/DiscountDetails/" + $(this).parent().attr('data-studentid');
+
+    //});
+    $(function () {
+        $(".table-student-list").dataTable();
+    })
+    $(document).on('change', '.class-drop-down', function () {
+        var id = $(this).val();
+        if (id != '') {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + id,
+                type: "GET",
+                success: function (result) {
+                    if (result.list.length > 0) {
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $("#division-drop-down").prop("disabled", false);
+                    }
+                    else {
+                        // resetDropDown('Class');
+                        $("#division-drop-down").html(""); // clear before appending new list
+                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").prop("disabled", true);
+                    }
+                }
+            });
+        }
+        else {
+            //  resetDropDown('Class');
+        }
+    });
+    $(document).on('change', '#division-drop-down', function () {
+        var id = $(this).val();
+        if (id != '' || id != 0) {
+            // resetDropDown('Class');
+            $.ajax({
+                url: '/School/GetDiscountSyudentsByDivGrid/' + id,
+                dataType: 'html',
+                success: function (data) {
+                    $('#pv-table').html('');
+                    $('#pv-table').html(data);
+                    $(".table-student-list").dataTable();
+                },
+            });
+        }
+        else {
+            //   resetDropDown('Class');
+        }
+    });
+    $(document).on('click', '#addDiscount', function () {
+        var id = $('#division-drop-down').val();
+        if (id != '') {
+            window.location.href = "/School/AssignDiscount?id=" + id;
+        }
+        else {
+            $('#ValidationStudentDivision').modal('show');
+
+        }
+    });
+    $(document).on('click', '.delete-fee-tr', function () {
+        var feeId = $(this).attr('data-feeId');
+        var studentId = $(this).attr('data-id');
+        var source = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this !",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+function (isConfirm) {
+    if (isConfirm) {
+
+        $.ajax({
+            url: '/School/DeleteDiscount/' + studentId + "~" + feeId,
+            type: "GET",
+            dataType: 'json',
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+                    RefreshFeeDiscountGrid();
+                }
+                else {
+                    toastrError(result.msg);
+                }
+            }
+        });
+
+        //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+    }
+    //else {
+    //    swal("Cancelled", "Your imaginary file is safe :)", "error");
+    //}
+});
+
+
+
+
+    });
+    $(document).on('click', '.edit-fee-tr', function () {
+        var studentId = $(this).attr('data-id');
+        var feeId = $(this).attr('data-feeId');
+        $.ajax({
+            url: '/School/EditFeeDiscountStudView/' + studentId + "~" + feeId,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#editStudentDiscountModel').html(data);
+                $('#editStudentDiscountModel').modal('show');
+            }
+        });
+    });
+    function RefreshFeeDiscountGrid() {
+
+        $.ajax({
+            url: '/School/RefreshFeeDiscountGrid',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#pv-table').html(data);
+                $(".table-student-list").dataTable();
+            }
+        });
+    }
+    function EditFeeDiscountSuccess(result) {
+        if (result.status) {
+            //console.log(result.list)
+            toastrSuccess(result.msg);
+            $('#editStudentDiscountModel').modal('hide');
+            RefreshFeeDiscountGrid();
+        }
+        else {
+            $('#editStudentDiscountModel').modal('hide');
+            toastrError(result.msg);
+        }
+    }
+</script>

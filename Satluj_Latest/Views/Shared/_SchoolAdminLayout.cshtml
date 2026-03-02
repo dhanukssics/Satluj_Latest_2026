@@ -1,0 +1,874 @@
+﻿@using Microsoft.AspNetCore.Http
+@using Newtonsoft.Json
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+@*<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>*@
+
+<script src="~/Content/Plugins/Autocomplete/jquery.easy-autocomplete.min.js"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    @*<meta name="viewport" content="width=device-width, initial-scale=1.0">*@  @*SOORAJ CHETTEN 11/07/2019*@
+    @*<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">*@
+
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>SchoolMan | Online School Management Systems </title>
+    <!--Meta-->
+    <meta name="description" content="SchoolMan is a complete management application for school administration, teachers and parents, it provides a web as well as mobile application which can be downloaded from Google Play store. The mobile application will be customized to the particular school with school name. SchoolMan handles all your school activities by integrating the functionalities of school administration, teachers and communication with parents. It is also associated with a real time GPS tracking system for school bus which ensures safety and timely transit of students.">
+    <meta name="keywords" content="Schoolman, class management software, school management software, class software, School software, web based school management system, online school management systems, school management software, school management system, Online School Tutorial, Online school payment, school fee payment, timetable, schedule, timetable software, school scheduling">
+    <meta name="author" content="SchoolMan">
+    <!--Meta-->
+    <!-- Bootstrap -->
+    <link href="~/Content/css/bootstrap.css" rel="stylesheet" />
+    <!-- Custom style -->
+    <link href="~/Content/css/styles.css" rel="stylesheet" />
+    <link href="/Content/css/accountStyles.css" rel="stylesheet" />
+
+    <link href="~/Content/Plugins/Datepicker/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <!-- Google font Droid sans-->
+    <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
+    <!-- Font awesome icons css -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+
+
+    <link href="~/Content/fonts/schoolman/style.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/toastr/toastr.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/toastr/toastr.min.css" rel="stylesheet" />
+
+    <link href="~/Content/Plugins/Autocomplete/easy-autocomplete.min.css" rel="stylesheet" />
+    <link href="~/Content/Plugins/Autocomplete/easy-autocomplete.themes.min.css" rel="stylesheet" />
+
+
+    <script src="~/Content/Plugins/toastr/toastr.min.js"></script>
+    <script src="~/Content/Plugins/toastr/toastrConfig.js"></script>
+    <link href="~/Content/plugins/Datepicker/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <script src="~/Content/plugins/Datepicker/bootstrap-datepicker.min.js"></script>
+    @*<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">*@
+    @*<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">*@
+
+    <!-- DataTables CSS -->
+    <!--<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css"> -->
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+    <!-- Favicon -->
+    <link href="~/Content/img/favicon.png" rel="shortcut icon" />
+
+
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link href="/Content/Plugins/SweetAlert/sweetalert.css" rel="stylesheet" />
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script src="/Content/Plugins/SweetAlert/sweetalert.min.js"></script>
+    <script src="~/Scripts/Chart.min.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-133342861-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-133342861-1');
+    </script>
+
+</head>
+<body>
+
+    <style type="text/css">
+        li.sub-menu li {
+            font-size: 13px;
+        }
+    </style>
+    <div class="se-pre-con"></div>
+    <div class="main-section">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="header-main">
+
+                    </div><!-- end of header main -->
+                </div>
+            </div><!-- end of row -->
+            @{
+                var action = ViewContext.RouteData.Values["action"]?.ToString().ToLower();
+                var controller = ViewContext.RouteData.Values["controller"]?.ToString().ToLower();
+
+                int userType = Context.Session.GetInt32("UserType") ?? 0;
+
+                int teacherType = (int)UserRole.Teacher;
+                int schoolType = (int)UserRole.School;
+                int staffType = (int)UserRole.Staff;
+                int masterType = (int)UserRole.Master;
+
+                TbLogin user = null;
+                var userJson = Context.Session.GetString("User");
+
+                if (!string.IsNullOrEmpty(userJson))
+                {
+                    user = JsonConvert.DeserializeObject<TbLogin>(userJson);
+                }
+
+               
+            }
+
+            <div class="">
+
+                @{
+                    var userData = new Satluj_Latest.Data.Login(user);
+                    //var allotedMenu = userData.GetUserMenuList();
+                    var logo = userData.School.FilePath;
+
+                    var admin = 0;
+                    bool IsAdmin = ViewBag.IsAdmin ?? false;
+                    if (IsAdmin == true)
+                    {
+                        admin = 1;
+                    }
+                }
+                <div class="body-container">
+                    @if (userData.RoleId == 1 || userData.RoleId == 5 || admin == 1)//School and Master
+                    {
+                        <input type="checkbox" id="menu-toggle" />
+                        <label for="menu-toggle" class="menu-icon"><i class="fa fa-bars"></i></label>
+                        <div class="sidemenu-box">
+                            <div class="sidebar-menu">
+                                <div class="logo">
+                                    <img class="img-responsive" src="/Content/img/logo.png" alt="Peekabu" style="padding: 19px;" />
+                                </div><!-- end of logo -->
+                                <div class="side-menu">
+                                    <label class="mobile-label">Menu</label>
+                                    <ul class="responsive-menu">
+                                        @******************************************************************@
+                                        <a href="/School/Home">
+                                        <li class="@(((controller == "school" && action == "home")) ? "active" : "")"><i class="icon-home"></i> HOME</li></a>
+
+                                        <li class="sub-menu @(((controller == "school" && action == "class") || (controller == "school" && action == "teacherlist")|| (controller == "school" && action == "stafflist") || (controller == "teacher" && action == "designation")|| (controller == "teacher" && action == "departments") || (controller == "teacher" && action == "roledetails") || (controller == "teacher" && action == "region")) ? " open" : "")">
+                                            <span><i class="icon-user-config"></i>  MANAGEMENT</span>
+                                            <ul>
+                                                <a href="/School/Class">
+                                                <li class="@(((controller == "school" && action == "class")) ? "active" : "")"><i class="fa fa-pencil-square"></i> CLASS & DIVISION</li></a>
+                                                <a href="/Progress/Region">
+                                                <li class="isHiddenFromMobile @(((controller == "progress" && action == "region")) ? "active" : "")"><i class="fa fa-registered"></i> REGION</li></a>
+                                                <a href="/School/TeacherList">
+                                                <li class="@(((controller == "school" && action == "teacherlist")) ? "active" : "")"><i class="fa fa-user-circle"></i>   TEACHER </li></a>
+                                                <a href="/School/StaffList">
+                                                <li class="@(((controller == "school" && action == "stafflist")) ? "active" : "")"><i class="fa fa-user-circle"></i>  STAFF</li></a>
+                                                <a href="/Teacher/Designation">
+                                                <li class="isHiddenFromMobile @(((controller == "teacher" && action == "designation")) ? "active" : "")"><i class="fa fa-handshake-o"></i>  DESIGNATION</li></a>
+                                                <a href="/Teacher/Departments">
+                                                <li class="isHiddenFromMobile @(((controller == "teacher" && action == "departments")) ? "active" : "")"><i class="fa fa-superpowers"></i>  DEPARTMENTS</li></a>
+                                                <a href="/Teacher/RoleDetails">
+                                                <li class="isHiddenFromMobile @(((controller == "teacher" && action == "roledetails")) ? "active" : "")"><i class="fa fa-ravelry"></i>  ROLE</li></a>
+                                                <a href="/School/SchoolSettingsHome">
+                                                <li class="isHiddenFromMobile @(((controller == "school" && action == "schoolsettingshome")) ? "active" : "")"><i class="fa fa-wrench"></i> SETTINGS</li></a>
+                                            </ul>
+                                        </li>
+                                        <li class="sub-menu @(((controller == "school" && action == "fee") || (controller == "school" && action == "feelist") || (controller == "school" && action == "feediscount")) ? " open" : "")">
+                                            <span><i class="fa fa-rupee"></i>  Fees</span>
+                                            <ul>
+                                                <a href="/School/Fee">
+                                                <li class="@(((controller == "school" && action == "fee")) ? "active" : "")"><i class="icon-currency"></i> Add Fee</li></a>
+                                                <a href="/School/FeeList">
+                                                <li class="@(((controller == "school" && action == "feelist")) ? "active" : "")"><i class="icon-list"></i> Fee List</li></a>
+                                                <a href="/School/FeeDiscount">
+                                                <li class="@(((controller == "school" && action == "feediscount")) ? "active" : "")"><i class="icon-discount"></i> Fee Discount</li></a>
+                                            </ul>
+                                        </li>
+
+                                        <li class="sub-menu @(((controller == "school" && action == "student") || (controller == "report" && action == "studentlist")|| (controller == "teacher" && action == "attendance")|| (controller == "teacher" && action == "periods")|| (controller == "school" && action == "summaryhome")) ? " open" : "")">
+                                            <span><i class="icon-student"></i>  ACADEMICS </span>
+                                            <ul>
+                                                <a href="/School/Student">
+                                                <li class="@(((controller == "school" && action == "student")) ? "active" : "")"><i class="fa fa-male"></i>  STUDENTS </li></a>
+                                                <a href="/Report/StudentList">
+                                                <li class="@(((controller == "report" && action == "studentlist") ) ? "active" : "")"><i class="fa fa-search"></i> FIND STUDENTS </li></a>
+                                                <a href="/Teacher/Attendance">
+                                                <li class="@(((controller == "teacher" && action == "attendance")) ? "active" : "")"><i class="fa fa-star-half-o"></i> ATTENDANCE  </li></a>
+                                                <a href="/Teacher/Periods">
+                                                <li class="isHiddenFromMobile @(((controller == "teacher" && action == "periods")) ? "active" : "")"><i class="fa fa-life-bouy"></i> PERIODS  </li></a>
+                                                <a href="/School/SummaryHome">
+                                                <li class="@(((controller == "school" && action == "summaryhome")) ? "active" : "")"><i class="fa fa-file-archive-o"></i> SUMMARY  </li></a>
+                                            </ul>
+                                        </li>
+
+                                        @*.....................Pramotion....................*@
+
+
+                                        <li class="sub-menu @(((controller == "promotion" && action == "promoteclassHome")) || (controller == "promotion" && action == "promotestudents") ? " open" : "")">
+                                            <span><i class="icon-student"></i>  PROMOTION </span>
+                                            <ul>
+                                                <a href="/promotion/PromoteClassHome">
+                                                <li class="@(((controller == "promotion" && action == "promoteclassHome")) ? "active" : "")"><i class="fa fa-male"></i>  Class </li></a>
+                                                <a href="/promotion/PromoteStudents">
+                                                <li class="@(((controller == "promotion" && action == "promotestudents") ) ? "active" : "")"><i class="fa fa-search"></i> Students </li></a>
+                                            </ul>
+                                        </li>
+
+
+                                        @*..................................................*@
+
+                                        <li class="sub-menu @(((controller == "student" && action == "subjects") || (controller == "student" && action == "timetable")|| (controller == "progress" && action == "optionalsubjects") || (controller == "progress" && action == "optionalsubjectslist")) ? " open" : "")">
+                                            <span><i class="icon-school"></i>  CURRICULUM     </span>
+                                            <ul>
+                                                <a href="/Student/Subjects">
+                                                <li class="isHiddenFromMobile @(((controller == "student" && action == "subjects")) ? "active" : "")"><i class="fa fa-hourglass-2"></i>  SUBJECTS</li></a>
+                                                <a href="/Student/TimeTable">
+                                                <li class="@(((controller == "student" && action == "timetable")) ? "active" : "")"><i class="fa fa-clock-o"></i> TIME TABLE</li></a>
+                                                <a href="/Progress/OptionalSubjects">
+                                                <li class="@(((controller == "progress" && action == "optionalsubjects")) ? "active" : "")"><i class="fa fa-circle-o-notch"></i>ASSIGN  SUBJECTS</li></a>
+                                                <a href="/Progress/OptionalSubjectsList">
+                                                <li class="@(((controller == "progress" && action == "optionalsubjectslist")) ? "active" : "")"><i class="fa fa-chain"></i>  SUBJECTS & STUDENTS</li></a>
+                                                <a href="/Student/Upload_Assignmentsadm">
+                                                <li class="@(((controller == "student" && action == "upload_assignments")) ? "active" : "")"><i class="fa fa-hourglass-2"></i>  ASSIGN ASSIGNMENTS</li></a>
+
+
+                                            </ul>
+                                        </li>
+
+                                        <li class="sub-menu isHiddenFromMobile @(((controller == "progress" && action == "certificatename") || (controller == "progress" && action == "scholasticarea")|| (controller == "progress" && action == "coscholasticsrea") || (controller == "progress" && action == "examdeclaration")|| (controller == "progress" && action == "remarkhome")) ? " open" : "")">
+                                            <span><i class="icon-blackboard"></i>  EXAM  </span>
+                                            <ul>
+                                                <a href="/Progress/CertificateName">
+                                                <li class="@(((controller == "progress" && action == "certificatename")) ? "active" : "")"><i class="fa fa-bookmark-o"></i>  CERTIFICATE NAME  </li></a>
+                                                <a href="/Progress/ScholasticArea">
+                                                <li class="@(((controller == "progress" && action == "scholasticarea")) ? "active" : "")"><i class="fa fa-cubes"></i> SCHOLASTIC AREA </li></a>
+                                                <a href="/Progress/CoScholasticArea">
+                                                <li class="@(((controller == "progress" && action == "coscholasticsrea")) ? "active" : "")"><i class="fa fa-cube"></i>CO-SCHOLASTIC AREA </li></a>
+                                                <a href="/Progress/ExamDeclaration">
+                                                <li class="@(((controller == "progress" && action == "examdeclaration")) ? "active" : "")"><i class="fa fa-clone"></i> DECLARE EXAM </li></a>
+                                                <a href="/Progress/RemarkHome">
+                                                <li class="@(((controller == "progress" && action == "remarkhome")) ? "active" : "")"><i class="fa fa-tags"></i> REMARKS </li></a>
+                                            </ul>
+                                        </li>
+
+                                        <li class="sub-menu @(((controller == "progress" && action == "scholasticarearesult") || (controller == "progress" && action == "coscholasticarearesult") || (controller == "progress" && action == "examresult") || (controller == "progress" && action == "studentremark")|| (controller == "teacher" && action == "health") || (controller == "progress" && action == "generatecertificate")) ? " open" : "")">
+                                            <span><i class="icon-list"></i>    RESULT </span>
+                                            <ul>
+                                                <a href="/Progress/ScholasticAreaResult">
+                                                <li class="@(((controller == "progress" && action == "scholasticarearesult")) ? "active" : "")"><i class="fa fa-sticky-note-o"></i> SCHOLASTIC RESULT  </li></a>
+                                                <a href="/Progress/CoScholasticAreaResult">
+                                                <li class="@(((controller == "progress" && action == "coscholasticarearesult")) ? "active" : "")"><i class="fa fa-lightbulb-o"></i>CO-SCHOLASTIC RESULT</li></a>
+                                                <a href="/Progress/StudentRemark">
+                                                <li class="@(((controller == "progress" && action == "studentremark")) ? "active" : "")"><i class="fa fa-info-circle"></i>  REMARK</li></a>
+                                                <a href="/Progress/ExamResult">
+                                                <li class="@(((controller == "progress" && action == "examresult")) ? "active" : "")"><i class="fa fa-dashboard"></i> EXAM RESULTS   </li></a>
+                                                <a href="/Teacher/Health">
+                                                <li class="@(((controller == "teacher" && action == "health")) ? "active" : "")"><i class="fa fa-heartbeat"></i> HEALTH  </li></a>
+                                                <a href="/Progress/GenerateCertificate">
+                                                <li class="@(((controller == "progress" && action == "generatecertificate")) ? "active" : "")"><i class="fa fa-line-chart"></i> PROGRESS CARD</li></a>
+                                                <a href="/Progress/PreviousyearCertificate">
+                                                <li class="@(((controller == "progress" && action == "PreviousyearCertificate")) ? "active" : "")"><i class="fa fa-line-chart"></i>PREVIOUS YEAR PROGRESS CARD</li></a>
+
+                                            </ul>
+                                        </li>
+
+                                        <li class="sub-menu @(((controller == "performance" && action == "teacherrolemanagementedithome") ||(controller == "performance" && action == "teachersubject") || (controller == "school" && action == "curriculumdetails") || (controller == "school" && action == "studentmarks")|| (controller == "performance" && action == "performancehome")|| (controller == "performance" && action == "teacherperformancehome")) ? " open" : "")">
+                                            <span><i class="fa fa-puzzle-piece"></i>  PERFORMANCE </span>
+                                            <ul>
+                                                @*<a href="/Performance/TeacherRoleManagement"><li class="@(((controller == "performance" && action == "teacherrolemanagement")) ? "active" : "")"><i class="fa fa-plus-square-o"></i> ADD   </li></a>*@
+                                                <a href="/Performance/TeacherRoleManagementEditHome">
+                                                <li class="isHiddenFromMobile @(((controller == "performance" && action == "teacherrolemanagementedithome")) ? "active" : "")"><i class="fa fa-minus-square-o"></i>ADD / EDIT </li></a>
+                                                <a href="/Performance/TeacherSubject">
+                                                <li class="isHiddenFromMobile @(((controller == "performance" && action == "teachersubject")) ? "active" : "")"><i class="fa fa-retweet"></i>TEACHER & SUBJECT </li></a>
+                                                <a href="/School/CurriculumDetails">
+                                                <li class="@(((controller == "school" && action == "curriculumdetails")) ? "active" : "")"><i class="fa fa-percent"></i>  EXAM</li></a>
+                                                <a href="/School/StudentMarks">
+                                                <li class="@(((controller == "school" && action == "studentmarks")) ? "active" : "")"><i class="fa fa-linode"></i>  SCORE</li></a>
+                                                <a href="/Performance/PerformanceHome">
+                                                <li class="@(((controller == "performance" && action == "performancehome")) ? "active" : "")"><i class="fa fa-pie-chart"></i>  REPORT</li></a>
+                                                <a href="/Performance/TeacherPerformanceHome">
+                                                <li class="@(((controller == "performance" && action == "teacherperformancehome")) ? "active" : "")"><i class="fa fa-black-tie"></i>  TEACHER</li></a>
+                                            </ul>
+                                        </li>
+
+                                        <li class="sub-menu @(((controller == "school" && action == "circularnotification") || (controller == "school" && action == "calendarevent")) ? " open" : "")">
+                                            <span><i class="fa fa-bell"></i>  NOTIFICATIONS </span>
+                                            <ul>
+                                                <a href="/School/CalendarEvent">
+                                                <li class="@(((controller == "school" && action == "calendarevent")) ? "active" : "")"><i class="fa fa-sticky-note-o"></i> EVENTS  </li></a>
+                                                <a href="/School/CircularNotification">
+                                                <li class="@(((controller == "school" && action == "circularnotification")) ? "active" : "")"><i class="fa fa-check-circle-o"></i> CIRCULARS   </li></a>
+                                            </ul>
+                                        </li>
+
+                                        <li class="sub-menu isHiddenFromMobile @(((controller == "school" && action == "homeworksms") || (controller == "school" && action == "messages")|| (controller == "school" && action == "staffmessages") || (controller == "student" && action == "installationinstruction")|| (controller == "school" && action == "smshistory")) ? " open" : "")">
+                                            <span><i class="fa fa-comments-o"></i>  MESSAGES  </span>
+                                            <ul>
+                                                <a href="/School/Messages">
+                                                <li class="@(((controller == "school" && action == "messages")) ? "active" : "")"><i class="fa fa-comment-o"></i> STUDENT    </li></a>
+                                                <a href="/School/StaffMessages">
+                                                <li class="@(((controller == "school" && action == "staffmessages")) ? "active" : "")"><i class="fa fa-comment-o"></i>STAFF  </li></a>
+                                                <a href="/School/HomeworkSms">
+                                                <li class="@(((controller == "school" && action == "homeworksms")) ? "active" : "")"><i class="fa fa-commenting-o"></i>  HOMEWORK    </li></a>
+                                                <a href="/Student/InstallationInstruction">
+                                                <li class="@(((controller == "student" && action == "installationinstruction")) ? "active" : "")"><i class="fa fa-info-circle"></i> INSTRUCTIONS </li></a>
+                                                <a href="/School/SmsHistory">
+                                                <li class="@(((controller == "school" && action == "smshistory")) ? "active" : "")"><i class="fa fa-history"></i> HISTORY </li></a>
+                                            </ul>
+                                        </li>
+
+                                        <li class="sub-menu isHiddenFromMobile @(((controller == "school" && action == "bookcategory") || (controller == "school" && action == "librarybook")|| (controller == "school" && action == "librarybookdue")) ? " open" : "")">
+                                            <span><i class="fa fa-address-book"></i>  LIBRARY  </span>
+                                            <ul>
+                                                <a href="/School/BookCategory">
+                                                <li class="@(((controller == "school" && action == "bookcategory")) ? "active" : "")"><i class="fa fa-microchip"></i> CATEGORY  </li></a>
+                                                <a href="/School/LibraryBook">
+                                                <li class="@(((controller == "school" && action == "librarybook")) ? "active" : "")"><i class="fa fa-Book"></i> BOOKS    </li></a>
+                                                <a href="/School/LibraryBookDue">
+                                                <li class="@(((controller == "school" && action == "librarybookdue")) ? "active" : "")"><i class="fa fa-money"></i> DUES    </li></a>
+                                            </ul>
+                                        </li>
+
+                                        <li class="sub-menu isHiddenFromMobile @(((controller == "module" && action == "usertypedefinehome")||(controller == "module" && action == "usertypedataedit")||(controller == "module" && action == "usermodulelistview")) ? " open" : "")">
+                                            <span><i class="fa fa-user-secret"></i>  USER SETTINGS  </span>
+                                            <ul>
+                                                <a href="/Module/UserTypeDefineHome">
+                                                <li class="@(((controller == "module" && action == "usertypedefinehome")) ? "active" : "")"><i class="fa fa-eye"></i> ADD  </li></a>
+                                                <a href="/Module/UserTypeDataEdit">
+                                                <li class="@(((controller == "module" && action == "usertypedataedit")) ? "active" : "")"><i class="fa fa-align-center"></i> EDIT  </li></a>
+                                                <a href="/Module/UserModuleListView">
+                                                <li class="@(((controller == "module" && action == "usermodulelistview")) ? "active" : "")"><i class="fa fa-wpexplorer"></i> USER MODULES  </li></a>
+                                            </ul>
+                                        </li>
+
+                                        <li class="sub-menu @(((controller == "specialclass" && action == "assesmenthome")||(controller == "specialclass" && action == "readingskillshome")||(controller == "specialclass" && action == "noneducationalhome")||(controller == "specialclass" && action == "vprogresscardhome")) ? " open" : "")">
+                                            <span><i class="fa fa-vine"></i>CLASS V</span>
+                                            <ul>
+                                                <a href="/SpecialClass/AssesmentHome">
+                                                <li class="@(((controller == "specialclass" && action == "assesmenthome")) ? "active" : "")"><i class="fa fa-gg"></i> ASSESMENT  </li></a>
+                                                <a href="/SpecialClass/ReadingSkillsHome">
+                                                <li class="@(((controller == "specialclass" && action == "readingskillshome")) ? "active" : "")"><i class="fa fa-angle-double-left"></i> SCHOLASTIC </li></a>
+                                                <a href="/SpecialClass/NonEducationalHome">
+                                                <li class="@(((controller == "specialclass" && action == "noneducationalhome")) ? "active" : "")"><i class="fa fa-angle-double-right"></i>CO-SCHOLASTIC </li></a>
+                                                <a href="/SpecialClass/VProgressCardHome">
+                                                <li class="@(((controller == "specialclass" && action == "vprogresscardhome")) ? "active" : "")"><i class="fa fa-line-chart"></i> PROGRESS CARD  </li></a>
+                                            </ul>
+                                        </li>
+
+                                        <li id="id_sub_menu_kg" class="sub-menu @(((controller == "specialclass" && action == "AssesmentHome_Others")||(controller == "specialclass" && action == "ReadingSkillsHome_Others")||(controller == "specialclass" && action == "NonEducationalHome_Others")||(controller == "specialclass" && action == "VProgressCardHome_Others")) ? " open" : "")">
+
+                                            <span><i class="fa fa-child"></i>NURSERY/KG</span>
+                                            <ul>
+                                                <a href="/SpecialClass/AssesmentHome_Others">
+                                                <li id="Id_AssesmentHome_Others" class="@(((controller == "specialclass" && action == "AssesmentHome_Others")) ? "active" : "")"><i class="fa fa-gg"></i> ASSESMENT  </li></a>
+                                                <a href="/SpecialClass/ReadingSkillsHome_Others">
+                                                <li id="Id_ReadingSkillsHome_Others" class="@(((controller == "specialclass" && action == "ReadingSkillsHome_Others")) ? "active" : "")"><i class="fa fa-angle-double-left"></i> SCHOLASTIC </li></a>
+                                                <a href="/SpecialClass/NonEducationalHome_Others">
+                                                <li id="Id_NonEducationalHome_Others" class="@(((controller == "specialclass" && action == "NonEducationalHome_Others")) ? "active" : "")"><i class="fa fa-angle-double-right"></i>CO-SCHOLASTIC </li></a>
+                                                <a href="/SpecialClass/VProgressCardHome_Others">
+                                                <li id="Id_VProgressCardHome_Others" class="@(((controller == "specialclass" && action == "VProgressCardHome_Others")) ? "active" : "")"><i class="fa fa-line-chart"></i> PROGRESS CARD  </li></a>
+                                            </ul>
+                                        </li>
+                                        <li id="id_sub_menu_ONE_FOUR" class="sub-menu @(((controller == "specialclass" && action == "AssesmentHome_ONE_FOUR")||(controller == "specialclass" && action == "ReadingSkillsHome_ONE_FOUR")||(controller == "specialclass" && action == "NonEducationalHome_ONE_FOUR")||(controller == "specialclass" && action == "VProgressCardHome_ONE_FOUR")) ? " open" : "")">
+
+                                            <span><i class="fa fa-child"></i>I TO IV</span>
+                                            <ul>
+                                                <a href="/SpecialClass/AssesmentHome_ONE_FOUR">
+                                                <li id="Id_AssesmentHome_ONE_FOUR" class="@(((controller == "specialclass" && action == "AssesmentHome_ONE_FOUR")) ? "active" : "")"><i class="fa fa-gg"></i> ASSESMENT  </li></a>
+                                                <a href="/SpecialClass/ReadingSkillsHome_ONE_FOUR">
+                                                <li id="Id_ReadingSkillsHome_ONE_FOUR" class="@(((controller == "specialclass" && action == "ReadingSkillsHome_ONE_FOUR")) ? "active" : "")"><i class="fa fa-angle-double-left"></i> SCHOLASTIC </li></a>
+                                                <a href="/SpecialClass/NonEducationalHome_ONE_FOUR">
+                                                <li id="Id_NonEducationalHome_ONE_FOUR" class="@(((controller == "specialclass" && action == "NonEducationalHome_ONE_FOUR")) ? "active" : "")"><i class="fa fa-angle-double-right"></i>CO-SCHOLASTIC </li></a>
+                                                <a href="/SpecialClass/VProgressCardHome_ONE_FOUR">
+                                                <li id="Id_VProgressCardHome_ONE_FOUR" class="@(((controller == "specialclass" && action == "VProgressCardHome_ONE_FOUR")) ? "active" : "")"><i class="fa fa-line-chart"></i> PROGRESS CARD  </li></a>
+                                                <a href="/SpecialClass/PreviousYear_Progresscard">
+                                                <li id="Id_PreviousYear_Progresscard" class="@(((controller == "specialclass" && action == "PreviousYear_Progresscard")) ? "active" : "")"><i class="fa fa-line-chart"></i>PREVIOUS YEAR    PROGRESS CARD  </li></a>
+
+                                            </ul>
+                                        </li>
+
+
+                                        @*<li class="sub-menu @(((controller == "relation" && action == "relationhome")) ? " open" : "")">
+            <span><i class="fa fa-users"></i>RELATION</span>
+            <ul>
+                <a href="/Relation/RelationHome"><li class="@(((controller == "relation" && action == "relationhome")) ? "active" : "")"><i class="fa fa-share-alt"></i> ADD RELATION  </li></a>
+            </ul>
+        </li>*@
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        var data = new List<Satluj_Latest.Data.UserModule>();
+
+                        if (userData.RoleId == 3)//Teacher
+                        {
+                            data = new Satluj_Latest.Data.Teacher(userData.UserId, 0).GetTearhersModules();
+                        }
+                        else// Staff
+                        {
+                            data = new Satluj_Latest.Data.Staff(userData.UserId, 0).GetStaffModules();
+                        }
+                        <input type="checkbox" id="menu-toggle" />
+                        <label for="menu-toggle" class="menu-icon"><i class="fa fa-bars"></i></label>
+                        <div class="sidemenu-box">
+                            <div class="sidebar-menu">
+                                <div class="logo">
+                                    <img class="img-responsive" src="/Content/img/logo.png" alt="Peekabu" style="padding: 19px;" />
+                                </div><!-- end of logo -->
+                                <div class="side-menu">
+                                    <label class="mobile-label">Menu</label>
+                                    <ul class="responsive-menu">
+
+                                        <a href="/School/Home"><li class="@(((controller == "school" && action == "home")) ? "active" : "")"><i class="icon-home"></i> HOME</li></a>
+                                        @if (data.Any(x => x.MainId == 2))
+                                        {
+                                            <li class="sub-menu @(((controller == "school" && action == "class")|| (controller == "teacher" && action == "region") || (controller == "school" && action == "teacherlist") || (controller == "school" && action == "stafflist") || (controller == "teacher" && action == "designation") || (controller == "teacher" && action == "departments") || (controller == "teacher" && action == "roledetails") ) ? " open" : "")">
+                                                <span><i class="icon-user-config"></i>  MANAGEMENT</span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 1))
+                                                    {
+                                                        <a href="/School/Class"><li class="@(((controller == "school" && action == "class")) ? "active" : "")"><i class="fa fa-pencil-square"></i> CLASS & DIVISION</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 2))
+                                                    {
+                                                        <a href="/Progress/Region"><li class="isHiddenFromMobile @(((controller == "progress" && action == "region")) ? "active" : "")"><i class="fa fa-registered"></i> REGION</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 3))
+                                                    {
+                                                        <a href="/School/TeacherList"><li class="@(((controller == "school" && action == "teacherlist")) ? "active" : "")"><i class="fa fa-user-circle"></i>   TEACHER </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 4))
+                                                    {
+                                                        <a href="/School/StaffList"><li class="@(((controller == "school" && action == "stafflist")) ? "active" : "")"><i class="fa fa-user-circle"></i>  STAFF</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 5))
+                                                    {
+                                                        <a href="/Teacher/Designation"><li class="isHiddenFromMobile @(((controller == "teacher" && action == "designation")) ? "active" : "")"><i class="fa fa-handshake-o"></i>  DESIGNATION</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 6))
+                                                    {
+                                                        <a href="/Teacher/Departments"><li class="isHiddenFromMobile @(((controller == "teacher" && action == "departments")) ? "active" : "")"><i class="fa fa-superpowers"></i>  DEPARTMENTS</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 7))
+                                                    {
+                                                        <a href="/Teacher/RoleDetails"><li class="isHiddenFromMobile @(((controller == "teacher" && action == "roledetails")) ? "active" : "")"><i class="fa fa-ravelry"></i>  ROLE</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 8))
+                                                    {
+                                                        <a href="/School/SchoolSettingsHome"><li class="isHiddenFromMobile @(((controller == "school" && action == "schoolsettingshome")) ? "active" : "")"><i class="fa fa-wrench"></i> SETTINGS</li></a>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 3))
+                                        {
+                                            <li class="sub-menu @(((controller == "school" && action == "student") || (controller == "report" && action == "studentlist") || (controller == "teacher" && action == "attendance")|| (controller == "teacher" && action == "periods")|| (controller == "school" && action == "summaryhome")) ? " open" : "")">
+                                                <span><i class="icon-student"></i>  ACADEMICS </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 9))
+                                                    {
+                                                        <a href="/School/Student"><li class="@(((controller == "school" && action == "student")) ? "active" : "")"><i class="fa fa-male"></i>  STUDENTS </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 10))
+                                                    {
+                                                        <a href="/Report/StudentList"><li class="@(((controller == "report" && action == "studentlist")) ? "active" : "")"><i class="fa fa-search"></i> FIND STUDENTS </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 11))
+                                                    {
+                                                        <a href="/Teacher/Attendance"><li class="@(((controller == "teacher" && action == "attendance")) ? "active" : "")"><i class="fa fa-star-half-o"></i> ATTENDANCE  </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 10039))
+                                                    {
+                                                        <a href="/Teacher/Periods"><li class="isHiddenFromMobile @(((controller == "teacher" && action == "periods")) ? "active" : "")"><i class="fa fa-life-bouy"></i> PERIODS  </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 10042))
+                                                    {
+                                                        <a href="/School/SummaryHome"><li class="@(((controller == "school" && action == "summaryhome")) ? "active" : "")"><i class="fa fa-file-archive-o"></i> SUMMARY  </li></a>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 4))
+                                        {
+                                            <li class="sub-menu @(((controller == "student" && action == "subjects") || (controller == "student" && action == "timetable") || (controller == "progress" && action == "optionalsubjects") || (controller == "progress" && action == "optionalsubjectslist")) ? " open" : "")">
+                                                <span><i class="icon-school"></i>  CURRICULUM     </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 12))
+                                                    {
+                                                        <a href="/Student/Subjects"><li class="@(((controller == "student" && action == "subjects")) ? "active" : "")"><i class="fa fa-hourglass-2"></i>  SUBJECTS</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 13))
+                                                    {
+                                                        <a href="/Student/TimeTable"><li class="@(((controller == "student" && action == "timetable")) ? "active" : "")"><i class="fa fa-clock-o"></i> TIME TABLE</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 14))
+                                                    {
+                                                        <a href="/Progress/OptionalSubjects"><li class="@(((controller == "progress" && action == "optionalsubjects")) ? "active" : "")"><i class="fa fa-circle-o-notch"></i>ASSIGN  SUBJECTS</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 15))
+                                                    {
+                                                        <a href="/Progress/OptionalSubjectsList"><li class="@(((controller == "progress" && action == "optionalsubjectslist")) ? "active" : "")"><i class="fa fa-chain"></i>  SUBJECTS & STUDENTS</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30062))
+                                                    {
+                                                        <a href="/Student/Upload_Assignments"><li class="@(((controller == "student" && action == "upload_assignments")) ? "active" : "")"><i class="fa fa-hourglass-2"></i>  ASSIGN ASSIGNMENTS</li></a>
+                                                    }
+
+
+
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 5))
+                                        {
+                                            <li class="sub-menu isHiddenFromMobile @(((controller == "progress" && action == "certificatename") || (controller == "progress" && action == "scholasticarea") || (controller == "progress" && action == "coscholasticsrea") || (controller == "progress" && action == "examdeclaration")|| (controller == "progress" && action == "remarkhome")) ? " open" : "")">
+                                                <span><i class="icon-blackboard"></i>  EXAM  </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 16))
+                                                    {
+                                                        <a href="/Progress/CertificateName"><li class="@(((controller == "progress" && action == "certificatename")) ? "active" : "")"><i class="fa fa-bookmark-o"></i>  CERTIFICATE NAME  </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 17))
+                                                    {
+                                                        <a href="/Progress/ScholasticArea"><li class="@(((controller == "progress" && action == "scholasticarea")) ? "active" : "")"><i class="fa fa-cubes"></i> SCHOLASTIC AREA </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 18))
+                                                    {
+                                                        <a href="/Progress/CoScholasticArea"><li class="@(((controller == "progress" && action == "coscholasticsrea")) ? "active" : "")"><i class="fa fa-cube"></i>CO-SCHOLASTIC AREA </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 19))
+                                                    {
+                                                        <a href="/Progress/ExamDeclaration"><li class="@(((controller == "progress" && action == "examdeclaration")) ? "active" : "")"><i class="fa fa-clone"></i> DECLARE EXAM </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 20042))
+                                                    {
+                                                        <a href="/Progress/RemarkHome"><li class="@(((controller == "progress" && action == "remarkhome")) ? "active" : "")"><i class="fa fa-tags"></i> REMARKS </li></a>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 6))
+                                        {
+                                            <li class="sub-menu @(((controller == "progress" && action == "scholasticarearesult") || (controller == "progress" && action == "coscholasticarearesult") || (controller == "progress" && action == "examresult") || (controller == "progress" && action == "studentremark")|| (controller == "teacher" && action == "health") || (controller == "progress" && action == "generatecertificate")) ? " open" : "")">
+                                                <span><i class="icon-list"></i>    RESULT </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 21))
+                                                    {
+                                                        <a href="/Progress/ScholasticAreaResult"><li class="@(((controller == "progress" && action == "scholasticarearesult")) ? "active" : "")"><i class="fa fa-sticky-note-o"></i> SCHOLASTIC RESULT  </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 22))
+                                                    {
+                                                        <a href="/Progress/CoScholasticAreaResult"><li class="@(((controller == "progress" && action == "coscholasticarearesult")) ? "active" : "")"><i class="fa fa-lightbulb-o"></i>CO-SCHOLASTIC RESULT</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 20))
+                                                    {
+                                                        <a href="/Progress/ExamResult"><li class="@(((controller == "progress" && action == "examresult")) ? "active" : "")"><i class="fa fa-dashboard"></i> EXAM RESULTS   </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 23))
+                                                    {
+                                                        <a href="/Progress/StudentRemark"><li class="@(((controller == "progress" && action == "studentremark")) ? "active" : "")"><i class="fa fa-info-circle"></i>  REMARK</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 10040))
+                                                    {
+                                                        <a href="/Teacher/Health"><li class="@(((controller == "teacher" && action == "health")) ? "active" : "")"><i class="fa fa-heartbeat"></i> HEALTH  </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 24))
+                                                    {
+                                                        <a href="/Progress/GenerateCertificate"><li class="@(((controller == "progress" && action == "generatecertificate")) ? "active" : "")"><i class="fa fa-line-chart"></i> PROGRESS CARD</li></a>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 10))
+                                        {
+                                            <li class="sub-menu @(((controller == "performance" && action == "teacherrolemanagementedithome") ||(controller == "performance" && action == "teachersubject") || (controller == "school" && action == "curriculumdetails") || (controller == "school" && action == "studentmarks")|| (controller == "performance" && action == "performancehome")|| (controller == "performance" && action == "teacherperformancehome")) ? " open" : "")">
+                                                <span><i class="fa fa-puzzle-piece"></i>  PERFORMANCE </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 36))
+                                                    {
+                                                        <a href="/Performance/TeacherRoleManagementEditHome"><li class="isHiddenFromMobile @(((controller == "performance" && action == "teacherrolemanagementedithome")) ? "active" : "")"><i class="fa fa-minus-square-o"></i>ADD / EDIT </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 35))
+                                                    {
+                                                        <a href="/Performance/TeacherSubject"><li class="isHiddenFromMobile @(((controller == "performance" && action == "teachersubject")) ? "active" : "")"><i class="fa fa-retweet"></i>TEACHER & SUBJECT </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 38))
+                                                    {
+                                                        <a href="/School/CurriculumDetails"><li class="@(((controller == "school" && action == "curriculumdetails")) ? "active" : "")"><i class="fa fa-percent"></i>  EXAM</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 39))
+                                                    {
+                                                        <a href="/School/StudentMarks"><li class="@(((controller == "school" && action == "studentmarks")) ? "active" : "")"><i class="fa fa-linode"></i>  SCORE</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 37))
+                                                    {
+                                                        <a href="/Performance/PerformanceHome"><li class="@(((controller == "performance" && action == "performancehome")) ? "active" : "")"><i class="fa fa-pie-chart"></i>  REPORT</li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 10041))
+                                                    {
+                                                        <a href="/Performance/TeacherPerformanceHome"><li class="@(((controller == "performance" && action == "teacherperformancehome")) ? "active" : "")"><i class="fa fa-black-tie"></i>  TEACHER</li></a>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 7))
+                                        {
+                                            <li class="sub-menu @(((controller == "school" && action == "calendarevent") || (controller == "school" && action == "circularnotification")) ? " open" : "")">
+                                                <span><i class="fa fa-bell"></i>  NOTIFICATIONS </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 25))
+                                                    {
+                                                        <a href="/School/CalendarEvent"><li class="@(((controller == "school" && action == "calendarevent")) ? "active" : "")"><i class="fa fa-sticky-note-o"></i> EVENTS  </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 26))
+                                                    {
+                                                        <a href="/School/CircularNotification"><li class="@(((controller == "school" && action == "circularnotification")) ? "active" : "")"><i class="fa fa-check-circle-o"></i> CIRCULARS   </li></a>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 8))
+                                        {
+                                            <li class="sub-menu isHiddenFromMobile @(((controller == "school" && action == "messages") || (controller == "school" && action == "staffmessages") || (controller == "school" && action == "homeworksms") || (controller == "student" && action == "installationinstruction") || (controller == "school" && action == "smshistory")) ? " open" : "")">
+                                                <span><i class="fa fa-comments-o"></i>  MESSAGES  </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 27))
+                                                    {
+                                                        <a href="/School/Messages"><li class="@(((controller == "school" && action == "messages")) ? "active" : "")"><i class="fa fa-comment-o"></i> STUDENT    </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 28))
+                                                    {
+                                                        <a href="/School/StaffMessages"><li class="@(((controller == "school" && action == "staffmessages")) ? "active" : "")"><i class="fa fa-comment-o"></i>STAFF  </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 29))
+                                                    {
+                                                        <a href="/School/HomeworkSms"><li class="@(((controller == "school" && action == "homeworksms")) ? "active" : "")"><i class="fa fa-commenting-o"></i>  HOMEWORK    </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30))
+                                                    {
+                                                        <a href="/Student/InstallationInstruction"><li class="@(((controller == "student" && action == "installationinstruction")) ? "active" : "")"><i class="fa fa-info-circle"></i> INSTRUCTIONS </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 31))
+                                                    {
+                                                        <a href="/School/SmsHistory"><li class="@(((controller == "school" && action == "smshistory")) ? "active" : "")"><i class="fa fa-history"></i> HISTORY </li></a>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 9))
+                                        {
+                                            <li class="sub-menu isHiddenFromMobile @(((controller == "school" && action == "bookcategory") || (controller == "school" && action == "librarybook") || (controller == "school" && action == "librarybookdue")) ? " open" : "")">
+                                                <span><i class="fa fa-address-book"></i>  LIBRARY  </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 32))
+                                                    {
+                                                        <a href="/School/BookCategory"><li class="@(((controller == "school" && action == "bookcategory")) ? "active" : "")"><i class="fa fa-microchip"></i> CATEGORY  </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 33))
+                                                    {
+                                                        <a href="/School/LibraryBook"><li class="@(((controller == "school" && action == "librarybook")) ? "active" : "")"><i class="fa fa-Book"></i> BOOKS    </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 34))
+                                                    {
+                                                        <a href="/School/LibraryBookDue"><li class="@(((controller == "school" && action == "librarybookdue")) ? "active" : "")"><i class="fa fa-money"></i> DUES    </li></a>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 12))
+                                        {
+                                            <li class="sub-menu @(((controller == "specialclass" && action == "assesmenthome")||(controller == "specialclass" && action == "readingskillshome")||(controller == "specialclass" && action == "noneducationalhome")||(controller == "specialclass" && action == "vprogresscardhome")) ? " open" : "")">
+                                                <span><i class="fa fa-address-book"></i>  CLASS V  </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 30042))
+                                                    {
+                                                        <a href="/SpecialClass/AssesmentHome"><li class="@(((controller == "specialclass" && action == "assesmenthome")) ? "active" : "")"><i class="fa fa-gg"></i> ASSESMENT  </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30043))
+                                                    {
+                                                        <a href="/SpecialClass/ReadingSkillsHome"><li class="@(((controller == "specialclass" && action == "readingskillshome")) ? "active" : "")"><i class="fa fa-angle-double-left"></i> SCHOLASTIC </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30044))
+                                                    {
+                                                        <a href="/SpecialClass/NonEducationalHome"><li class="@(((controller == "specialclass" && action == "noneducationalhome")) ? "active" : "")"><i class="fa fa-angle-double-right"></i>CO-SCHOLASTIC </li></a>
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30045))
+                                                    {
+                                                        <a href="/SpecialClass/VProgressCardHome"><li class="@(((controller == "specialclass" && action == "vprogresscardhome")) ? "active" : "")"><i class="fa fa-line-chart"></i> PROGRESS CARD  </li></a>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 14))
+                                        {
+                                            <li class="sub-menu  @(((controller == "specialclass" && action == "AssesmentHome_Others")||(controller == "specialclass" && action == "ReadingSkillsHome_Others")||(controller == "specialclass" && action == "NonEducationalHome_Others")||(controller == "specialclass" && action == "VProgressCardHome_Others")) ? " open" : "")">
+                                                <span><i class="fa fa-child"></i> NURSERY/KG  </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 30051))
+                                                    {
+                                                        <a href="/SpecialClass/AssesmentHome_Others"><li id="Id_AssesmentHome_Others" class="@(((controller == "specialclass" && action == "AssesmentHome_Others")) ? "active" : "")"><i class="fa fa-gg"></i> ASSESMENT  </li></a>
+
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30052))
+                                                    {
+                                                        <a href="/SpecialClass/ReadingSkillsHome_Others"><li id="Id_ReadingSkillsHome_Others" class="@(((controller == "specialclass" && action == "ReadingSkillsHome_Others")) ? "active" : "")"><i class="fa fa-angle-double-left"></i> SCHOLASTIC </li></a>
+
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30053))
+                                                    {
+                                                        <a href="/SpecialClass/NonEducationalHome_Others"><li id="Id_NonEducationalHome_Others" class="@(((controller == "specialclass" && action == "NonEducationalHome_Others")) ? "active" : "")"><i class="fa fa-angle-double-right"></i>CO-SCHOLASTIC </li></a>
+
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30054))
+                                                    {
+                                                        <a href="/SpecialClass/VProgressCardHome_Others"><li id="Id_VProgressCardHome_Others" class="@(((controller == "specialclass" && action == "VProgressCardHome_Others")) ? "active" : "")"><i class="fa fa-line-chart"></i> PROGRESS CARD  </li></a>
+
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @if (data.Any(x => x.MainId == 15))
+                                        {
+                                            <li class="sub-menu  @(((controller == "specialclass" && action == "AssesmentHome_ONE_FOUR")||(controller == "specialclass" && action == "ReadingSkillsHome_ONE_FOUR")||(controller == "specialclass" && action == "NonEducationalHome_ONE_FOUR")||(controller == "specialclass" && action == "VProgressCardHome_ONE_FOUR")) ? " open" : "")">
+                                                <span><i class="fa fa-child"></i> I To IV  </span>
+                                                <ul>
+                                                    @if (data.Any(x => x.SubId == 30057))
+                                                    {
+                                                        <a href="/SpecialClass/AssesmentHome_ONE_FOUR"><li id="Id_AssesmentHome_ONE_FOUR" class="@(((controller == "specialclass" && action == "AssesmentHome_ONE_FOUR")) ? "active" : "")"><i class="fa fa-gg"></i> ASSESMENT  </li></a>
+
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30059))
+                                                    {
+                                                        <a href="/SpecialClass/ReadingSkillsHome_ONE_FOUR"><li id="Id_ReadingSkillsHome_ONE_FOUR" class="@(((controller == "specialclass" && action == "ReadingSkillsHome_ONE_FOUR")) ? "active" : "")"><i class="fa fa-angle-double-left"></i> SCHOLASTIC </li></a>
+
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30060))
+                                                    {
+                                                        <a href="/SpecialClass/NonEducationalHome_ONE_FOUR"><li id="Id_NonEducationalHome_ONE_FOUR" class="@(((controller == "specialclass" && action == "NonEducationalHome_ONE_FOUR")) ? "active" : "")"><i class="fa fa-angle-double-right"></i>CO-SCHOLASTIC </li></a>
+
+                                                    }
+                                                    @if (data.Any(x => x.SubId == 30061))
+                                                    {
+                                                        <a href="/SpecialClass/VProgressCardHome_ONE_FOUR"><li id="Id_VProgressCardHome_ONE_FOUR" class="@(((controller == "specialclass" && action == "VProgressCardHome_ONE_FOUR")) ? "active" : "")"><i class="fa fa-line-chart"></i> PROGRESS CARD  </li></a>
+
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+
+                    <div class="content-body" style="min-height:150%;">
+                        <div class="main-section-header">
+                            <ul>
+                                @if (logo != null)
+                                {
+                                    var log = "http://satluj.schoolman.in" + logo;
+                                    <li><img class="img-responsive" src="@log" width="150" /></li>
+                                }
+                                @*<li>@userData.Name</li>*@
+                                <li>|</li>
+                                @if (userType == teacherType || userType == staffType)
+                                {
+                                    <li><a href="/Logout/StaffLogout"><i class="fa  fa-power-off"></i></a></li>
+                                }
+                                else if (userType == schoolType || userType == masterType)
+                                {
+                                    <li><a href="/Logout/SchoolLogout"><i class="fa  fa-power-off"></i></a></li>
+                                }
+
+                            </ul>
+                        </div>
+
+                        @RenderBody()
+                    </div>
+                </div>
+
+            </div><!-- end of row -->
+        </div><!-- end of container fluid -->
+    </div><!-- end of main section -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    @*<script src="https://code.jquery.com/jquery-2.1.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>*@
+    <!-- jQuery -->
+    @*<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>*@
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="~/Content/js/bootstrap.js"></script>
+    <script src="~/Content/Plugins/Datepicker/bootstrap-datepicker.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.dpicker').datepicker();
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.6/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $('.mobile-label').click(function () {
+            $('.responsive-menu').slideToggle();
+        });
+        $(document).on('click', '.sub-menu > span', function () {
+            //alert();
+            $(document).find('.sub-menu.open').removeClass('open');
+            $(this).parent().toggleClass('open');
+        });
+        $(document).on('click', '.sub-menu.open > span', function () {
+            $(this).parent().removeClass('open');
+        });
+
+        $(window).load(function () {
+            // Animate loader off screen
+            $(".se-pre-con").fadeOut("slow");
+        });
+
+    </script>
+    @*<script src="~/Scripts/jquery.validate.min.js"></script>
+        <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+
+    @*  <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>*@
+    @*<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>*@
+
+
+
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+
+    <script src="~/Content/Plugins/jquery.table2excel.min.js"></script>
+
+</body>
+</html>
+<script>
+    //Loader
+    $(document).ajaxStart(function () {
+        $(":submit").attr("disabled", true);
+        //$('body').pleaseWait();
+        ajaxLoaderStart();
+    });
+    $(document).ajaxComplete(function () {
+        $(":submit").attr("disabled", false);
+        //$('body').pleaseWait('stop');
+        ajaxLoaderStop();
+    });
+
+    function ajaxLoaderStart() {
+        $(".se-pre-con").show();
+
+    }
+
+    function ajaxLoaderStop() {
+        $(".se-pre-con").hide()
+
+    }
+
+</script>

@@ -1,0 +1,74 @@
+﻿@model Satluj_Latest.Models.StudentModel
+@{
+    long schoolId = Model.schoolId;
+    long classId = Model.classId;
+    long divisionId = Model.divisionId;
+    var data = new Satluj_Latest.Data.School(schoolId).GetAllStudentdata(classId, divisionId);
+}
+<thead>
+    <tr>
+        <th>
+            Slno
+        </th>
+        <th>
+            Student Name
+        </th>
+        <th class="hideColumn">
+            Class / Div
+        </th>
+        <th>
+            Admission No
+        </th>
+        <th>
+            Father Name
+        </th>
+        <th>
+            Contact No
+        </th>
+
+        @*<th>
+            Bus Name
+        </th>*@
+    </tr>
+</thead>
+<tbody>
+    @{
+      
+        int i = 1;
+        foreach (var one in data)
+        {
+            <tr>
+                <td>
+                    @i
+                </td>
+                <td>
+                    @one.StundentName.ToString()
+                </td>
+                <td class="hideColumn">
+                    @one.ClassName / @one.DivisionName
+                </td>
+                <td>
+                    @one.StudentSpecialId
+                </td>
+                <td>
+                    @one.ParentName
+                </td>
+                <td>
+                    @one.ContactNumber
+                </td>
+                @*<td>
+                    @if (one.Bus.BusId == 1)
+                    {
+                        {<p>NA</p> }
+                    }
+                    else
+                    {
+                        @one.Bus.BusName
+                    }
+                </td>*@
+            </tr>
+            i = i + 1;
+
+        }
+    }
+</tbody>

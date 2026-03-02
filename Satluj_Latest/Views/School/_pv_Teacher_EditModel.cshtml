@@ -1,0 +1,118 @@
+﻿@model TeacherEditModel
+
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="max-height:70vh; overflow-y:auto;">
+
+        <form id="form-teacher-edit" method="post" asp-action="EditTeacher" asp-controller="School">
+
+            <input type="hidden" asp-for="schoolId" />
+            <input type="hidden" asp-for="teacherId" />
+            <input type="hidden" asp-for="classId" />
+            <input type="hidden" asp-for="divisionId" />
+            <input type="hidden" asp-for="RolesData" />
+
+            <div class="modal-header">
+                <h4>Edit Teacher</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    &times;
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input asp-for="teacherName" class="form-control" />
+                    <span asp-validation-for="teacherName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input asp-for="emailId" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Contact</label>
+                    <input asp-for="contactNumber" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Designation</label>
+                    <select asp-for="DesignationId"
+                            asp-items="Model.DesignationList"
+                            class="form-control">
+                        <option value="">--Choose--</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Department</label>
+                    <select asp-for="DepartmentId"
+                            asp-items="Model.DepartmentList"
+                            class="form-control">
+                        <option value="">--Choose--</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>User Type</label>
+                    <select asp-for="UserTypeId"
+                            asp-items="Model.UserTypes"
+                            class="form-control">
+                        <option value="">--Choose--</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Roles</label>
+                    <div class="row">
+                        @foreach (var role in Model.RolesList)
+                        {
+                            <div class="col-md-4">
+                                <label>
+                                    <input type="checkbox"
+                                           class="chk-roles-cls-edit"
+                                           value="@role.Id"
+                                           @(Model.RolesData.Contains(role.Id.ToString()) ? "checked" : "") />
+                                    @role.RoleName
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+    $("#form-teacher-edit").submit(function (e) {
+        e.preventDefault();
+
+        // Collect roles
+        var roles = "";
+        $(".chk-roles-cls-edit:checked").each(function () {
+            roles += (roles === "" ? "" : "~") + $(this).val();
+        });
+        $("#RolesData").val(roles);
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (res) {
+                EditTeacherSuccess(res);
+            },
+            error: function () {
+                alert("Error occurred");
+            }
+        });
+    });
+</script>

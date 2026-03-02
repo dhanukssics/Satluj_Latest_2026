@@ -1,0 +1,194 @@
+﻿@model Satluj_Latest.Models.StudentModel
+
+<style>
+    .isHidden {
+        display: none;
+    }
+
+    span {
+        color: red;
+    }
+</style>
+
+<div class="modal-dialog" role="document" style="background-color:#fff;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+                <span>&times;</span>
+            </button>
+            <h4 class="modal-title">Add Student</h4>
+        </div>
+    </div>
+
+    <form id="form-login"
+          asp-action="AddStudent"
+          asp-controller="School"
+          method="post"
+          enctype="multipart/form-data">
+
+        <div class="modal-body">
+            <div class="row">
+
+                <!-- LEFT -->
+                <div class="col-sm-6">
+                    <div class="text-center">
+                        <label>Upload Profile Picture</label>
+                        <div class="upload-box" id="file_preview_grid"
+                             style="background-image:url(/Content/img/default-placeholder-1024x1024-960x960.png);">
+                            <input id="default-pic-browse" type="file" class="uploder-controler" />
+                            <input type="hidden" asp-for="profilePic" />
+                            <input type="hidden" asp-for="bloodGroup" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input asp-for="studentName" class="form-control" />
+                        <span asp-validation-for="studentName"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Father Name</label>
+                        <input asp-for="parentName" class="form-control" />
+                        <span asp-validation-for="parentName"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mother Name</label>
+                        <input asp-for="MotherName" class="form-control" />
+                        <span asp-validation-for="MotherName"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Parent Email</label>
+                        <input asp-for="parentEmail" class="form-control" />
+                        <span asp-validation-for="parentEmail"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea asp-for="address" class="form-control"></textarea>
+                        <span asp-validation-for="address"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>DOB</label>
+                        <input asp-for="DOBstring" class="form-control" />
+                    </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="col-sm-6">
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label>State</label>
+                            <input asp-for="state" class="form-control" />
+                            <span asp-validation-for="state"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label>City</label>
+                            <input asp-for="city" class="form-control" />
+                            <span asp-validation-for="city"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label>Class</label>
+                            <select asp-for="classId"
+                                    asp-items="ViewBag.Classlist"
+                                    class="form-control pv_class-drop-down"
+                                    id="classDataDropdown">
+                                <option value="">--Choose--</option>
+                            </select>
+                            <span asp-validation-for="classId"></span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label>Division</label>
+                            <select asp-for="divisionId"
+                                    class="form-control division_Select"
+                                    disabled>
+                                <option value="">--select division--</option>
+                            </select>
+                            <span asp-validation-for="divisionId"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label>Blood Group</label>
+                            <select id="slct-bloodGroup" class="form-control">
+                                <option value="">--Choose--</option>
+                                <option>O+</option>
+                                <option>O-</option>
+                                <option>A+</option>
+                                <option>A-</option>
+                                <option>B+</option>
+                                <option>B-</option>
+                                <option>AB+</option>
+                                <option>AB-</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label>Gender</label><br />
+                            <input type="radio" asp-for="gender" value="M" checked /> Male
+                            <input type="radio" asp-for="gender" value="F" /> Female
+                            <span asp-validation-for="gender"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contact No.</label>
+                        <input asp-for="contactNo" class="form-control" />
+                        <span asp-validation-for="contactNo"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Admission No.</label>
+                        <input asp-for="admissionNo" class="form-control" />
+                        <span asp-validation-for="admissionNo"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bus Name</label>
+                        <select asp-for="BusId"
+                                asp-items="ViewBag.Buslist"
+                                class="form-control">
+                            <option value="">--Select Bus--</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Trip Number</label>
+                        <input asp-for="tripNumber" class="form-control" />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn pay-now-btn">Save</button>
+        </div>
+
+    </form>
+</div>
+<script>
+    $("#form-login").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: this.action,
+            type: "POST",
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            success: StudentAddSuccess,
+            error: StudentAddFailed
+        });
+    });
+</script>

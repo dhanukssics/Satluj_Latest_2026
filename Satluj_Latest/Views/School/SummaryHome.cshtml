@@ -1,0 +1,99 @@
+﻿@model Satluj_Latest.Models.SummaryModel
+@{
+    ViewBag.Title = "ExamDeclaration";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 style="margin-top: 5px;">SUMMARY</h3>
+        <div class="row">
+            <div class="col-md-12" style="min-height:50px; margin-top:10px;">
+                @foreach (var item in Model._list)
+            {
+                    <div style="padding:0px 10px; display:inline-block;">
+                        <input type="checkbox" class="checklist-sub" data-id="@item.ClassId" />
+                        <span>
+                            @item.ClassName
+                        </span>
+                    </div>
+                }
+            </div>
+            <div class="col-md-12">
+                <label>Date</label>
+                <div style="width:20%">
+                    <input type="text" class="form-control attendance-date" data-date-end-date="0d" value="@Model.DatetimeString.ToString("dd-MM-yyyy")">
+                    <i class="fa fa-calendar"></i>
+                </div>
+            </div>
+            <div class="col-md-12" style="margin-top:10px;">
+                <button class="btn pay-now-btn" id="attendance-btn-id">Attendance Summary</button>
+                <button class="btn pay-now-btn" id="timetable-btn-id">Timetable Summary</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $('.attendance-date').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    //Attendance Summary Button Click
+    $(document).on('click', '#attendance-btn-id', function () {
+        debugger;
+        var date = $('.attendance-date').val();
+        var res = date.split("-");
+        var dd = res[0];
+        var mm = res[1];
+        var yyyy = res[2];
+        var today = mm + '-' + dd + '-' + yyyy;
+
+        var classList = "";
+        $.each($("input[type='checkbox']:checked"), function () {
+            var source = $(this);
+            if (classList == '') {
+                classList = $(source).attr("data-id");
+            }
+            else {
+                classList = classList + '~' + $(source).attr("data-id");
+            }
+        });
+        if (classList != "") {
+            var data = today + '~' + classList;
+            var link = '/School/GenerateAttendanceSummary/' + data;
+            window.open(link, '_blank');
+        }
+        else {
+            toastrError('Please select any Class !');
+        }
+    });
+
+    //Timetable Summary Button Click
+    $(document).on('click', '#timetable-btn-id', function () {
+        var classList = "";
+        $.each($("input[type='checkbox']:checked"), function () {
+            var source = $(this);
+            if (classList == '') {
+                classList = $(source).attr("data-id");
+            }
+            else {
+                classList = classList + '~' + $(source).attr("data-id");
+            }
+        });
+        if (classList != "") {
+            var link = '/School/GenerateTimetableSummary/' + classList;
+            window.open(link, '_blank');
+        }
+        else {
+            toastrError('Please select any Class !');
+        }
+    });
+
+
+
+
+</script>

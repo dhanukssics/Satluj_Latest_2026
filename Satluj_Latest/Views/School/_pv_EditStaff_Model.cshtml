@@ -1,0 +1,176 @@
+﻿@model Satluj_Latest.Models.StaffModels
+
+<div class="modal-dialog modal-lg" role="document">
+
+    <form asp-action="EditStaff"
+          asp-controller="School"
+          id="form-staff-edit"
+          method="post">
+
+        @Html.HiddenFor(m => m.UserId)
+        @Html.HiddenFor(m => m.RoleData)
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Staff</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- NAME & EMAIL -->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label>Name</label>
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(z => z.Name)
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label>Email</label>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(z => z.Email)
+                        <span id="spn-error-email-teacher"></span>
+                    </div>
+                </div>
+
+                <!-- DOB, CONTACT, DESIGNATION -->
+                <div class="row mt-2">
+                    <div class="col-sm-3">
+                        <label>DOB</label>
+                        @Html.TextBoxFor(m => m.DOBstring, new { @class = "form-control" })
+                    </div>
+
+                    <div class="col-sm-3">
+                        <label>Contact</label>
+                        @Html.TextBoxFor(m => m.Contact, new { @class = "form-control" })
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label>Designation</label>
+                        @Html.DropDownListFor(
+                        m => m.DesignationId,
+                                                Model.Designations,
+                                                "--Choose--",
+                                                new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <!-- ADDRESS + DEPARTMENT -->
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        <label>Address</label>
+                        @Html.TextAreaFor(m => m.Address, new { @class = "form-control", rows = 3 })
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label>Department</label>
+                        @Html.DropDownListFor(
+                                                m => m.DepartmentId,
+                                                Model.Departments,
+                                                "--Choose--",
+                                                new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <!-- ROLES + USER TYPE -->
+                <div class="row mt-2">
+
+                    <!-- ROLES DROPDOWN -->
+                    <div class="col-sm-6">
+                        <label>Roles</label>
+
+                        <div class="dropdown_main">
+                            <span class="dropdown_btn">Roles <i class="fa fa-caret-down"></i></span>
+
+                            <ul class="dropdown_lists">
+                                @foreach (var role in Model.RolesList)
+                                {
+                                    bool isChecked =
+                                    ("," + Model.RoleData + ",")
+                                    .Contains("," + role.Value + ",");
+
+                                    <li>
+                                        <label>
+                                            <input type="checkbox"
+                                                   class="chk-roles-cls-edit"
+                                                   value="@role.Value"
+                                                   @(isChecked ? "checked" : "") />
+                                            @role.Text
+                                        </label>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- USER TYPE -->
+                    <div class="col-sm-6">
+                        <label>User Type</label>
+                        @Html.DropDownListFor(
+                        m => m.UserTypeId,
+                                                Model.UserTypes,
+                                                "--Choose--",
+                                                new { @class = "form-control" })
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+
+                <button type="button" id="btn-dummy-editstaff" class="btn pay-now-btn">Save</button>
+
+                
+            </div>
+
+        </div>
+
+    </form>
+</div>
+<script>
+    $('#DOBstring').datepicker({
+        format: "dd-mm-yyyy",
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(".dropdown_btn").click(function () {
+        $(this).siblings(".dropdown_lists").toggle();
+    });
+
+    $("#btn-dummy-editstaff").click(function () {
+        let roles = [];
+        $(".chk-roles-cls-edit:checked").each(function () {
+            roles.push($(this).val());
+        });
+
+        $("#RoleData").val(roles.join(","));
+        $("#form-staff-edit").submit();  
+    });
+
+
+    $("#form-staff-edit").on("submit", function (e) {
+
+        e.preventDefault();  
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (res) {
+                EditStaffSuccess(res); 
+            },
+            error: function () {
+                ajaxFailure(); 
+            }
+        });
+
+    });
+
+</script>

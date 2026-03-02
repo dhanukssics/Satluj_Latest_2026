@@ -1,0 +1,212 @@
+﻿
+@model Satluj_Latest.Models.DayBookReportModel
+@{
+    DateTime startDate = Model.FromDate;
+    DateTime endDate = Model.ToDate;
+    long schoolId = Model.SchoolId;
+    var school = new Satluj_Latest.Data.School(schoolId);
+    //var data = school.GetDayBookReport(startDate, endDate, schoolId).ToList();
+    var list = school.DayBookReportDetailsCollection(startDate, endDate);
+    string schoolName = Model.SchoolName;
+    string heading = Model.Heading;
+
+}
+
+<thead>
+    <tr>
+        <td colspan="8" style="text-align:center; font-weight:bold;font-size:22; display:none;">
+            @schoolName
+        </td>
+    </tr>
+    <tr>
+        <td colspan="8" style="text-align:center; font-weight:normal;font-size:18; display:none;">
+           Day Book Report
+        </td>
+    </tr>
+    <tr>
+        <td colspan="8" style="text-align:center; font-weight:normal;font-size:12; display:none;">
+            @heading
+        </td>
+    </tr>
+
+    <tr>
+        <th>
+            VoucherNo / BillNo
+        </th>
+        <th>
+            Type
+        </th>
+        <th>
+            Bank/Cash
+        </th>
+        <th>
+            Account Head
+        </th>
+        <th>
+            Sub Ledger
+        </th>
+        <th>
+            Income
+        </th>
+        <th>
+            Expense
+        </th>
+        <th>
+            Narration
+        </th>
+    </tr>
+</thead>
+
+<tbody>
+    @foreach (var item in list)
+    {
+        <tr>
+            <td style="color:red; font-weight:bold; text-align:left;" colspan="8">
+                @item.EnterDate.ToShortDateString()
+            </td>
+            
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="font-weight:bold">Opening Balance</td>
+            <td></td>
+            <td style="font-weight:bold">
+                @String.Format("{0:0.00}", item.Opening)
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        foreach (var one in item._list.OrderBy(x => x.VoucherNo))
+        {
+            <tr>
+                <td>
+                    @one.VoucherNo
+                </td>
+                <td style="text-align:center;">
+                    @one.TransactionType
+                </td>
+                <td style="text-align:center;">
+                    @one.FromStatus
+                </td>
+                <td>
+                    @one.AccountHeadName
+                </td>
+                <td>
+                    @one.SubLedger
+                </td>
+                <td>
+                    @String.Format("{0:0.00}", one.IncomeAmount)
+                </td>
+                <td>
+                    @String.Format("{0:0.00}", one.ExpenseAmount)
+                </td>
+                <td>
+                    @one.Narration
+                </td>
+            </tr>
+        }
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="font-weight:bold">Closing Balance</td>
+            <td></td>
+            <td style="font-weight:bold">
+                @String.Format("{0:0.00}", item.Closing)
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+    }
+
+
+
+</tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*<thead>
+        <tr>
+            <th>
+                Voucher No
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Bank/Cash
+            </th>
+            <th>
+                Account Head
+            </th>
+            <th>
+                Credit/Income
+            </th>
+            <th>
+                Expense/Debit
+            </th>
+            <th>
+                Narration
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var one in data)
+            {
+                <tr>
+                    <td>
+                        @one.VoucherNumber
+                    </td>
+                    <td>
+                        @one.VoucherType
+                    </td>
+                    <td>
+                        @one.Bank_Cash
+                    </td>
+                    <td>
+                        @one.AccHeadName
+                    </td>
+                    <td>
+                        @one.Income
+                    </td>
+                    <td>
+                        @one.Expense
+                    </td>
+                    <td>
+                        @one.Narration
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>*@

@@ -1,0 +1,240 @@
+﻿@model Satluj_Latest.Models.TimetableSummaryFull
+@{
+    var schoolLogo = "http://satluj.edumanonline.com" + Model.SchoolLogo;
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>School</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6, a, p, i, b, ul, ol, li, span, strong {
+            margin: 0;
+            padding: 0;
+        }
+
+        div {
+            box-sizing: border-box;
+        }
+
+        .schoolPrint {
+            width: 900px;
+            height: auto;
+            margin: 30px auto;
+        }
+
+        .schoolname {
+            width: 100%;
+            padding: 12px 0px;
+            text-align: center;
+            margin-bottom: 35px;
+            border-bottom: 1px solid #000;
+        }
+
+        .school_img {
+            float: left;
+            margin-right: -150px;
+        }
+
+        .schoolname * {
+            padding: 3px 0px;
+        }
+
+        .photo_img {
+            width: 150px;
+            height: 160px;
+            padding: 5px;
+            margin-right: 5px;
+            border: 1px solid #000;
+        }
+
+            .photo_img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .parent_info h2 {
+            font-size: 21px;
+            margin-top: 30px;
+            margin-bottom: 12px;
+        }
+
+        .signFoot {
+            width: 100%;
+            margin-top: 60px;
+        }
+
+        .pay-now-btn {
+            background: #369;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            float: right;
+            padding: 8px 20px;
+        }
+
+        .schoolInfo {
+            padding: 10px 0px;
+            text-align: center;
+            margin: 0 0 15px;
+            border-bottom: 1px solid #000;
+            float: left;
+            width: 100%;
+        }
+
+            .schoolInfo .schoolname {
+                border: 0;
+                width: auto;
+                margin: 0 auto;
+                /* float: left; */
+                display: inline-block;
+            }
+
+            .schoolInfo .school_img img {
+                max-width: 200px;
+            }
+
+        .header-style {
+            float: left !important;
+        }
+
+       table {
+  width: 100%;
+  border: 1px solid black;
+}
+
+th {
+  height: 50px;
+}
+
+.custome-table {
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+    </style>
+</head>
+<body>
+    <span>
+        <button type="button" id="btn-print" class="btn pay-now-btn" onclick="myFunction()"><i class="fa fa-edit"></i>Print </button>
+    </span>
+    <div class="schoolPrint">
+        <div class="schoolInfo">
+            <div class="school_img">
+                @if (Model.SchoolLogo == null)
+                {
+
+                }
+                else
+                {
+                    <img src="@schoolLogo " />
+                }
+            </div>
+            <div class="schoolname">
+                <h2>@Model.SchoolName</h2>
+                <h5>@Model.SchoolAddress</h5>
+                <h4>Timetable</h4>
+
+            </div>
+        </div>
+        @foreach (var item in Model._list)
+        {
+            <table style="width:100%;" class="table custome-table" border="1">
+                <thead>
+                    <tr style="background: #ccc;"><td colspan="9" align="center" style="text-align:center; font-size: large;">@item.ClassName / @item.DivisionName</td></tr>
+                    <tr>
+                        <th width="200">
+                            Day
+                        </th>
+                        <th>
+                            1
+                        </th>
+                        <th>
+                            2
+                        </th>
+                        <th>
+                            3
+                        </th>
+                        <th>
+                            4
+                        </th>
+                        <th>
+                            5
+                        </th>
+                        <th>
+                            6
+                        </th>
+                        <th>
+                            7
+                        </th>
+                        <th>
+                            8
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                        foreach (var table in item.list)
+                        {
+                            <tr style="color:black;">
+                                <td style="font-weight:bold;">
+                                    @table.DayName
+                                </td>
+                                <td>
+                                    <a><i data-id="1"></i></a>
+                                    @table.One
+                                </td>
+                                <td>
+                                    <a><i data-id="2"></i></a>
+                                    @table.two
+                                </td>
+                                <td>
+                                    <a><i data-id="3"></i></a>
+                                    @table.three
+                                </td>
+                                <td>
+                                    <a><i data-id="4"></i></a>
+                                    @table.four
+                                </td>
+                                <td>
+                                    <a><i data-id="5"></i></a>
+                                    @table.five
+                                </td>
+                                <td>
+                                    <a><i data-id="6"></i></a>
+                                    @table.six
+                                </td>
+                                <td>
+                                    <a><i data-id="7"></i></a>
+                                    @table.seven
+                                </td>
+                                <td>
+                                    <a><i data-id="8"></i></a>
+                                    @table.eight
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+                        }
+    </div>
+</body>
+</html>
+<script>
+    function myFunction() {
+        var printButton = document.getElementById("btn-print");
+        printButton.style.visibility = 'hidden';
+        window.print();
+        printButton.style.visibility = 'visible';
+    }
+</script>
+

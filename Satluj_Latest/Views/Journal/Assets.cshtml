@@ -1,0 +1,307 @@
+﻿@model Satluj_Latest.Models.AssetsLiabilityModel
+@{
+    ViewBag.Title = "assets";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+<style>
+    .gap_bottom {
+        padding-bottom: 35px;
+    }
+        .gap_bottom label {
+            padding-top: 8px;
+        }
+</style>
+<div>
+    <div col-lg-12>
+        <h2>Assets & Liabilities</h2>
+    </div>
+</div>
+<div>
+    <div id="add-assets-space-Id">
+    </div>
+    <div class="modal fade" id="get-InvoiceNo-for-edit">
+    </div>
+    <div class="modal fade" id="tablePrintData">
+    </div>
+</div>
+
+<script>
+    $('.date-assests-add-date').datepicker({
+        format: 'dd-mm-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).on('change', '.pv_assests-type', function () {
+        //debugger;
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Journal/GetAssestsInvoiceNumber?id=' + id,
+                type: "GET",
+                success: function (response) {
+                    if (response.status > 0) {
+                        $("#InviceNumber").val('');
+                        $("#InviceNumber").val(response.result);
+                    }
+                    else {
+                        $("#InviceNumber").val('');
+                    }
+                }
+            });
+        }
+        else {
+        }
+    });
+
+    $(document).ready(function () {
+        //debugger;
+        RefreshPage();
+    });
+
+    $(document).on('click', '#btn-edit-assests', function () {
+        $.ajax({
+            url: '/Journal/SearchVoucherNoForAssets/',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#get-InvoiceNo-for-edit').html('');
+                $('#get-InvoiceNo-for-edit').html(data);
+                $.validator.unobtrusive.parse($("#get-InvoiceNo-for-edit"));
+                $('#get-InvoiceNo-for-edit').modal('show');
+            }
+        });
+    });
+
+    function AddAssetsSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.msg);
+            RefreshPage();
+        }
+        else {
+            toastrError("Please enter the all  data!")
+        }
+    }
+
+    function AddAssetsFailed() {
+        RefreshPage();
+        toastrError('No changes made !');
+    }
+
+    function GetVoucherNumber() {
+        var id = 0;
+        $.ajax({
+            url: '/Journal/GetAssestsInvoiceNumber?id=' + id,
+            type: "GET",
+            success: function (response) {
+                if (response.status > 0) {
+                    $("#InviceNumber").val('');
+                    $("#InviceNumber").val(response.result);
+                }
+                else {
+                    $("#InviceNumber").val('');
+
+                }
+            }
+        });
+    }
+
+    function RefreshPage() {
+        //debugger;
+        $.ajax({
+            url: '/Journal/AddAssetsReaload',
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#add-assets-space-Id').html('');
+                $('#add-assets-space-Id').html(data);
+                $.validator.unobtrusive.parse($('#add-assets-space-Id'));
+                GetVoucherNumber();
+                $('.date-assests-add-date').datepicker({
+                    format: 'dd-mm-yyyy',
+                    autoclose: true,
+                    todayHighlight: true
+                });
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                var todayy = dd + '-' + mm + '-' + yyyy;
+                $('.display-currentDate').val(todayy);
+                //CurrentBankBalance();
+            }
+        });
+    }
+
+    $(document).on('click', '#btn-invoice-search', function () {
+        //debugger;
+        var obj = new Object();
+        obj.TypeId = $('#assets-type-id-search').val();
+        obj.SearchInviceNumber = $('#SearchInviceNumber').val();
+        if ($('#SearchInviceNumber').val() != '') {
+            $.ajax({
+                url: '/Journal/SearchInvoiceForAssets',
+                type: "GET",
+                dataType: 'html',
+                data: obj,
+                success: function (data) {
+                    $('#add-assets-space-Id').html('');
+                    $('#add-assets-space-Id').html(data);
+                    $.validator.unobtrusive.parse($("#add-assets-space-Id"));
+                    $('#get-InvoiceNo-for-edit').modal('hide');
+                    ReloadDetailsEdit();
+                    //$("#EntryDateString").focus();
+                }
+            });
+        }
+        else {
+            var message = "Please enter a Invoice No!";
+            $('#spn-error-invoice-number').text(message);
+            $('#spn-error-invoice-number').show();
+            $('#btn-invoice-search').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+        }
+    }); 
+
+    function ReloadDetailsEdit() {
+        $('.date-assests-add-date').datepicker({
+            format: 'dd-mm-yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+    }
+
+    function EditAssetsSuccess(result) {
+        if (result.status == true) {
+            toastrSuccess(result.message);
+            RefreshPage();
+        }
+        else {
+            toastrError("No changes made!")
+        }
+    }
+
+    function EditAssetsFailed() {
+        RefreshPage();
+        toastrError('Failed!');
+    }
+
+    $(document).on('click', '#btn-invoice-search-dummy', function () {
+        //debugger;
+        var data = $('#SearchInviceNumber').val();
+        var type = $('#assets-type-id-search').val();
+        var dataSet = data + '~' + type;
+        $.ajax({
+            url: '/Journal/CheckInvoiceNumberForAssets?text=' + dataSet,
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.Status) {
+                    var message = "No such Invoice number!";
+                    $('#spn-error-invoice-number').text(message);
+                    $('#spn-error-invoice-number').show();
+                    $('#btn-invoice-search').css({ 'cursor': 'default', 'pointer-events': 'none', 'opacity': '.8' });
+                }
+                else {
+                    $('#spn-error-invoice-number').hide();
+                    $('#btn-invoice-search').css({ 'cursor': 'pointer', 'pointer-events': 'initial', 'opacity': '1' });
+                    $('#btn-invoice-search').trigger('click');
+                }
+            }
+        });
+    }); 
+
+    $(document).on('click', '#btn-cancel-assets', function () { 
+        RefreshPage();
+    }); 
+
+    $(document).on('click', '#btn-print-assets-add', function () {
+        //debugger;
+        var obj = new Object();
+        obj.TypeId = $('#assets-type-id').val();
+        obj.EntryDateString = $('#EntryDateString').val();
+        obj.InviceNumber = $('#InviceNumber').val();
+        obj.HeadId = $('#assests-head-id').val();
+        obj.Amount = $('#amount-assets-id').val();
+        if ($('#addstatus-id-check').is(":checked") == true)
+            obj.AddStatus = true;
+        else
+            obj.AddStatus = false;
+        obj.Narration = $('#Narration').val();
+        $.ajax({
+            url: '/Journal/AddAssests',
+            type: "GET",
+            dataType: 'json',
+            data: obj,
+            success: function (result) {
+                if (result.status) {
+                    PrintData();
+                }
+                else {
+                    AddAssetsFailed();
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-print-assets-edit', function () {
+        //debugger;
+        var obj = new Object();
+        obj.TypeId = $('#assets-type-id').val();
+        obj.EntryDateString = $('#EntryDateString').val();
+        obj.InviceNumber = $('#InviceNumber').val();
+        obj.HeadId = $('#assests-head-id').val();
+        obj.Amount = $('#amount-assets-id').val();
+        obj.Narration = $('#Narration').val();
+        if ($('#addstatus-id-check').is(":checked") == true)
+            obj.AddStatus = true;
+        else
+            obj.AddStatus = false;
+        obj.Id = $('#Id').val();
+        $.ajax({
+            url: '/Journal/EditAssets',
+            type: "GET",
+            dataType: 'json',
+            data: obj,
+            success: function (result) {
+                if (result.status) {
+                    PrintData();
+                }
+                else {
+                    PrintData();
+                }
+            }
+        });
+    });
+
+    function PrintData() {
+        var obj = new Object();
+        obj.TypeId = $('#assets-type-id').val();
+        obj.EntryDateString = $('#EntryDateString').val();
+        obj.InviceNumber = $('#InviceNumber').val();
+        obj.HeadId = $('#assests-head-id').val();
+        obj.Amount = $('#amount-assets-id').val();
+        obj.Narration = $('#Narration').val();
+        if ($('#addstatus-id-check').is(":checked") == true)
+            obj.AddStatus = true;
+        else
+            obj.AddStatus = false;
+        obj.Id = $('#Id').val();
+        $.ajax({
+            url: '/Journal/AssestsPrint',
+            type: "GET",
+            dataType: 'html',
+            data: obj,
+            success: function (data) {
+                $('#tablePrintData').html(data);
+                $('#tablePrintData').modal('show');
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,1345 @@
+﻿//This was changed in  240422
+@model Satluj_Latest.Models.StudentTerm2ProgressCardModel
+@{
+    var logo = "http://satluj.schoolman.in" + Model.SchoolLogo;
+    var studentImage = "http://satluj.edumanonline.com" + Model.SchoolLogo;
+    var ScholasticList = new List<Satluj_Latest.Models.ScolasticAreaList>();
+    var ScholasticList2 = new List<Satluj_Latest.Models.ScolasticAreaList>();
+    var SubjectList = new List<Satluj_Latest.Models.SubjectDetails>();
+    // var CoScholasticArea = new List<Satluj_Latest.Models.CoscholasticAreaList>();
+
+
+    ///////////////////////////////////////////////////////////
+    ///
+
+    var SubjectList_Sorting = new List<Satluj_Latest.Models.SubjectDetails>();
+    var SubjectList_Compale = new List<Satluj_Latest.Models.SubjectDetails>();
+    var var_sublist = new Satluj_Latest.Data.School(Model.SchoolId).GetAllDeclaredExamSubjectList_V_VIII(Model.ExamId);
+
+    foreach (var a1 in var_sublist.List)
+    {
+        Satluj_Latest.Models.SubjectDetails mo = new Satluj_Latest.Models.SubjectDetails();
+
+        if (a1.Subject1 != "Punjabi")
+        {
+            mo.SubjectName = a1.Subject1;
+            SubjectList_Sorting.Add(mo);
+        }
+        else
+        {
+
+
+        }
+
+        //Hindi,Punjabi
+
+
+    }
+
+
+    var dataremove = SubjectList_Sorting.Single(x => x.SubjectName == "Information Technology");
+    SubjectList_Sorting.Remove(dataremove);
+
+    Satluj_Latest.Models.SubjectDetails mo23 = new Satluj_Latest.Models.SubjectDetails();
+
+    mo23.SubjectName = "Punjabi";
+    SubjectList_Sorting.Add(mo23);
+
+    Satluj_Latest.Models.SubjectDetails mo24 = new Satluj_Latest.Models.SubjectDetails();
+
+    mo24.SubjectName = "Sanskrit";
+    SubjectList_Sorting.Add(mo24);
+
+
+    //Satluj_Latest.Models.SubjectDetails mo25 = new Satluj_Latest.Models.SubjectDetails();
+
+    //mo24.SubjectName = "Information Technology";
+    //SubjectList_Sorting.Add(mo25);
+
+
+
+
+    var CoScholasticArea = new List<Satluj_Latest.Models.CoscholasticAreaList>();
+    int totalScolasticCount = 0;
+    if (Model.IsIssued == false)
+    {
+        ScholasticList = Model.TermDataList[0].scholasticList.ToList();
+        SubjectList_Compale = ScholasticList[0].subjectList.ToList();
+        ////////////////////////////////////
+        foreach (var a1 in SubjectList_Sorting)
+        {
+            var datas_Sort = SubjectList_Compale.Where(x => x.SubjectName == a1.SubjectName).FirstOrDefault();
+            if (datas_Sort != null)
+            {
+                Satluj_Latest.Models.SubjectDetails mo = new Satluj_Latest.Models.SubjectDetails();
+                mo.SubjectName = datas_Sort.SubjectName;
+                mo.Mark = datas_Sort.Mark;
+                mo.PracticalScore = datas_Sort.PracticalScore;
+                mo.MarkTotal = datas_Sort.MarkTotal;
+                mo.PracticalScoreTotal = datas_Sort.PracticalScoreTotal;
+                SubjectList.Add(mo);
+            }
+
+        }
+
+        CoScholasticArea = Model.TermDataList[0].ColasticAreaResult.ToList();
+    }
+
+
+    ///////////////////////////////////////////////////
+
+
+    var public_Totel = 0;
+
+    //if (Model.IsIssued == false)
+    //{
+    //    ScholasticList = Model.TermDataList[0].scholasticList.ToList();
+    //    SubjectList = ScholasticList[0].subjectList.ToList();
+    //    CoScholasticArea = Model.TermDataList[0].ColasticAreaResult.ToList();
+    //}
+
+
+
+    int totalScore = 0;
+    List<int> TotalScoreOfTerms = new List<int>();
+    var count = 0;
+    var studentData = new Satluj_Latest.Data.Student(Model.StudentId);
+    //var attendanceData = studentData.GetAcademicPeriods();// Data taking from attendance table
+    var attendanceData = studentData.GetStudentsAttendanceData(); // Data taking from the attendance period table
+    var HealthData = studentData.GetHealthDetails();
+
+    var HealthData_new = studentData.GetHealthDetails_NewFinal(Model.StudentId);
+
+
+
+
+    //var remarks = studentData.StudentRemarks();
+
+    var remarks = studentData.StudentRemarksIX();
+
+    var remarks_final = studentData.StudentRemarksIX_New(Model.ExamId, Model.StudentId);
+
+
+    var colmSpan = ScholasticList.Count() + 2;
+    int co_count = 0;
+    int lastCo_Count = studentData.GetCoScholasticNonHeadCount(Model.RegionId);
+    decimal totalMark = 0;
+    decimal totalOutOff = 0;
+    decimal totalMark2 = 0;
+    decimal totalOutOff2 = 0;
+    int lastScholastic = 0;
+    int schoCount = 0;
+
+    if (Model.IsOneTerm == true && Model.csList != null && Model.csList.Count() > 0)
+    {
+        if (Model.csList[0].PracticalScore == "")
+        {
+            Model.csList[0].PracticalScore = "0";
+        }
+        if (Model.csList[0].TheoryScore == "")
+        {
+            Model.csList[0].TheoryScore = "0";
+        }
+        totalMark = Convert.ToDecimal(Model.csList[0].PracticalScore) + Convert.ToDecimal(Model.csList[0].TheoryScore);
+        totalOutOff = 50;// this is done, since information technology mark has been changed to out of 50, it was previously for out of 100- Razi 28/03/22
+    }
+    else if (Model.csList != null && Model.csList.Count() > 0)
+    {
+        if (Model.csList[0].PracticalScore == "")
+        {
+            Model.csList[0].PracticalScore = "0";
+        }
+        if (Model.csList[0].TheoryScore == "")
+        {
+            Model.csList[0].TheoryScore = "0";
+        }
+        totalMark = Convert.ToDecimal(Model.csList[0].PracticalScore) + Convert.ToDecimal(Model.csList[0].TheoryScore);
+        //totalMark2 = Convert.ToDecimal(Model.csList[1].PracticalScore) + Convert.ToDecimal(Model.csList[1].TheoryScore);
+        //totalOutOff = 100;
+        totalOutOff = 50;
+        //totalOutOff2 = 100;
+    }
+    else
+    {
+
+    }
+
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Report Card - Satluj School</title>
+</head>
+<body style="font-family:Arial;">
+    @*--------------------PRINT BUTTON----------------------------------------------*@
+    @*<div style="height:30px;">*@
+    <button type="button" class="btn btn-success btn-style" id="btn-print" style="width: 200px;background-color: #7c89ad; position:absolute; right:20px; top:20px; width: 100px;
+     padding: 10px; color: rgb(255, 255, 255); background-color: rgb(124, 137, 173); position: absolute; right: 20px; top: 20px; border: none; display: block; z-index: 999;   visibility: visible;cursor: pointer;" onclick="myFunction()">
+        Print
+    </button>
+    @*</div>*@
+    @*--------------------PRINT BUTTON----------------------------------------------*@
+    <div class="report-card" style="box-sizing:border-box;">
+        <table style="width:100%; font-size:12px;">
+            @*15px*@
+            <tbody>
+                <tr>
+                    <th colspan="2" align="left">
+                        <img src="@logo" width="190" style="float:left; margin-right:20px; width:250px;" />
+                        <div style="margin-right:200px;">
+                            @*<h3 align="left" style="padding:0px; margin:0px;">Evaluation Report</h3>*@
+                            <h3 align="center" style="padding:0px; margin:0px;">@Model.ReportName</h3>
+                            <p align="center" style="font-size:12px; margin-bottom:0px; margin-top:5px;">
+                                @*14px*@
+                                @*@Model.SchoolName
+                                    <br />*@
+                                @Model.SchoolAdddress &nbsp;&nbsp;
+                                <br />
+                                Email: satlujps@yahoo.co.in @*@Model.SchoolEmail*@ &nbsp;&nbsp;&nbsp;
+                                <br />
+                                Website: @Model.SchoolWebsite
+                            </p>
+                        </div>
+                    </th>
+                </tr>
+
+                <tr>
+                    <th colspan="2">
+                        <h3 style="margin:0; padding:0; margin-left: 65px;">
+                            Academic Performance
+                            <br />
+                            Class IX &nbsp;&nbsp; Session: @Model.AccademicSession
+                        </h3>
+                    </th>
+                </tr>
+
+                <tr>
+                    <th width="50%">
+                        <h4 align="left" style="padding: 5px 0px; margin: 0px;">
+                            Name: @Model.StudentName
+                            <br />
+                            Father's Name: @Model.FathersName
+                            <br />
+                            Mother's Name: @Model.MothersName
+                        </h4>
+                    </th>
+                    <th width="50%">
+                        <div style="float:left;">
+                            <h4 align="left" style="padding: 5px 0px; margin: 0px; margin-left: -65px; text-align: center;">
+                                Roll No.: @Model.RollNo <span style="margin-left: 10px;">Adm.No.: @Model.AdmissionNo </span>
+                                <br />
+                                Date of Birth: @Model.DateOfBirth
+                                <br />
+                                Class: @Model.ClassDivision
+                            </h4>
+                        </div>
+                        <img src="@Model.StudentImage" style="width:65px; height:65px; margin-left:300px;" />
+                    </th>
+                </tr>
+                @*--------------------------------------------------------------------------------------------------*@
+                @if (Model.IsOneTerm == true) // One Term Progress Card
+                {
+                    <tr>
+                        <th colspan="2">
+                            <table border="1" width="100%" style="border-collapse: collapse; font-size:10px;">
+                                @*13px*@
+                                <thead>
+                                    <tr>
+                                        <th rowspan="3" style="font-weight:bolder;">SCHOLASTIC SUBJECTS</th>
+                                        @*<th colspan="7">Term I - @Model.Periods</th>*@
+                                        <th colspan="8" style="font-weight:bolder;">HALF YEARLY EXAMINATION</th>
+                                    </tr>
+                                    <tr>
+                                        @foreach (var terms in Model.TermDataList) // Exam Heading List
+                                        {
+                                            foreach (var item in ScholasticList) // Full Scholastics
+                                            {
+                                        <th>@item.ScolasticArea </th>
+                                            }
+                                        <th>Grand Total</th>
+                                        <th>Grade</th>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        @foreach (var terms in Model.TermDataList) // Full out of marks
+                                        {
+                                            int avoidScholasticTotalFromGrand = 0;
+                                            totalScore = 0;
+                                            foreach (var item in ScholasticList) // Full Scholastics out of Marks
+                                            {
+                                                if (item.TotalScore != string.Empty && item.TotalScore != "" && avoidScholasticTotalFromGrand != 4)
+                                                {
+                                                    totalScore = totalScore + Convert.ToInt32(item.TotalScore);
+                                                }
+                                        <th>@item.TotalScore</th>
+                                                avoidScholasticTotalFromGrand = avoidScholasticTotalFromGrand + 1;
+                                            }
+                                        <th>@totalScore</th>
+                                        <th></th>
+                                            TotalScoreOfTerms.Add(totalScore);
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var subjects in SubjectList)// Sujects and their marks listing section
+                                    {
+                                        count = 0;
+                                    <tr>
+                                        <td align="left">@subjects.SubjectName.ToUpper()</td>
+                                        @foreach (var terms in Model.TermDataList)
+                                        {
+                                            var data = terms.scholasticList.ToList();
+                                            decimal tot = 0;
+                                            var grade = "";
+                                            int avoidSchTotalForGrand = 0;
+                                            foreach (var result in data)
+                                            {
+                                                var areaName = result.ScolasticArea;
+                                                var areaviseData = ((IEnumerable<dynamic>)result.subjectList).Where(X => X.SubjectName == subjects.SubjectName).FirstOrDefault();
+                                                decimal zz = Convert.ToDecimal(areaviseData.Mark);
+                                                if (avoidSchTotalForGrand != 4)
+                                                {
+                                                    if (areaName == "PT")
+                                                    {
+                                                        zz = (zz * 3) / 40;
+                                                        tot = tot + zz;
+                                                    }
+
+                                                    else
+                                                    {
+                                                        tot = tot + zz;
+                                                    }
+                                                }
+                                                if (areaviseData.Mark == "0")
+                                                {
+                                                    <td>-</td>
+                                                }
+                                                else
+                                                {
+                                                    @*<td>@areaviseData.Mark</td>*@
+                                                    @*<td></td>*@
+                                                    <td>@Convert.ToInt32(zz)</td>
+                                                }
+                                                avoidSchTotalForGrand = avoidSchTotalForGrand + 1;
+                                            }
+                                            <td>@Convert.ToInt32(tot)</td>
+                                            var persentage = Math.Round(((tot / TotalScoreOfTerms[count]) * 100), MidpointRounding.AwayFromZero);
+                                            if (persentage > 90)
+                                            {
+                                                grade = "A1";
+                                            }
+                                            else if (80 < persentage && persentage < 91)
+                                            {
+                                                grade = "A2";
+                                            }
+                                            else if (70 < persentage && persentage < 81)
+                                            {
+                                                grade = "B1";
+                                            }
+                                            else if (60 < persentage && persentage < 71)
+                                            {
+                                                grade = "B2";
+                                            }
+                                            else if (50 < persentage && persentage < 61)
+                                            {
+                                                grade = "C1";
+                                            }
+                                            else if (40 < persentage && persentage < 51)
+                                            {
+                                                grade = "C2";
+                                            }
+                                            else if (32 < persentage && persentage < 41)
+                                            {
+                                                grade = "D";
+                                            }
+                                            else
+                                            {
+                                                grade = "E";
+                                            }
+                                            <td>@grade</td>
+                                            totalMark = totalMark + tot;
+                                            totalOutOff = totalOutOff + TotalScoreOfTerms[count];
+                                            count = count + 1;
+                                        }
+                                    </tr>
+                                    }
+                                    @*COMPUTER SCIENCE*@
+                                    @if (Model.csList.Count() > 0 && Model.csList != null)
+                                    {
+                                        decimal first = Convert.ToDecimal(Model.csList[0].PracticalScore) + Convert.ToDecimal(Model.csList[0].TheoryScore);
+                                        decimal second = first * 2;//this variable is declared for displaying grade-Razi 28/03/2022
+                                        decimal x = Convert.ToDecimal(Model.csList[0].PracticalScore);
+                                        decimal y = Convert.ToDecimal(Model.csList[0].PracticalTotal);
+                                        decimal p = Convert.ToDecimal(Model.csList[0].TheoryScore);
+                                        decimal q = Convert.ToDecimal(Model.csList[0].TheoryTotal);
+
+                                        var grade1 = "";
+                                <tr>
+                                    <td align="left">@Model.csList[0].SubjectName.ToUpper()</td>
+                                    @if (Model.csList[0].PracticalScore == "0")
+                                    {
+                                        <td colspan="3">-</td>
+                                    }
+                                    else
+                                    {
+                                        @*<td colspan="3">Practical @Model.csList[0].PracticalScore / @Model.csList[0].PracticalTotal</td>*@
+                                        <td colspan="3">Practical @Convert.ToInt32(x)/@Convert.ToInt32(y)</td>
+                                    }
+                                    @if (Model.csList[0].TheoryScore == "0")
+                                    {
+                                        <td colspan="3">-</td>
+                                    }
+                                    else
+                                    {
+                                        @*<td colspan="3">Theory @Model.csList[0].TheoryScore / @Model.csList[0].TheoryTotal</td>*@
+                                        <td colspan="3">Theory @Convert.ToInt32(p)/@Convert.ToInt32(q)</td>
+                                    }
+
+                                    <td colspan="1">@Convert.ToInt32(first) </td>
+                                    @*@if (first > 90)
+        {
+            grade1 = "A1";
+        }
+        else if (80 < first && first < 91)
+        {
+            grade1 = "A2";
+        }
+        else if (70 < first && first < 81)
+        {
+            grade1 = "B1";
+        }
+        else if (60 < first && first < 71)
+        {
+            grade1 = "B2";
+        }
+        else if (50 < first && first < 61)
+        {
+            grade1 = "C1";
+        }
+        else if (40 < first && first < 51)
+        {
+            grade1 = "C2";
+        }
+        else if (32 < first && first < 41)
+        {
+            grade1 = "D";
+        }
+        else
+        {
+            grade1 = "E";
+        }*@
+                                    @*
+
+        this is done, since information technology mark has been changed to out of 50, it was previously for out of 100 - Razi 28/03/2022
+
+                                    *@
+
+                                    @if (second > 90)
+                                    {
+                                        grade1 = "A1";
+                                    }
+                                    else if (80 < second && second < 91)
+                                    {
+                                        grade1 = "A2";
+                                    }
+                                    else if (70 < second && second < 81)
+                                    {
+                                        grade1 = "B1";
+                                    }
+                                    else if (60 < second && second < 71)
+                                    {
+                                        grade1 = "B2";
+                                    }
+                                    else if (50 < second && second < 61)
+                                    {
+                                        grade1 = "C1";
+                                    }
+                                    else if (40 < second && second < 51)
+                                    {
+                                        grade1 = "C2";
+                                    }
+                                    else if (32 < second && second < 41)
+                                    {
+                                        grade1 = "D";
+                                    }
+                                    else
+                                    {
+                                        grade1 = "E";
+                                    }
+                                    <td colspan="1">@grade1</td>
+                                </tr>
+
+                                    }@*COMPUTER SCIENCE*@
+
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr colspan="2">
+                        <th>
+                            @*<table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                    <tr>
+                                        <td style="text-align:left;">*ASL: Assessment of Speaking and Listening Skills</td>
+                                        <td style="text-align:left;">*M.A: Multiple Assesment</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:left;">*S.E: Subject Enrichment</td>
+                                        <td style="text-align:left;">*PT: Periodic Test</td>
+                                    </tr>
+                                </table>*@
+                            @*Co - scholastic Area Results*@
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:left;font-weight:bolder;">CO-SCHOLASTIC SUBJECTS</th>
+                                        <th>Half Yearly</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center;">
+                                    @foreach (var co in CoScholasticArea)
+                                    {
+                                        if (co_count == lastCo_Count)
+                                        {
+                                            <tr>
+                                                <th style="border-right:hidden;font-weight:bolder; text-align:left;">HEALTH AND PHYSICAL EDUCATION</th>
+                                                <th></th>
+                                            </tr>
+                                        }
+                                    <tr>
+                                        <td align="left">@co.CoScholasticData.ToUpper()</td>
+                                        @foreach (var terms in Model.TermDataList)
+                                            {
+                                                var coData = terms.ColasticAreaResult;
+                                                var results = ((IEnumerable<dynamic>)coData).Where(x => x.CoScholasticData == co.CoScholasticData).Select(x => x.CoScholasticResult).FirstOrDefault();
+                                            <td>@results.ToUpper()</td>
+                                            }
+                                    </tr>
+                                        co_count= co_count + 1;
+                                    }
+                                </tbody>
+                            </table>
+                        </th>
+
+                        <th>
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;margin-top: -30px;">
+                                <tr>
+                                    <td style="text-align:left;"> Total</td>
+                                    @*<td style="text-align:left;">@Convert.ToInt32(totalMark)/@totalOutOff</td>*@
+                                    <td style="text-align:left;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">Percentage</td>
+                                    @if (totalOutOff != 0)
+                                    {
+                                        var per = Math.Round((totalMark / totalOutOff) * 100, 2);
+                                        <td style="text-align:left;"> @per% </td>
+                                       // <td style="text-align:left;"> </td>
+                                    }
+                                    else
+                                    {
+                                        <td colspan="@colmSpan" style="text-align:left;"></td>
+                                    }
+                                </tr>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr style="vertical-align:text-top;">
+                        <th>
+                            @*Co - scholastic Area Results*@
+                            @*<table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                    <thead>
+                                        <tr>
+                                            <th>CO-SCHOLASTIC SUBJECTS</th>
+                                            <th>Half Yearly</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="text-align:center;">
+                                        @foreach (var co in CoScholasticArea)
+                                        {
+                                            <tr>
+                                                <td align="left">@co.CoScholasticData.ToUpper()</td>
+                                                @foreach (var terms in Model.TermDataList)
+                                                {
+                                                    var coData = terms.ColasticAreaResult;
+                                                    var results = ((IEnumerable<dynamic>)coData).Where(x => x.CoScholasticData == co.CoScholasticData).Select(x => x.CoScholasticResult).FirstOrDefault();
+                                                    <td>@results.ToUpper()</td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>*@
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                <tr>
+                                    <td style="text-align:left;">*ASL: Assessment of Speaking and Listening Skills</td>
+                                    <td style="text-align:left;">*M.A: Multiple Assessment</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">*S.E: Subject Enrichment</td>
+                                    <td style="text-align:left;">*PT: Periodic Test</td>
+                                </tr>
+                            </table>
+                        </th>
+                        <th>
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;margin-top: -30px;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2" width="50%" style="font-weight:bolder;">ATTENDANCE</th>
+                                        <th colspan="2" width="50%" style="font-weight:bolder;">HEALTH STATUS</th>
+                                    </tr>
+                                    <tr>
+                                        <th>STATUS</th>
+                                        <th>Half Yearly</th>
+
+                                        <th></th>
+                                        <th>Half Yearly</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td align="left">No. of Working Days</td>
+                                        @if (attendanceData != null && attendanceData.Count > 0)
+                                        {
+                                        <td>@attendanceData[0].Total</td>
+                                        }
+                                        else
+                                        {
+                                        <td></td>
+                                        }
+                                        <td align="left">Height (cms)</td>
+                                        @if (HealthData != null && HealthData.Count > 0)
+                                        {
+                                        <td>@HealthData[0].Height</td>
+                                        }
+                                        else
+                                        {
+                                        <td></td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td align="left">Days Attended</td>
+                                        @if (attendanceData != null && attendanceData.Count > 0)
+                                        {
+                                        <td>@attendanceData[0].Present</td>
+                                        }
+                                        else
+                                        {
+                                        <td></td>
+                                        }
+                                        <td align="left">Weight (kgs)</td>
+                                        @if (HealthData != null && HealthData.Count > 0)
+                                        {
+                                        <td>@HealthData[0].Weight</td>
+                                        }
+                                        else
+                                        {
+                                        <td></td>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table border="1" style="border-collapse:collapse; font-size:10px; width:70%; margin-top:4px;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="1" style="font-weight:bolder;">REMARKS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        @if (remarks != null && remarks.Count > 0)
+                                        {
+
+                                            @*if (remarks.Count > 2)
+                                                {
+                                                    <td align="left">@remarks[1].Remark</td>
+                                                }
+                                                else
+                                                {
+                                                    <td align="left">@remarks[0].Remark</td>
+                                                }*@
+
+                                            <td align="left">@Model.Remark</td>/*Razi on 28/03/22 for remark issue fix*/
+                                        }
+                                        else
+                                        {
+                                            <td align="left">-</td>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Class Teacher/ HOY/ Link Officer Signature</h5>
+                            </div>
+
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Parent's Signature</h5>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Managing Director Signature</h5>
+                            </div>
+
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Co-Chairman/ Principal's Signature</h5>
+                            </div>
+                        </td>
+                    </tr>
+
+                }
+                @*-----------------------------------------------------------------------------------------------------------------------------------------*@
+                else
+                {
+                    <tr>
+                        <th colspan="2">
+                            <table border="1" width="100%" style="border-collapse: collapse; font-size:10px;">
+                                @*13px*@
+                                <thead>
+                                    <tr>
+                                        <th rowspan="3" style="font-weight:bolder;">SCHOLASTIC SUBJECTS</th>
+                                        @*<th colspan="@colmSpan">Term II - @Model.Periods</th>*@
+                                        <th colspan="@colmSpan" style="font-weight:bolder;">ANNUAL EXAMINATION</th>
+
+                                    </tr>
+                                    <tr>
+                                        @foreach (var terms in Model.TermDataList) // Exam Heading List
+                                        {
+                                            foreach (var item in ScholasticList) // Full Scholastics **
+                                            {
+                                                lastScholastic = lastScholastic + 1;
+                                        <th>@item.ScolasticArea </th>
+                                            }
+                                        <th>Grand Total</th>
+                                        <th>Grade</th>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        @foreach (var terms in Model.TermDataList) // Full out of marks
+                                        {
+                                            int calculateGrandTotal = 0;
+                                            totalScore = 0;
+                                            var areaname = ScholasticList.ToList();
+                                            foreach (var item in ScholasticList) // Full Scholastics out of Marks
+                                            {
+                                                if (item.TotalScore != string.Empty && item.TotalScore != "" && (calculateGrandTotal == 6 || calculateGrandTotal == 7))
+                                                {
+                                                    if (item.ScolasticArea == "PT")
+                                                    {
+                                                        double totScore = Math.Round((Convert.ToDouble(item.TotalScore) * 3) / 40);
+                                                        totalScore = totalScore + Convert.ToInt32(totScore);
+                                                    }
+                                                    else
+                                                    {
+                                                        totalScore = totalScore + Convert.ToInt32(item.TotalScore);
+                                                    }
+
+                                                    //totalScore = totalScore + Convert.ToInt32(item.TotalScore);
+                                                }
+                                                else
+                                                {
+                                                    if (item.ScolasticArea == "PT")
+                                                    {
+                                                        double totScore = Math.Round((Convert.ToDouble(item.TotalScore) * 3) / 40);
+                                                        totalScore = totalScore + Convert.ToInt32(totScore);
+                                                        <th>@totalScore</th>
+                                                    }
+                                                    else
+                                                    {
+                                                        <th>@item.TotalScore</th>
+                                                        calculateGrandTotal = calculateGrandTotal + 1;
+                                                    }
+                                                }
+                                                @*<th>@item.TotalScore</th>
+                                                calculateGrandTotal = calculateGrandTotal + 1;*@
+                                            }
+                                            <th>@totalScore</th>
+                                            <th></th>
+                                            TotalScoreOfTerms.Add(totalScore);
+
+                                            public_Totel = totalScore;
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var subjects in SubjectList)// Sujects and their marks listing section
+                                    {
+                                        count = 0;
+                                    <tr>
+                                        <td align="left">@subjects.SubjectName.ToUpper()</td>
+                                        @foreach (var terms in Model.TermDataList)
+                                        {
+                                            var data = terms.scholasticList.ToList();
+                                            decimal tot = 0;
+                                            var grade = "";
+                                            int calculateGrandTotal = 0;
+                                            foreach (var result in data)
+                                            {
+                                                var areaName = result.ScolasticArea;
+                                                var areaviseData = ((IEnumerable<dynamic>)result.subjectList).Where(X => X.SubjectName == subjects.SubjectName).FirstOrDefault();
+                                                decimal zz = Convert.ToDecimal(areaviseData.Mark);
+                                                if (areaviseData == null)
+                                                {
+
+                                                }
+                                                else
+                                                {
+                                                    //decimal zz = 0;
+                                                    if (calculateGrandTotal == 6 || calculateGrandTotal == 7)
+                                                    {
+                                                        // zz = Convert.ToDecimal(areaviseData.Mark);
+                                                        //tot = tot + zz;
+                                                        if (areaName == "PT")
+                                                        {
+                                                            //zz = Math.Round((Convert.ToDecimal(areaviseData.Mark)*3)/40);
+                                                            //tot = tot + zz;
+                                                            zz = (zz * 3) / 40;
+                                                        }
+                                                        else
+                                                        {
+                                                            //zz = Convert.ToDecimal(areaviseData.Mark);
+                                                            tot = tot + zz;
+                                                        }
+                                                    }
+                                                    if (areaviseData.Mark == "0")
+                                                    {
+                                                        <td>-</td>
+                                                    }
+                                                    else
+                                                    {
+
+                                                        int n;
+                                                        bool isNumeric = int.TryParse(areaviseData.Mark, out n);
+                                                        if (isNumeric == true)
+                                                        {
+                                                            if (areaName == "PT")
+                                                            {
+                                                                <td>@Math.Round((Convert.ToDouble(areaviseData.Mark) * 3) / 40)</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>@Convert.ToInt32(areaviseData.Mark)</td>
+                                                            }
+                                                            @*<td>@Convert.ToInt32(areaviseData.Mark)</td>*@
+                                                        }
+                                                        else
+                                                        {
+                                                            decimal value1100;
+                                                            if (Decimal.TryParse(areaviseData.Mark, out value1100))
+                                                            {
+                                                                string ipp1 = areaviseData.Mark;
+                                                                string[] ipp = ipp1.Split('.');
+
+                                                                <td> @ipp[0]</td>
+                                                            }
+                                                            // It's a decimal
+                                                            else
+                                                            {
+                                                                @*<td> @areaviseData.Mark</td>*@
+                                                                <td>@Convert.ToInt32(zz)</td>
+                                                            }
+                                                            // No it's not.
+
+                                                        }
+
+                                                        @*...edited -09-03-2020...*@
+                                                        @*<td>@Convert.ToInt32(zz)</td>*@
+                                                    }
+                                                }
+                                                calculateGrandTotal = calculateGrandTotal + 1;
+                                            }
+                                            <td> @Convert.ToInt32(tot)</td>
+
+                                            if (tot != 0)
+                                            {
+                                                var persentage = Math.Round(((tot / TotalScoreOfTerms[count]) * 100), MidpointRounding.AwayFromZero);
+                                                if (persentage > 90)
+                                                {
+                                                    grade = "A1";
+                                                }
+                                                else if (80 < persentage && persentage < 91)
+                                                {
+                                                    grade = "A2";
+                                                }
+                                                else if (70 < persentage && persentage < 81)
+                                                {
+                                                    grade = "B1";
+                                                }
+                                                else if (60 < persentage && persentage < 71)
+                                                {
+                                                    grade = "B2";
+                                                }
+                                                else if (50 < persentage && persentage < 61)
+                                                {
+                                                    grade = "C1";
+                                                }
+                                                else if (40 < persentage && persentage < 51)
+                                                {
+                                                    grade = "C2";
+                                                }
+                                                else if (32 < persentage && persentage < 41)
+                                                {
+                                                    grade = "D";
+                                                }
+                                                else
+                                                {
+                                                    grade = "E";
+                                                }
+                                            }
+
+
+                                            <td>@grade</td>
+                                            //if (count == 0)
+                                            //{
+                                            //    totalMark = totalMark + tot;
+                                            //    totalOutOff = totalOutOff + TotalScoreOfTerms[count];
+                                            //}
+                                            //else
+                                            //{
+                                            //    totalMark2 = totalMark2 + tot;
+                                            //    totalOutOff2 = totalOutOff2 + TotalScoreOfTerms[count];
+                                            //}
+                                            if (count != 0)
+                                            {
+                                                totalMark = totalMark + tot;
+                                                totalOutOff2 = totalOutOff2 + TotalScoreOfTerms[count];
+                                            }
+                                            else
+                                            {
+                                                totalMark2 = totalMark2 + tot;
+                                                totalOutOff2 = totalOutOff2 + TotalScoreOfTerms[count];
+                                            }
+
+                                            //count = count + 1;
+                                        }
+                                    </tr>
+                                    }
+                                    @*COMPUTER SCIENCE*@
+                                    @if (Model.csList.Count() > 0 && Model.csList != null)
+                                    {
+                                        decimal first = Convert.ToDecimal(Model.csList[0].PracticalScore) + Convert.ToDecimal(Model.csList[0].TheoryScore);
+                                        decimal second = first * 2;//this variable is declared for displaying grade-Razi 28/03/2022
+                                         //decimal second = Convert.ToDecimal(Model.csList[1].PracticalScore) + Convert.ToDecimal(Model.csList[1].TheoryScore);
+                                        decimal x = Convert.ToDecimal(Model.csList[0].PracticalScore);
+                                        decimal y = Convert.ToDecimal(Model.csList[0].PracticalTotal);
+                                        decimal p = Convert.ToDecimal(Model.csList[0].TheoryScore);
+                                        decimal q = Convert.ToDecimal(Model.csList[0].TheoryTotal);
+
+                                        var grade1 = "";
+                                        //var grade2 = "";
+                                <tr>
+                                    <td colspan="1" align="left">@Model.csList[0].SubjectName.ToUpper()</td>
+                                    @if (Model.csList[0].PracticalScore == "0")
+                                    {
+                                        <td colspan="4">-</td>
+                                    }
+                                    else
+                                    {
+                                        @*<td colspan="4">Practical @Model.csList[0].PracticalScore / @Model.csList[0].PracticalTotal</td>*@
+                                        <td colspan="2">Practical @Convert.ToInt32(x)/@Convert.ToInt32(y)</td>
+                                    }
+                                    @if (Model.csList[0].TheoryScore == "0")
+                                    {
+                                        <td colspan="4">-</td>
+                                    }
+                                    else
+                                    {
+                                        @*<td colspan="4">Theory @Model.csList[0].TheoryScore / @Model.csList[0].TheoryTotal</td>*@
+                                        <td colspan="6">Theory @Convert.ToInt32(p)/@Convert.ToInt32(q)</td>
+                                    }
+
+                                    @*<td colspan="2"></td>*@
+                                    @*<td colspan="2"></td>*@
+                                    @*<td colspan="1">@Math.Round(first) </td>
+        @if (first > 90)
+            {
+                grade1 = "A1";
+            }
+            else if (80 < first && first < 91)
+            {
+                grade1 = "A2";
+            }
+            else if (70 < first && first < 81)
+            {
+                grade1 = "B1";
+            }
+            else if (60 < first && first < 71)
+            {
+                grade1 = "B2";
+            }
+            else if (50 < first && first < 61)
+            {
+                grade1 = "C1";
+            }
+            else if (40 < first && first < 51)
+            {
+                grade1 = "C2";
+            }
+            else if (32 < first && first < 41)
+            {
+                grade1 = "D";
+            }
+            else
+            {
+                grade1 = "E";
+            }*@
+
+                                    @*
+
+        this is done, since information technology mark has been changed to out of 50, it was previously for out of 100 - Razi 28/03/2022
+
+                                    *@
+
+                                    <td colspan="1">@Math.Round(first) </td>
+                                    @if (second > 90)
+                                    {
+                                        grade1 = "A1";
+                                    }
+                                    else if (80 < second && second < 91)
+                                    {
+                                        grade1 = "A2";
+                                    }
+                                    else if (70 < second && second < 81)
+                                    {
+                                        grade1 = "B1";
+                                    }
+                                    else if (60 < second && second < 71)
+                                    {
+                                        grade1 = "B2";
+                                    }
+                                    else if (50 < second && second < 61)
+                                    {
+                                        grade1 = "C1";
+                                    }
+                                    else if (40 < second && second < 51)
+                                    {
+                                        grade1 = "C2";
+                                    }
+                                    else if (32 < second && second < 41)
+                                    {
+                                        grade1 = "D";
+                                    }
+                                    else
+                                    {
+                                        grade1 = "E";
+                                    }
+
+                                    <td colspan="1">@grade1</td>
+                                </tr>
+
+                                    }@*COMPUTER SCIENCE*@
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr colspan="2">
+                        <th>
+                            @*<table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                    <tr>
+                                        <td style="text-align:left;">*ASL: Assessment of Speaking and Listening Skills</td>
+                                        <td style="text-align:left;">*M.A: Multiple Assesment</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:left;">*S.E: Subject Enrichment</td>
+                                        <td style="text-align:left;">*PT: Periodic Test</td>
+                                    </tr>
+                                </table>*@
+                            @*Co - scholastic Area Results*@
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:left;font-weight:bolder;">CO-SCHOLASTIC SUBJECTS</th>
+                                        <th>Annual</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center;">
+                                    @foreach (var co in CoScholasticArea)
+                                    {
+                                        if (co_count == lastCo_Count)
+                                        {
+                                            <tr>
+                                                <th style="border-right:hidden;font-weight:bolder; text-align:left;">HEALTH AND PHYSICAL EDUCATION</th>
+                                                <th></th>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <td align="left">@co.CoScholasticData.ToUpper()</td>
+                                            @foreach (var terms in Model.TermDataList)
+                                            {
+                                                var coData = terms.ColasticAreaResult;
+                                                var results = ((IEnumerable<dynamic>)coData).Where(x => x.CoScholasticData == co.CoScholasticData).Select(x => x.CoScholasticResult).FirstOrDefault();
+                                                <td>@results.ToUpper()</td>
+                                            }
+                                        </tr>
+                                        co_count = co_count + 1;
+                                    }
+                                </tbody>
+                            </table>
+                        </th>
+                        
+                        <th>
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;margin-top: -30px;">
+                                <tr>
+                                    <td style="text-align:left;"> Total </td>
+
+                                    @{
+
+                                        var aaa1 = totalMark;
+                                        var aaa2 = totalMark;
+                                        var aaa = totalMark;
+                                        var fsdf = public_Totel;
+                                    }
+
+
+                                    <td style="text-align:left; color : white;">@Convert.ToInt32(totalMark)/@totalOutOff</td>
+                                   @*<td style="text-align:left;"></td>*@
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">Percentage</td>
+                                    @if (totalOutOff != 0)
+                                    {
+                                        var per = Math.Round((totalMark / totalOutOff) * 100, 2);
+
+                                        string getPercentage = per.ToString();
+                                        string[] Array_getPercentage = getPercentage.Split('.');
+
+                                        <td style="text-align:left; color:white;">@Array_getPercentage[0]% </td>
+                                        //<td style="text-align:left;"> </td>
+                                    }
+                                    else
+                                    {
+                                        <td style="text-align:left;"> </td>
+                                    }
+                                </tr>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr style="vertical-align: text-top;">
+                        <th>
+                            @*Co - scholastic Area Results*@
+                            @*<table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                    <thead>
+                                        <tr>
+                                            <th>CO-SCHOLASTIC SUBJECTS</th>
+                                            <th>Annual</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="text-align:center;">
+                                        @foreach (var co in CoScholasticArea)
+                                        {
+                                        <tr>
+                                            <td align="left">@co.CoScholasticData.ToUpper()</td>
+                                            @foreach (var terms in Model.TermDataList)
+                                                {
+                                                    var coData = terms.ColasticAreaResult;
+                                                    var results = ((IEnumerable<dynamic>)coData).Where(x => x.CoScholasticData == co.CoScholasticData).Select(x => x.CoScholasticResult).FirstOrDefault();
+                                                <td>@results.ToUpper()</td>
+                                                }
+                                        </tr>
+                                        }
+                                    </tbody>
+                                </table>*@
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;">
+                                <tr>
+                                    <td style="text-align:left;">*ASL: Assessment of Speaking and Listening Skills</td>
+                                    <td style="text-align:left;">*M.A: Multiple Assessment</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">*S.E: Subject Enrichment</td>
+                                    <td style="text-align:left;">*PT: Periodic Test</td>
+                                </tr>
+                            </table>
+                        </th>
+                        <th>
+                            <table border="1" style="border-collapse: collapse; font-size:10px; width:70%;margin-top: -30px;">
+                                @*13px*@
+                                <thead>
+                                    <tr>
+                                        <th colspan="2" width="50%" style="font-weight:bolder;">ATTENDANCE</th>
+                                        <th colspan="2" width="50%" style="font-weight:bolder;">HEALTH STATUS</th>
+                                    </tr>
+                                    <tr>
+                                        <th>STATUS</th>
+                                        <th>Annual</th>
+
+                                        <th></th>
+                                        <th>Annual</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td align="left">No. of Working Days</td>
+                                        @if (attendanceData != null && attendanceData.Count > 1)
+                                        {
+                                            <td>@attendanceData[1].Total</td>
+                                            @*<td>@attendanceData[2].Total</td>*@
+                                        }
+                                        else
+                                        {
+                                            <td>-</td>
+                                        }
+                                        <td align="left">Height (cms)</td>
+                                        @*@if (HealthData != null && HealthData.Count > 1)
+        {
+        <td>@HealthData[1].Height</td>
+        }
+        else
+        {
+        <td></td>
+        }*@
+
+                                        @if (HealthData_new != null)
+                                        {
+                                            <td>@HealthData_new.Height</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+
+
+
+                                    </tr>
+                                    <tr>
+                                        <td align="left">Days Attended</td>
+                                        @if (attendanceData != null && attendanceData.Count > 1)
+                                        {
+                                            <td>@attendanceData[1].Present</td>
+                                            //<td>@attendanceData[2].Present</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                        <td align="left">Weight (kgs)</td>
+                                        @*@if (HealthData != null && HealthData.Count > 1)
+        {
+        <td>@HealthData[1].Weight</td>
+        }
+        else
+        {
+        <td></td>*@
+
+
+                                        @if (HealthData_new != null)
+                                        {
+                                            <td>@HealthData_new.Weight</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table border="1" style="border-collapse:collapse; font-size:10px; width:70%; margin-top:4px;">
+                                @*13px*@
+                                <thead>
+                                    <tr>
+                                        <th colspan="2" width="50%" style="font-weight:bolder;"> REMARKS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        @*@if (remarks_final != null && remarks.Count > 1)
+        {
+            if (remarks[1].Remark == "")
+            {
+                <td align="left" style="text-align: center;"> - </td>
+            }
+            else
+            {
+                <td align="left">@remarks[1].Remark</td>
+            }
+
+        }
+        else
+        {
+            <td align="left">-</td>
+        }*@
+
+
+                                        @if (remarks_final != null)
+                                        {
+
+                                            if (remarks_final.Remark == "")
+                                            {
+                                                <td align="left" style="text-align: center;"> - </td>
+                                            }
+                                            else
+                                            {
+                                                <td align="left">@remarks_final.Remark</td>
+                                            }
+
+                                            
+                                        }
+                                        else
+                                        {
+                                            <td align="left">-</td>
+                                        }
+
+
+
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Class Teacher/ HOY/ Link Officer Signature</h5>
+                            </div>
+
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Parent's Signature</h5>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Managing Director Signature</h5>
+                            </div>
+
+                            <div style="width:50%; float:left; text-align:center;">
+                                <div style="height:27px;"></div>
+                                <h5>Co-Chairman/ Principal's Signature</h5>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
+
+
+<script>
+    function myFunction() {
+        var printButton = document.getElementById("btn-print");
+        printButton.style.visibility = 'hidden';
+        window.print();
+        printButton.style.visibility = 'visible';
+    }
+</script>

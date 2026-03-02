@@ -1,0 +1,73 @@
+﻿@model Satluj_Latest.Models.StudentModel
+
+@{ 
+    var students = new Satluj_Latest.Data.Division(Model.divisionId).GetStudentDetails().OrderBy(z => z.StundentName).ToList();
+
+
+}
+<table id="stud-list-table" class="table custome-table table-student-list">
+    <thead>
+        <tr>
+            <th>
+                <input id="chkBox-chkAll" type="checkbox" data-id="xxx"/>
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Parent Name
+            </th>
+            <th>
+                Address
+            </th>
+            <th>
+                Contact No.
+            </th>
+            <th>
+                Class/Division
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in students)
+        {
+
+            <tr class="ng-click-studentDiscount-details">
+
+                <td>
+                    <label style="margin-right: 10px;">
+                        <input id="chkBox-user" class="checkbox-input chk-stud" type="checkbox" data-id="@student.StudentId" />
+                        <span class="checkbox-virtual"></span>
+                    </label>
+                </td>
+                <td>
+
+                    @if (student.FilePath != null)
+                {
+                        <img src="@student.FilePath" class="user-pic-tab" />
+                    }
+                    else
+                    {
+                        <img src="~/Content/img/children-1.gif" class="user-pic-tab" />
+                    }
+                    @student.StundentName
+                </td>
+                <td>
+                    @student.ParentName
+                </td>
+                <td>
+                    @student.Address
+                </td>
+                <td>
+                    @student.ContactNumber
+                </td>
+                <td>
+                    @student.ClassName / @student.DivisionName
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+ 

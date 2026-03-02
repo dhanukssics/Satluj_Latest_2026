@@ -1,0 +1,117 @@
+﻿@model Satluj_Latest.Models.ExamsModel
+
+@{
+    var dd = new Satluj_Latest.Data.DropdownData();
+}
+
+<style>
+    .border-design {
+        border: 1px solid black !important;
+    }
+</style>
+
+<form asp-action="SubmitEditExam"
+      asp-controller="School"
+      id="form-exam-edit"
+      method="post"
+      data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-success="ExamEditSuccess"
+      data-ajax-failure="ExamEditFailed">
+
+    @Html.HiddenFor(z => z.ExamId)
+    @Html.HiddenFor(z => z.SchoolId)
+    @Html.HiddenFor(z => z.ClassId)
+
+    <div class="col-lg-6 col-lg-offset-4" role="document">
+        <div class="modal-content">
+
+            <!-- HEADER -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Exams</h4>
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Class</label><span style="color:red">*</span>
+
+                            @Html.DropDownListFor(
+                            m => m.ClassId,
+                                                        dd.GetClasses(Model.SchoolId),
+                                                        "--Choose--",
+                                                        new { @class = "form-control slct-alldivisions-dropdwn", @data_live_search = "true" }
+                                                        )
+                            @Html.ValidationMessageFor(z => z.ClassId)
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Name</label><span style="color:red">*</span>
+
+                            @Html.TextBoxFor(
+                                                        m => m.ExamName,
+                                                        new { @class = "form-control border-design", placeholder = "Name" }
+                                                        )
+                            @Html.ValidationMessageFor(z => z.ExamName)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DATES -->
+                <div class="row">
+
+                    <div class="col-sm-6 calendar-inp pos_icon_adj form-group">
+                        <label>Start Date</label><span style="color:red">*</span>
+                        @Html.TextBoxFor(
+                                                m => m.StartDateString,
+                                                new { @class = "form-control date-exam-add border-design", placeholder = "Select Date" }
+                                                )
+                        @Html.ValidationMessageFor(z => z.StartDateString)
+                    </div>
+
+                    <div class="col-sm-6 calendar-inp pos_icon_adj form-group">
+                        <label>End Date</label><span style="color:red">*</span>
+                        @Html.TextBoxFor(
+                                                m => m.EndDateString,
+                                                new { @class = "form-control date-exam-add border-design", placeholder = "Select Date" }
+                                                )
+                        @Html.ValidationMessageFor(z => z.EndDateString)
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+
+                <button type="submit" id="btn-editExam" class="btn pay-now-btn" style="display:none;">Save</button>
+                <button type="button" id="btn-dummy-editExam" class="btn pay-now-btn">Save</button>
+            </div>
+
+        </div> <!-- modal-content -->
+    </div> <!-- col-lg-6 -->
+
+</form>
+
+<script>
+    $('.date-exam-add').datepicker({
+        format: 'mm-dd-yyyy',
+        autoclose: true,
+        todayHighlight: true,
+        startDate: 'd'
+    });
+
+    $("#btn-dummy-editExam").click(function () {
+        $("#btn-editExam").click();
+    });
+</script>

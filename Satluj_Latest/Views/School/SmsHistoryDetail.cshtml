@@ -1,0 +1,166 @@
+﻿@model Satluj_Latest.Models.SMSHistoryModel
+@{
+    ViewBag.Title = "SMS History";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+
+}
+
+<style>
+    .ng-click-feeDetails {
+        cursor: pointer;
+    }
+</style>
+<div class="form-group">
+    <a href="/School/SmsHistory" class="btn btn-peek"><i class="fa fa-arrow-left"></i> Back</a>
+</div>
+<h3>Sms Details</h3>
+
+@*<div class="table-responsive">
+        <table class="table custome-table" id="smsList">
+            <thead>
+                <tr>
+                    <th>
+                        Slno
+                    </th>
+                    <th>
+                        Date
+                    </th>
+                    <th>
+                        Student Name
+                    </th>
+                    <th>
+                        Class
+                    </th>
+                    <th>
+                        Division
+                    </th>
+                    <th>
+                        Content
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var index = 1;
+                    if (ViewBag.Result.Count > 0)
+                    {
+                        foreach (var sms in ViewBag.Result)
+                        {
+                            <tr class="ng-click" data-id="@sms.Id">
+                                <td>
+                                    @index
+                                </td>
+                                <td>
+                                    @sms.MessageDate.ToString("dd-MM-yyyy")
+                                </td>
+                                <td>
+                                    @sms.StuedentName
+                                </td>
+                                <td>
+                                    @sms.StudentClass
+                                </td>
+                                <td>
+                                    @sms.StudentDivision
+
+                                </td>
+                                <td>
+                                    @sms.MessageContent
+                                </td>
+                            </tr>
+                            index++;
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>*@
+
+
+<div class="table-responsive" id="student-history-view">
+    @if (Model.SenderType == 0)
+    {
+        @Html.Partial("~/Views/School/_pv_StudentSMSHistory.cshtml", Model)
+    }
+    else
+    {
+        @Html.Partial("~/Views/School/_pv_StaffSMSHistory.cshtml", Model)
+    }
+</div>
+
+<div class="table-responsive" id="modalRefreshSMS">
+  
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $("#smsList").dataTable();
+    });
+
+
+
+    //----------------Staff----------------------
+    $(document).on('click', '#devivery-status', function () {
+        var headId = $('#headt-Id').val();
+        if (headId != '') {
+            $.ajax({
+                url: '/School/CheckSMSDeliveryData/' + headId,
+                type: "GET",
+                dataType: 'json',
+                success: function (status) {
+                    console.log(status);
+                    RefreshDatas();
+                }
+            });
+        }
+
+    });
+
+
+    function RefreshDatas() {
+        var headId = $('#headt-Id').val();
+        $.ajax({
+            url: '/School/GetAllSmsHistoryWithStatus/' + headId,
+            dataType: 'html',
+            success: function (data) {
+                $('#student-history-view').html('');
+                $('#student-history-view').html(data);
+                $("#smsList").dataTable();
+            }
+        })
+    }
+    //----------------------------------------------------
+    //----------------Student----------------------
+    $(document).on('click', '#devivery-status-student', function () {
+        //debugger;
+        var headId = $('#headt-Id').val();
+        if (headId != '') {
+            $.ajax({
+                url: '/School/CheckSMSDeliveryDataStudent/' + headId,
+                type: "GET",
+                dataType: 'json',
+                success: function (status) {
+                    RefreshDatasStudent();
+                }
+            });
+        }
+    });
+    function RefreshDatasStudent() {
+        var headId = $('#headt-Id').val();
+        $.ajax({
+            url: '/School/GetAllSmsHistoryWithStatusStudent/' + headId,
+            dataType: 'html',
+            success: function (data) {
+                $('#student-history-view').html('');
+                $('#student-history-view').html(data);
+                $("#smsList").dataTable();
+            }
+        })
+    }
+
+
+
+    //------------------------------------------
+</script>

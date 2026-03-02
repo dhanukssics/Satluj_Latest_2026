@@ -1,0 +1,287 @@
+﻿@model Satluj_Latest.Models.NonSubjectScoreModel
+@{
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+
+<div class="row">
+    <div class="col-lg-12">
+        <h3 style="margin-top: 5px;"> V Class Result</h3>
+            <div class="row">
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Assesments : </label>
+                        <br />
+                    <select asp-for="AssesmentTableId"
+                            asp-items="ViewBag.Vassessments"
+                            class="form-control assesment-id"
+                            data-live-search="true"
+                            name="classDropdown">
+
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="AssesmentTableId" class="text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Division : </label>
+                        <br />
+                    <select asp-for="DivisionId"
+                            asp-items="ViewBag.VClassDivisinLists"
+                            class="form-control division-drop-down class-drop-down"
+                            data-live-search="true"
+                            name="classDropdown">
+
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="DivisionId" class="text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label>Skill : </label>
+                        <br />
+                    <select asp-for="VMarkTypeId"
+                            asp-items="Html.GetEnumSelectList<VNonSubjectSkills>()"
+                            class="form-control skill_selction"
+                            data-live-search="true"
+                            name="classDropdown">
+
+                        <option value="">--Choose--</option>
+                    </select>
+
+                    <span asp-validation-for="VMarkTypeId" class="text-danger"></span>
+
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+<div class="row col-lg-3">
+    <button type="button" id="students-Mark-Search_btn" style="width: 100%;" class="btn pay-now-btn">Search</button>
+</div>
+<div class="row col-lg-12" id="result-entry-div-id" style="margin-top:10px;">
+
+</div>
+
+
+<script>
+
+    $("#students-Mark-Search_btn").click(function () {
+        var assesmentId = $(".assesment-id option:selected").val();
+        if (assesmentId == 0) {
+            toastrError('Please select the Assesment!');
+        }
+        else {
+            var divisionId = $(".division-drop-down option:selected").val();
+            if (divisionId == 0) {
+                toastrError('Please select the division!');
+            }
+            else {
+                LoadDetails();
+            }
+        }
+    });
+
+    function LoadDetails() {
+
+        var divisionId = $(".division-drop-down option:selected").val();
+        var skillId = $(".skill_selction option:selected").val();
+        var assesmentId = $(".assesment-id option:selected").val();
+        var id = divisionId + '~' + skillId + '~' + assesmentId;
+        $.ajax({
+            url: '/SpecialClass/LoadAllStudentsWithNonSubjectSkillsMarks?id=' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#result-entry-div-id').html('');
+                $('#result-entry-div-id').html(data);
+            }
+        });
+
+    }
+
+    //GAMESS SKILL SAVE
+    $(document).on('click', '#students-game-skill-Save_btn', function () {
+        var source = $(this);
+        storeGamesSkills(source);
+    });
+
+    function storeGamesSkills(source) {
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._GamesScore = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data._GamesScore.Enthusiasm = $(this).find('.cls-mark-Enthusiasm').val();
+            //data._GamesScore.Discipline = $(this).find('.cls-mark-Discipline').val();
+            //data._GamesScore.TeamSpirit = $(this).find('.cls-mark-TeamSpirit').val();
+            data.StudentName = '';
+            dataList._SkillModel.push(data);
+        });
+        console.log(dataList);
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentGameSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //HEALTH SKILL SAVE
+    $(document).on('click', '#students-health-skill-Save_btn', function () {
+        var source = $(this);
+        storeHealthSkills(source);
+    });
+
+    function storeHealthSkills(source) {
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._HealthScore = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data._HealthScore.Height = $(this).find('.cls-mark-Height').val();
+            data._HealthScore.Weight = $(this).find('.cls-mark-Weight').val();
+            data._HealthScore.WorkingDays = $(this).find('.cls-mark-WorkingDays').val();
+            data._HealthScore.Present = $(this).find('.cls-mark-Present').val();
+            data.StudentName = '';
+            dataList._SkillModel.push(data);
+        });
+        console.log(dataList);
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentHealthSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //PERSONALITY DEVELOPMENT
+    $(document).on('click', '#students-personality-skill-Save_btn', function () {
+        var source = $(this);
+        storePersonalitySkills(source);
+    });
+
+    function storePersonalitySkills(source) {
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._Personality_Development = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data._Personality_Development.Courteousness = $(this).find('.cls-mark-Courteousness').val();
+            data._Personality_Development.Confident = $(this).find('.cls-mark-Confident').val();
+            data._Personality_Development.CareOfBelongings = $(this).find('.cls-mark-CareOfBelongings').val();
+            data._Personality_Development.Neatness = $(this).find('.cls-mark-Neatness').val();
+            data._Personality_Development.Punctuality = $(this).find('.cls-mark-Punctuality').val();
+            data._Personality_Development.Initiative = $(this).find('.cls-mark-Initiative').val();
+            data._Personality_Development.SharingCaring = $(this).find('.cls-mark-SharingCaring').val();
+            data._Personality_Development.Property = $(this).find('.cls-mark-Property').val();
+            data.StudentName = '';
+            dataList._SkillModel.push(data);
+        });
+        console.log(dataList);
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentPersonalSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+    //REMARKS SKILL SAVE
+    $(document).on('click', '#students-remark-skill-Save_btn', function () {
+        var source = $(this);
+        storeRemarkSkills(source);
+    });
+
+    function storeRemarkSkills(source) {
+        var dataList = new Object();
+        dataList.SchoolId = $('#SchoolId').val();
+        dataList.DivisionId = $('#DivisionId').val();
+        dataList.AssesmentId = $('#AssesmentId').val();
+        dataList._SkillModel = [];
+        $('.cls-tr-class').each(function (index, elem) {
+            var data = new Object();
+            data._RemarkSchore = new Object();
+            data.StudentId = $(this).attr('data-StudentId');
+            data._RemarkSchore.Remark = $(this).find('.cls-mark-Remark').val();
+            data._RemarkSchore.AdditionalRemark = $(this).find('.cls-AdditionalRemark').val();
+            data.StudentName = '';
+            dataList._SkillModel.push(data);
+        });
+        console.log(dataList);
+        $.ajax({
+            url: "/SpecialClass/SubmitStudentRemarkSkill",
+            type: "POST",
+            dataType: 'json',
+            data: dataList,
+            global: false,
+            success: function (response) {
+                if (response.status) {
+                    toastrSuccess(response.msg);
+                    LoadDetails();
+                }
+                else {
+                    toastrError(response.msg);
+                }
+            },
+            error: function (data) {
+            }
+        });
+    };
+
+</script>

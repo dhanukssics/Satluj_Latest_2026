@@ -1,0 +1,152 @@
+﻿@model Satluj_Latest.Models.StudentModel
+
+<form asp-action="AddNewStudentParentInfo"
+      asp-controller="School"
+      method="post"
+      id="form-login">
+
+    @Html.HiddenFor(m => m.studentId)
+    @Html.HiddenFor(m => m.ParentId)
+
+    <div class="modal-dialog" role="document" style="background-color:#fff;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title">Edit Student Parents Info</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- Parent Names -->
+                <div class="row">
+                    <div class="col-sm-12">
+
+                        <div class="form-group col-sm-4">
+                            <label>Father Name</label>
+                            <input asp-for="FatherName" class="form-control" placeholder="Father Name" />
+                            <span asp-validation-for="FatherName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <label>Mother Name</label>
+                            <input asp-for="MotherName" class="form-control" placeholder="Mother Name" />
+                            <span asp-validation-for="MotherName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <label>Guardian Name</label>
+                            <input asp-for="GuardianName" class="form-control" placeholder="Guardian Name" />
+                            <span asp-validation-for="GuardianName" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Education -->
+                <div class="row">
+                    <div class="col-sm-12">
+
+                        <div class="form-group col-sm-4">
+                            <label>Education</label>
+                            <input asp-for="FatherEducation" class="form-control" placeholder="Education" />
+                            <span asp-validation-for="FatherEducation" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <label>Education</label>
+                            <input asp-for="MotherEducaton" class="form-control" placeholder="Education" />
+                            <span asp-validation-for="MotherEducaton" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <label>Education</label>
+                            <input asp-for="GuardianEduation" class="form-control" placeholder="Education" />
+                            <span asp-validation-for="GuardianEduation" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Occupation -->
+                <div class="row">
+                    <div class="col-sm-12">
+
+                        <div class="form-group col-sm-4">
+                            <label>Occupation</label>
+                            <input asp-for="FatherOccupation" class="form-control" placeholder="Occupation" />
+                            <span asp-validation-for="FatherOccupation" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <label>Occupation</label>
+                            <input asp-for="MotherOccupation" class="form-control" placeholder="Occupation" />
+                            <span asp-validation-for="MotherOccupation" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <label>Occupation</label>
+                            <input asp-for="GuardianOccupation" class="form-control" placeholder="Occupation" />
+                            <span asp-validation-for="GuardianOccupation" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="row">
+                    <div class="col-sm-12">
+
+                        <div class="form-group col-sm-4">
+                            <label>Contact No</label>
+                            <input asp-for="FatherContact" class="form-control" placeholder="Contact" />
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <label>Contact No</label>
+                            <input asp-for="MotherContact" class="form-control" placeholder="Contact" />
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <label>Contact No</label>
+                            <input asp-for="GuardianContact" class="form-control" placeholder="Contact" />
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="row">
+                    <div class="col-sm-12">
+
+                        <div class="form-group col-sm-4">
+                            <label>Email</label>
+                            <input asp-for="FatherEmail" class="form-control" placeholder="Email" />
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <label>Email</label>
+                            <input asp-for="MotherEmail" class="form-control" placeholder="Email" />
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <label>Email</label>
+                            <input asp-for="GuardianEmail" class="form-control" placeholder="Email" />
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn pay-now-btn">Save</button>
+            </div>
+
+        </div>
+    </div>
+
+</form>

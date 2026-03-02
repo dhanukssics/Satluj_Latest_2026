@@ -1,0 +1,118 @@
+﻿
+
+@model Satluj_Latest.Models.DayBookReportModel
+@{
+    DateTime startDate = Model.FromDate;
+    DateTime endDate = Model.ToDate;
+    long schoolId = Model.SchoolId;
+    var school = new Satluj_Latest.Data.School(schoolId);
+    var data = school.GetCashBookReport(startDate, endDate, schoolId).ToList();
+    string schoolName = Model.SchoolName;
+    string heading = Model.Heading;
+}
+<thead>
+    <tr>
+        <td colspan="8" style="text-align:center; font-weight:bold;font-size:22; display:none;">
+            @schoolName
+        </td>
+    </tr>
+    <tr>
+        <td colspan="8" style="text-align:center; font-weight:normal;font-size:18; display:none;">
+            Cash Book Report
+        </td>
+    </tr>
+    <tr>
+        <td colspan="8" style="text-align:center; font-weight:normal;font-size:12; display:none;">
+            @heading
+        </td>
+    </tr>
+
+    <tr>
+        <th>
+            Date
+        </th>
+        <th>
+            VoucherNo / BillNo
+        </th>
+        <th>
+            Type
+        </th>
+        <th>
+            Acc.Head
+        </th>
+        <th>
+            Income
+        </th>
+        <th>
+            Expense
+        </th>
+        <th>
+            Narration
+        </th>
+        <th>
+            Status
+        </th>
+    </tr>
+</thead>
+<tbody>
+    @{
+        foreach (var one in data)
+        {
+            <tr>
+                <td>
+                    @one.EnterDate.ToShortDateString()
+                </td>
+                <td>
+                    @one.VoucherNumber
+                </td>
+                <td>
+                    @one.VoucherType
+                </td>
+                <td>
+                    @one.AccHeadName
+                </td>
+                <td>
+                    @one.Income
+                </td>
+                <td>
+                    @one.Expense
+                </td>
+                <td>
+                    @one.Narration
+                </td>
+                <td>
+                    @one.Status
+                </td>
+            </tr>
+        }
+    }
+</tbody>
+<tfoot>
+    <tr>
+        <td style="font-weight:bold">
+            Total
+        </td>
+        <td>
+          
+        </td>
+        <td>
+           
+        </td>
+        <td>
+            
+        </td>
+        <td style="font-weight:bold">
+            @data.Sum(x=>x.Income)
+        </td>
+        <td style="font-weight:bold">
+           @data.Sum(x => x.Expense)
+        </td>
+        <td>
+            
+        </td>
+        <td>
+           
+        </td>
+    </tr>
+</tfoot>
+

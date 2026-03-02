@@ -1,0 +1,403 @@
+﻿@model Satluj_Latest.Models.FeeModel
+
+@{
+    var student = new Satluj_Latest.Data.Student(Model.SchoolModel.studentId);
+    decimal studBalance = student.StudentBalance();
+    // var paymentList = student.GetStudentPaymentFees().OrderBy(z => z.DueDate).ToList();
+    var paymentList = (await student.GetStudentPaymentFees(student.ClassId, student.StudentId));
+
+    var discountFee = student.Discount.ToList();
+}
+<input type="hidden" value="@student.SchoolId" id="schoolId" />
+<input type="hidden" value="@student.ClassId" id="classId" />
+<input type="hidden" value="@student.StudentId" id="studentId" />
+
+<style>
+    [data-event=disable] > td:not(:first-child) {
+        pointer-events: none;
+        opacity: .5;
+    }
+
+    [data-event=disable] > td {
+        background-color: #f1f1f1 !important;
+    }
+</style>
+<div class="form-group isHidden">
+    <h4 style="text-align: right;"><span style="float: left;">Payment Details</span> <button class="btn pay-now-btn" data-toggle="modal" data-target="#modalPayment"><i class="fa fa-plus"></i> Add Payment</button></h4>
+</div>
+@if (paymentList.Count >= 1)
+{
+    <input type="hidden" id="hfTotal" />
+    <div>
+        <div class="table-responsive">
+            <table class="table account-table" id="tbAcBill">
+                <tr id="thead">
+                    <th colspan="2">
+                        Particulars
+                    </th>
+                    <th>
+                        Discount
+                    </th>
+                    <th></th>
+                    <th style="width:20%; text-align: right;">
+                        Amount
+                    </th>
+                </tr>
+                <tbody id="bodyTable">
+                    @foreach (var fee in paymentList)
+                    {
+                        <tr data-id="tbRowAmount">
+                            <td style="width: 10px;">
+                                @*-----for check box--------*@
+                                @{
+                                    var isAny1 = 0;
+                                    foreach (var discount in discountFee)
+                                    {
+                                        if (discount.feeId == fee.FeeId && fee.DiscountAllowed == 0)//DiscountAllowed= 0 means the bill is normal ,1 = due bills ,2=fine bills
+                                        {
+                                            //var afterDisc = fee.Amount - discount.discountAmount;
+                                            decimal feeAmount = fee.Amount;
+                                            decimal dis = discount.discountAmount;
+                                            decimal afterDisc = feeAmount - dis;
+                                            <label>
+                                                <input type="checkbox" checked="checked" class="checkbox-input" data-billType="@fee.DiscountAllowed" data-amount="@afterDisc" data-feeidd="@fee.FeeId" data-feeGuid="@fee.FeeGuid" data-maxamt="@fee.Amount" data-disc="@discount.discountAmount" data-prev-billNo="@fee.BillNo" data-fee="@afterDisc^@fee.FeeId^@fee.FeeGuid^@fee.Amount^@discount.discountAmount^0^@fee.DiscountAllowed^@fee.From^@fee.BillNo" onchange="AddRemoveFee(this)" data-id="chekIp" />
+                                                <span class="checkbox-virtual"></span>
+                                            </label>
+                                            isAny1 = 1;
+                                        }
+
+                                    }
+                                    if (isAny1 == 0)
+                                    {
+                                        <label>
+                                            <input type="checkbox" checked="checked" class="checkbox-input" data-billType="@fee.DiscountAllowed" data-amount="@fee.Amount" data-feeidd="@fee.FeeId" data-feeGuid="@fee.FeeGuid" data-maxamt="@fee.Amount" data-disc="0" data-prev-billNo="@fee.BillNo" data-fee="@fee.Amount^@fee.FeeId^@fee.FeeGuid^@fee.Amount^0^0^@fee.DiscountAllowed^@fee.From^@fee.BillNo" onchange="AddRemoveFee(this)" data-id="chekIp" />
+                                            <span class="checkbox-virtual"></span>
+                                        </label>
+                                    }
+                                }
+                            </td>
+
+                            <td>
+                                @*-----Fee Name--------*@
+                                @fee.Feename
+                            </td>
+
+                            <td>
+                                @*-----Amount if discount--------*@
+                                @foreach (var discount in discountFee)
+                                {
+                                    if (discount.feeId == fee.FeeId && fee.DiscountAllowed == 0)//DiscountAllowed= 0 means the bill is normal ,1 = due bills ,2=fine bills
+                                    {
+
+                                        @String.Format("{0:0.00}", discount.discountAmount)
+                                    }
+                                }
+                            </td>
+                            @if (fee.StudentspecialFee == 1)
+                            {
+                            <td> @String.Format("{0:y}", fee.DueDate) <button type="button" class="close" id="delete-spcl-fee" data-id="@fee.FeeGuid" data-studentId="@student.StudentId" aria-label="Close"><span aria-hidden="true">&times;</span></button> </td>
+                            }
+                            else
+                            {
+                                if (fee.DiscountAllowed == 0)
+                                {
+                                    <td> @String.Format("{0:y}", fee.DueDate) <button type="button" style="color: red;opacity: 0.3;text-shadow: 0 1px 0 #f70c0c;" class="close" id="delete-common-fee" data-id="@fee.FeeGuid" data-studentId="@student.StudentId" aria-label="Close"><span aria-hidden="true">&times;</span></button></td>
+                                }
+                                else
+                                {
+                                    <td> @String.Format("{0:y}", fee.DueDate)</td>
+                                }
+                            }
+                            <td style="width:20%; text-align: right;">
+                                @{
+                                    var isAny = 0;
+
+                                    foreach (var discount in discountFee)
+                                    {
+
+                                        if (discount.feeId == fee.FeeId && fee.DiscountAllowed == 0)//DiscountAllowed= 0 means the bill is normal ,1 = due bills ,2=fine bills
+                                        {
+                                            <s>@String.Format("{0:0.00}", fee.Amount)</s>
+                                            decimal feeAmount = fee.Amount;
+                                            decimal dis = discount.discountAmount;
+                                            decimal afterDisc = feeAmount - dis;
+                                            //decimal afterDisc = fee.Amount ?? 0 - discount.discountAmount;
+                                            if (afterDisc >= 0)
+                                            {
+                                                <div @*data-amount="@afterDisc"*@><label>After Discount: </label><input id="txt-amount" type="text" style="text-align: right;" value="@String.Format("{0:0.00}", (afterDisc))" /></div>
+                                            }
+                                            else
+                                            {
+                                                <div @*data-amount="@afterDisc"*@><label>After Discount: </label><input id="txt-amount" type="text" style="text-align: right;" value="@String.Format("{0:0.00}", fee.Amount)" /></div>
+                                            }
+                                            isAny = 1;
+                                        }
+
+                                    }
+                                    if (isAny == 0)
+                                    {
+                                        //decimal partialPayment = student.GetCurrentAmountParial(fee.FeeId);
+
+                                        <div @*data-amount="@fee.Amount"*@>
+                                            <input id="txt-amount" type="text" style="text-align: right;" value="@String.Format("{0:0.00}", fee.Amount)" />
+                                        </div>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" style="text-align:right">
+                            Previous Balance
+                        </td>
+                        <td id="tdBalance" style="text-align: right;background-color: #ffffff;" data-id="@studBalance">
+                            @String.Format("{0:0.00}", studBalance)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            Total Fee
+                        </td>
+                        <td id="tdTotal" style="text-align: right;background-color: #ffffff;">
+                            0.00
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" style="text-align:right">
+                            Amount Payable
+                        </td>
+                        <td id="tdAmountPayable" style="text-align: right;">
+                            @String.Format("{0:0.00}", studBalance)
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="form-group text-right">
+            <div style="display:none;"><label>Pay</label><input type="text" id="paying-amount" style="margin-left:20px;"></div>
+            <div>
+                <button class="btn btn-peek" id="editPayment" data-toggle="modal" data-target="#modalPaymentEdit"><i class="fa fa-edit"></i> Edit</button>
+                <button class="btn pay-now-btn" id="btn-save-bill"><i class="fa fa-save"></i> Save</button>
+            </div>
+            @*<button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('tbAcBill')"><i class="fa fa-print"></i> Print</button>*@
+        </div>
+    </div>}
+                                    else
+                                    {
+                                        <div class="table-responsive">
+                                            <table class="table account-table" id="tbAcBill">
+                                                <tr id="thead">
+                                                    <th colspan="2">
+                                                        Particulars
+                                                    </th>
+                                                    <th>
+                                                        Discount
+                                                    </th>
+                                                    <th></th>
+                                                    <th style="width:20%; text-align: right;">
+                                                        Amount
+                                                    </th>
+                                                </tr>
+                                                <tbody id="bodyTable"></tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="4" style="text-align:right">
+                                                            Previous Balance
+                                                        </td>
+                                                        <td id="tdBalance" style="text-align: right;" data-id="@studBalance">
+                                                            @String.Format("{0:0.00}", studBalance)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4">
+                                                            Total Fee
+                                                        </td>
+                                                        <td id="tdTotal" style="text-align: right;">
+                                                            0.00
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+
+
+                                        <div class="form-group text-right isHidden" id="div-adv-pay">
+                                            <button class="btn btn-peek" id="editPayment" data-toggle="modal" data-target="#modalPaymentEdit"><i class="fa fa-edit"></i> Edit</button>
+                                            <button class="btn pay-now-btn" id="btn-save-bill"><i class="fa fa-save"></i> Save</button>
+                                            @*<button class="btn pay-now-btn" id="btn-Print-bill" onclick="printContent('tbAcBill')"><i class="fa fa-print"></i> Print</button>*@
+                                        </div>
+                                    }
+<script>
+    $(document).on('click', '[data-toggle="tclose"]', function () {
+        var e = $(this), p = $(e).parent().parent();
+        $(p).remove();
+        sumTotal();
+    });
+
+    $(document).ready(function () {
+        //$('[data-id="chekIp"]').attr('checked', 'checked');
+        $('[data-id="chekIp"]').each(function () {
+            AddRemoveFee(this);
+            //  $(this).trigger('click');
+        });
+        sumTotal();
+    });
+    //$(document).on('click', '.fa-remove', function () {
+    //    sumTotal();
+    //});
+
+    function sumTotal() {
+        //alert();
+        var val = 0;
+        var textBoxVal = 0;
+        var payable = 0;
+
+        $("input:checked").each(function () {
+            textBoxVal = parseFloat($(this).parents('tr').find("#txt-amount").val());
+
+            if (!textBoxVal) {
+                textBoxVal = 0;
+            }
+
+            val = parseFloat(val) + parseFloat(textBoxVal);
+        });
+        //$('*[data-amount]').each(function () {
+        //    // val = parseFloat(val) + parseFloat($(this).attr('data-amount'));
+        //    if ($(this).is(':checked')) {
+        //        val = parseFloat(val) + parseFloat($(this).attr('data-amount'));
+        //    }
+        //});
+        $('#hfTotal').val(val);
+        $('#tdTotal').html(parseFloat(val));
+        var balance = $('#tdBalance').attr('data-id');
+        console.log(balance);
+
+        payable = parseFloat(val) - parseFloat(balance);
+        if (payable < 0) {
+
+            payable = 0;
+        }
+        console.log(Math.abs(payable));
+        $('#tdAmountPayable').html(parseFloat(Math.abs(payable)));
+    }
+
+    $(document).on('click', '[data-id="chekIp"]', function () {
+        AddRemoveFee(this);
+        var f = $(this), p = $(f).parents('tr');
+        if ($(f).is(':checked')) {
+            $(this).attr('checked', 'checked');
+            var t = $(p).html(), h = '<tr data-event="" data-id="tbRowAmount">' + t + '</tr>';
+            $('#bodyTable').prepend(h);
+            $(p).remove();
+            sumTotal();
+            //AddRemoveFee($('[data-id="chekIp"]'));
+            //console.log($('#chekIp'));
+            console.log(f);
+        }
+        else {
+            sumTotal();
+            $(this).removeAttr('checked', 'checked');
+            var t = $(p).html(), h = '<tr data-event="disable" data-id="tbRowAmount">' + t + '</tr>';
+            $('#bodyTable').append(h);
+            $(p).remove();
+            //AddRemoveFee($('[data-id="chekIp"]'));
+            //alert('Archana');
+            console.log(t);
+            //----------------------------------------------------------------------
+            var full = f.text().split(',');
+            for (var i = full.length - 1; i >= 0; i--) {
+                var one = full[i].split('^');
+                //alert(one[1]);
+
+            }
+        }
+
+    });
+    $(document).on('click', '[data-remo="adv"]', function () {
+        AddRemoveFee(this);
+        var f = $(this), p = $(f).parents('tr');
+        if ($(f).is(':checked')) {
+            $(this).attr('checked', 'checked');
+            var t = $(p).html(), h = '<tr data-event="" data-id="tbRowAmount">' + t + '</tr>';
+            $('#bodyTable').prepend(h);
+            $(p).remove();
+            sumTotal();
+            //AddRemoveFee($('[data-id="chekIp"]'));
+        }
+        else {
+            sumTotal();
+            $(this).removeAttr('checked', 'checked');
+            var t = $(p).html(), h = '<tr data-event="disable" data-id="tbRowAmount">' + t + '</tr>';
+            $('#bodyTable').append(h);
+            $(p).remove();
+            //AddRemoveFee($('[data-id="chekIp"]'));
+        }
+
+    });
+
+    var array = [];
+    function AddRemoveFee(source) {
+        //var btnStatus = $('#hfBtnStatus').val();
+
+
+        var feeId = $(source).attr("data-fee");
+        var specialId = feeId.split('^');
+        if ($(source).is(":checked")) {
+            // it is checked
+            array.push(feeId);
+            // $('#btn-homework').attr('disabled', false);
+            console.log(JSON.stringify(array));
+        }
+        else {
+            for (var i = array.length - 1; i >= 0; i--) {
+                if (array[i] == feeId) {
+                    array.splice(i, 1);
+                }
+            }
+            //if (array.length == 0) {
+            //    $('#btn-homework').attr('disabled', true);
+            //}
+            console.log(JSON.stringify(array));
+        }
+    }
+
+    //$("#btn-save-bill").click(function () {
+    //    var item = new Object();
+    //    item.SchoolId = $('#schoolId').val();
+    //    item.ClassId = $('#classId').val();
+    //    item.StudentId = $('#studentId').val();
+    //    item.FeeDetails = array.toString();
+    //    $.post("/School/StudentMainBillPay/", item, function (result) {
+    //        console.log(JSON.stringify(result))
+    //        if (result.status) {
+    //            if (result.status) {
+    //                alert('hi')
+    //                //toastrSuccess(result.msg);
+    //                //location.reload();
+    //                printViewData();
+    //            }
+    //            else {
+    //                toastrError(result.msg);
+    //            }
+    //        }
+    //    });
+    //});
+
+    //function printViewData()
+    //{
+    //    var studentMainId = $('#studentId').val();
+    //    $.ajax({
+    //        url: '/School/PrintData/' + studentMainId,
+    //        type: "GET",
+    //        dataType: 'html',
+    //        success: function (data) {
+    //            $('#billingList').html(data);
+    //            //$.validator.unobtrusive.parse($("#billingList"));
+    //            //$('#billingList').modal('show');
+    //            //alert('GGG')
+    //        }
+    //    });
+    //}
+</script>

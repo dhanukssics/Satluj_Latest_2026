@@ -1,0 +1,45 @@
+﻿
+@model Satluj_Latest.Models.RegionModel
+@{
+    long schoolId = Model.SchoolId;
+    var data = new Satluj_Latest.Data.School(schoolId).GetAllRegionsWithClass();
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<table class="table custome-table table-class-list">
+    <thead>
+        <tr>
+            <th>
+                Sl No
+            </th>
+            <th>
+                Region Name
+            </th>
+            <th>
+                Class List
+            </th>
+            @if (IsAdmin == true)
+            {
+                <th>Action</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in data)
+        {
+            <tr>
+                <td>@item.Slno</td>
+                <td data-region-id="@item.RegionId">@item.RegionName</td>
+                <td>@item.ClaassList</td>
+                @if (IsAdmin == true)
+                {
+                <td>
+                    <button class="delete-class-tr btn btn-peek" data-regionid="@item.RegionId"><i class="fa fa-trash"></i></button>
+                    <button class="edit-class-tr btn btn-peek" data-regionid="@item.RegionId" ><i class="fa fa-edit"></i></button>
+
+                </td>
+                }
+            </tr>
+
+        }
+    </tbody>
+</table>

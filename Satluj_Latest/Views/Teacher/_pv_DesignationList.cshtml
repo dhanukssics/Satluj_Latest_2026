@@ -1,0 +1,40 @@
+﻿@model Satluj_Latest.Models.DesignationModel
+@{
+    long schoolId = Model.SchoolId;
+    var data = new Satluj_Latest.Data.School(schoolId).GetAllDesignation();
+    int x = 1;
+        bool IsAdmin = ViewBag.IsAdmin;
+}
+<table class="table custome-table designation-list">
+    <thead>
+        <tr>
+            <th>
+                Sl No
+            </th>
+            <th>
+                Designation Name
+            </th>
+            @if (IsAdmin == true)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in data)
+        {
+            <tr>
+                <td>@x</td>
+                <td>@item.DesignationName</td>
+                @if (IsAdmin == true)
+                {
+                    <td>
+                        <button class="delete-class-tr btn btn-peek" data-designation="@item.Id"><i class="fa fa-trash"></i></button>
+                        <button class="edit-class-tr btn btn-peek" data-designation="@item.Id"><i class="fa fa-edit"></i></button>
+                    </td>
+                }
+            </tr>
+            x = x + 1;
+        }
+    </tbody>
+</table>

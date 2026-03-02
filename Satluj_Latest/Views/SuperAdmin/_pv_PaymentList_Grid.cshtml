@@ -1,0 +1,70 @@
+﻿@model Satluj_Latest.Models.SchoolModel
+@{ 
+    var paymentList = new Satluj_Latest.Data.Admin().GetPaymentList(Model.schoolId, Model.month, Model.year, Model.opr);
+}
+
+<div class="table-responsive">
+    <table class="table custome-table table-student-list" id="table-student-list">
+        <thead>
+            <tr>
+
+                <th>
+                    Name
+                </th>
+                <th>
+                    Admission No
+                </th>
+                <th>
+                    School
+                </th>
+                <th>
+                    Class/Division
+                </th>
+                <th>
+                    BillNo
+                </th>
+                <th>
+                    Paid Time
+                </th>
+                <th>
+                    Amount
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var data in paymentList)
+            {
+
+                <tr style="cursor: pointer !important;">
+                    <td>
+                        @data.StundentName
+                    </td>
+                    <td>
+                        @data.StudentSpecialId
+                    </td>
+                    <td>
+                        @data.SchoolName
+                    </td>
+                    <td>
+                        @data.Class / @data.Division
+                    </td>
+                    <td>
+                        @data.BillNo
+                    </td>
+                    <td>
+                        @data.TimeStamp
+                    </td>
+                    <td>
+                        @data.CCAmount
+                    </td>
+                    @*<td>
+                    </td>
+                    <td>
+                        <button class="delete-student-td btn btn-peek" data-studentid="@student.StudentId"><i class="fa fa-trash "></i></button>
+                        <button class="edit-student-td btn pay-now-btn" data-studentid="@student.StudentId"><i class="fa fa-edit "></i></button>
+                    </td>*@
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

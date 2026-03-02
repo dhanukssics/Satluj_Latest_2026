@@ -1,0 +1,65 @@
+﻿@model Satluj_Latest.Models.FeeAlertDataModel
+
+<div class="col-md-12 col-md-offset-1">
+    <div class="email-setup-main">
+
+        <form id="form-login"
+              asp-controller="School"
+              asp-action="EditNewFeeAlertDate"
+              method="post">
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label class="cust-label">Fee Alert Date</label>
+                <p>Automatically send alert messages to all students who haven't paid their bills before this date.</p>
+
+                <span class="col-md-4">
+                    <input asp-for="AlertDate"
+                           class="form-control"
+                           autocomplete="off"
+                           id="AlertDate"
+                           placeholder="Select Date" />
+
+                    <span asp-validation-for="AlertDate" class="text-danger"></span>
+                </span>
+            </div>
+
+            <div class="form-group">
+                <span class="col-md-12" style="float:left; margin-top:15px;">
+                    <button type="submit" class="btn pay-now-btn" id="feeAlert_date">Edit</button>
+                </span>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+
+    // Datepicker initialization
+    $('#AlertDate').datepicker({
+        format: 'dd-MM-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    // AJAX submit
+    $("#form-login").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (res) {
+                AddNewFeeAlertDateSuccess(res);
+            },
+            error: function (err) {
+                AddNewFeeAlertDateFailed(err);
+            }
+        });
+    });
+
+</script>
