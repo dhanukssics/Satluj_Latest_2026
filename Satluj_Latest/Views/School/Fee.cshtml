@@ -123,7 +123,10 @@
 
         $('#btn-dummysubmit-feeclass').prop('disabled', !enabled);
     });
-
+    function ajaxFailure(xhr, status, error) {
+        console.error("AJAX Failed:", error);
+        toastrError("Something went wrong. Please try again.");
+    }
     function AddFeeClassSuccess(result) {
         if (result.status) {
             toastrSuccess(result.msg);
