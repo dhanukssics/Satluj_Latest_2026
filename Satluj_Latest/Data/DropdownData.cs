@@ -16,10 +16,7 @@ namespace Satluj_Latest.Data
             _Entities = entities;
         }
 
-        public DropdownData()
-        {
-        }
-
+        
         public List<SelectListItem> GetUnPublishedClasses(long schoolId)
         {
             var input = _Entities.TbClasses
@@ -268,26 +265,41 @@ namespace Satluj_Latest.Data
 
         public List<SelectListItem> GetTeacherDivision(long classId, long userId)
         {
-            var teacher = _Entities.TbTeachers.FirstOrDefault(x => x.UserId == userId);
-            if (teacher == null) return new List<SelectListItem>();
+            var teacher = _Entities.TbTeachers
+                .FirstOrDefault(x => x.UserId == userId);
 
-            var teacherData = _Entities.TbTeacherClasses
-                .Where(x => x.TeacherId == teacher.TeacherId && x.ClassId == classId)
-                .ToList();
+            if (teacher == null)
+                return new List<SelectListItem>();
 
-            return teacherData.Select(x => new SelectListItem { Text = x.Division.Division, Value = x.DivisionId.ToString() }).ToList();
+            var divisions = (from tc in _Entities.TbTeacherClasses
+                             join d in _Entities.TbDivisions
+                             on tc.DivisionId equals d.DivisionId
+                             where tc.TeacherId == teacher.TeacherId
+                             && tc.ClassId == classId
+                             select new SelectListItem
+                             {
+                                 Text = d.Division,
+                                 Value = d.DivisionId.ToString()
+                             }).ToList();
+
+            return divisions;
         }
 
         public List<SelectListItem> GetTeacherClass(long userId)
         {
             var teacher = _Entities.TbTeachers.FirstOrDefault(x => x.UserId == userId);
-            if (teacher == null) return new List<SelectListItem>();
 
-            var teacherData = _Entities.TbTeacherClasses
-                .Where(x => x.TeacherId == teacher.TeacherId && x.Class.PublishStatus == true)
+            if (teacher == null)
+                return new List<SelectListItem>();
+
+            return _Entities.TbTeacherClasses
+                .Where(x => x.TeacherId == teacher.TeacherId && x.Class != null && x.Class.PublishStatus)
+                .Select(x => new SelectListItem
+                {
+                    Text = x.Class.Class,
+                    Value = x.ClassId.ToString()
+                })
                 .ToList();
-
-            return teacherData.Select(x => new SelectListItem { Text = x.Class.Class, Value = x.ClassId.ToString() }).ToList();
         }
 
         public List<SelectListItem> GetBookCategory(long schoolId)
@@ -400,12 +412,24 @@ namespace Satluj_Latest.Data
             return input.Select(x => new SelectListItem { Text = x.RegionName.ToUpper(), Value = x.Id.ToString() }).ToList();
         }
 
-        public List<SelectListItem> GetAllSchoolClassesByRegion(long id, long schoolid)
+        public List<SelectListItem> GetAllSchoolClassesByRegion(long regionId, long schoolId)
         {
-            var classIds = _Entities.TbRegionsClasses.Where(x => x.RegionId == id && x.IsActive).Select(x => x.ClassId).ToList();
-            var input = _Entities.TbClasses.Where(z => z.IsActive && z.PublishStatus && z.SchoolId == schoolid).OrderBy(z => z.ClassOrder).ToList();
-            var outList = input.Where(x => classIds.Contains(x.ClassId)).ToList();
-            return outList.Select(x => new SelectListItem { Text = x.Class, Value = x.ClassId.ToString() }).ToList();
+            var result = (from rc in _Entities.TbRegionsClasses
+                          join c in _Entities.TbClasses
+                          on rc.ClassId equals c.ClassId
+                          where rc.RegionId == regionId
+                                && rc.IsActive
+                                && c.IsActive
+                                && c.PublishStatus
+                                && c.SchoolId == schoolId
+                          orderby c.ClassOrder
+                          select new SelectListItem
+                          {
+                              Text = c.Class,
+                              Value = c.ClassId.ToString()
+                          }).ToList();
+
+            return result;
         }
 
         public List<SelectListItem> GetAllExamsDeclared(long id, long schoolid, long classId)

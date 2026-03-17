@@ -12,16 +12,19 @@ namespace Satluj_Latest.Controllers
     public class SpecialClassController : BaseController
     {
         private readonly DropdownData _dropdown;
-        public SpecialClassController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities) : base(schoolRepository, parentRepository, teacherRepository, Entities)
+        private readonly SchoolDbContext _Entities;
+        public SpecialClassController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities,DropdownData dropdown) : base(schoolRepository, parentRepository, teacherRepository, Entities)
         {
+            _dropdown = dropdown;
+            _Entities=Entities;
         }
 
         public IActionResult AssesmentHome()
         {
             SpecialClassModel model = new SpecialClassModel();
             model.SchoolId = _user.SchoolId;
-            var dropdown = new DropdownData();
-            ViewBag.PeriodList = dropdown.GetPeriodsLists(model.SchoolId);
+           // var dropdown = new DropdownData();
+            ViewBag.PeriodList = _dropdown.GetPeriodsLists(model.SchoolId);
             return View(model);
         }
         [HttpPost]
@@ -1958,6 +1961,7 @@ namespace Satluj_Latest.Controllers
                     }
                 }
                 model._SkillModel = model._SkillModel.OrderBy(x => x.RollNo).ThenBy(x => x.StudentName).ToList();
+                ViewBag.Remarks = _dropdown.GetAllRemarks(model.SchoolId);
                 return PartialView("~/Views/SpecialClass/_pv_StudentRemarkScoreEntry.cshtml", model);
                 #endregion
             }
@@ -4509,8 +4513,8 @@ namespace Satluj_Latest.Controllers
         {
             SpecialClassModel model = new SpecialClassModel();
             model.SchoolId = _user.SchoolId;
-            DropdownData dropdown = new DropdownData();
-            ViewBag.PeriodList = dropdown.GetPeriodsLists(model.SchoolId);
+            //DropdownData dropdown = new DropdownData();
+            ViewBag.PeriodList = _dropdown.GetPeriodsLists(model.SchoolId);
 
             return View(model);
         }
@@ -6284,8 +6288,8 @@ namespace Satluj_Latest.Controllers
         {
             SpecialClassModel model = new SpecialClassModel();
             model.SchoolId = _user.SchoolId;
-            DropdownData dropdown = new DropdownData();
-            ViewBag.PeriodList= dropdown.GetPeriodsLists(model.SchoolId);
+            //DropdownData dropdown = new DropdownData();
+            ViewBag.PeriodList= _dropdown.GetPeriodsLists(model.SchoolId);
             return View(model);
         }
         #endregion

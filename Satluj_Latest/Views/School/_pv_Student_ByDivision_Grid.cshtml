@@ -1,26 +1,8 @@
 ﻿@model Satluj_Latest.Models.SchoolModel
 
 @{
-    List<Satluj_Latest.Data.Student> students;
-
-
-    if (Model.divisionId != 0)
-    {
-        students = new Satluj_Latest.Data.Division(Model.divisionId).GetStudentDetails().OrderBy(z => z.StundentName).ToList();
-    }
-    else
-    {
-        if (Model.classId != 0)
-        {
-            students = new Satluj_Latest.Data.Class(Model.classId).GetStudentDetails().OrderBy(z => z.StundentName).ToList();
-        }
-        else
-        {
-            students = new Satluj_Latest.Data.School(Model.schoolId).GetStudentDetails().OrderBy(z => z.StundentName).ToList();
-        }
-    }
-
-        bool IsAdmin = ViewBag.IsAdmin;
+    var students = Model.Students;
+    
 
 }
 <div class="table-responsive">
@@ -49,7 +31,7 @@
                 <th>
                     Admn No
                 </th>
-                @if (IsAdmin == true)
+                @if (true)
                 {
                     <th>
                         Edit
@@ -89,7 +71,7 @@
                         @student.ContactNumber
                     </td>
                     <td class="student-row" data-id="@student.StudentId">
-                        @student.ClassName/@student.DivisionName
+                        @student.Class.Class/@student.Division.Division
                     </td>
                     @*<td class="student-row" data-id="@student.StudentId">
                             @if (student.Bus.BusId != 1)
@@ -101,7 +83,7 @@
                     <td class="student-row" data-id="@student.StudentId">
                         @student.StudentSpecialId
                     </td>
-                    @if (IsAdmin == true)
+                    @if (true)
                     {
                         <td>
                             @*<button class="btn pay-now-btn "  href="/School/StudentDetailedViewPrint/@student.StudentId"><i class="fa fa-print"></i>Print </button>*@

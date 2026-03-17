@@ -130,7 +130,7 @@ namespace Satluj_latestversion.Controllers
                         status = _Entities.SaveChanges() > 0;
                         msg = status ? "success" : "failed";
                     }
-                    return Json(new { status = status, msg = msg, list = new Satluj_Latest.Data.DropdownData().RefreshClasses(model.SchoolId) });
+                    return Json(new { status = status, msg = msg, list =_dropdown.RefreshClasses(model.SchoolId) });
                 }
                 else
                 {
@@ -155,7 +155,7 @@ namespace Satluj_latestversion.Controllers
 
                     status = _Entities.SaveChanges() > 0;
                     msg = status ? "success" : "failed";
-                    return Json(new { status = status, msg = msg, list = new Satluj_Latest.Data.DropdownData().RefreshClasses(model.SchoolId) });
+                    return Json(new { status = status, msg = msg, list = _dropdown.RefreshClasses(model.SchoolId) });
                 }
             }
             catch (Exception ex)
@@ -207,7 +207,7 @@ namespace Satluj_latestversion.Controllers
                         status = _Entities.SaveChanges() > 0;
                         msg = status ? "success" : "failed";
                     }
-                    return Json(new { status = status, msg = msg, list = new Satluj_Latest.Data.DropdownData().RefreshClasses(model.SchoolId) });
+                    return Json(new { status = status, msg = msg, list = _dropdown.RefreshClasses(model.SchoolId) });
                 }
                 else
                 {
@@ -232,7 +232,7 @@ namespace Satluj_latestversion.Controllers
 
                     status = _Entities.SaveChanges() > 0;
                     msg = status ? "success" : "failed";
-                    return Json(new { status = status, msg = msg, list = new Satluj_Latest.Data.DropdownData().RefreshClasses(model.SchoolId) });
+                    return Json(new { status = status, msg = msg, list = _dropdown.RefreshClasses(model.SchoolId) });
                 }
             }
             catch (Exception ex)
@@ -270,7 +270,7 @@ namespace Satluj_latestversion.Controllers
                 }
             }
             message = status ? "Deleted" : "failed";
-            return Json(new { status = status, msg = message, list = new Satluj_Latest.Data.DropdownData().RefreshClassesUnPublished(_user.SchoolId) });
+            return Json(new { status = status, msg = message, list = _dropdown.RefreshClassesUnPublished(_user.SchoolId) });
         }
 
         public object PublishClassUnPublished(string id)
@@ -297,7 +297,7 @@ namespace Satluj_latestversion.Controllers
                 }
             }
             message = status ? "Published" : "failed";
-            return Json(new { status = status, msg = message, list = new Satluj_Latest.Data.DropdownData().RefreshClassesUnPublished(_user.SchoolId) });
+            return Json(new { status = status, msg = message, list = _dropdown.RefreshClassesUnPublished(_user.SchoolId) });
         }
 
         public PartialViewResult GetToPromotionStudentsByDivGrid(string id)
@@ -508,6 +508,7 @@ namespace Satluj_latestversion.Controllers
             LibraryModels model = new LibraryModels();
             model.schoolId = _user.SchoolId;
             model.bookCount = 1;
+            ViewBag.BookCategories = _dropdown.GetBookCategory(model.schoolId);
             return PartialView("~/Views/School/_pv_LibraryBook_Add.cshtml", model);
         }
 
@@ -702,6 +703,7 @@ namespace Satluj_latestversion.Controllers
             model.status = book.Status;
             model.bookId = bookId;
             model.ReferenceNumber = book.ReferenceNumber == null ? "" : book.ReferenceNumber;
+            ViewBag.BookCategories = _dropdown.GetBookCategory(model.schoolId);
             return PartialView("~/Views/School/_pv_LibraryBook_Edit.cshtml", model);
         }
         public ActionResult LibraryBookStudent(string id)
@@ -961,19 +963,36 @@ namespace Satluj_latestversion.Controllers
         {
             SchoolModel model = new SchoolModel();
             model.divisionId = Convert.ToInt32(id);
+            ViewBag.IsAdmin = true;
             return PartialView("~/Views/School/_pv_Student_ByDivision_Grid.cshtml", model);
 
         }
         public PartialViewResult GetUserListByClassDiv(string id)
         {
             string[] splitData = id.Split('~');
-            SchoolModel model = new SchoolModel();
-            model.classId = Convert.ToInt64(splitData[0]);
-            model.divisionId = Convert.ToInt64(splitData[1]);
-            model.schoolId = _user.SchoolId;
-            return PartialView("~/Views/School/_pv_Student_ByDivision_Grid.cshtml", model);
 
+            long classId = Convert.ToInt64(splitData[0]);
+            long divisionId = Convert.ToInt64(splitData[1]);
+
+            SchoolModel model = new SchoolModel();
+            model.classId = classId;
+            model.divisionId = divisionId;
+            model.schoolId = _user.SchoolId;
+
+            ViewBag.IsAdmin = true;
+
+            model.Students = _Entities.TbStudents
+                .Where(x => x.IsActive && x.SchoolId == _user.SchoolId)
+                .Where(x => classId == 0 || x.ClassId == classId)
+                .Where(x => divisionId == 0 || x.DivisionId == divisionId)
+                .Include(x => x.Class)
+                .Include(x => x.Division)
+                .OrderBy(x => x.StundentName)
+                .ToList();
+
+            return PartialView("~/Views/School/_pv_Student_ByDivision_Grid.cshtml", model);
         }
+        
         public PartialViewResult GetUserListByClassBilling(string id)
         {
             string[] splitData = id.Split('~');
@@ -2081,7 +2100,7 @@ namespace Satluj_latestversion.Controllers
                 status = _Entities.SaveChanges() > 0;
                 message = status ? " Fee Added" : "failed";
             }
-            return Json(new { status = status, msg = message, list = new Satluj_Latest.Data.DropdownData().RefreshSchoolFees(model.SchoolId) });
+            return Json(new { status = status, msg = message, list = _dropdown.RefreshSchoolFees(model.SchoolId) });
         }
 
         [HttpPost]
@@ -2151,12 +2170,20 @@ namespace Satluj_latestversion.Controllers
         {
             var model = new Satluj_Latest.Models.ListFee();
             model.SchoolId = _user.SchoolId;
+            model.Fees = _Entities.TbFees
+                  .Where(x => x.SchoolId == model.SchoolId && x.IsActive)
+                  .OrderBy(x => x.FeeId)
+                  .ToList();
             return View(model);
         }
         public PartialViewResult RefreshFeelistPartial()
         {
             var model = new Satluj_Latest.Models.ListFee();
             model.SchoolId = _user.SchoolId;
+            model.Fees = _Entities.TbFees
+                  .Where(x => x.SchoolId == model.SchoolId && x.IsActive)
+                  .OrderBy(x => x.FeeId)
+                  .ToList();
             return PartialView("~/Views/School/_pv_Feelist.cshtml", model);
         }
 
@@ -2307,7 +2334,7 @@ namespace Satluj_latestversion.Controllers
                 }
             }
             message = status ? "Deleted" : "failed";
-            return Json(new { status = status, msg = message, list = new Satluj_Latest.Data.DropdownData().RefreshClasses(_user.SchoolId) });
+            return Json(new { status = status, msg = message, list = _dropdown.RefreshClasses(_user.SchoolId) });
         }
 
         public PartialViewResult EditStudentModel(string id)
@@ -2497,6 +2524,8 @@ namespace Satluj_latestversion.Controllers
             var model = new SchoolModel();
             model.schoolId = _user.SchoolId;
             ViewBag.Classlist = _dropdown.GetClasses(model.schoolId);
+            var school = new School(model.schoolId, _Entities);
+            ViewBag.Discounts = school.GetStudentDiscountList();
             return View(model);
         }
         public ActionResult DiscountDetails(string id)
@@ -2570,10 +2599,21 @@ namespace Satluj_latestversion.Controllers
         }
         public ActionResult AssignDiscount(int id)
         {
-            long divisionId = Convert.ToInt32(id);
+            long divisionId = id;
+
             var model = new FeeModel();
             model.DivisionId = divisionId;
             model.SchoolId = _user.SchoolId;
+
+            model.Students = _Entities.TbStudents
+                                .Where(s => s.DivisionId == divisionId && s.IsActive)
+                                .Include(s => s.Class)
+                                .Include(s => s.Division)
+                                .OrderBy(s => s.StundentName)
+                                .ToList();
+
+            ViewBag.FeeList = _dropdown.RefreshSchoolFees(_user.SchoolId);
+
             return View(model);
         }
 
@@ -2583,26 +2623,36 @@ namespace Satluj_latestversion.Controllers
         {
             bool status = false;
             string message = "Failed";
+
             List<string> studentsUserId = model.FeeStudentId.Split(',').ToList();
 
-            var discount = new TbFeeDiscount();
             foreach (var userId in studentsUserId)
             {
-                long userIdLong = Convert.ToInt32(userId);
-                var isDiscount = _Entities.TbFeeDiscounts.Where(z => z.StudentId == userIdLong && z.FeeId == model.FeeId && z.IsActive).FirstOrDefault();
+                long userIdLong = Convert.ToInt64(userId);
+
+                var isDiscount = _Entities.TbFeeDiscounts
+                    .FirstOrDefault(z => z.StudentId == userIdLong
+                                      && z.FeeId == model.FeeId
+                                      && z.IsActive);
+
                 if (isDiscount == null)
                 {
-                    discount.StudentId = userIdLong;
-                    discount.FeeId = model.FeeId;
-                    discount.DiscountAmount = model.Amount;
-                    discount.TimeStamp = CurrentTime;
-                    discount.IsActive = true;
+                    var discount = new TbFeeDiscount  
+                    {
+                        StudentId = userIdLong,
+                        FeeId = model.FeeId,
+                        DiscountAmount = model.Amount,
+                        TimeStamp = CurrentTime,
+                        IsActive = true
+                    };
+
                     _Entities.TbFeeDiscounts.Add(discount);
                     status = _Entities.SaveChanges() > 0;
-                    message = status ? " Discount added" : "Failed to add discount";
                 }
-
             }
+
+            message = status ? "Discount added" : "Failed to add discount";
+
             return Json(new { status = status, msg = message });
         }
 
@@ -3362,53 +3412,82 @@ namespace Satluj_latestversion.Controllers
         {
             bool status = false;
             string msg = "Failed";
-            List<string> studentsUserId = model.FeeStudentId.Split(',').ToList();
 
-            var FeeDetail = _Entities.TbFees.Where(z => z.FeeId == model.FeeId && z.IsActive).FirstOrDefault();
-            var discount = new TbFeeDiscount();
-            foreach (var userId in studentsUserId)
+            if (string.IsNullOrWhiteSpace(model.FeeStudentId))
+                return Json(new { status = false, msg = "No students selected" });
+
+            var studentIds = model.FeeStudentId
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Select(long.Parse)
+                                .ToList();
+
+            var feeDetail = _Entities.TbFees
+                                .FirstOrDefault(z => z.FeeId == model.FeeId && z.IsActive);
+
+            if (feeDetail == null)
+                return Json(new { status = false, msg = "Fee not found" });
+
+            if (feeDetail.Interval <= 0)
+                feeDetail.Interval = 1;   
+
+            List<TbFeeStudent> newFeeStudents = new List<TbFeeStudent>();
+
+            foreach (var studentId in studentIds)
             {
+                // Prevent duplicates
+                var exists = _Entities.TbFeeStudents
+                               .Any(x => x.StudentId == studentId &&
+                                         x.FeeId == model.FeeId &&
+                                         x.IsActive);
 
+                if (exists)
+                    continue;
 
-                if (FeeDetail.Interval > 1)
+                if (feeDetail.Interval > 1)
                 {
-                    DateTime dueDt = FeeDetail.FeeStartDate;
-                    var addMonth = 12 / FeeDetail.Interval;
-                    for (int i = 1; i <= FeeDetail.Interval; i++)
-                    {
-                        var feeStudent = new TbFeeStudent();
-                        feeStudent.Amount = model.Amount;
-                        feeStudent.StudentId = Convert.ToInt32(userId);
-                        feeStudent.FeeId = model.FeeId;
-                        feeStudent.FeeStudentGuid = Guid.NewGuid();
-                        feeStudent.IsActive = true;
-                        feeStudent.TimeStamp = CurrentTime;
-                        feeStudent.DueDate = dueDt;
-                        dueDt = dueDt.AddMonths(addMonth);
-                        feeStudent.Instalment = i;
-                        _Entities.TbFeeStudents.Add(feeStudent);
-                        status = _Entities.SaveChanges() > 0;
-                        msg = status ? " Fee added" : "Failed to add Fee";
+                    DateTime dueDate = feeDetail.FeeStartDate;
+                    int addMonths = 12 / feeDetail.Interval;
 
+                    for (int i = 1; i <= feeDetail.Interval; i++)
+                    {
+                        newFeeStudents.Add(new TbFeeStudent
+                        {
+                            StudentId = studentId,
+                            FeeId = model.FeeId,
+                            Amount = model.Amount,
+                            DueDate = dueDate,
+                            Instalment = i,
+                            TimeStamp = CurrentTime,
+                            IsActive = true,
+                            FeeStudentGuid = Guid.NewGuid()
+                        });
+
+                        dueDate = dueDate.AddMonths(addMonths);
                     }
                 }
                 else
                 {
-                    var feeStudent = new TbFeeStudent();
-                    feeStudent.Amount = model.Amount;
-                    feeStudent.StudentId = Convert.ToInt32(userId);
-                    feeStudent.FeeId = model.FeeId;
-                    feeStudent.FeeStudentGuid = Guid.NewGuid();
-                    feeStudent.IsActive = true;
-                    feeStudent.TimeStamp = CurrentTime;
-                    feeStudent.DueDate = CurrentTime;
-                    feeStudent.Instalment = 1;
-                    _Entities.TbFeeStudents.Add(feeStudent);
-                    status = _Entities.SaveChanges() > 0;
-                    msg = status ? " Fee added" : "Failed to add Fee";
+                    newFeeStudents.Add(new TbFeeStudent
+                    {
+                        StudentId = studentId,
+                        FeeId = model.FeeId,
+                        Amount = model.Amount,
+                        DueDate = DateTime.Now,
+                        Instalment = 1,
+                        TimeStamp = CurrentTime,
+                        IsActive = true,
+                        FeeStudentGuid = Guid.NewGuid()
+                    });
                 }
             }
-            return Json(new { status = status, msg = msg });
+
+            // SAVE ONCE
+            _Entities.TbFeeStudents.AddRange(newFeeStudents);
+            status = _Entities.SaveChanges() > 0;
+
+            msg = status ? "Special Fee Assigned Successfully" : "Failed to assign fee";
+
+            return Json(new { status, msg });
         }
         public PartialViewResult GetStudentFeeByDivGrid(string id)
         {
@@ -5309,7 +5388,7 @@ namespace Satluj_latestversion.Controllers
             long examId = Convert.ToInt64(id);
             ExamsModel model = new ExamsModel();
             var data = _Entities.TbExams.Where(x => x.ExamId == examId && x.IsActive).FirstOrDefault();
-            ViewBag.Classlist = _dropdown.GetClasses(model.SchoolId);
+            
             if (data != null)
             {
                 model.ExamId = data.ExamId;
@@ -5322,6 +5401,7 @@ namespace Satluj_latestversion.Controllers
                 if (data.EndDate != null)
                     model.EndDateString = data.EndDate.Value.ToString("MM-dd-yyyy");
             }
+            ViewBag.Classlist = _dropdown.GetClasses(model.SchoolId);
             return PartialView("~/Views/School/_pv_EditExam.cshtml", model);
         }
 
@@ -5478,7 +5558,7 @@ namespace Satluj_latestversion.Controllers
             long subjectId = Convert.ToInt64(id);
             ExamSubjectDetailsModel model = new ExamSubjectDetailsModel();
             var data = _Entities.TbExamSubjects.Where(x => x.SubId == subjectId && x.IsActive).FirstOrDefault();
-            ViewBag.Subjectlist = _dropdown.GetSubjectss(model.SchoolId);
+            
             if (data != null)
             {
                 model.ExamId = data.ExamId;
@@ -5508,6 +5588,7 @@ namespace Satluj_latestversion.Controllers
                 }
                 model.ExamTime = TimeSpan.Parse(timeSpan);
             }
+            ViewBag.Subjectlist = _dropdown.GetSubjectss(model.SchoolId);
             return PartialView("~/Views/School/_pv_EditSubject.cshtml", model);
         }
         public object SubmitEditSubject(ExamSubjectDetailsModel model)
@@ -6038,6 +6119,12 @@ namespace Satluj_latestversion.Controllers
             {
                 model.SenderDetails.SenderData = "MYSCHO";
             }
+            var schoolData = new Satluj_Latest.Data.School(model.SchoolId);
+
+            ViewBag.SenderDetails = schoolData.GetSenderDetails();
+            ViewBag.FeeIncomeData = schoolData.GetFeeIncomeHead();
+            ViewBag.SpecialFees = _dropdown.SchoolSpecialFeesList(model.SchoolId);
+
             return View(model);
         }
         [HttpPost]
@@ -7518,6 +7605,7 @@ namespace Satluj_latestversion.Controllers
             model.SchoolId = _user.SchoolId;
             model.SchoolModel.curredntDateTime = CurrentTime;
             model.ChequeDate = CurrentTime.ToShortDateString();
+            ViewBag.BankList = _dropdown.GetBankLists(model.SchoolId);
             return PartialView("~/Views/School/_pv_ReturnPaymnetModeView.cshtml", model);
         }
         public PartialViewResult LoadBankEntrySearchView()
@@ -7642,10 +7730,16 @@ namespace Satluj_latestversion.Controllers
         public ActionResult AddNewStudentsFullDetails()
         {
             StudentModel model = new StudentModel();
+
+            var school = _Entities.TbSchools
+                          .FirstOrDefault(x => x.SchoolId == _user.SchoolId);
+
             model.schoolId = _user.SchoolId;
-            model.state = _user.School.State;
-            model.city = _user.School.City;
+            model.state = school?.State;
+            model.city = school?.City;
+
             ViewBag.Classlist = _dropdown.GetClasses(model.schoolId);
+
             return View(model);
         }
 
@@ -7944,7 +8038,11 @@ namespace Satluj_latestversion.Controllers
         {
             long studentId = Convert.ToInt64(id);
             StudentModel model = new StudentModel();
-            var studentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId && x.IsActive).FirstOrDefault();
+            var studentDetails = _Entities.TbStudents
+                                .Include(x => x.Class)
+                                .Include(x => x.Division)
+                                .Include(x => x.Parent)
+                                .FirstOrDefault(x => x.StudentId == studentId && x.IsActive);
             model.stringStudentId = studentDetails.StudentSpecialId;
             model.classId = studentDetails.ClassId;
             model.admissionNo = studentDetails.StudentSpecialId;
@@ -8014,10 +8112,18 @@ namespace Satluj_latestversion.Controllers
                 model.MotherEducaton = "";
                 model.GuardianEduation = "";
             }
-            model.SchoolName = _user.School.SchoolName;
-            model.SchoolAddress = _user.School.Address;
+            var school = _Entities.TbSchools
+                        .FirstOrDefault(x => x.SchoolId == _user.SchoolId);
+
+            if (school != null)
+            {
+                model.SchoolName = school.SchoolName;
+                model.SchoolAddress = school.Address;
+                model.SchoolLogo = school.FilePath;
+            }
+            
             model.CurrentDate = CurrentTime.ToShortDateString();
-            model.SchoolLogo = _user.School.FilePath;
+            
             return View(model);
 
         }
@@ -8150,6 +8256,7 @@ namespace Satluj_latestversion.Controllers
         {
             SchoolModel model = new SchoolModel();
             model.CurrentAddedStudent = Convert.ToInt64(id);
+            ViewBag.SchoolList = _dropdown.GetSchoolList().OrderBy(z => z.Text).ToList();
             return PartialView("~/Views/School/_pv_SelectSiblings.cshtml", model);
         }
         public PartialViewResult SearchAdmission(string id)
@@ -8235,9 +8342,23 @@ namespace Satluj_latestversion.Controllers
             string[] split = id.Split('~');
             var classList = split.Where(x => x != split[0]).ToList();
             AttendanceSummaryFull modelMain = new AttendanceSummaryFull();
-            modelMain.SchoolName = _user.School.SchoolName;
-            modelMain.SchoolAddress = _user.School.Address;
-            modelMain.SchoolLogo = _user.School.FilePath;
+            var school = _Entities.TbSchools
+                        .Where(x => x.SchoolId == _user.SchoolId)
+                        .Select(x => new
+                        {
+                            x.SchoolName,
+                            x.Address,
+                            x.FilePath
+                        })
+                        .FirstOrDefault();
+
+            if (school != null)
+            {
+                modelMain.SchoolName = school.SchoolName;
+                modelMain.SchoolAddress = school.Address;
+                modelMain.SchoolLogo = school.FilePath;
+            }
+            
             modelMain.AttendanceDate = Convert.ToDateTime(split[0]);
             modelMain._list = new List<AttendanceSummaryReportModel>();
             foreach (var item in classList)
@@ -8250,11 +8371,15 @@ namespace Satluj_latestversion.Controllers
                     DateTime maxDate = Convert.ToDateTime(Maxdate);
                     AttendanceSummaryReportModel model = new AttendanceSummaryReportModel();
                     var atndance = _Entities.TbAttendances.Where(z => z.ClassId == ClassId && z.DivisionId == item1.DivisionId && z.AttendanceDate >= modelMain.AttendanceDate && z.AttendanceDate <= modelMain.AttendanceDate && z.ShiftStatus == 0).OrderBy(x => x.Student.StundentName).ToList();
-                    model.SchoolName = _user.School.SchoolName;
-                    model.SchoolAddress = _user.School.Address;
-                    model.SchoolLogo = _user.School.FilePath;
+                    model.SchoolName = school.SchoolName;
+                    model.SchoolAddress =school.Address;
+                    model.SchoolLogo = school.FilePath;
                     model.AttendanceDate = modelMain.AttendanceDate;
-                    model.ClassName = _user.School.TbClasses.Where(x => x.ClassId == ClassId && x.IsActive).Select(x => x.Class).FirstOrDefault();
+                    model.ClassName = _Entities.TbClasses
+                                   .Where(x => x.ClassId == ClassId && x.IsActive)
+                                   .Select(x => x.Class)
+                                   .FirstOrDefault();
+                   
                     model.DivisionName = _Entities.TbDivisions.Where(x => x.DivisionId == item1.DivisionId && x.IsActive).Select(x => x.Division).FirstOrDefault();
                     var students = _Entities.TbStudents.Where(x => x.SchoolId == _user.SchoolId && x.IsActive && x.ClassId == ClassId && x.DivisionId == item1.DivisionId).ToList();
                     if (atndance != null && atndance.Count > 0)
@@ -8273,7 +8398,11 @@ namespace Satluj_latestversion.Controllers
                         int balance = model.TotalStudents - atndance.Count;
                         model.Absent = model.Absent + balance;
                     }
-                    var teacher = _Entities.TbTeacherClasses.Where(x => x.ClassId == ClassId && x.DivisionId == item1.DivisionId && x.Teacher.IsActive).FirstOrDefault();
+                    var teacher = _Entities.TbTeacherClasses
+                        .Include(x => x.Teacher)
+                        .FirstOrDefault(x => x.ClassId == ClassId
+                                          && x.DivisionId == item1.DivisionId
+                                          && x.Teacher.IsActive);
                     if (teacher != null)
                         model.InCharge = teacher.Teacher.TeacherName;
                     else
@@ -8288,15 +8417,32 @@ namespace Satluj_latestversion.Controllers
         {
             string[] split = id.Split('~');
             TimetableSummaryFull model = new TimetableSummaryFull();
-            model.SchoolName = _user.School.SchoolName;
-            model.SchoolAddress = _user.School.Address;
-            model.SchoolLogo = _user.School.FilePath;
+            var school = _Entities.TbSchools
+                        .Where(x => x.SchoolId == _user.SchoolId)
+                        .Select(x => new
+                        {
+                            x.SchoolName,
+                            x.Address,
+                            x.FilePath
+                        })
+                        .FirstOrDefault();
+
+            if (school != null)
+            {
+                model.SchoolName = school.SchoolName;
+                model.SchoolAddress = school.Address;
+                model.SchoolLogo = school.FilePath;
+            }
+            
             model._list = new List<ListOfTimetable>();
             foreach (var item in split)
             {
                 long ClassId = Convert.ToInt64(item);
-                var divisionList = _Entities.TbDivisions.Where(x => x.ClassId == ClassId && x.IsActive).ToList();
-                foreach(var item1 in divisionList)
+                var divisionList = _Entities.TbDivisions
+                                .Include(x => x.Class)
+                                .Where(x => x.ClassId == ClassId && x.IsActive)
+                                .ToList();
+                foreach (var item1 in divisionList)
                 {
                     ListOfTimetable one = new ListOfTimetable();
                     one.ClassName = item1.Class.Class;

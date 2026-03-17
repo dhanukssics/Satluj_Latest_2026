@@ -1,9 +1,9 @@
 ﻿@model Satluj_Latest.Models.AcademicPeriodsModelClass
 @{
     long schoolId = Model.SchoolId;
-    var data = new Satluj_Latest.Data.School(schoolId).GetAllAcademicPeriods();
+    var data = Model.PeriodList;
     int x = 1;
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = Convert.ToBoolean(ViewBag.IsAdmin ?? false);
 }
 <table class="table custome-table academic-periods-list">
     <thead>
@@ -30,23 +30,26 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in data)
+
+        @if (data != null && data.Count > 0)
+        {
+            foreach (var item in data)
+            {
+                <tr>
+                    <td>@x</td>
+                    <td>@item.ClassName</td>
+                    <td>@item.StartDate.ToShortDateString()</td>
+                    <td>@item.EndDate.ToShortDateString()</td>
+                    <td>@item.PeriodsName</td>
+                </tr>
+                x++;
+            }
+        }
+        else
         {
             <tr>
-                <td>@x</td>
-                <td>@item.ClassName</td>
-                <td>@item.StartDate.ToShortDateString()</td>
-                <td>@item.EndDate.ToShortDateString()</td>
-                <td>@item.PeriodsName</td>
-                @*@if (IsAdmin == true)
-                    {
-                        <td>
-                            <button class="delete-class-tr btn btn-peek" data-scho="@item.Id"><i class="fa fa-trash"></i></button>
-                            <button class="edit-class-tr btn btn-peek" data-scho="@item.Id"><i class="fa fa-edit"></i></button>
-                        </td>
-                    }*@
+                <td colspan="5" style="text-align:center;">No Periods Found</td>
             </tr>
-            x = x + 1;
         }
     </tbody>
 </table>

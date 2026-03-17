@@ -273,6 +273,7 @@ namespace Satluj_Latest.Controllers
         {
             var model = new AddDayBookModel();
             model.SchoolId = _user.SchoolId;
+            ViewBag.AccountHeads = _dropdown.GetAccountHeads(model.SchoolId);
             return PartialView("~/Views/Journal/_pv_Edit_DayBook.cshtml", model);
         }
         public PartialViewResult SearchVoucher(AddDayBookModel model)
@@ -654,6 +655,9 @@ namespace Satluj_Latest.Controllers
             int typeId = Convert.ToInt32(model.TypeId);
             var data = _Entities.TbBankBookData.Where(x => x.TypeId == typeId && x.SchoolId == _user.SchoolId && x.IsActive && x.VoucherNumber == model.SearchVoucherNo).FirstOrDefault();
             model.SchoolId = _user.SchoolId;
+            ViewBag.BankList = _dropdown.GetBankLists(model.SchoolId);
+            ViewBag.AccountHeads = _dropdown.GetAccountHeads(model.SchoolId);
+
             if (data != null)
             {
                 model.EntryDateString = data.EntryDate.ToString("dd-MM-yyyy");
@@ -1334,8 +1338,8 @@ namespace Satluj_Latest.Controllers
             model.StartDate = new DateTime(CurrentTime.Year, CurrentTime.Month, 1);
             model.EndDate = model.StartDate.AddMonths(1).AddDays(-1);
             model.BankId = 0;
-            DropdownData dropdown = new DropdownData();
-            ViewBag.BankList = dropdown.GetBankLists(model.SchoolId);
+            //DropdownData dropdown = new DropdownData();
+            ViewBag.BankList = _dropdown.GetBankLists(model.SchoolId);
 
             return View(model);
         }

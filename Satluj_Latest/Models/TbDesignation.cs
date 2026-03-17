@@ -5,6 +5,8 @@ namespace Satluj_Latest.Models;
 
 public partial class TbDesignation
 {
+  
+
     public long Id { get; set; }
 
     public long SchoolId { get; set; }

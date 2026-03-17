@@ -35,9 +35,9 @@ namespace Satluj_Latest.Controllers
             model.schoolId = _user.SchoolId;
             model.userId = _user.UserId;
             model.Selecteddate = CurrentTime;
-            DropdownData dropdown = new DropdownData();
-            ViewBag.TeacherClassList = dropdown.GetTeacherClass(model.userId);
-            ViewBag.Classlist = dropdown.GetClasses(model.schoolId);
+           // DropdownData dropdown = new DropdownData();
+            ViewBag.TeacherClassList = _dropdown.GetTeacherClass(model.userId);
+            ViewBag.Classlist = _dropdown.GetClasses(model.schoolId);
 
             return View(model);
         }
@@ -51,7 +51,6 @@ namespace Satluj_Latest.Controllers
             long classId = long.Parse(splitData[2]);
             long divisionId = long.Parse(splitData[3]);
 
-            
             DateTime maxDate = minDate.Date.AddDays(1).AddSeconds(-1);
 
             var attendance = _Entities.TbAttendances
@@ -64,6 +63,11 @@ namespace Satluj_Latest.Controllers
                 .OrderBy(x => x.Student.StundentName)
                 .ToList();
 
+            var students = _Entities.TbStudents
+                .Where(x => x.DivisionId == divisionId && x.IsActive)
+                .OrderBy(x => x.StundentName)
+                .ToList();
+
             var model = new AttendanceModels
             {
                 classId = classId,
@@ -71,17 +75,15 @@ namespace Satluj_Latest.Controllers
                 shift = shift,
                 minDate = minDate,
                 maxDate = maxDate,
+                studentList = students,
+                markedAttendances = attendance,
                 IsAdminUser = HttpContext.Session.GetString("IsAdmin") == "true"
             };
 
             if (!attendance.Any())
-            {
                 return PartialView("~/Views/Teacher/_pv_AttendanceMark_Grid.cshtml", model);
-            }
             else
-            {
                 return PartialView("~/Views/Teacher/_pv_AttendanceView_Grid.cshtml", model);
-            }
         }
 
 
@@ -95,7 +97,7 @@ namespace Satluj_Latest.Controllers
             long classId = model.classId;
             long divisionId = model.divisionId;
             int shiftStatus = model.shiftStatus;
-            DateTime attendanceDate = Convert.ToDateTime(model.attendanceDate);
+            DateTime attendanceDate = model.attendanceDate;
 
             try
             {
@@ -124,7 +126,7 @@ namespace Satluj_Latest.Controllers
                         AttendanceData = item.attendaneStatus != "False",
                         IsActive = true,
                         TimeStamp = DateTime.UtcNow,
-                        StudentId = item.StudentId,
+                        StudentId = Convert.ToInt64(item.studentId),
                         ShiftStatus = shiftStatus
                     };
 
@@ -461,6 +463,7 @@ namespace Satluj_Latest.Controllers
         {
             DepartmentsModel model = new DepartmentsModel();
             model.SchoolId = _user.SchoolId;
+            ViewBag.IsAdmin = true;
             return View(model);
         }
         public async Task<IActionResult> AddDepartment(DepartmentsModel model)
@@ -497,6 +500,12 @@ namespace Satluj_Latest.Controllers
         {
             DesignationModel model = new DesignationModel();
             model.SchoolId = _user.SchoolId;
+
+            var data = new Satluj_Latest.Data.School(_user.SchoolId).GetAllDesignation();
+
+            ViewBag.DesignationList = data;
+            ViewBag.IsAdmin = true; 
+
             return View(model);
         }
         public async Task<IActionResult> AddDesignation(DesignationModel model)
@@ -665,6 +674,26 @@ namespace Satluj_Latest.Controllers
                     status = true;
                 }
             }
+            return Json(new { status = status, msg = msg });
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteDesignation(long id)
+        {
+            bool status = false;
+            string msg = "Failed";
+
+            var data = await _Entities.TbDesignations
+                        .FirstOrDefaultAsync(x => x.Id == id && x.IsActive);
+
+            if (data != null)
+            {
+                data.IsActive = false;
+
+                status = await _Entities.SaveChangesAsync() > 0;
+
+                msg = "Deleted Successfully";
+            }
+
             return Json(new { status = status, msg = msg });
         }
         public async Task<IActionResult> DeleteDepartment(string id)
@@ -852,12 +881,36 @@ namespace Satluj_Latest.Controllers
             string Maxdate = date.Date.ToString("MM-dd-yyyy") + ' ' + "11:59:00 PM";
             DateTime maxDate = Convert.ToDateTime(Maxdate);
             AttendanceSummaryReportModel model = new AttendanceSummaryReportModel();
-            var atndance = _Entities.TbAttendances.Where(z => z.ClassId == classId && z.DivisionId == div && z.AttendanceDate >= date && z.AttendanceDate <= date && z.ShiftStatus == section).OrderBy(x => x.Student.StundentName).ToList();
-            model.SchoolName = _user.School.SchoolName;
-            model.SchoolAddress = _user.School.Address;
-            model.SchoolLogo = _user.School.FilePath;
+            var atndance = _Entities.TbAttendances
+                .Where(z =>
+                    z.ClassId == classId &&
+                    z.DivisionId == div &&
+                    z.AttendanceDate >= date &&
+                    z.AttendanceDate <= maxDate &&
+                    z.ShiftStatus == section)
+                .OrderBy(x => x.Student.StundentName)
+                .ToList();
+            var school = _Entities.TbSchools
+                        .Where(x => x.SchoolId == _user.SchoolId)
+                        .Select(x => new
+                        {
+                            x.SchoolName,
+                            x.Address,
+                            x.FilePath
+                        })
+                        .FirstOrDefault();
+
+            if (school != null)
+            {
+                model.SchoolName = school.SchoolName;
+                model.SchoolAddress = school.Address;
+                model.SchoolLogo = school.FilePath;
+            }
             model.AttendanceDate = date;
-            model.ClassName = _user.School.TbClasses.Where(x => x.ClassId == classId && x.IsActive).Select(x => x.Class).FirstOrDefault();
+            model.ClassName = _Entities.TbClasses
+                .Where(x => x.ClassId == classId && x.IsActive)
+                .Select(x => x.Class)
+                .FirstOrDefault();
             model.DivisionName = _Entities.TbDivisions.Where(x => x.DivisionId == div && x.IsActive).Select(x => x.Division).FirstOrDefault();
             var students = _Entities.TbStudents.Where(x => x.SchoolId == _user.SchoolId && x.IsActive && x.ClassId == classId && x.DivisionId == div).ToList();
             if (atndance != null && atndance.Count > 0)
@@ -876,11 +929,12 @@ namespace Satluj_Latest.Controllers
                 int balance = model.TotalStudents - atndance.Count;
                 model.Absent = model.Absent + balance;
             }
-            var teacher = _Entities.TbTeacherClasses.Where(x => x.ClassId == classId && x.DivisionId == div && x.Teacher.IsActive).FirstOrDefault();
-            if (teacher != null)
-                model.InCharge = teacher.Teacher.TeacherName;
-            else
-                model.InCharge = "";
+            var teacher = _Entities.TbTeacherClasses
+                        .Where(x => x.ClassId == classId && x.DivisionId == div)
+                        .Select(x => x.Teacher.TeacherName)
+                        .FirstOrDefault();
+
+            model.InCharge = teacher ?? "";
             return View(model);
         }
         public IActionResult Periods()
@@ -999,6 +1053,14 @@ namespace Satluj_Latest.Controllers
         {
             AcademicPeriodsModelClass model = new AcademicPeriodsModelClass();
             model.SchoolId = _user.SchoolId;
+            model.PeriodList = _Entities.TbAcademicPeriods
+                            .Include(x => x.Class)
+                            .Where(x => x.IsActive && x.SchoolId == model.SchoolId
+                            && x.Class.IsActive
+                            && x.Class.PublishStatus)
+                            .Select(x => new AcademicPeriods(x))
+                            .ToList();
+            ViewBag.IsAdmin = true;
             return PartialView("~/Views/Teacher/_pv_AcademicPeriodsList.cshtml", model);
         }
         public IActionResult Health()

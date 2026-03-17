@@ -47,13 +47,14 @@
         </div>
 
         <script>
+            var schoolId = $('#schoolId').val();
             $(document).on('change', '.slct-mark-dropdwn1', function () {
                 //debugger;
                 $('#classId').val($(this).val());
                 var id = $(this).val();
                 if (id != '') {
                     $.ajax({
-                        url: '/Data/LoadAllSchoolDivision?id=' + id + '&schoolid=' + $('#schoolId').val(),
+                        url: '/Data/LoadAllSchoolDivision?id=' + id + '&schoolid=' + schoolId,
                         type: "GET",
                         success: function (result) {
                             //debugger;
@@ -61,7 +62,9 @@
                                 $(".slct-free-div-dropdown").html("");
                                 $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
                                 $.each(result.list, function (i, item) {
-                                    $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                                    $(".slct-free-div-dropdown").append(
+                                        '<option value="' + item.value + '">' + item.text + '</option>'
+                                    );
                                 });
                                 $(".slct-free-div-dropdown").prop("disabled", false);
                                 ListStudents();
@@ -110,16 +113,19 @@
             }
 
             $(document).on('change', '.slct-free-div-dropdown', function () {
-                var head = $(".slct-mark-dropdwn1 option:selected").text();
-                head = head + " / " + $(".slct-free-div-dropdown option:selected").text();
+
+                var classId = $(".slct-mark-dropdwn1").val();
+                var divisionId = $(this).val();
+
+                var head = $(".slct-mark-dropdwn1 option:selected").text() + " / " +
+                           $(".slct-free-div-dropdown option:selected").text();
+
                 $('#studentList-head').text(head);
 
-
-                var classId = $('#classId').val();
-                $('#divisionId').val($(this).val());
-                var divisionId = $(this).val();
                 if (classId != '' && divisionId != '') {
+
                     var dataId = classId + '~' + divisionId;
+
                     $.ajax({
                         url: '/Report/DatatableStudentsListReport/' + dataId,
                         type: "GET",
@@ -128,8 +134,6 @@
                             $('#student-report-list').html(data);
                         }
                     });
-                }
-                else {
 
                 }
             });

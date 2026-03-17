@@ -1,10 +1,9 @@
 ﻿
 @model Satluj_Latest.Models.AttendanceModels
 @{
-    var studentList = new Satluj_Latest.Data.Division(Model.divisionId).GetStudentDetails();
-    var markedAttendances = new Satluj_Latest.Data.Division(Model.divisionId).GetAttendance(Model.maxDate, Model.minDate, Model.shift);
+    var studentList = Model.studentList;
+    var markedAttendances = Model.markedAttendances;
     var studentCount = studentList.Count();
-    //    bool IsAdmin = ViewBag.IsAdmin;
 }
 
 <style>

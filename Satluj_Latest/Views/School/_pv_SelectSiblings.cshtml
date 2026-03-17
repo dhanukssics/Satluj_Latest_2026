@@ -1,7 +1,7 @@
 ﻿
 @model Satluj_Latest.Models.SchoolModel
 @{
-    var dd = new Satluj_Latest.Data.DropdownData();
+    
 }
 <div class="modal-dialog">
     <!-- Modal content-->
@@ -16,7 +16,7 @@
                 <div class="login-form fullWid">
                     <h3>Student Detail</h3>
                     <div class="form-group">
-                        @Html.DropDownListFor(m => m.classId, dd.GetSchoolList().OrderBy(z => z.Text), "--School Name--", new { @class = "newDes", @data_live_search = "true", @style = "    background-color: #2f7e86;" })
+                        @Html.DropDownListFor(m => m.classId, ViewBag.SchoolList as List<SelectListItem>, "--School Name--", new { @class = "newDes", @data_live_search = "true", @style = "    background-color: #2f7e86;" })
                     </div>
                     <div class="form-group">
                         <input id="admission" style="height:47px;" class="newDes" placeholder="Admission Number" />

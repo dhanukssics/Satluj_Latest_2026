@@ -1,6 +1,6 @@
 ﻿@model Satluj_Latest.Models.BankBookModel
 @{
-    var dd = new Satluj_Latest.Data.DropdownData();
+    
 }
 
 <!-- AJAX form for ASP.NET Core -->
@@ -24,7 +24,7 @@
             <div class="col-md-9">
                 @Html.DropDownListFor(
                 m => m.BankId,
-                                dd.GetBankLists(Model.SchoolId),
+                                ViewBag.BankList as List<SelectListItem>,
                                 "--Choose--",
                                 new { @class = "form-control", id = "day-bank-Name-id" }
                                 )
@@ -75,7 +75,7 @@
             <div class="col-md-9">
                 @Html.DropDownListFor(
                                 m => m.HeadId,
-                                dd.GetAccountHeads(Model.SchoolId),
+                                ViewBag.AccountHeads as List<SelectListItem>,
                                 "--Choose--",
                                 new { @class = "form-control accHead-drop-down", id = "day-book-head-id" }
                                 )

@@ -1,4 +1,5 @@
-﻿using Satluj_Latest.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Satluj_Latest.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,9 +34,17 @@ namespace Satluj_Latest.Data
         {
             return division.TbStudents.Where(z => z.IsActive).Count();
         }
-        public List<FeeDiscount> GetStudentDiscountList()
+        public List<TbFeeDiscount> GetStudentDiscountList()
         {
-            return division.TbStudents.SelectMany(z => z.TbFeeDiscounts).Where(z => z.IsActive).ToList().Select(q => new FeeDiscount(q)).ToList();
+            return _Entities.TbFeeDiscounts
+                    .Where(z => z.IsActive && z.Student.DivisionId == division.DivisionId)
+                    .Include(z => z.Student)
+                        .ThenInclude(s => s.Class)
+                    .Include(z => z.Student)
+                        .ThenInclude(s => s.Division)
+                    .Include(z => z.Fee)
+                    .OrderBy(z => z.Student.StundentName)
+                    .ToList();
         }
         public List<FeeStudent> GetSpecialFeeStudentList(long feeId)
         {

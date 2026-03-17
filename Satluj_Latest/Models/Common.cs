@@ -91,10 +91,10 @@ namespace Satluj_Latest.Models
         {
             public List<Datalist> list { get; set; }
         }
-        public class ListFee
-        {
-            public long schoolId { get; set; }
-        }
+        //public class ListFee
+        //{
+        //    public long schoolId { get; set; }
+        //}
         public class EditFee
         {
             //public long schoolId { get; set; }

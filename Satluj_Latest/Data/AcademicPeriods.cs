@@ -11,6 +11,11 @@ namespace Satluj_Latest.Data
     public class AcademicPeriods:BaseReference
     {
         private TbAcademicPeriod ap;
+
+        public AcademicPeriods()
+        {
+        }
+
         public AcademicPeriods(TbAcademicPeriod obj) { ap = obj; }
 
         public AcademicPeriods(long Id) { ap = _Entities.TbAcademicPeriods.FirstOrDefault(z => z.Id == Id); }

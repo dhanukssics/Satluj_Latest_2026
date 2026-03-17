@@ -1,6 +1,6 @@
 ﻿@model Satluj_Latest.Models.ExamSubjectDetailsModel
 @{
-    var dd = new Satluj_Latest.Data.DropdownData();
+    
 }
 
 <style>
@@ -39,7 +39,7 @@
                         <label>Subject</label>
                         <select asp-for="SubjectId"
                                 class="form-control border-design same-height"
-                                asp-items="@(dd.GetSubjectss(Model.SchoolId))">
+                                asp-items="ViewBag.Subjectlist">
                             <option value="">--Choose--</option>
                         </select>
                         <span asp-validation-for="SubjectId" class="text-danger"></span>

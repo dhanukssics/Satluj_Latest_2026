@@ -1,9 +1,9 @@
 ﻿@model Satluj_Latest.Models.DesignationModel
 @{
     long schoolId = Model.SchoolId;
-    var data = new Satluj_Latest.Data.School(schoolId).GetAllDesignation();
+    var data = ViewBag.DesignationList as List<Satluj_Latest.Data.Designation>;
     int x = 1;
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = ViewBag.IsAdmin ?? false;
 }
 <table class="table custome-table designation-list">
     <thead>
@@ -38,3 +38,111 @@
         }
     </tbody>
 </table>
+<div class="modal fade" id="designationEditModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5>Edit Designation</h5>
+            </div>
+
+            <div class="modal-body">
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+        $(document).on("submit", "#form-teacher-edit", function (e) {
+
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: EditDesignationSuccess,
+            error: EditDesignationFailure
+        });
+
+    });
+        function EditDesignationSuccess(result) {
+
+        if (result.status) {
+
+            toastrSuccess(result.msg);
+
+            $("#designationEditModal").modal("hide");
+
+            window.location.href = '/Teacher/Designation/';
+
+        } else {
+
+            toastrError(result.msg);
+
+        }
+    }
+
+    function EditDesignationFailure() {
+        toastrError("Failed!");
+    }
+        $(document).on("click", ".edit-class-tr", function () {
+
+        var id = $(this).data("designation");
+
+        $.get("/Teacher/DesignationEditPartial", { id: id }, function (data) {
+
+            $("#designationEditModal .modal-body").html(data);
+
+            $("#designationEditModal").modal("show");
+
+        });
+
+    });
+    $(document).on('click', '.delete-class-tr', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+        function (isConfirm) {
+
+            if (isConfirm) {
+
+                $.ajax({
+                    url: '/Teacher/DeleteDesignation/' + $(source).attr('data-designation'),
+                    type: "GET",
+                    dataType: 'json',
+                    success: function (data) {
+
+                        if (data.status) {
+
+                            toastrSuccess(data.msg);
+
+                            setTimeout(function () {
+                                window.location.href = '/Teacher/Designation/';
+                            }, 250);
+
+                        }
+                        else {
+                            toastrError(data.msg);
+                        }
+
+                    }
+                });
+
+            }
+
+        });
+
+    });
+</script>

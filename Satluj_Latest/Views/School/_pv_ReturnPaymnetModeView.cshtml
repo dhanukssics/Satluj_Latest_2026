@@ -3,9 +3,7 @@
     var studentId = Model.SchoolModel.studentId;
 
 }
-@{
-    var dd = new Satluj_Latest.Data.DropdownData();
-}
+
 <div class="modal-dialog modal-sm" style="width:35%; margin:auto;">
     <input type="hidden" id="hfstudentId" value="@Model.SchoolModel.studentId" />
     <input type="hidden" id="hfbillno" value="@Model.BillNumber" />
@@ -35,7 +33,7 @@
                         <label>Bank Name</label>
                     </div>
                     <div class="col-md-7">
-                        @Html.DropDownListFor(m => m.BankId, dd.GetBankLists(Model.SchoolId), new { @class = "form-control accHead-drop-down ",id="rtuen-BankId" })
+                        @Html.DropDownListFor(m => m.BankId, ViewBag.BankList as List<SelectListItem>, new { @class = "form-control accHead-drop-down ", id = "rtuen-BankId" })
                     </div>
                 </div>
 

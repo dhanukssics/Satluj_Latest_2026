@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
 
 @{
-    var dd = new Satluj_Latest.Data.DropdownData();
+   
 }
 
 <form asp-action="EditDayBook"
@@ -65,7 +65,7 @@
             <div class="col-md-9">
                 @Html.DropDownListFor(
                                 m => m.HeadId,
-                                dd.GetAccountHeads(Model.SchoolId),
+                                ViewBag.AccountHeads as List<SelectListItem>,
                                 "--Choose--",
                                 new { @class = "form-control accHead-drop-down", @data_live_search = "true", id = "day-book-head-id" }
                                 )

@@ -3,7 +3,7 @@
 <form asp-action="AddNewStudentParentInfo"
       asp-controller="School"
       method="post"
-      id="form-login">
+      id="parentInfoForm">
 
     @Html.HiddenFor(m => m.studentId)
     @Html.HiddenFor(m => m.ParentId)
@@ -39,7 +39,7 @@
                         <div class="form-group col-sm-4">
                             <label>Guardian Name</label>
                             <input asp-for="GuardianName" class="form-control" placeholder="Guardian Name" />
-                            <span asp-validation-for="GuardianName" class="text-danger"></span>
+                            
                         </div>
 
                     </div>
@@ -64,7 +64,7 @@
                         <div class="form-group col-sm-4">
                             <label>Education</label>
                             <input asp-for="GuardianEduation" class="form-control" placeholder="Education" />
-                            <span asp-validation-for="GuardianEduation" class="text-danger"></span>
+                            
                         </div>
 
                     </div>
@@ -83,13 +83,13 @@
                         <div class="form-group col-sm-4">
                             <label>Occupation</label>
                             <input asp-for="MotherOccupation" class="form-control" placeholder="Occupation" />
-                            <span asp-validation-for="MotherOccupation" class="text-danger"></span>
+                            
                         </div>
 
                         <div class="form-group col-sm-4">
                             <label>Occupation</label>
                             <input asp-for="GuardianOccupation" class="form-control" placeholder="Occupation" />
-                            <span asp-validation-for="GuardianOccupation" class="text-danger"></span>
+                            
                         </div>
 
                     </div>
@@ -150,3 +150,53 @@
     </div>
 
 </form>
+<script>
+      
+
+    $(document).ready(function () {
+
+        $("#parentInfoForm").submit(function (e) {
+
+            e.preventDefault();
+
+            var form = $(this);
+
+            $.ajax({
+                url: form.attr("action"),
+                type: "POST",
+                data: form.serialize(),
+
+                success: function (response) {
+
+                    if (response.status) {
+
+                        toastr.success(response.msg);
+
+                        setTimeout(function () {
+
+                            $('#editStudentModel').modal('hide');   // close modal
+                            location.reload();             // refresh page
+
+                        }, 1200);
+
+                    } else {
+
+                        toastr.error(response.msg);
+
+                    }
+
+                },
+
+                error: function () {
+
+                    toastr.error("Something went wrong!");
+
+                }
+
+            });
+
+        });
+
+    });
+
+</script>

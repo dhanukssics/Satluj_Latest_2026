@@ -73,18 +73,18 @@
 
                             @if (IsAdmin == true)
                             {
-                                @Html.DropDownListFor(model => item.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId),item.Remark ,  new {@class="cls-mark" })
+                                @Html.DropDownListFor(model => item.Remark, ViewBag.Remarks as List<SelectListItem>, item.Remark, new { @class = "cls-mark" })
                             }
                             else
                             {
                                 if (item.Remark.Trim() == "")
                                 {
-                                    @Html.DropDownListFor(model => item.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item.Remark, new { @class = "cls-mark" })
+                                    @Html.DropDownListFor(model => item.Remark, ViewBag.Remarks as List<SelectListItem>, item.Remark, new { @class = "cls-mark" })
                                 }
                                 else
                                 {
                                     //Html.DropDownListFor(model => item.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item.Remark,new { @class = "cls-mark", @disabled = "disabled" })
-                                    @Html.DropDownListFor(model => item.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item.Remark, new { @class = "cls-mark" })
+                                    @Html.DropDownListFor(model => item.Remark, ViewBag.Remarks as List<SelectListItem>, item.Remark, new { @class = "cls-mark" })
 
                                 }
                             }

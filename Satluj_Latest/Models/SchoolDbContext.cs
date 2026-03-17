@@ -3280,7 +3280,7 @@ public partial class SchoolDbContext : DbContext
         {
             entity.HasKey(e => e.DiscountId).HasName("PK__tb_FeeDi__E43F6D967E4C5864");
 
-            entity.ToTable("TbFeeDiscounts");
+            entity.ToTable("tb_FeeDiscount");
 
             entity.Property(e => e.DiscountAmount).HasColumnType("money");
             entity.Property(e => e.TimeStamp).HasColumnType("datetime");

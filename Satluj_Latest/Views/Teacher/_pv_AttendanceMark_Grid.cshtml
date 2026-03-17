@@ -1,6 +1,6 @@
 ﻿@model Satluj_Latest.Models.AttendanceModels
 @{
-    var studentList = new Satluj_Latest.Data.Division(Model.divisionId).GetStudentDetails();
+    var studentList = Model.studentList;
     var studentCount = studentList.Count();
 }
 <style>

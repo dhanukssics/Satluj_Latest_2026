@@ -33,14 +33,17 @@ namespace Satluj_Latest.Data
             _Entities.Entry(school).Collection(s => s.TbStudents).Load();
             _Entities.Entry(school).Collection(s => s.TbCalenderEvents).Load();
             _Entities.Entry(school).Collection(s => s.TbBookCategories).Load();
-
+            _Entities.Entry(school).Collection(s => s.TbDesignations).Load();
+            _Entities.Entry(school).Collection(s => s.TbDepartments).Load();
             foreach (var cat in school.TbBookCategories)
             {
                 _Entities.Entry(cat).Collection(c => c.TbLibraryBooks).Load();
             }
         }
 
-
+        public School(long id, SchoolDbContext entities) : this(id)
+        {
+        }
 
         public long SchoolId { get { return school.SchoolId; } }
         public string SchoolName { get { return school.SchoolName; } }
@@ -67,22 +70,45 @@ namespace Satluj_Latest.Data
 
         public List<Student> GetStudentDetails()
         {
-            return school.TbStudents.Where(z => z.IsActive).ToList().Select(q => new Student(q)).ToList();
+            return _Entities.TbStudents
+               .Where(z => z.IsActive && z.SchoolId == school.SchoolId)
+               .Include(z => z.Class)
+               .Include(z => z.Division)
+               .ToList()
+               .Select(q => new Student(q))
+               .ToList();
         }
         public List<TbStudent> GetPublishedClassStudentDetails()
         {
-            return school.TbStudents.Where(z => z.IsActive && z.Class.PublishStatus == true).ToList().Select(q => new TbStudent(q)).ToList();
+            return _Entities.TbStudents
+                .Where(s => s.IsActive &&
+                            s.SchoolId == school.SchoolId &&
+                            s.Class.PublishStatus)
+                .Include(s => s.Class)
+                .Include(s => s.Division)
+                .ToList();
         }
         public List<TbStudent> GetStudentDetailsByFeeDiscount(long feeId)
         {
-            var list1 = school.TbStudents.Where(z => z.IsActive).ToList().Select(q => new TbStudent(q)).ToList();
-            var list2 = school.TbStudents.SelectMany(z => z.TbFeeDiscounts).Where(z => z.IsActive && z.FeeId == feeId).ToList().Select(q => new TbStudent(q.Student)).ToList();
-            var list3 = list1.Except(list2).ToList();
-            return list3;
+            return _Entities.TbStudents
+                .Where(s => s.IsActive && s.SchoolId == school.SchoolId)
+                .Include(s => s.Class)
+                .Include(s => s.Division)
+                .Where(s => !s.TbFeeDiscounts.Any(fd => fd.FeeId == feeId && fd.IsActive))
+                .OrderBy(s => s.StundentName)
+                .ToList();
         }
         public List<TbFeeDiscount> GetStudentDiscountList()
         {
-            return school.TbStudents.SelectMany(z => z.TbFeeDiscounts).Where(z => z.IsActive).ToList().Select(q => new TbFeeDiscount(q)).ToList();
+            return _Entities.TbFeeDiscounts
+                    .Where(z => z.IsActive && z.Student.SchoolId == school.SchoolId)
+                    .Include(z => z.Student)
+                        .ThenInclude(s => s.Class)
+                    .Include(z => z.Student)
+                        .ThenInclude(s => s.Division)
+                    .Include(z => z.Fee)
+                    .OrderBy(z => z.Student.StundentName)
+                    .ToList();
         }
         public List<FeeStudent> GetSpecialFeeStudentList(long feeId)
         {
@@ -90,7 +116,7 @@ namespace Satluj_Latest.Data
         }
         public List<Fee> GetAllFees()
         {
-            return school.TbFees.Where(z => z.IsActive).ToList().Select(z => new Fee(z)).ToList();
+            return school.TbFees.Where(z => z.SchoolId == school.SchoolId && z.IsActive).OrderBy(z => z.FeeId).ToList().Select(z => new Fee(z)).ToList();
         }
 
         public async Task<List<SPGetDailyReports>> GetReportDailyByDate(DateTime startDate, DateTime endDate)
@@ -111,7 +137,14 @@ namespace Satluj_Latest.Data
 
         public List<TbStudent> GetStudentForParent(string admissionNo)
         {
-            return school.TbStudents.Where(z => z.StudentSpecialId.ToUpper() == admissionNo.ToUpper()).ToList().Select(q => new TbStudent(q)).ToList();
+            return _Entities.TbStudents
+                .Where(z => z.IsActive &&
+                            z.SchoolId == school.SchoolId &&
+                            z.StudentSpecialId.ToUpper() == admissionNo.ToUpper())
+                .Include(z => z.Class)
+                .Include(z => z.Division)
+                .Include(z => z.Parent)
+                .ToList();
         }
         public List<TbLogin> GetStaffDetails()
         {
@@ -2364,8 +2397,10 @@ namespace Satluj_Latest.Data
         }
         public List<AcademicPeriods> GetAllAcademicPeriods()
         {
-            var data = school.TbAcademicPeriods.Where(x => x.IsActive && x.Class.IsActive == true && x.Class.PublishStatus == true).ToList().Select(x => new AcademicPeriods(x)).ToList();
-            return data;
+            return _Entities.TbAcademicPeriods
+                .Where(x => x.IsActive)
+                .Select(x => new AcademicPeriods(x))
+                .ToList();
         }
         public List<RemarkClass> GetAllRemarks()
         {

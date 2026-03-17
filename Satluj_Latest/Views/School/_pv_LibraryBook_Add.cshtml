@@ -42,7 +42,7 @@
                 <div class="form-group">
                     <label>Category</label>
                     @Html.DropDownListFor(m => m.categoryId,
-                    new Satluj_Latest.Data.DropdownData().GetBookCategory(Model.schoolId),
+                    ViewBag.BookCategories as List<SelectListItem>,
                                         "--Choose Category--",
                                         new { @class = "form-control slct-fee-dropdwn", @data_live_search = "true" })
                     <span asp-validation-for="categoryId" class="text-danger"></span>

@@ -23,13 +23,14 @@ namespace Satluj_Latest.Controllers
         private readonly SchoolDbContext _Entities;
         private readonly HttpClient _httpClient;
         private readonly IWebHostEnvironment _env;
-
-        public ParentController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities, IHttpContextAccessor httpAccessor, HttpClient httpClient, IWebHostEnvironment env) : base(schoolRepository, parentRepository, teacherRepository, Entities)
+        private readonly DropdownData _dropdown;
+        public ParentController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities, IHttpContextAccessor httpAccessor, HttpClient httpClient, IWebHostEnvironment env, DropdownData dropdown) : base(schoolRepository, parentRepository, teacherRepository, Entities)
         {
             _Entities = Entities;
             _http = httpAccessor;
             _httpClient = httpClient;
             _env = env;
+            _dropdown = dropdown;
         }
 
         //
@@ -46,8 +47,8 @@ namespace Satluj_Latest.Controllers
         {
             var model = new SchoolModel();
 
-            var dropdown = new DropdownData();
-            ViewBag.SchoolList = dropdown
+            //var dropdown = new DropdownData();
+            ViewBag.SchoolList = _dropdown
                 .GetSchoolList()
                 .OrderBy(x => x.Text)
                 .ToList();

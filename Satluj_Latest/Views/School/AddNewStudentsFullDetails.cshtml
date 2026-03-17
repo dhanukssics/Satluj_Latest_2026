@@ -523,7 +523,48 @@
     });
 
 
+    $(document).on('change', '#classDataDropdown', function () {
 
+        var classId = $(this).val();
+
+        if (classId != '') {
+
+            $.ajax({
+                url: '/Data/LoadDivision?id=' + classId,
+                type: "GET",
+                success: function (result) {
+
+
+                    $(".division_Select").html("");
+
+                    if (result.list.length > 0) {
+
+                        $(".division_Select").append(
+                            $('<option></option>').val("").html('-- Select Division --')
+                        );
+
+                        $.each(result.list, function (i, item) {
+
+                            $(".division_Select").append(
+                                $('<option></option>').val(item.value).html(item.text)
+                            );
+
+                        });
+
+                        $(".division_Select").prop("disabled", false);
+
+                    }
+                    else {
+
+                        $(".division_Select")
+                            .append($('<option></option>').val("").html('-- No Division Found --'))
+                            .prop("disabled", true);
+
+                    }
+                }
+            });
+        }
+    });
 
 
 

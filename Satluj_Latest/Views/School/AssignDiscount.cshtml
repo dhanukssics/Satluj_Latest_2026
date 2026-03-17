@@ -1,7 +1,7 @@
 ﻿    @model Satluj_Latest.Models.FeeModel
 @{
     ViewBag.Title = "Assign Discount";
-    var students = new Satluj_Latest.Data.Division(Model.DivisionId).GetStudentDetails().OrderBy(z => z.StundentName).ToList();
+    var students = Model.Students;
     
     Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
 
@@ -40,8 +40,12 @@
                 <h5 class="head-box">Save Discount</h5>
                 <div class="row">
                     <div class="col-sm-4">
-                        @Html.DropDownListFor(m => m.FeeId, new Satluj_Latest.Data.DropdownData().RefreshSchoolFees(Model.SchoolId), "--Choose Fee--", new { @class = "form-control slct-fee-dropdwn", @data_live_search = "true" })
-                        <span id="val_fee" class="isHidden">*Select fee</span>
+                        @Html.DropDownListFor(
+                        m => m.FeeId,
+                                                ViewBag.FeeList as List<SelectListItem>,
+                                                "--Choose Fee--",
+                                                new { @class = "form-control slct-fee-dropdwn", @data_live_search = "true" }
+                                                )                        <span id="val_fee" class="isHidden">*Select fee</span>
                     </div>
                     <div class="col-sm-4">
                         @Html.TextBoxFor(m => m.Amount, new { @class = "form-control", placeholder = "Amount", @type = "number" })
@@ -113,7 +117,7 @@
                                     @student.ContactNumber
                                 </td>
                                 <td>
-                                    @student.ClassName / @student.DivisionName
+                                    @student.Class.Class / @student.Division.Division
                                 </td>
                               
                             </tr>

@@ -17,6 +17,7 @@ namespace Satluj_Latest.Models
         public int year { get; set; }
         public string StudentName { get; set; }
         public bool IsAdminUser { get; set; }
-
+        public List<TbStudent> studentList { get; set; }
+        public List<TbAttendance> markedAttendances { get; set; }
     }
 }

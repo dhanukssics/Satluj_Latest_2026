@@ -42,6 +42,6 @@ namespace Satluj_Latest.Models
 
         public int From { get; set; } // 12-12-2018 Archana 
         public long BillNo { get; set; }// 12-12-2018 Archana 
-
+        public List<TbStudent> Students { get; internal set; }
     }
 }

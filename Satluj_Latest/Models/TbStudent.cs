@@ -10,10 +10,7 @@ public partial class TbStudent
     {
 
     }
-    public TbStudent(TbStudent q)
-    {
-        Q = q;
-    }
+    
 
     public long StudentId { get; set; }
 
@@ -166,5 +163,5 @@ public partial class TbStudent
     public virtual ICollection<TbVRemark> TbVRemarks { get; set; } = new List<TbVRemark>();
 
     public virtual ICollection<TbWritingSkill> TbWritingSkills { get; set; } = new List<TbWritingSkill>();
-    public TbStudent Q { get; }
+    
 }

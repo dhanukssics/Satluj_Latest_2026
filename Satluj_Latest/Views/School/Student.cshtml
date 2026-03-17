@@ -79,9 +79,11 @@
                     if (result.list.length > 0) {
                         $("#division-drop-down").html(""); // clear before appending new list
                         $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
-                        $.each(result.list, function (i, item) {
-                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
-                        });
+                            $.each(result.list, function (i, item) {
+                                    $("#division-drop-down").append(
+                                        $('<option></option>').val(item.value).html(item.text)
+                                    );
+                                });
                         $("#division-drop-down").prop("disabled", false);
                     }
                     else {
@@ -230,25 +232,32 @@ function (isConfirm) {
         if (classid != '') {
             // resetDropDown('Class');
             $.ajax({
-                url: '/Data/LoadDivision?id=' + classid,
+                url: '/Data/LoadDivision?id=' + classId,
                 type: "GET",
                 success: function (result) {
-                    if (result.list.length > 0) {
-                        $("#division-drop-down").html(""); // clear before appending new list
-                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
-                        $.each(result.list, function (i, item) {
-                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
-                        });
-                        $("#division-drop-down").prop("disabled", false);
-                    }
-                    else {
-                        // resetDropDown('Class');
-                        $("#division-drop-down").html(""); // clear before appending new list
-                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
-                        $("#division-drop-down").prop("disabled", true);
-                    }
-                }
-            });
+
+            $("#division-drop-down").html("");
+
+            if (result.list.length > 0) {
+                $("#division-drop-down").append(
+                    $('<option></option>').val("").html('-- Select Division --')
+                );
+
+                $.each(result.list, function (i, item) {
+                    $("#division-drop-down").append(
+                        $('<option></option>').val(item.value).html(item.text)
+                    );
+                });
+
+                $("#division-drop-down").prop("disabled", false);
+            }
+            else {
+                $("#division-drop-down")
+                    .append($('<option></option>').val("").html('-- No Division Found --'))
+                    .prop("disabled", true);
+            }
+        }
+    });
         }
         else {
             //  resetDropDown('Class');
@@ -266,7 +275,7 @@ function (isConfirm) {
 
     $(document).on('change', '#division-drop-down', function () {
         var id = $(this).val();
-        if (id != '' || id != 0) {
+            if (id != '' && id != 0) {
             // resetDropDown('Class');
             $.ajax({
                 url: '/School/GetUserListByClassDiv/' + '0' + '~' + id,

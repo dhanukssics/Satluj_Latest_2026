@@ -11,7 +11,13 @@ namespace Satluj_Latest.Data
     {
         private TbStudent student;
         public Student(TbStudent obj) { student = obj; }
-        public Student(long id) { student = _Entities.TbStudents.FirstOrDefault(z => z.StudentId == id); }
+        public Student(long id)
+        {
+            student = _Entities.TbStudents
+                .Include(x => x.Class)
+                .Include(x => x.Division)
+                .FirstOrDefault(z => z.StudentId == id);
+        }
         public long StudentId { get { return student.StudentId; } }
         public long SchoolId { get { return student.SchoolId; } }
         public string StudentSpecialId { get { return student.StudentSpecialId; } }
@@ -36,9 +42,15 @@ namespace Satluj_Latest.Data
         public Nullable<long> ParentId { get { return student.ParentId; } }
         public string State { get { return student.State; } }
         public string MotherName { get { return student.MotherName; } }
-        public string ClassName { get { return student.Class.Class; } }
+        public string ClassName => student.Class?.Class ?? "";
         public Division Division { get { return new Data.Division(student.Division); } }
-        public string DivisionName { get { return Division.DivisionName; } }
+        public string DivisionName
+        {
+            get
+            {
+                return student.Division != null ? student.Division.Division : "";
+            }
+        }
         public Bus Bus { get { return new Data.Bus(student.Bus); } }
         public string BusSpecialId { get { return student.Bus.BusSpecialId; } }
         public string SchoolName { get { return student.School.SchoolName; } }

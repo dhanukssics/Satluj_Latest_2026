@@ -1,7 +1,7 @@
 ﻿@model Satluj_Latest.Models.ExamsModel
 
 @{
-    var dd = new Satluj_Latest.Data.DropdownData();
+    
 }
 
 <style>
@@ -44,7 +44,7 @@
 
                             @Html.DropDownListFor(
                             m => m.ClassId,
-                                                        dd.GetClasses(Model.SchoolId),
+                                                        ViewBag.Classlist as List<SelectListItem>,
                                                         "--Choose--",
                                                         new { @class = "form-control slct-alldivisions-dropdwn", @data_live_search = "true" }
                                                         )

@@ -150,7 +150,7 @@
                         $("#division-drop-down").html(""); // clear before appending new list
                         $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
                         $.each(result.list, function (i, item) {
-                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                            $("#division-drop-down").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $("#division-drop-down").prop("disabled", false);
                     }

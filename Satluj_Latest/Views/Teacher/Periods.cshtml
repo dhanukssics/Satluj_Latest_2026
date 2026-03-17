@@ -11,15 +11,8 @@
 
         <div class="row" style="margin-left:15px !important;">
 
-            <form id="form-teacher-add"
-                  asp-action="AddAcademicPeriods"
-                  asp-controller="Teacher"
-                  method="post"
-                  data-ajax="true"
-                  data-ajax-method="POST"
-                  data-ajax-success="AddAcademicPeriodsSuccess"
-                  data-ajax-failure="AddAcademicPeriodsFailure">
-
+            <form id="form-teacher-add">
+               
                 <input type="hidden" asp-for="SchoolId" />
                 <input type="hidden" asp-for="ClassId" />
 
@@ -79,59 +72,77 @@
         </div>
 
         <div class="table-responsive" id="academicAreaList">
-            <partial name="~/Views/Teacher/_pv_AcademicPeriodsList.cshtml" />
         </div>
 
     </div>
 </div>
 
 <script>
-    $(document).on('change', '.slct-region-dropdwn', function () {
-        $('#RegionId').val($(this).val());
-        var id = $(this).val();
+        $("#form-teacher-add").submit(function (e) {
+        e.preventDefault();
 
-        if (id != '') {
+        $.ajax({
+            url: '/Teacher/AddAcademicPeriods',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (result) {
+
+                if (result.status) {
+                    toastr.success(result.msg);
+                    RefreshData();
+                }
+                else {
+                    toastr.error(result.msg);
+                }
+            },
+            error: function () {
+                toastr.error("Something went wrong");
+            }
+        });
+    });
+        $(document).on('change', '.slct-region-dropdwn', function () {
+
+        var regionId = $(this).val();
+        var schoolId = $('#SchoolId').val();
+        console.log("RegionId:", regionId);
+        console.log("SchoolId:", schoolId);
+
+        if (regionId != '') {
+
             $.ajax({
-                url: '/Data/LoadAllClass?id=' + id + '&schoolid=' + $('#SchoolId').val(),
+                url: '/Data/LoadAllClass?id=' + regionId + '&schoolid=' + schoolId,
                 type: "GET",
                 success: function (result) {
+
+                    $(".slct-class-dropdown").html("");
+
                     if (result.list.length > 0) {
-                        $(".slct-class-dropdown").html("");
-                        $(".slct-class-dropdown").append($('<option></option>').val("0").html(' All '));
+
+                        $(".slct-class-dropdown").append('<option value="">--Choose Class--</option>');
+
                         $.each(result.list, function (i, item) {
-                            $(".slct-class-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-class-dropdown").append(
+                                $('<option></option>').val(item.value).html(item.text)
+                            );
                         });
+
                         $(".slct-class-dropdown").prop("disabled", false);
                     }
                     else {
-                        $(".slct-class-dropdown").html("");
-                        $(".slct-class-dropdown").append($('<option></option>').val("0").html('-- No Class Found --'));
+                        $(".slct-class-dropdown").append('<option value="">No Class Found</option>');
                         $(".slct-class-dropdown").prop("disabled", true);
-                        $('#ClassId').val("0");
                     }
                 }
             });
         }
-        else {
-            $(".slct-class-dropdown").html("");
-            $(".slct-class-dropdown").append($('<option></option>').val("0").html('-- Select Class --'));
-            $(".slct-class-dropdown").prop("disabled", true);
-        }
     });
-
     $('.date-add').datepicker({
         format: 'dd-mm-yyyy',
         autoclose: true,
         todayHighlight: true
     });
 
-    $(document).ready(function () {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0');
-        var yyyy = today.getFullYear();
-        $('.date-add').val(dd + '-' + mm + '-' + yyyy);
-    });
+    
 
     function AddAcademicPeriodsSuccess(result) {
         if (result.status) {
@@ -156,4 +167,20 @@
     $(document).on('change', '.slct-class-dropdown', function () {
         $('#ClassId').val($(this).val());
     });
+    $(document).ready(function () {
+
+        loadPeriodList();
+
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        $('.date-add').val(dd + '-' + mm + '-' + yyyy);
+    });
+
+    function loadPeriodList() {
+        $.get('/Teacher/ListAcademicPeriodsData/', function (data) {
+            $('#academicAreaList').html(data);
+        });
+    }
 </script>

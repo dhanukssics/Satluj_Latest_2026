@@ -10,8 +10,11 @@ namespace Satluj_Latest.Controllers
     public class ReportController : BaseController
     {
         private readonly DropdownData _dropdown;
-        public ReportController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities) : base(schoolRepository, parentRepository, teacherRepository, Entities)
+        private readonly SchoolDbContext _Entities;
+        public ReportController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities,DropdownData dropdown) : base(schoolRepository, parentRepository, teacherRepository, Entities)
         {
+            _dropdown = dropdown;
+            _Entities = Entities;
         }
 
         // GET: Report
@@ -199,9 +202,19 @@ namespace Satluj_Latest.Controllers
         public IActionResult StudentList()
         {
             StudentModel model = new StudentModel();
+
             model.schoolId = _user.SchoolId;
-            model.SchoolName = _user.School.SchoolName;
+
+            var school = _Entities.TbSchools
+                .FirstOrDefault(x => x.SchoolId == _user.SchoolId && x.IsActive);
+
+            if (school != null)
+            {
+                model.SchoolName = school.SchoolName;
+            }
+
             ViewBag.classlist = _dropdown.GetClasses(model.schoolId);
+
             return View(model);
         }
 

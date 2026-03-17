@@ -3,8 +3,8 @@
 @{
     Layout = "_SchoolAdminLayout";
 
-    var senderDetails = new Satluj_Latest.Data.School(Model.SchoolId).GetSenderDetails();
-    var feeIncomeData = new Satluj_Latest.Data.School(Model.SchoolId).GetFeeIncomeHead();
+    var senderDetails = ViewBag.SenderDetails;
+    var feeIncomeData = ViewBag.FeeIncomeData;
 
     if (feeIncomeData != null)
     {
@@ -93,7 +93,7 @@
 
             <form id="form-libraryFine" asp-controller="School" asp-action="AddLibraryDueFine" method="post">
                 <select asp-for="feeId"
-                        asp-items="new Satluj_Latest.Data.DropdownData().SchoolSpecialFeesList(Model.SchoolId)"
+                        asp-items="ViewBag.SpecialFees"
                         class="form-control slct-fee-dropdwn">
                     <option value="">--Choose Fee--</option>
                 </select>

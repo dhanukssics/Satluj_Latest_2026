@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Satluj_Latest.Controllers;
 using Satluj_Latest.Data;
 using Satluj_Latest.Models;
@@ -17,8 +18,10 @@ namespace Satluj_Latest.Controllers
     //Sathluj
     public class PromotionController : BaseController
     {
-        public PromotionController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities) : base(schoolRepository, parentRepository, teacherRepository, Entities)
+        private readonly DropdownData _dropdown;
+        public PromotionController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities, DropdownData dropdown) : base(schoolRepository, parentRepository, teacherRepository, Entities)
         {
+            _dropdown = dropdown;
         }
 
         // GET: Promotion
@@ -26,8 +29,8 @@ namespace Satluj_Latest.Controllers
         {
             SchoolValue model = new SchoolValue();
             model.schoolId = _user.SchoolId;
-            DropdownData dropdown = new DropdownData();
-            model.UnPublishedClasses = dropdown.GetUnPublishedClasses(model.schoolId);
+            //DropdownData dropdown = new DropdownData();
+            model.UnPublishedClasses = _dropdown.GetUnPublishedClasses(model.schoolId);
             return View(model);
         }
         public PartialViewResult UnpublishedClasses(string id)
@@ -38,7 +41,15 @@ namespace Satluj_Latest.Controllers
             model.list = new List<UpPublishedClassItem>();
             if (Classid == 0)
             {
-                var classList = _Entities.TbDivisions.Where(x => x.Class.SchoolId == _user.SchoolId && x.IsActive && x.Class.IsActive && x.Class.PublishStatus == false).ToList();
+                var classList = _Entities.TbDivisions
+                    .Include(x => x.Class)
+                    .ThenInclude(c => c.AcademicYear)
+                    .Where(x => x.Class.SchoolId == _user.SchoolId
+                             && x.IsActive
+                             && x.Class.IsActive
+                             && x.Class.PublishStatus == false
+                             && (Classid == 0 || x.Class.ClassId == Classid))
+                    .ToList();
                 if (classList.Count > 0 && classList != null)
                 {
                     foreach (var item in classList)
@@ -58,7 +69,15 @@ namespace Satluj_Latest.Controllers
             }
             else
             {
-                var classList = _Entities.TbDivisions.Where(x => x.Class.SchoolId == _user.SchoolId && x.IsActive && x.Class.IsActive && x.Class.PublishStatus == false && x.Class.ClassId == Classid).ToList();
+                var classList = _Entities.TbDivisions
+                                .Include(x => x.Class)
+                                .ThenInclude(c => c.AcademicYear)
+                                .Where(x => x.Class.SchoolId == _user.SchoolId
+                                         && x.IsActive
+                                         && x.Class.IsActive
+                                         && x.Class.PublishStatus == false
+                                         && (x.Class.ClassId == Classid))
+                                .ToList();
                 if (classList.Count > 0 && classList != null)
                 {
                     foreach (var item in classList)
@@ -83,9 +102,9 @@ namespace Satluj_Latest.Controllers
         {
             AddClassModel model = new AddClassModel();
             model.SchoolId = _user.SchoolId;
-            DropdownData dropdown = new DropdownData();
-            model.ClassList = dropdown.GetClassAllList();
-            model.currentacademiclist = dropdown.GetCurrentAcademicYear();
+           // DropdownData dropdown = new DropdownData();
+            model.ClassList = _dropdown.GetClassAllList();
+            model.currentacademiclist = _dropdown.GetCurrentAcademicYear();
             return PartialView("~/Views/Promotion/_pv_AddClassUnPublished.cshtml", model);
         }
         public object AddClassUnPublished(AddClassModel model)
@@ -141,7 +160,7 @@ namespace Satluj_Latest.Controllers
                     ClassId = newClass.ClassId;
                 }
             }
-            return Json(new { status = status, msg = msg, classId = ClassId, list = new Data.DropdownData().RefreshClasses(model.SchoolId) });
+            return Json(new { status = status, msg = msg, classId = ClassId, list = _dropdown.RefreshClasses(model.SchoolId) });
         }
         public object PublishUnPublishedClass(string id)
         {
@@ -167,7 +186,7 @@ namespace Satluj_Latest.Controllers
                 }
             }
             message = status ? "Published" : "failed";
-            return Json(new { status = status, msg = message, list = new Data.DropdownData().RefreshClassesUnPublished(_user.SchoolId) });
+            return Json(new { status = status, msg = message, list = _dropdown.RefreshClassesUnPublished(_user.SchoolId) });
         }
         public ActionResult PromoteStudents()
         {
@@ -179,8 +198,8 @@ namespace Satluj_Latest.Controllers
         {
             Models.PromoteStudents model = new Models.PromoteStudents();
             model.SchoolId = _user.SchoolId;
-            DropdownData dropdown = new DropdownData();
-            model.AcademicYearList = dropdown.GetOtherAcademicYear();
+            //DropdownData dropdown = new DropdownData();
+            model.AcademicYearList = _dropdown.GetOtherAcademicYear();
             return View(model);
         }
         public PartialViewResult StudentListForPromotion(string id)
@@ -213,8 +232,8 @@ namespace Satluj_Latest.Controllers
         public PartialViewResult PromoteStudentsToAnotherParialView(Models.PromoteStudents model)
         {
             model.SchoolId = _user.SchoolId;
-                DropdownData dropdown = new DropdownData();
-            ViewBag.OtherAcademicYears = dropdown.GetOtherAcademicYear();
+                //DropdownData dropdown = new DropdownData();
+            ViewBag.OtherAcademicYears = _dropdown.GetOtherAcademicYear();
             foreach (var item in model.StudentList)
             {
                 if (model.StudentListString == null)

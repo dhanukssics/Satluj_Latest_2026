@@ -16,11 +16,12 @@ namespace Satluj_Latest.Controllers
     public class SchoolAccountController : BaseController
     {
         private readonly SchoolDbContext _Entites;
-        private readonly DropdownData dropdown;
+        private readonly DropdownData _dropdown;
 
-        public SchoolAccountController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities) : base(schoolRepository, parentRepository, teacherRepository, Entities)
+        public SchoolAccountController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities,DropdownData dropdown) : base(schoolRepository, parentRepository, teacherRepository, Entities)
         {
-
+            _dropdown = dropdown;
+            _Entites=Entities;
         }
        
 
@@ -323,7 +324,7 @@ namespace Satluj_Latest.Controllers
         {
             var model = new CashEntryModel();
             model.SchoolId = _user.SchoolId;
-            ViewBag.Accounthead = dropdown.GetAccountHeads(model.SchoolId);
+            ViewBag.Accounthead = _dropdown.GetAccountHeads(model.SchoolId);
             return PartialView("~/Views/SchoolAccount/_pv_AddCashEntryData.cshtml", model);
         }
         public ActionResult BankHome()
@@ -815,8 +816,8 @@ namespace Satluj_Latest.Controllers
         {
             var model = new BankEntryModel();
             model.SchoolId = _user.SchoolId;
-            ViewBag.Bnaklist = dropdown.GetBankLists(model.SchoolId);
-            ViewBag.Accounthead = dropdown.GetAccountHeads(model.SchoolId);
+            ViewBag.Bnaklist = _dropdown.GetBankLists(model.SchoolId);
+            ViewBag.Accounthead = _dropdown.GetAccountHeads(model.SchoolId);
             return PartialView("~/Views/SchoolAccount/_pv_AddBankEntryData.cshtml", model);
         }
         public ActionResult DayBookReportHome()
@@ -886,8 +887,8 @@ namespace Satluj_Latest.Controllers
             model.SchoolId = _user.SchoolId;
             model.FromDate = CurrentTime;
             model.ToDate = CurrentTime;
-            DropdownData dropdown = new DropdownData();
-            ViewBag.BankList = dropdown.GetBankLists(model.SchoolId);
+            //DropdownData dropdown = new DropdownData();
+            ViewBag.BankList = _dropdown.GetBankLists(model.SchoolId);
             return View(model);
         }
         public PartialViewResult BankBookReport(string id)
@@ -1088,8 +1089,8 @@ namespace Satluj_Latest.Controllers
                 model.CashTransaction = false;
             model.SubLedgerData = _Entities.TbSubLedgerData.Where(x => x.LedgerId == bankData.SubId).Select(x => x.SubLedgerName).FirstOrDefault();
             model.BankDataId = bankData.Id;
-            ViewBag.Banklist = dropdown.GetBankLists(model.SchoolId);
-            ViewBag.Accountheadlist = dropdown.GetAccountHeads(model.SchoolId);
+            ViewBag.Banklist = _dropdown.GetBankLists(model.SchoolId);
+            ViewBag.Accountheadlist = _dropdown.GetAccountHeads(model.SchoolId);
             return PartialView("~/Views/SchoolAccount/_pv_EditBankEntryData.cshtml", model);
 
         }
@@ -1414,7 +1415,7 @@ namespace Satluj_Latest.Controllers
             model.EntryDateString = cashData.EnterDate.ToString();
             model.SubLedgerData = _Entities.TbSubLedgerData.Where(x => x.LedgerId == cashData.SubId).Select(x => x.SubLedgerName).FirstOrDefault();
             model.CashId = cashData.Id;
-            ViewBag.Accountlist = dropdown.GetAccountHeads(model.SchoolId);
+            ViewBag.Accountlist = _dropdown.GetAccountHeads(model.SchoolId);
             return PartialView("~/Views/SchoolAccount/_pv_EditCashEntryData.cshtml", model);
 
         }
@@ -1557,7 +1558,7 @@ namespace Satluj_Latest.Controllers
             model.SchoolId = _user.SchoolId;
             model.FromDate = CurrentTime;
             model.ToDate = CurrentTime;
-            ViewBag.AccountHeadsWithFeeHead =dropdown.GetAccountHeadsWithFeeHead(model.SchoolId);
+            ViewBag.AccountHeadsWithFeeHead =_dropdown.GetAccountHeadsWithFeeHead(model.SchoolId);
             return View(model);
         }
 

@@ -17,7 +17,7 @@ namespace Satluj_Latest.Models
 
         public int shiftStatus { get; set; }
         public long userId { get; set; }
-
+        public List<TbStudent> Students { get; set; }
         public long divisionId { get; set; }
         public string studentName { get; set; }
         public string division { get; set; }

@@ -1,48 +1,32 @@
 ﻿@model Satluj_Latest.Models.DesignationModel
 
-<div class="modal-dialog modal-sm" role="document">
+<form id="form-teacher-edit"
+      asp-action="EditDesignation"
+      asp-controller="Teacher"
+      method="post">
 
-    <form asp-action="EditDesignation"
-          asp-controller="Teacher"
-          id="form-teacher-edit"
-          method="post"
-          data-ajax="true"
-          data-ajax-method="POST"
-          data-ajax-success="EditDesignationSuccess"
-          data-ajax-failure="ajaxFailure">
+    <input type="hidden" asp-for="Id" />
 
-        <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <label>Designation :</label>
+        <input asp-for="DesignationName"
+               class="form-control"
+               placeholder="Designation Name" />
+        <span asp-validation-for="DesignationName"
+              class="text-danger"></span>
+    </div>
 
-        <div class="modal-content">
+    <div class="text-right">
+        <button type="button"
+                class="btn btn-default"
+                data-dismiss="modal">
+            Cancel
+        </button>
 
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-                <h4 class="modal-title">Edit Designation</h4>
-            </div>
+        <button type="submit"
+                class="btn pay-now-btn">
+            Edit
+        </button>
+    </div>
 
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="form-group">
-                            <label asp-for="DesignationName">Designation :</label>
-                            <input asp-for="DesignationName"
-                                   class="form-control"
-                                   placeholder="Designation Name" />
-                            <span asp-validation-for="DesignationName" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn pay-now-btn">Edit</button>
-            </div>
-
-        </div>
-
-    </form>
-
-</div>
+</form>

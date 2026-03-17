@@ -24,17 +24,20 @@ namespace Satluj_Latest.Controllers
 {
     public class ProgressController : BaseController
     {
+        private readonly DropdownData _dropdown;
         // GET: Progress
         public ProgressController(
         SchoolRepository schoolRepository,
         ParentRepository parentRepository,
         TeacherRepository teacherRepository,
-        SchoolDbContext context)
+        SchoolDbContext context,
+        DropdownData dropdown)
         : base(schoolRepository, parentRepository, teacherRepository, context)
         {
+            _dropdown = dropdown;
         }
         protected bool IsAdmin { get; private set; }
-        public DropdownData dropdown = new DropdownData();
+        //public DropdownData dropdown = new DropdownData();
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             IsAdmin = HttpContext.Session.GetString("IsAdmin") == "true";
@@ -48,8 +51,8 @@ namespace Satluj_Latest.Controllers
             ProgressCardModel model = new ProgressCardModel();
             model.SchoolId = _user.SchoolId;
             model.ProgressCardName = _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault() == null ? " " : _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault();
-            var dropdownData = new DropdownData();
-            model.RegionList = dropdownData.GetRegion(model.SchoolId);
+            //var dropdownData = new DropdownData();
+            model.RegionList = _dropdown.GetRegion(model.SchoolId);
             return View(model);
         }
         public PartialViewResult GetStudentList(string id)
@@ -453,8 +456,8 @@ namespace Satluj_Latest.Controllers
         {
             ScholasticAreaModel model = new ScholasticAreaModel();
             model.SchoolId = _user.SchoolId;
-            DropdownData dropdown = new DropdownData();
-            model.RegionList = dropdown.GetRegion(model.SchoolId);
+            //DropdownData dropdown = new DropdownData();
+            model.RegionList = _dropdown.GetRegion(model.SchoolId);
             return View(model);
         }
 
@@ -495,7 +498,7 @@ namespace Satluj_Latest.Controllers
         {
             CoScholasticAreaModel model = new CoScholasticAreaModel();
             model.SchoolId = _user.SchoolId;
-            ViewBag.Regions =dropdown.GetRegion(model.SchoolId);
+            ViewBag.Regions =_dropdown.GetRegion(model.SchoolId);
 
             return View(model);
         }
@@ -587,8 +590,8 @@ namespace Satluj_Latest.Controllers
             model.SchoolId = _user.SchoolId;
             model.StartDateString = CurrentTime.ToShortDateString();
             model.EndDateString = CurrentTime.ToShortDateString();
-            DropdownData dropdownData = new DropdownData();
-            ViewBag.ClassList = dropdownData.GetClasses(model.SchoolId);
+            //DropdownData dropdownData = new DropdownData();
+            ViewBag.ClassList = _dropdown.GetClasses(model.SchoolId);
 
             return View(model);
         }
@@ -771,8 +774,8 @@ namespace Satluj_Latest.Controllers
             ExamResultMainModel model = new ExamResultMainModel();
             model.SchoolId = _user.SchoolId;
             model.UserId = _user.UserId;
-            DropdownData dropdownData = new DropdownData();
-            ViewBag.ClassListwise = dropdownData.GetClassesUserWise(model.SchoolId,model.UserId);
+           // DropdownData dropdownData = new DropdownData();
+            ViewBag.ClassListwise = _dropdown.GetClassesUserWise(model.SchoolId,model.UserId);
 
             return View(model);
         }
@@ -1046,9 +1049,9 @@ namespace Satluj_Latest.Controllers
             ExamResultMainModel model = new ExamResultMainModel();
             model.SchoolId = _user.SchoolId;
             model.UserId = _user.UserId;
-            DropdownData dropdown = new DropdownData();
-            model.ClassList = (List<SelectListItem>)dropdown.GetClasses(model.SchoolId);
-            model.ClassList_wise = dropdown.GetClassesUserWise(model.SchoolId,model.UserId);
+            //DropdownData dropdown = new DropdownData();
+            model.ClassList = (List<SelectListItem>)_dropdown.GetClasses(model.SchoolId);
+            model.ClassList_wise = _dropdown.GetClassesUserWise(model.SchoolId,model.UserId);
             return View(model);
         }
 
@@ -1286,7 +1289,7 @@ namespace Satluj_Latest.Controllers
         {
             ExamResultMainModel model = new ExamResultMainModel();
             model.SchoolId = _user.SchoolId;
-            ViewBag.Classes = dropdown.GetClasses(model.SchoolId);
+            ViewBag.Classes = _dropdown.GetClasses(model.SchoolId);
             return View(model);
         }
         public PartialViewResult SudentListForEnterCoScolasticAreaResult(string id)
@@ -1453,9 +1456,9 @@ namespace Satluj_Latest.Controllers
         {
             ExamResultMainModel model = new ExamResultMainModel();
             model.SchoolId = _user.SchoolId;
-            var dropdownData = new DropdownData();
-            model.SubjectList = dropdownData.GetAllOptionalSubjects(model.SchoolId);
-            ViewBag.ClassList = dropdownData.GetClasses(model.SchoolId);
+            //var dropdownData = new DropdownData();
+            model.SubjectList = _dropdown.GetAllOptionalSubjects(model.SchoolId);
+            ViewBag.ClassList = _dropdown.GetClasses(model.SchoolId);
             return View(model);
         }
 
@@ -1525,10 +1528,10 @@ namespace Satluj_Latest.Controllers
         {
             ExamResultMainModel model = new ExamResultMainModel();
             model.SchoolId = _user.SchoolId;
-            var dropdownData = new DropdownData();
+            //var dropdownData = new DropdownData();
             model.OptionalSubjectList =
-                dropdownData.GetAllOptionalSubjects(model.SchoolId);
-            ViewBag.ClassList = dropdownData.GetClasses(model.SchoolId);
+                _dropdown.GetAllOptionalSubjects(model.SchoolId);
+            ViewBag.ClassList = _dropdown.GetClasses(model.SchoolId);
 
             return View(model);
         }
@@ -1580,8 +1583,8 @@ namespace Satluj_Latest.Controllers
         {
             ExamResultMainModel model = new ExamResultMainModel();
             model.SchoolId = _user.SchoolId;
-            DropdownData dropdownData = new DropdownData();
-            model.ClassList = (List<SelectListItem>)dropdownData.GetClasses(model.SchoolId);
+            //DropdownData dropdownData = new DropdownData();
+            model.ClassList = (List<SelectListItem>)_dropdown.GetClasses(model.SchoolId);
             
             return View(model);
         }
@@ -1616,6 +1619,7 @@ namespace Satluj_Latest.Controllers
                 model.list.Add(one);
             }
             model.list = model.list.OrderBy(x => x.RollNo).ThenBy(x => x.StudentName).ToList();
+            ViewBag.Remarks = _dropdown.GetAllRemarks(model.SchoolId);
             return PartialView("~/Views/Progress/_pv_StudentsRemarkResult.cshtml", model);
         }
         [HttpPost]
@@ -4775,8 +4779,8 @@ namespace Satluj_Latest.Controllers
             ProgressCardModel model = new ProgressCardModel();
             model.SchoolId = _user.SchoolId;
             model.ProgressCardName = _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault() == null ? " " : _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault();
-            DropdownData dropdown = new DropdownData();
-            model.AcademicYearList = dropdown.GetAllAcademicYear();
+            //DropdownData dropdown = new DropdownData();
+            model.AcademicYearList = _dropdown.GetAllAcademicYear();
             return View(model);
         }
 

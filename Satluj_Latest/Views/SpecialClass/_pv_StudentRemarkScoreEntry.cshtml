@@ -46,7 +46,7 @@
                         @if (item._RemarkSchore.Remark.Trim() == "")
                         {
                             <div>
-                                @Html.DropDownListFor(model => item._RemarkSchore.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item._RemarkSchore.Remark, new { @class = "cls-mark-Remark" })
+                                @Html.DropDownListFor(model => item._RemarkSchore.Remark, ViewBag.Remarks as List<SelectListItem>, item._RemarkSchore.Remark, new { @class = "cls-mark-Remark" })
                             </div>
                         }
                         else
@@ -54,11 +54,11 @@
                             <div>
                                 @if (IsAdmin == true)
                                 {
-                                    @Html.DropDownListFor(model => item._RemarkSchore.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item._RemarkSchore.Remark, new { @class = "cls-mark-Remark" })
+                                    @Html.DropDownListFor(model => item._RemarkSchore.Remark, ViewBag.Remarks as List<SelectListItem>, item._RemarkSchore.Remark, new { @class = "cls-mark-Remark" })
                                 }
                                 else
                                 {
-                                    @Html.DropDownListFor(model => item._RemarkSchore.Remark, new Satluj_Latest.Data.DropdownData().GetAllRemarks(Model.SchoolId), item._RemarkSchore.Remark, new { @class = "cls-mark-Remark", @disabled = "disabled" })
+                                    @Html.DropDownListFor(model => item._RemarkSchore.Remark, ViewBag.Remarks as List<SelectListItem>, item._RemarkSchore.Remark, new { @class = "cls-mark-Remark", @disabled = "disabled" })
                                 }
                             </div>
                         }

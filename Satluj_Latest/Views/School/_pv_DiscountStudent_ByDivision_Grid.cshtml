@@ -50,7 +50,7 @@
                         </td>
                     }*@
                     <td class="ng-click-studentDiscount-details">
-                        @discount.student.StundentName
+                        @discount.Student.StundentName
                     </td>
                     @*<td>
                             @student.ParentName
@@ -60,17 +60,17 @@
                         </td>*@
 
                     <td class="ng-click-studentDiscount-details">
-                        @discount.student.ClassName / @discount.student.DivisionName
+                        @discount.Student.Class.Class / @discount.Student.Division.Division
                     </td>
                     <td class="ng-click-studentDiscount-details">
-                        @discount.feename
+                        @discount.Fee.FeesName
                     </td>
                     <td class="ng-click-studentDiscount-details">
-                        @String.Format("{0:0.00}", discount.discountAmount)
+                        @String.Format("{0:0.00}", discount.DiscountAmount)
                     </td>
-                    <td data-studentname="@discount.student.StundentName" data-amount="@discount.discountAmount" data-feename="@discount.feename">
-                        <button class="delete-fee-tr btn btn-peek" data-id="@discount.studentId" data-feeid="@discount.feeId"><i class="fa fa-trash "></i></button>
-                        <button class="edit-fee-tr btn pay-now-btn" data-id="@discount.studentId" data-feeid="@discount.feeId"><i class="fa fa-edit "></i></button>
+                    <td data-studentname="@discount.Student.StundentName" data-amount="@discount.DiscountAmount" data-feename="@discount.Fee.FeesName">
+                        <button class="delete-fee-tr btn btn-peek" data-id="@discount.StudentId" data-feeid="@discount.FeeId"><i class="fa fa-trash "></i></button>
+                        <button class="edit-fee-tr btn pay-now-btn" data-id="@discount.StudentId" data-feeid="@discount.FeeId"><i class="fa fa-edit "></i></button>
                     </td>
                 </tr>
             }

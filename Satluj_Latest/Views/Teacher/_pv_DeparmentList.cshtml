@@ -5,7 +5,7 @@
     long schoolId = Model.SchoolId;
     var data = new Satluj_Latest.Data.School(schoolId).GetAllDepartment();
     int x = 1;
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = ViewBag.IsAdmin ?? false;
 }
 <table class="table custome-table department-list">
     <thead>
@@ -21,7 +21,7 @@
                 </th>*@
             @if (IsAdmin == true)
             {
-                <th></th>
+                <th>Action</th>
             }
         </tr>
     </thead>
@@ -34,13 +34,99 @@
                 @*<td>@item.Abbreviation</td>*@
                 @if (IsAdmin == true)
                 {
+                    
                     <td>
-                        <button class="delete-class-tr btn btn-peek" data-deparrtment="@item.Id"><i class="fa fa-trash"></i></button>
-                        <button class="edit-class-tr btn btn-peek" data-deparrtment="@item.Id"><i class="fa fa-edit"></i></button>
+                        <button class="delete-department-tr btn btn-peek" data-department="@item.Id">
+                            <i class="fa fa-trash"></i>
+                        </button>
+
+                        <button class="edit-department-tr btn btn-peek" data-department="@item.Id">
+                            <i class="fa fa-edit"></i>
+                        </button>
                     </td>
+                    
                 }
             </tr>
             x = x + 1;
         }
     </tbody>
 </table>
+<script>
+    $(document).on("click", ".edit-department-tr", function () {
+
+        var id = $(this).data("department");
+
+        $.get("/Teacher/DepartmentEditPartial", { id: id }, function (data) {
+
+            $("#modalDepartmentEdit").html(data);
+            $("#modalDepartmentEdit").modal("show");
+
+        });
+
+    });
+        $(document).on('click', '.delete-department-tr', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: true
+        },
+        function (isConfirm) {
+
+            if (isConfirm) {
+
+                $.ajax({
+                    url: '/Teacher/DeleteDepartment/' + $(source).data("department"),
+                    type: "GET",
+                    dataType: 'json',
+                    success: function (data) {
+
+                        if (data.status) {
+
+                            toastrSuccess(data.msg);
+
+                            setTimeout(function () {
+                                window.location.href = '/Teacher/Departments/';
+                            }, 250);
+
+                        }
+                        else {
+                            toastrError(data.msg);
+                        }
+
+                    }
+                });
+
+            }
+
+        });
+
+    });
+    function EditDepartmentSuccess(result) {
+
+        if (result.status) {
+
+            toastrSuccess(result.msg);
+
+            $("#modalDepartmentEdit").modal("hide");
+
+            window.location.href = '/Teacher/Departments/';
+
+        } else {
+
+            toastrError(result.msg);
+
+        }
+    }
+
+    function ajaxFailure() {
+        toastrError("Failed!");
+    }
+</script>
