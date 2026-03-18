@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Satluj_Latest.Data;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,5 +16,7 @@ namespace Satluj_Latest.Models
         public long SubjectId { get; set; }
         public string Abbreviation { get; set; }
         public string Code { get; set; }
+        public List<Subjects> SubjectList { get;  set; }
+        public bool IsAdmin { get; set; }
     }
 }

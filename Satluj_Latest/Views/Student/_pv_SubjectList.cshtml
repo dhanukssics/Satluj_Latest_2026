@@ -1,8 +1,8 @@
 ﻿
 @model Satluj_Latest.Models.SubjectsModel
 @{
-    var subjectDetails = new Satluj_Latest.Data.School(Model.SchoolId).GetAllSubjects();
-        bool IsAdmin = ViewBag.IsAdmin;
+    var subjectDetails = Model.SubjectList;
+    bool IsAdmin = Model.IsAdmin;
 }
 <thead>
     <tr>

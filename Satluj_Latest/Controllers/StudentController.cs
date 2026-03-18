@@ -30,6 +30,8 @@ namespace TrackTap.Controllers
         {
             SubjectsModel model = new SubjectsModel();
             model.SchoolId = _user.SchoolId;
+            model.IsAdmin = true;
+            model.SubjectList = new Satluj_Latest.Data.School(_user.SchoolId).GetAllSubjects();
             return View(model);
         }
         public async Task<IActionResult> SubmitAddSubject(SubjectsModel model)
@@ -90,6 +92,9 @@ namespace TrackTap.Controllers
         {
             var model = new SubjectsModel();
             model.SchoolId = _user.SchoolId;
+            model.IsAdmin = true;
+            model.SubjectList = new Satluj_Latest.Data.School(_user.SchoolId)
+       .                        GetAllSubjects() ?? new List<Subjects>();
             return PartialView("~/Views/Student/_pv_SubjectList.cshtml", model);
         }
         public IActionResult TimeTable()

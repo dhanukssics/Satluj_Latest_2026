@@ -983,8 +983,10 @@ namespace Satluj_Latest.Data
         }
         public List<Subjects> GetAllSubjects()
         {
-            var data = school.TbSubjects.Where(x => x.IsActive).ToList().Select(z => new Subjects(z)).ToList();
-            return data;
+            return _Entities.TbSubjects
+                            .Where(x => x.SchoolI == school.SchoolId && x.IsActive)
+                            .Select(z => new Subjects(z))
+                            .ToList();
         }
 
         public List<TimetableListingModel> GetTimetable(long ClassId, long DivisionId)
