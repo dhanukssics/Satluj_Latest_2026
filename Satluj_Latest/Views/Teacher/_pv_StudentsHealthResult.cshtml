@@ -1,8 +1,10 @@
 ﻿@model Satluj_Latest.Models.HealthResultModel
 @{
+  
     int count = 1;
     long schoolId = Model.SchoolId;
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = ViewBag.IsAdmin != null && Convert.ToBoolean(ViewBag.IsAdmin);
+
 }
 @Html.HiddenFor(z => z.ClassId, new { Value = @Model.ClassId })
 @Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })

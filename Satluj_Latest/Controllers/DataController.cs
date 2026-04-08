@@ -47,6 +47,7 @@ namespace Satluj_Latest.Controllers
             var result = _dropdown.GetTeacherDivision(id, userid);
             return Json(new { status = result.Count > 0, list = result } );
         }
+        
         public object LoadExams(long classId, long schoolId)
         {
             var result = _dropdown.GetAllExams(classId, schoolId);

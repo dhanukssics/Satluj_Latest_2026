@@ -111,15 +111,34 @@
     </form>
 </div>
 <script>
-    $("#form-teacher-edit").submit(function (e) {
+    $('.date-cashentry-add').datepicker({
+        format: 'mm-dd-yyyy',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $(document).off("submit", "#form-teacher-edit").on("submit", "#form-teacher-edit", function (e) {
         e.preventDefault();
 
         $.ajax({
             url: $(this).attr("action"),
             type: "POST",
             data: $(this).serialize(),
-            success: EditDeclareExamSuccess,
-            error: ajaxFailure
+            success: function (result) {
+                if (result.status) {
+                    toastr.success(result.msg);
+                    $("#modalDeclaredExamEdit").modal("hide");
+
+                    setTimeout(function () {
+                        window.location.href = '/Progress/ExamDeclaration/';
+                    }, 800);
+                } else {
+                    toastr.error(result.msg);
+                }
+            },
+            error: function () {
+                toastr.error("Edit failed!");
+            }
         });
     });
 </script>

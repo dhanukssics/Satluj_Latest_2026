@@ -34,4 +34,5 @@ public partial class TbTimeTable
     public virtual TbSubject Subject { get; set; } = null!;
 
     public virtual TbTeacher Teacher { get; set; } = null!;
+    public long? SeasonId { get; set; }
 }

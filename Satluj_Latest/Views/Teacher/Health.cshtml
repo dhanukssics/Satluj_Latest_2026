@@ -1,32 +1,33 @@
 ﻿@model Satluj_Latest.Models.HealthModel
+
 @{
     ViewBag.Title = "Health";
     Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
 }
+
 <div class="row">
     <div class="col-md-12">
-        <h3 style="margin-top: 5px;"> HEALTH & ATTENDANCE</h3>
+        <h3 style="margin-top: 5px;">HEALTH & ATTENDANCE</h3>
+
         <div class="row" style="margin-left:15px !important;">
-            @Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+            @Html.HiddenFor(z => z.SchoolId)
             @Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
             @Html.HiddenFor(z => z.PeriodId, new { Value = 0 })
             @Html.HiddenFor(z => z.ClassId, new { Value = 0 })
+
             <div class="row">
                 <div class="form-group col-sm-3">
                     <div class="form-group">
-                        <label>Class : </label>
+                        <label>Class :</label>
                         <br />
                         <select asp-for="ClassId"
-                                asp-items=" ViewBag.classlist"
+                                asp-items="ViewBag.classlist"
                                 class="form-control pv_class-drop-down class-drop-down"
                                 data-live-search="true"
-                                name="classDropdown"
                                 id="classDataDropdown">
                             <option value="">--Choose--</option>
                         </select>
-
                         <span asp-validation-for="ClassId" class="text-danger"></span>
-
                     </div>
                 </div>
 
@@ -34,164 +35,215 @@
                     <label>Division</label>
                     <br />
                     <select id="division-drop-down" class="form-control slct-free-div-dropdown" disabled>
-                        <option>--Select Division --</option>
+                        <option value="">--Select Division --</option>
                     </select>
-                    <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+                    <span id="spn-error-Division" style="color:red;"></span>
                 </div>
 
                 <div class="form-group col-sm-3">
                     <div class="form-group">
-                        <label>Periods : </label>
+                        <label>Periods :</label>
                         <br />
                         <select id="period-drop-down" class="form-control slct-free-period-dropdown" disabled>
-                            <option>--Select Periods --</option>
+                            <option value="">--Select Periods --</option>
                         </select>
-                        <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+                        <span id="spn-error-Period" style="color:red;"></span>
                     </div>
                 </div>
+
                 <div class="form-group col-sm-3">
                     <div class="form-group">
-                        <label></label>
-                        <button class="btn pay-now-btn" style="margin-top: 9%;" data-toggle="modal" id="btn-search"><i class="fa fa-save"></i> Search </button>
+                        <label></label><br />
+                        <button class="btn pay-now-btn" style="margin-top: 9%;" id="btn-search" type="button">
+                            <i class="fa fa-save"></i> Search
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="table-responsive" id="academicAreaList">
-            
-        </div>
+
+        <div class="table-responsive" id="academicAreaList"></div>
     </div>
 </div>
 
 <script>
-    //Division listing -- Class Change -- And Periods too
+    //---------------------------------------------
+    // CLASS CHANGE → LOAD DIVISION + PERIODS
+    //---------------------------------------------
     $(document).on('change', '.class-drop-down', function () {
-        var id = $(this).val();
-        $('#ClassId').val($(this).val());
-        if (id != '') {
+
+        var classId = $(this).val();
+        $('#ClassId').val(classId);
+
+        // reset hidden values
+        $('#DivisionId').val('');
+        $('#PeriodId').val('');
+
+        // reset dropdowns
+        $("#division-drop-down").html('<option value="">-- Select Division --</option>').prop("disabled", true);
+        $("#period-drop-down").html('<option value="">-- Select Periods --</option>').prop("disabled", true);
+        $('#academicAreaList').html('');
+
+        if (classId !== '') {
+
+            //---------------------------------------------
+            // LOAD DIVISIONS
+            //---------------------------------------------
             $.ajax({
-                url: '/Data/LoadDivision?id=' + id,
+                url: '/Data/LoadDivision',
                 type: "GET",
+                data: { id: classId },
                 success: function (result) {
-                    if (result.list.length > 0) {
-                        $("#division-drop-down").html("");
-                        $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+                    $("#division-drop-down").html('');
+
+                    if (result.list && result.list.length > 0) {
+                        $("#division-drop-down").append('<option value="">-- Select Division --</option>');
+
                         $.each(result.list, function (i, item) {
-                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                            $("#division-drop-down").append(
+                                $('<option>').val(item.value || item.Value).text(item.text || item.Text)
+                            );
                         });
+
                         $("#division-drop-down").prop("disabled", false);
                     }
                     else {
-                        $("#division-drop-down").html(""); //Division
-                        $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
+                        $("#division-drop-down").append('<option value="">-- No Division Found --</option>');
                         $("#division-drop-down").prop("disabled", true);
                     }
+                },
+                error: function () {
+                    console.log("Error loading divisions");
+                    $("#division-drop-down").html('<option value="">-- No Division Found --</option>').prop("disabled", true);
                 }
             });
-            BindPeriods(id);
+
+            //---------------------------------------------
+            // LOAD PERIODS
+            //---------------------------------------------
+            BindPeriods(classId);
         }
         else {
-            $("#division-drop-down").html(""); //Division
-            $("#division-drop-down").append($('<option></option>').val("").html('-- No Division Found --'));
-            $("#division-drop-down").prop("disabled", true);
             BindPeriods(0);
         }
     });
 
+    //---------------------------------------------
+    // LOAD PERIODS FUNCTION
+    //---------------------------------------------
     function BindPeriods(id) {
-        var classId = id;
-        if (classId == 0) {
-            $("#period-drop-down").html(""); //Periods
-            $("#period-drop-down").append($('<option></option>').val("").html('-- No Periods Found --'));
-            $("#period-drop-down").prop("disabled", true);
+
+        if (!id || id == 0) {
+            $("#period-drop-down").html('<option value="">-- No Periods Found --</option>').prop("disabled", true);
+            return;
         }
-        else {
-            $.ajax({
-                url: '/Data/LoadPeriods?id=' + id,
-                type: "GET",
-                success: function (result) {
-                    if (result.list.length > 0) {
-                        $("#period-drop-down").html("");
-                        $("#period-drop-down").append($('<option></option>').val("").html('-- Select Periods --'));
-                        $.each(result.list, function (i, item) {
-                            $("#period-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
-                        });
-                        $("#period-drop-down").prop("disabled", false);
-                    }
-                    else {
-                        $("#period-drop-down").html(""); //Periods
-                        $("#period-drop-down").append($('<option></option>').val("").html('-- No Periods Found --'));
-                        $("#period-drop-down").prop("disabled", true);
-                    }
+
+        $.ajax({
+            url: '/Data/LoadPeriods',
+            type: "GET",
+            data: { id: id },
+            success: function (result) {
+                $("#period-drop-down").html('');
+
+                if (result.list && result.list.length > 0) {
+                    $("#period-drop-down").append('<option value="">-- Select Periods --</option>');
+
+                    $.each(result.list, function (i, item) {
+                        $("#period-drop-down").append(
+                            $('<option>').val(item.value || item.Value).text(item.text || item.Text)
+                        );
+                    });
+
+                    $("#period-drop-down").prop("disabled", false);
                 }
-            });
-        }
+                else {
+                    $("#period-drop-down").append('<option value="">-- No Periods Found --</option>');
+                    $("#period-drop-down").prop("disabled", true);
+                }
+            },
+            error: function () {
+                console.log("Error loading periods");
+                $("#period-drop-down").html('<option value="">-- No Periods Found --</option>').prop("disabled", true);
+            }
+        });
     }
 
+    //---------------------------------------------
+    // DIVISION CHANGE
+    //---------------------------------------------
     $(document).on('change', '.slct-free-div-dropdown', function () {
-        var id = $(this).val();
         $('#DivisionId').val($(this).val());
     });
 
+    //---------------------------------------------
+    // PERIOD CHANGE
+    //---------------------------------------------
     $(document).on('change', '.slct-free-period-dropdown', function () {
-        var id = $(this).val();
         $('#PeriodId').val($(this).val());
     });
 
+    //---------------------------------------------
+    // SEARCH
+    //---------------------------------------------
     $(document).on('click', '#btn-search', function () {
         var classId = $('#ClassId').val();
         var divisionId = $('#DivisionId').val();
         var periods = $('#PeriodId').val();
-        if (classId == '' || classId == '0' || classId=='undefined'){
+
+        if (!classId || classId == '0') {
             toastrError('Please select the Class!');
         }
-        else if (divisionId == '' || divisionId=='0'){
+        else if (!divisionId || divisionId == '0') {
             toastrError('Please select the Division!');
         }
-        else if (periods == '' || periods == '0') {
+        else if (!periods || periods == '0') {
             toastrError('Please select the Periods!');
         }
         else {
             var id = classId + '~' + divisionId + '~' + periods;
+
             $.ajax({
                 url: '/Teacher/SearchStudentsForHealth/' + id,
                 type: "GET",
                 dataType: 'html',
                 success: function (data) {
-                    $('#academicAreaList').html('');
                     $('#academicAreaList').html(data);
                 }
             });
         }
     });
 
-    $(document).on('click', '#students-helth-Save_btn', function () { // Data Save 
+    //---------------------------------------------
+    // SAVE HEALTH DATA
+    //---------------------------------------------
+    $(document).on('click', '#students-helth-Save_btn', function () {
         getFullData();
     });
 
-    function getFullData(source) {
-        var dataList = new Object();
-        dataList.ClassId = $('#ClassId').val();
-        dataList.DivisionId = $('#DivisionId').val();
-        dataList.PeriodId = $('#PeriodId').val();
-        dataList._StudentListForHealth = [];
-        $('.cls-tr-class').each(function (index, elem) {
-            var data = new Object();
-            data.StudentId = $(this).attr('data-StudentId');
-            data.Height = $(this).find('.cls-Height').val();
-            data.Weight = $(this).find('.cls-Weight').val();
-            data.WorkingDays = $(this).find('.cls-WorkingDays').val();
-            data.PresentDays = $(this).find('.cls-PresentDays').val();
-            data.StudentName = '';
-            dataList._StudentListForHealth.push(data);
+    function getFullData() {
+        var dataList = {
+            ClassId: $('#ClassId').val(),
+            DivisionId: $('#DivisionId').val(),
+            PeriodId: $('#PeriodId').val(),
+            _StudentListForHealth: []
+        };
+
+        $('.cls-tr-class').each(function () {
+            dataList._StudentListForHealth.push({
+                StudentId: $(this).attr('data-StudentId'),
+                Height: $(this).find('.cls-Height').val(),
+                Weight: $(this).find('.cls-Weight').val(),
+                WorkingDays: $(this).find('.cls-WorkingDays').val(),
+                PresentDays: $(this).find('.cls-PresentDays').val(),
+                StudentName: ''
+            });
         });
-        console.log(dataList);
+
         $.ajax({
             url: "/Teacher/SubmitStudentsHealthDetails",
             type: "POST",
             dataType: 'json',
             data: dataList,
-            global: false,
             success: function (response) {
                 if (response.status) {
                     toastrSuccess(response.msg);
@@ -200,36 +252,29 @@
                 else {
                     toastrError(response.msg);
                 }
-            },
-            error: function (data) {
             }
         });
-    };
+    }
 
+    //---------------------------------------------
+    // REFRESH AFTER SAVE
+    //---------------------------------------------
     function Refresh() {
         var classId = $('#ClassId').val();
         var divisionId = $('#DivisionId').val();
         var periods = $('#PeriodId').val();
-        if (classId == '' || classId == '0' || classId == 'undefined') {
-            toastrError('Please select the Class!');
-        }
-        else if (divisionId == '' || divisionId == '0') {
-            toastrError('Please select the Division!');
-        }
-        else if (periods == '' || periods == '0') {
-            toastrError('Please select the Periods!');
-        }
-        else {
-            var id = classId + '~' + divisionId + '~' + periods;
-            $.ajax({
-                url: '/Teacher/SearchStudentsForHealth/' + id,
-                type: "GET",
-                dataType: 'html',
-                success: function (data) {
-                    $('#academicAreaList').html('');
-                    $('#academicAreaList').html(data);
-                }
-            });
-        }
+
+        if (!classId || !divisionId || !periods) return;
+
+        var id = classId + '~' + divisionId + '~' + periods;
+
+        $.ajax({
+            url: '/Teacher/SearchStudentsForHealth/' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#academicAreaList').html(data);
+            }
+        });
     }
 </script>

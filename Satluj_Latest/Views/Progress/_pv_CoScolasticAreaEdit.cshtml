@@ -72,15 +72,33 @@
     </form>
 </div>
 <script>
-    $("#form-teacher-edit").submit(function (e) {
+
+    $(document).on("submit", "#form-teacher-edit", function (e) {
         e.preventDefault();
 
         $.ajax({
             url: $(this).attr("action"),
             type: "POST",
             data: $(this).serialize(),
-            success: EditCoScholasticAreaSuccess,
-            error: ajaxFailure
+            success: function (result) {
+                console.log("Edit Response:", result);
+
+                if (result.status) {
+                    toastr.success(result.msg);
+                    $('#modalCoScholasticEdit').modal('hide');
+
+                    setTimeout(function () {
+                        location.reload();
+                    }, 500);
+                } else {
+                    toastr.error(result.msg);
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                toastr.error("Something went wrong");
+            }
         });
     });
 </script>
+

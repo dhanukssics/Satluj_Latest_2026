@@ -87,4 +87,54 @@
             }
         });
     });
+        $(document).on('click', '.edit-class-tr', function () {
+        var id = $(this).data('coso');
+
+        console.log("Edit CoScholastic Id:", id);
+
+        $.ajax({
+            url: '/Progress/CoScholasticEditPartial',
+            type: 'GET',
+            data: { id: id },
+            success: function (result) {
+                $('#modalCoScholasticEdit').html(result);
+                $('#modalCoScholasticEdit').modal('show');
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                toastr.error("Unable to load edit form");
+            }
+        });
+    });
+    $(document).on('click', '.delete-class-tr', function () {
+        var id = $(this).data('coso');
+
+        console.log("Delete CoScholastic Id:", id);
+
+        if (confirm("Are you sure? You will not be able to undo this!")) {
+            $.ajax({
+                url: '/Progress/DeleteCoScholastic',
+                type: "GET",
+                data: { id: id },
+                success: function (data) {
+                    console.log("Delete Response:", data);
+
+                    if (data.status) {
+                        toastr.success(data.msg);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 500);
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                },
+                error: function (xhr) {
+                    console.log("Delete Error:", xhr.responseText);
+
+                    // ✅ show only toaster
+                    toastr.error("Unable to delete. Please try again.");
+                }
+            });
+        }
+    });
 </script>

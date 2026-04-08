@@ -1,12 +1,6 @@
 ﻿@model Satluj_Latest.Models.RemarkModel
-@{
 
-}
-
-
-  
 <div class="modal-dialog modal-lg" role="document">
-
     <form id="form-teacher-edit"
           asp-action="EditRemark"
           asp-controller="Progress"
@@ -61,16 +55,27 @@
         </div>
     </form>
 </div>
-    <script>
-        $("#form-teacher-edit").submit(function (e) {
-            e.preventDefault();
 
-            $.ajax({
-                url: $(this).attr("action"),
-                type: "POST",
-                data: $(this).serialize(),
-                success: AddRemarkSuccess,
-                error: AddRemarkFailed
-            });
+<script>
+    $("#form-teacher-edit").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (result) {
+                if (result.status) {
+                    toastr.success(result.msg);
+                    $('#modalRemarkEdit').modal('hide');
+                    RefreshList();
+                } else {
+                    toastr.error(result.msg);
+                }
+            },
+            error: function () {
+                toastr.error("Failed!");
+            }
         });
-    </script>
+    });
+</script>

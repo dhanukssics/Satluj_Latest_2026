@@ -89,7 +89,7 @@ namespace Satluj_Latest.Controllers
             var studentId = Convert.ToInt64(splitData[0]);
             var declaredExamId = Convert.ToInt64(splitData[1]);
             var DeclredExamDetails = _Entities.TbDeclaredExams.Where(x => x.Id == declaredExamId && x.IsActive).FirstOrDefault();
-            var ExamTermDetails = DeclredExamDetails.TbExamBook.Term;
+            var ExamTermDetails = DeclredExamDetails.Exam.Term;
             var StudentDetails = _Entities.TbStudents.Where(x => x.SchoolId == _user.SchoolId && x.StudentId == studentId && x.IsActive).FirstOrDefault();
             var ClassDetails = DeclredExamDetails.Class;
             var RegionDetails = ClassDetails.TbRegionsClasses.FirstOrDefault();
@@ -192,7 +192,7 @@ namespace Satluj_Latest.Controllers
                         ScolasticAreaList zz = new ScolasticAreaList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -330,7 +330,7 @@ namespace Satluj_Latest.Controllers
                         ScolasticAreaList zz = new ScolasticAreaList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -458,6 +458,9 @@ namespace Satluj_Latest.Controllers
             model.SchoolId = _user.SchoolId;
             //DropdownData dropdown = new DropdownData();
             model.RegionList = _dropdown.GetRegion(model.SchoolId);
+            ViewBag.IsAdmin = true;
+            model.ScholasticAreaList = new Satluj_Latest.Data.School(model.SchoolId).GetAllScholasticArea();
+
             return View(model);
         }
 
@@ -499,6 +502,9 @@ namespace Satluj_Latest.Controllers
             CoScholasticAreaModel model = new CoScholasticAreaModel();
             model.SchoolId = _user.SchoolId;
             ViewBag.Regions =_dropdown.GetRegion(model.SchoolId);
+            ViewBag.IsAdmin = true;
+
+            model.CoScholasticAreaList = new Satluj_Latest.Data.School(model.SchoolId).GetAllCoScholasticArea();
 
             return View(model);
         }
@@ -531,16 +537,23 @@ namespace Satluj_Latest.Controllers
 
         //Certificate Name
 
-        public ActionResult CertificateName()
+        public IActionResult CertificateName()
         {
             CertificateNameModel model = new CertificateNameModel();
             model.SchoolId = _user.SchoolId;
-            var data = _Entities.TbCertificateNames.Where(x => x.SchoolId == model.SchoolId && x.IsActive).FirstOrDefault();
+
+            ViewBag.IsAdmin = true; 
+
+            var data = _Entities.TbCertificateNames
+                .Where(x => x.SchoolId == model.SchoolId && x.IsActive)
+                .FirstOrDefault();
+
             if (data != null)
             {
                 model.Id = data.Id;
                 model.Name = data.CertificateName;
             }
+
             return View(model);
         }
         public object AddCertificateName(CertificateNameModel model)
@@ -567,21 +580,46 @@ namespace Satluj_Latest.Controllers
             }
             return Json(new { status = status, msg = message });
         }
-        public object EditCertificateName(CertificateNameModel model)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditCertificateName(CertificateNameModel model)
         {
-            bool status = false;
-            string msg = "Failed";
-            //if(model.Id!=0)
-            //{
-            var data = _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).FirstOrDefault();
-            data.CertificateName = model.Name.Trim();
-            status = _Entities.SaveChanges() > 0;
-            if (status)
-                msg = "successful";
-            else
-                msg = "Failed";
-            //}
-            return Json(new { status = status, msg = msg });
+            try
+            {
+                if (model == null)
+                    return Json(new { status = false, msg = "Invalid request" });
+
+                if (string.IsNullOrWhiteSpace(model.Name))
+                    return Json(new { status = false, msg = "Certificate name is required" });
+
+                var data = _Entities.TbCertificateNames
+                    .FirstOrDefault(x => x.SchoolId == _user.SchoolId && x.IsActive);
+
+                if (data == null)
+                    return Json(new { status = false, msg = "Certificate record not found" });
+
+                var newName = model.Name.Trim();
+
+                // If same name entered, don't show failed
+                if (data.CertificateName != null && data.CertificateName.Trim().ToLower() == newName.ToLower())
+                {
+                    return Json(new { status = true, msg = "No changes to update" });
+                }
+
+                data.CertificateName = newName;
+
+                bool status = _Entities.SaveChanges() > 0;
+
+                return Json(new
+                {
+                    status = status,
+                    msg = status ? "Updated successfully" : "Update failed"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { status = false, msg = ex.Message });
+            }
         }
         //Exam Declaration  
         public ActionResult ExamDeclaration()
@@ -592,88 +630,106 @@ namespace Satluj_Latest.Controllers
             model.EndDateString = CurrentTime.ToShortDateString();
             //DropdownData dropdownData = new DropdownData();
             ViewBag.ClassList = _dropdown.GetClasses(model.SchoolId);
+            ViewBag.IsAdmin = true;
+
+            model.DeclaredExamList = new Satluj_Latest.Data.School(model.SchoolId).GetAllDeclaredExamDetails();
 
             return View(model);
         }
 
-        public object AddDeclaredExams(ExamDeclarationModel model)
+       
+    public object AddDeclaredExams(ExamDeclarationModel model)
+    {
+        bool status = false;
+        string msg = "Failed";
+
+        // ✅ Required field validation
+        if (model.ClassId == 0)
+            return Json(new { status = false, msg = "Please select class !" });
+
+        if (model.TermId == 0)
+            return Json(new { status = false, msg = "Please select term !" });
+
+        if (string.IsNullOrWhiteSpace(model.ExamName))
+            return Json(new { status = false, msg = "Please enter exam name !" });
+
+        // ✅ Parse Start Date
+        if (!DateTime.TryParseExact(
+                model.StartDateString,
+                "MM-dd-yyyy",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out DateTime startDate))
         {
-            bool status = false;
-            string msg = "Failed";
-            bool flag = false;
-            //----Date Checking ----------
-            try
-            {
-                if (model.StartDateString != string.Empty && model.StartDateString != null)
-                {
-                    string[] splitData = model.StartDateString.Split('-');
-                    var dd = splitData[0];
-                    var mm = splitData[1];
-                    var yyyy = splitData[2];
-                    var date = mm + '-' + dd + '-' + yyyy;
-                    model.StartDate = Convert.ToDateTime(date);
-                }
-            }
-            catch
-            {
-                msg = "Invalid Start Date !";
-                flag = true;
-            }
-            try
-            {
-                if (model.EndDateString != string.Empty && model.EndDateString != null)
-                {
-                    string[] splitData = model.EndDateString.Split('-');
-                    var dd = splitData[0];
-                    var mm = splitData[1];
-                    var yyyy = splitData[2];
-                    var date = mm + '-' + dd + '-' + yyyy;
-                    model.EndDate = Convert.ToDateTime(date);
-                }
-            }
-            catch
-            {
-                msg = "Invalid Start Date !";
-                flag = true;
-            }
-            //-------------------------------
-            if (flag == false)
-            {
-                if (model.StartDate >= model.EndDate)
-                {
-                    msg = "Wrong start and end date !!";
-                }
-                else
-                {
-                    var book = new TbExamBook();
-                    book.ExamName = model.ExamName;
-                    book.TermId = model.TermId;
-                    book.SchoolId = _user.SchoolId;
-                    book.IsActive = true;
-                    book.TimeStamp = CurrentTime;
-                    _Entities.TbExamBooks.Add(book);
-                    status = _Entities.SaveChanges() > 0;
-                    if (status)
-                    {
-                        var exam = new TbDeclaredExam();
-                        exam.SchoolId = _user.SchoolId;
-                        exam.ClassId = model.ClassId;
-                        exam.TermId = model.TermId;
-                        exam.ExamId = book.Id;
-                        exam.StartDate = model.StartDate;
-                        exam.EndDate = model.EndDate;
-                        exam.TimeStamp = CurrentTime;
-                        exam.IsActive = true;
-                        _Entities.TbDeclaredExams.Add(exam);
-                        status = _Entities.SaveChanges() > 0;
-                        msg = "Successful";
-                    }
-                }
-            }
-            return Json(new { status = status, msg = msg });
+            return Json(new { status = false, msg = "Invalid Start Date !" });
         }
 
-        [HttpGet]
+        // ✅ Parse End Date
+        if (!DateTime.TryParseExact(
+                model.EndDateString,
+                "MM-dd-yyyy",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out DateTime endDate))
+        {
+            return Json(new { status = false, msg = "Invalid End Date !" });
+        }
+
+        // ✅ Allow same-day exam, reject only if end < start
+        if (startDate > endDate)
+        {
+            return Json(new { status = false, msg = "Wrong start and end date !!" });
+        }
+
+        // ✅ Duplicate check (important)
+        var alreadyExists = _Entities.TbDeclaredExams.Any(x =>
+            x.IsActive &&
+            x.SchoolId == _user.SchoolId &&
+            x.ClassId == model.ClassId &&
+            x.TermId == model.TermId);
+
+        if (alreadyExists)
+        {
+            return Json(new { status = false, msg = "Exam already declared for this class and term !" });
+        }
+
+        // ✅ Save Exam Book
+        var book = new TbExamBook
+        {
+            ExamName = model.ExamName.Trim(),
+            TermId = model.TermId,
+            SchoolId = _user.SchoolId,
+            IsActive = true,
+            TimeStamp = CurrentTime
+        };
+
+        _Entities.TbExamBooks.Add(book);
+        status = _Entities.SaveChanges() > 0;
+
+        if (!status)
+            return Json(new { status = false, msg = "Failed to save exam book !" });
+
+        // ✅ Save Declared Exam
+        var exam = new TbDeclaredExam
+        {
+            SchoolId = _user.SchoolId,
+            ClassId = model.ClassId,
+            TermId = model.TermId,
+            ExamId = book.Id,
+            StartDate = startDate,
+            EndDate = endDate,
+            TimeStamp = CurrentTime,
+            IsActive = true
+        };
+
+        _Entities.TbDeclaredExams.Add(exam);
+        status = _Entities.SaveChanges() > 0;
+
+        msg = status ? "Successful" : "Failed";
+
+        return Json(new { status = status, msg = msg });
+    }
+    [HttpGet]
         public ActionResult DeclaredExamSubject(string id)
         {
             DeclaredExamSubjectModel model = new DeclaredExamSubjectModel();
@@ -696,10 +752,11 @@ namespace Satluj_Latest.Controllers
             }
             //-----------------------------------------
             //var input = _Entities.sp_UnDeclaredExamSubjects(_user.SchoolId, model.ExamId).ToList();
-          var input =  _Entities.sp_UnDeclaredExamSubjects
-           .FromSqlRaw("EXEC sp_UnDeclaredExamSubjects {0}, {1}",
-                       _user.SchoolId, model.ExamId)
-           .ToList();
+            var input = _Entities.sp_UnDeclaredExamSubjects
+                          .FromSqlRaw("EXEC sp_UnDeclaredExamSubjects {0}, {1}",
+                                      _user.SchoolId, model.ExamId)
+                          .AsNoTracking()
+                          .ToList();
 
             ViewBag.store = input.Select(x => new SelectListItem { Text = x.SubjectName, Value = x.SubId.ToString() }).ToList();
             return View(model);
@@ -769,13 +826,18 @@ namespace Satluj_Latest.Controllers
             return Json(new { status = status, msg = msg });
         }
 
-        public ActionResult ExamResult()
+        public IActionResult ExamResult()
         {
             ExamResultMainModel model = new ExamResultMainModel();
+
             model.SchoolId = _user.SchoolId;
             model.UserId = _user.UserId;
-           // DropdownData dropdownData = new DropdownData();
-            ViewBag.ClassListwise = _dropdown.GetClassesUserWise(model.SchoolId,model.UserId);
+
+            model.ClassList = _dropdown.GetClasses(model.SchoolId)?.ToList() ?? new List<SelectListItem>();
+            model.ClassList_wise = _dropdown.GetClassesUserWise(model.SchoolId, model.UserId)?.ToList() ?? new List<SelectListItem>();
+
+            ViewBag.IsAdmin = true;   
+            ViewBag.RoleId = _user.RoleId;
 
             return View(model);
         }
@@ -1044,7 +1106,7 @@ namespace Satluj_Latest.Controllers
             }
             return Json(new { status = status, msg = msg });
         }
-        public ActionResult ScholasticAreaResult()
+        public IActionResult ScholasticAreaResult()
         {
             ExamResultMainModel model = new ExamResultMainModel();
             model.SchoolId = _user.SchoolId;
@@ -1052,6 +1114,7 @@ namespace Satluj_Latest.Controllers
             //DropdownData dropdown = new DropdownData();
             model.ClassList = (List<SelectListItem>)_dropdown.GetClasses(model.SchoolId);
             model.ClassList_wise = _dropdown.GetClassesUserWise(model.SchoolId,model.UserId);
+            ViewBag.IsAdmin = true;
             return View(model);
         }
 
@@ -1285,11 +1348,20 @@ namespace Satluj_Latest.Controllers
             return Json(new { status = status, msg = msg });
         }
 
-        public ActionResult CoScholasticAreaResult()
+        public IActionResult CoScholasticAreaResult()
         {
             ExamResultMainModel model = new ExamResultMainModel();
+
             model.SchoolId = _user.SchoolId;
-            ViewBag.Classes = _dropdown.GetClasses(model.SchoolId);
+            model.UserId = _user.UserId;
+
+            // Load both lists like your Scholastic page
+            model.ClassList = _dropdown.GetClasses(model.SchoolId)?.ToList() ?? new List<SelectListItem>();
+            model.ClassList_wise = _dropdown.GetClassesUserWise(model.SchoolId, model.UserId)?.ToList() ?? new List<SelectListItem>();
+
+            // VERY IMPORTANT
+            ViewBag.IsAdmin = true;
+
             return View(model);
         }
         public PartialViewResult SudentListForEnterCoScolasticAreaResult(string id)
@@ -1464,43 +1536,53 @@ namespace Satluj_Latest.Controllers
 
         public PartialViewResult SudentListForOptionalStubjects(string id)
         {
+            AddOptionalSubjectsToStudentsModel model = new AddOptionalSubjectsToStudentsModel();
+            model.Data = new List<StudentListData>();
+
+            if (string.IsNullOrEmpty(id))
+                return PartialView("~/Views/Progress/_pv_Student_WithoutOptionalSubjects.cshtml", model);
 
             string[] splitData = id.Split('~');
+
+            if (splitData.Length < 4)
+                return PartialView("~/Views/Progress/_pv_Student_WithoutOptionalSubjects.cshtml", model);
+
             long SubjectId = Convert.ToInt64(splitData[0]);
             long SchoolId = Convert.ToInt64(splitData[1]);
             long ClassId = Convert.ToInt64(splitData[2]);
             long DivisionId = Convert.ToInt64(splitData[3]);
 
-            var studnetList = _Entities.Students
-        .FromSqlRaw(
-            "EXEC sp_StudentsWithNoOptionalSubjects @SchoolId, @ClassId, @DivisionId, @SubjectId",
-            new SqlParameter("@SchoolId", SchoolId),
-            new SqlParameter("@ClassId", ClassId),
-            new SqlParameter("@DivisionId", DivisionId),
-            new SqlParameter("@SubjectId", SubjectId)
-        )
-        .Select(x => new Satluj_Latest.Data.Student(x.StudentId))
-        .ToList();
+            var studentList = _Entities.OptionalStudentDtos
+                .FromSqlRaw(
+                    "EXEC sp_StudentsWithNoOptionalSubjects @SchoolId, @ClassId, @DivisionId, @SubjectId",
+                    new SqlParameter("@SchoolId", SchoolId),
+                    new SqlParameter("@ClassId", ClassId),
+                    new SqlParameter("@DivisionId", DivisionId),
+                    new SqlParameter("@SubjectId", SubjectId)
+                )
+                .AsNoTracking()
+                .ToList();
 
-            //var studnetList = _Entities.sp_StudentsWithNoOptionalSubjects(SchoolId, ClassId, DivisionId, SubjectId).Select(x => new TrackTap.DataLibrary.Data.Student(x.StudentId)).ToList();
-            AddOptionalSubjectsToStudentsModel model = new AddOptionalSubjectsToStudentsModel();
             model.SchoolId = SchoolId;
             model.ClassId = ClassId;
             model.DivisionId = DivisionId;
             model.SubjectId = SubjectId;
-            model.Data = new List<StudentListData>();
-            foreach (var item in studnetList)
+
+            foreach (var item in studentList)
             {
-                StudentListData one = new StudentListData();
-                one.StudentId = item.StudentId;
-                one.StudentName = item.StundentName;
-                one.SpecialId = item.StudentSpecialId;
-                one.FilePath = item.FilePath;
-                one.ParentName = item.ParentName;
-                one.ContactNumber = item.ContactNumber;
-                one.Address = item.Address;
-                model.Data.Add(one);
+                model.Data.Add(new StudentListData
+                {
+                    StudentId = item.StudentId,
+                    StudentName = item.StundentName ?? "",
+                    SpecialId = item.StudentSpecialId ?? "",
+                    FilePath = item.FilePath ?? "",
+                    ParentName = item.ParentName ?? "",
+                    Address = item.Address ?? "",
+                    ContactNumber = item.ContactNumber ?? ""
+
+                });
             }
+
             return PartialView("~/Views/Progress/_pv_Student_WithoutOptionalSubjects.cshtml", model);
         }
 
@@ -1531,52 +1613,59 @@ namespace Satluj_Latest.Controllers
             //var dropdownData = new DropdownData();
             model.OptionalSubjectList =
                 _dropdown.GetAllOptionalSubjects(model.SchoolId);
-            ViewBag.ClassList = _dropdown.GetClasses(model.SchoolId);
+            model.ClassList = _dropdown.GetClasses(model.SchoolId);
 
             return View(model);
         }
 
         public PartialViewResult SudentListForOptionalStubjectsListing(string id)
         {
+            AddOptionalSubjectsToStudentsModel model = new AddOptionalSubjectsToStudentsModel();
+            model.Data = new List<StudentListData>();
+
+            if (string.IsNullOrEmpty(id))
+                return PartialView("~/Views/Progress/_pv_Student_WithOptionalSubjects.cshtml", model);
 
             string[] splitData = id.Split('~');
+            if (splitData.Length < 4)
+                return PartialView("~/Views/Progress/_pv_Student_WithOptionalSubjects.cshtml", model);
+
             long SubjectId = Convert.ToInt64(splitData[0]);
             long SchoolId = Convert.ToInt64(splitData[1]);
             long ClassId = Convert.ToInt64(splitData[2]);
             long DivisionId = Convert.ToInt64(splitData[3]);
 
-            //var studnetList = _Entities.sp_StudentsWithOptionalSubjects(SchoolId, ClassId, DivisionId, SubjectId).Select(x => new TrackTap.DataLibrary.Data.Student(x.StudentId)).ToList();
+            var studentList = _Entities.OptionalStudentDtos
+                .FromSqlRaw(
+                    "EXEC sp_StudentsWithOptionalSubjects @SchoolId, @ClassId, @DivisionId, @SubjectId",
+                    new SqlParameter("@SchoolId", SchoolId),
+                    new SqlParameter("@ClassId", ClassId),
+                    new SqlParameter("@DivisionId", DivisionId),
+                    new SqlParameter("@SubjectId", SubjectId)
+                )
+                .AsNoTracking()
+                .ToList();
 
-            var studnetList = _Entities.Students
-    .FromSqlRaw(
-        "EXEC sp_StudentsWithOptionalSubjects @SchoolId, @ClassId, @DivisionId, @SubjectId",
-        new SqlParameter("@SchoolId", SchoolId),
-        new SqlParameter("@ClassId", ClassId),
-        new SqlParameter("@DivisionId", DivisionId),
-        new SqlParameter("@SubjectId", SubjectId)
-    )
-    .Select(x => new Satluj_Latest.Data.Student(x.StudentId))
-    .ToList();
-
-            AddOptionalSubjectsToStudentsModel model = new AddOptionalSubjectsToStudentsModel();
             model.SchoolId = SchoolId;
             model.ClassId = ClassId;
             model.DivisionId = DivisionId;
             model.SubjectId = SubjectId;
-            model.Data = new List<StudentListData>();
-            foreach (var item in studnetList)
+
+            foreach (var item in studentList)
             {
-                StudentListData one = new StudentListData();
-                one.StudentId = item.StudentId;
-                one.StudentName = item.StundentName;
-                one.SpecialId = item.StudentSpecialId;
-                one.FilePath = item.FilePath;
-                one.ParentName = item.ParentName;
-                one.ContactNumber = item.ContactNumber;
-                one.Address = item.Address;
-                one.SubjectId = SubjectId;
-                model.Data.Add(one);
+                model.Data.Add(new StudentListData
+                {
+                    StudentId = item.StudentId,
+                    StudentName = item.StundentName ?? "",
+                    SpecialId = item.StudentSpecialId ?? "",
+                    FilePath = item.FilePath ?? "",
+                    ParentName = item.ParentName ?? "",
+                    ContactNumber = item.ContactNumber ?? "",
+                    Address = item.Address ?? "",
+                    SubjectId = SubjectId
+                });
             }
+
             return PartialView("~/Views/Progress/_pv_Student_WithOptionalSubjects.cshtml", model);
         }
         public ActionResult StudentRemark()
@@ -1748,7 +1837,7 @@ namespace Satluj_Latest.Controllers
         {
             ScholasticAreaModel model = new ScholasticAreaModel();
             long scoId = Convert.ToInt64(id);
-            var data = _Entities.TbScholasticAreas.Where(x => x.Id == scoId && x.SchoolId == _user.SchoolId && x.IsActive).FirstOrDefault();
+            var data = _Entities.TbScholasticAreas.Where(x => x.Id == scoId && x.SchoolId == _user.SchoolId && x.IsActive).Include(x => x.Region).FirstOrDefault();
             if (data != null)
             {
                 model.Id = data.Id;
@@ -1760,59 +1849,122 @@ namespace Satluj_Latest.Controllers
             }
             return PartialView("~/Views/Progress/_pv_ScolasticAreaEdit.cshtml", model);
         }
-        public object EditScholasticArea(ScholasticAreaModel model)
+        [HttpPost]
+        public IActionResult EditScholasticArea(ScholasticAreaModel model)
         {
-            bool status = false;
-            string msg = "Failed";
-            var data1 = _Entities.TbScholasticAreas.Where(x => x.IsActive && x.Id == model.Id).FirstOrDefault();
+            try
+            {
+                if (model == null || model.Id == 0)
+                    return Json(new { status = false, msg = "Invalid request" });
 
-            var resultData = _Entities.TbScolasticAreaResultDetails.Where(x => x.Main.ScholasticId == model.Id && x.Score > model.Score && x.Main.IsActive && x.IsActive).ToList();
-            if (resultData.Count > 0 && resultData != null)
-            {
-                msg = "More score have been given to some children, so Total score should be give above";
-            }
-            else
-            {
-                var sameRegionsHave = _Entities.TbScholasticAreas.Where(x => x.RegionId == model.RegionId && x.IsActive && x.Id != model.Id).ToList();
+                var data = _Entities.TbScholasticAreas
+                    .FirstOrDefault(x => x.IsActive && x.Id == model.Id);
+
+                if (data == null)
+                    return Json(new { status = false, msg = "Scholastic Area not found" });
+
+                var resultData = _Entities.TbScolasticAreaResultDetails
+                    .Where(x => x.Main.ScholasticId == model.Id &&
+                                x.Score > model.Score &&
+                                x.Main.IsActive &&
+                                x.IsActive)
+                    .ToList();
+
+                if (resultData.Count > 0)
+                {
+                    return Json(new
+                    {
+                        status = false,
+                        msg = "More score has been given to some children, so total score should be above that"
+                    });
+                }
+
+                var sameRegionsHave = _Entities.TbScholasticAreas
+                    .Where(x => x.RegionId == model.RegionId &&
+                                x.IsActive &&
+                                x.Id != model.Id)
+                    .ToList();
+
                 if (sameRegionsHave.Count > 4)
                 {
-                    msg = "There are 4 Scholastic Areas in this Region already. It can not be reached at this time";
+                    return Json(new
+                    {
+                        status = false,
+                        msg = "There are already 4 Scholastic Areas in this Region. It cannot be added at this time"
+                    });
                 }
-                else
+
+                string newArea = model.AreaName?.Trim() ?? "";
+
+                if ((data.ItemName ?? "").Trim().ToLower() == newArea.ToLower()
+                    && data.TotalScore == model.Score)
                 {
-                    var data = _Entities.TbScholasticAreas.Where(x => x.IsActive && x.Id == model.Id).FirstOrDefault();
-                    //data.RegionId = model.RegionId;
-                    data.ItemName = model.AreaName;
-                    data.TotalScore = model.Score;
-                    status = _Entities.SaveChanges() > 0;
+                    return Json(new { status = true, msg = "No changes to update" });
                 }
+
+                data.ItemName = newArea;
+                data.TotalScore = model.Score;
+
+                var rows = _Entities.SaveChanges();
+
+                return Json(new
+                {
+                    status = true,
+                    msg = "Updated successfully",
+                    rows = rows
+                });
             }
-            return Json(new { status = status, msg = msg });
+            catch (Exception ex)
+            {
+                return Json(new { status = false, msg = ex.Message });
+            }
         }
-        public object DeleteCoScholastic(string id)
+        [HttpGet]
+        public IActionResult DeleteCoScholastic(string id)
         {
-            bool status = false;
-            string msg = "Failed";
-            long CoScholasticId = Convert.ToInt64(id);
-          //  Session["CoScholasticId_session"] = CoScholasticId;
-            HttpContext.Session.SetInt32("CoScholasticId_session", (int)CoScholasticId);
+            try
+            {
+                if (!long.TryParse(id, out long coScholasticId))
+                    return Json(new { status = false, msg = "Invalid request" });
 
-            var result = _Entities.TbCoScholasticResultmains.Where(x => x.CoScholasticId == CoScholasticId && x.IsActive).ToList();
-            if (result.Count > 0 && result != null)
-            {
-                msg = "The Co-Scholastic Area have the results";
-            }
-            else
-            {
-                var data = _Entities.TbCoScholasticAreas.Where(x => x.Id == CoScholasticId && x.IsActive).FirstOrDefault();
+                HttpContext.Session.SetInt32("CoScholasticId_session", (int)coScholasticId);
+
+                var result = _Entities.TbCoScholasticResultmains
+                    .Where(x => x.CoScholasticId == coScholasticId && x.IsActive)
+                    .ToList();
+
+                if (result.Count > 0)
+                {
+                    return Json(new
+                    {
+                        status = false,
+                        msg = "The Co-Scholastic Area already has results"
+                    });
+                }
+
+                var data = _Entities.TbCoScholasticAreas
+                    .FirstOrDefault(x => x.Id == coScholasticId && x.IsActive);
+
+                if (data == null)
+                {
+                    return Json(new { status = false, msg = "Record not found" });
+                }
+
                 data.IsActive = false;
-                status = _Entities.SaveChanges() > 0;
-                if (status)
-                    msg = "Success";
-            }
-            return Json(new { status = status, msg = msg });
-        }
 
+                bool status = _Entities.SaveChanges() > 0;
+
+                return Json(new
+                {
+                    status = status,
+                    msg = status ? "Deleted successfully" : "Delete failed"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { status = false, msg = ex.Message });
+            }
+        }
         public object DeleteResultEnteredCoScholasticArea(string id)
         {
             bool status = false;
@@ -1867,16 +2019,25 @@ namespace Satluj_Latest.Controllers
         public PartialViewResult CoScholasticEditPartial(string id)
         {
             CoScholasticAreaModel model = new CoScholasticAreaModel();
-            long scoId = Convert.ToInt64(id);
-            var data = _Entities.TbCoScholasticAreas.Where(x => x.Id == scoId && x.SchoolId == _user.SchoolId && x.IsActive).FirstOrDefault();
+
+            if (!long.TryParse(id, out long scoId))
+                return PartialView("~/Views/Progress/_pv_CoScolasticAreaEdit.cshtml", model);
+
+            var data = _Entities.TbCoScholasticAreas
+                .Include(x => x.Region) // ✅ IMPORTANT
+                .FirstOrDefault(x => x.Id == scoId && x.IsActive);
+
             if (data != null)
             {
                 model.Id = data.Id;
                 model.RegionId = data.RegionId;
                 model.SchoolId = data.SchoolId;
                 model.Item = data.ItemName;
-                model.RegionName = data.Region.RegionName;
+
+                // ✅ safe
+                model.RegionName = data.Region != null ? data.Region.RegionName : "";
             }
+
             return PartialView("~/Views/Progress/_pv_CoScolasticAreaEdit.cshtml", model);
         }
         public object EditCoScholasticArea(CoScholasticAreaModel model)
@@ -1896,23 +2057,43 @@ namespace Satluj_Latest.Controllers
         {
             bool status = false;
             string msg = "Failed";
-            long ExamId = Convert.ToInt64(id);
-            var result = _Entities.TbExamResults.Where(x => x.ExamId == ExamId && x.IsActive).ToList();
-            if (result.Count > 0 && result != null)
+
+            long examId = Convert.ToInt64(id);
+
+            var data = _Entities.TbDeclaredExams
+                .FirstOrDefault(x => x.Id == examId && x.IsActive);
+
+            if (data == null)
+                return Json(new { status = false, msg = "Declared exam not found!" });
+
+            // ✅ Correct relation: use ExamId from declared exam
+            var result = _Entities.TbExamResults
+                .Where(x => x.ExamId == data.ExamId && x.IsActive)
+                .ToList();
+
+            if (result.Count > 0)
             {
-                msg = "The result of this exam was given to children. Therefore it can not be avoided";
+                msg = "The result of this exam was given to children. Therefore it cannot be deleted.";
             }
             else
             {
-                var data = _Entities.TbDeclaredExams.Where(x => x.Id == ExamId && x.IsActive).FirstOrDefault();
                 data.IsActive = false;
+
+                // ✅ Optional: also deactivate exam book
+                var book = _Entities.TbExamBooks
+                    .FirstOrDefault(x => x.Id == data.ExamId && x.IsActive);
+
+                if (book != null)
+                {
+                    book.IsActive = false;
+                }
+
                 status = _Entities.SaveChanges() > 0;
-                if (status)
-                    msg = "Success";
+                msg = status ? "Deleted Successfully" : "Delete Failed";
             }
+
             return Json(new { status = status, msg = msg });
         }
-
         public object DeleteResultEnteredDeclaredExams(string id)
         {
             bool status = false;
@@ -1938,102 +2119,123 @@ namespace Satluj_Latest.Controllers
         public PartialViewResult DeclaredExamEditPartial(string id)
         {
             ExamDeclarationModel model = new ExamDeclarationModel();
-            long scoId = Convert.ToInt64(id);
-            var data = _Entities.TbDeclaredExams.Where(x => x.Id == scoId && x.SchoolId == _user.SchoolId && x.IsActive).FirstOrDefault();
+
+            long examId = Convert.ToInt64(id);
+
+            var data = _Entities.TbDeclaredExams
+                .FirstOrDefault(x => x.Id == examId && x.SchoolId == _user.SchoolId && x.IsActive);
+
             if (data != null)
             {
-                model.SchoolId = _user.SchoolId;
+                model.Id = data.Id;
+                model.SchoolId = data.SchoolId;
                 model.TermId = data.TermId ?? 0;
                 model.ClassId = data.ClassId;
-                model.EndDate = data.EndDate;
-                model.EndDateString = data.EndDate.ToString("dd-MM-yyyy");
-                model.ExamName = data.TbExamBook.ExamName;
                 model.StartDate = data.StartDate;
-                model.StartDateString = data.StartDate.ToString("dd-MM-yyyy");
-                model.Id = data.Id;
-                model.TermName = data.TbExamTerm.DefaultExam;
-                model.ClassName = data.Class.Class;
+                model.EndDate = data.EndDate;
+
+                // ✅ IMPORTANT: keep same format you are using in Add / Edit
+                model.StartDateString = data.StartDate.ToString("MM-dd-yyyy");
+                model.EndDateString = data.EndDate.ToString("MM-dd-yyyy");
+
+                // ✅ Safe fetch exam book
+                var examBook = _Entities.TbExamBooks
+                    .FirstOrDefault(x => x.Id == data.ExamId && x.IsActive);
+
+                if (examBook != null)
+                {
+                    model.ExamName = examBook.ExamName;
+                }
+
+                // ✅ Safe fetch term
+                var term = _Entities.TbExamTerms
+                    .FirstOrDefault(x => x.Id == data.TermId && x.IsActive);
+
+                if (term != null)
+                {
+                    model.TermName = term.DefaultExam;
+                }
+
+                // ✅ Safe fetch class
+                var cls = _Entities.TbClasses
+                    .FirstOrDefault(x => x.ClassId == data.ClassId && x.IsActive);
+
+                if (cls != null)
+                {
+                    model.ClassName = cls.Class;
+                }
             }
+
             return PartialView("~/Views/Progress/_pv_DeclaredExamEdit.cshtml", model);
         }
-        public object EditDeclaredExam(ExamDeclarationModel model)
+        
+
+    public object EditDeclaredExam(ExamDeclarationModel model)
         {
             bool status = false;
             string msg = "Failed";
-            var resultData = _Entities.TbDeclaredExams.Where(x => x.Id == model.Id && x.IsActive).FirstOrDefault();
-            if (resultData != null)
+
+            var resultData = _Entities.TbDeclaredExams
+                .FirstOrDefault(x => x.Id == model.Id && x.IsActive);
+
+            if (resultData == null)
+                return Json(new { status = false, msg = "Exam not found!" });
+
+            var exam = _Entities.TbExamBooks
+                .FirstOrDefault(x => x.Id == resultData.ExamId && x.IsActive);
+
+            if (exam != null && exam.ExamName != model.ExamName)
             {
-                var exam = _Entities.TbExamBooks.Where(x => x.Id == resultData.ExamId && x.IsActive).FirstOrDefault();
-                if (exam.ExamName != model.ExamName)
-                {
-                    exam.ExamName = model.ExamName;
-                    status = _Entities.SaveChanges() > 0;
-                }
-                else
-                {
-                    status = true;
-                }
-                try
-                {
-                    if (model.StartDateString != string.Empty && model.StartDateString != null)
-                    {
-                        string[] splitData = model.StartDateString.Split('-');
-                        var dd = splitData[0];
-                        var mm = splitData[1];
-                        var yyyy = splitData[2];
-                        var date = mm + '-' + dd + '-' + yyyy;
-                        //model.StartDate = Convert.ToDateTime(date);
-                        model.StartDate = DateTime.ParseExact(date, "MM-dd-yyyy", new CultureInfo("en-US"), System.Globalization.DateTimeStyles.None);
-                    }
-                }
-                catch
-                {
-                    msg = "Invalid Start Date !";
-                }
-                try
-                {
-                    if (model.EndDateString != string.Empty && model.EndDateString != null)
-                    {
-                        string[] splitData = model.EndDateString.Split('-');
-                        var dd = splitData[0];
-                        var mm = splitData[1];
-                        var yyyy = splitData[2];
-                        var date = mm + '-' + dd + '-' + yyyy;
-                        //model.EndDate = Convert.ToDateTime(date);
-                        model.EndDate = DateTime.ParseExact(date, "MM-dd-yyyy", new CultureInfo("en-US"), System.Globalization.DateTimeStyles.None);
-                    }
-                }
-                catch
-                {
-                    msg = "Invalid End Date !";
-                    status = false;
-                }
-                if (resultData.StartDate != model.StartDate || resultData.EndDate != model.EndDate)
-                {
-                    if (model.StartDate >= model.EndDate)
-                    {
-                        msg = "Wrong start and end date !!";
-                        status = false;
-                    }
-                    else
-                    {
-                        resultData.StartDate = model.StartDate;
-                        resultData.EndDate = model.EndDate;
-                        status = _Entities.SaveChanges() > 0;
-                        if (status)
-                            msg = "Successful";
-                    }
-                }
-                else
-                {
-                    status = true;
-                    msg = "Successful";
-                }
+                exam.ExamName = model.ExamName?.Trim();
+                _Entities.SaveChanges();
+            }
+
+            // ✅ Parse Start Date directly (MM-dd-yyyy)
+            if (!DateTime.TryParseExact(
+                    model.StartDateString,
+                    "MM-dd-yyyy",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out DateTime startDate))
+            {
+                return Json(new { status = false, msg = "Invalid Start Date !" });
+            }
+
+            // ✅ Parse End Date directly (MM-dd-yyyy)
+            if (!DateTime.TryParseExact(
+                    model.EndDateString,
+                    "MM-dd-yyyy",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out DateTime endDate))
+            {
+                return Json(new { status = false, msg = "Invalid End Date !" });
+            }
+
+            // ✅ Validate date range
+            if (startDate > endDate)
+            {
+                return Json(new { status = false, msg = "End Date should be greater than or equal to Start Date !" });
+            }
+
+            // ✅ Update only if changed
+            if (resultData.StartDate != startDate || resultData.EndDate != endDate)
+            {
+                resultData.StartDate = startDate;
+                resultData.EndDate = endDate;
+
+                status = _Entities.SaveChanges() > 0;
+                msg = status ? "Successful" : "Failed";
+            }
+            else
+            {
+                status = true;
+                msg = "Successful";
             }
 
             return Json(new { status = status, msg = msg });
         }
-        public object DeleteDeclaredExamSubjects(string id)
+    public object DeleteDeclaredExamSubjects(string id)
         {
             bool status = false;
             string msg = "Failed";
@@ -2161,50 +2363,92 @@ namespace Satluj_Latest.Controllers
 
         public ActionResult ExamTimeTableViewPrint(string id)
         {
-            long ExamId = Convert.ToInt64(id);
+            long declaredExamId = Convert.ToInt64(id);
+
             ExamTimetableModel model = new ExamTimetableModel();
-            var data = _Entities.TbDeclaredExams.Where(x => x.Id == ExamId && x.IsActive).FirstOrDefault();
-            if (data != null)
+
+            var data = _Entities.TbDeclaredExams
+                .FirstOrDefault(x => x.Id == declaredExamId && x.IsActive);
+
+            if (data == null)
+                return View(model);
+
+            // ✅ School details safely
+            model.SchoolName = _user?.School?.SchoolName ?? "";
+            model.SchoolAdddress = _user?.School?.Address ?? "";
+            model.SchoolLogo = _user?.School?.FilePath ?? "";
+
+            // ✅ Fetch related data explicitly
+            var examBook = _Entities.TbExamBooks
+                .FirstOrDefault(x => x.Id == data.ExamId && x.IsActive);
+
+            var term = _Entities.TbExamTerms
+                .FirstOrDefault(x => x.Id == data.TermId && x.IsActive);
+
+            var cls = _Entities.TbClasses
+                .FirstOrDefault(x => x.ClassId == data.ClassId && x.IsActive);
+
+            model.ExamName = (examBook?.ExamName ?? "") + " - " + (term?.DefaultExam ?? "");
+            model.ClassName = cls?.Class ?? "";
+            model.StartDate = data.StartDate;
+            model.EndDate = data.EndDate;
+            model.List = new List<Satluj_Latest.Models.TimeTable>();
+
+            // ✅ Load declared subjects explicitly
+            var subjectList = _Entities.TbDeclaredExamSubjects
+                .Where(x => x.DeclaredExamId == data.Id && x.IsActive)
+                .OrderBy(x => x.TimeStamp)
+                .ToList();
+
+            if (subjectList.Count > 0)
             {
-                model.SchoolName = _user.School.SchoolName;
-                model.SchoolAdddress = _user.School.Address;
-                model.SchoolLogo = _user.School.FilePath;
-                model.ExamName = data.TbExamBook.ExamName + " - " + data.TbExamTerm.DefaultExam;
-                model.ClassName = data.Class.Class;
-                model.StartDate = data.StartDate;
-                model.EndDate = data.EndDate;
-                model.List = new List<Satluj_Latest.Models.TimeTable>();
-                var subjectList = data.TbDeclaredExamSubjects.Where(x => x.IsActive).ToList();
-                if (subjectList.Count > 0 && subjectList != null)
+                var dates = subjectList
+                    .Select(x => x.ExamDate.Date)
+                    .Distinct()
+                    .OrderBy(x => x)
+                    .ToList();
+
+                foreach (var item in dates)
                 {
-                    var dates = subjectList.Select(x => x.ExamDate.Date).Distinct().OrderBy(x => x.Date).ToList();
-                    foreach (var item in dates)
+                    Satluj_Latest.Models.TimeTable one = new Satluj_Latest.Models.TimeTable();
+                    one.ExamDate = item;
+
+                    var subjects = subjectList
+                        .Where(x => x.ExamDate.Date == item)
+                        .OrderBy(x => x.TimeStamp)
+                        .ToList();
+
+                    if (subjects.Count == 0)
                     {
-                        Satluj_Latest.Models.TimeTable one = new Satluj_Latest.Models.TimeTable();
-                        one.ExamDate = item;
-                        var subjects = subjectList.Where(x => x.ExamDate.Date == item).OrderBy(x => x.TimeStamp).ToList();
-                        if (subjects.Count == 0)
-                        {
-                            one.Subject1 = "";
-                            one.Subject2 = "";
-                        }
-                        else if (subjects.Count == 1)
-                        {
-                            one.Subject1 = subjects[0].Subject.SubjectName;
-                            one.Subject2 = "";
-                        }
-                        else if (subjects.Count == 2)
-                        {
-                            one.Subject1 = subjects[0].Subject.SubjectName;
-                            one.Subject2 = subjects[1].Subject.SubjectName;
-                        }
-                        model.List.Add(one);
+                        one.Subject1 = "";
+                        one.Subject2 = "";
                     }
+                    else if (subjects.Count == 1)
+                    {
+                        var sub1 = _Entities.TbSubjects
+                            .FirstOrDefault(x => x.SubId == subjects[0].SubjectId && x.IsActive);
+
+                        one.Subject1 = sub1?.SubjectName ?? "";
+                        one.Subject2 = "";
+                    }
+                    else
+                    {
+                        var sub1 = _Entities.TbSubjects
+                            .FirstOrDefault(x => x.SubId == subjects[0].SubjectId && x.IsActive);
+
+                        var sub2 = _Entities.TbSubjects
+                            .FirstOrDefault(x => x.SubId == subjects[1].SubjectId && x.IsActive);
+
+                        one.Subject1 = sub1?.SubjectName ?? "";
+                        one.Subject2 = sub2?.SubjectName ?? "";
+                    }
+
+                    model.List.Add(one);
                 }
             }
+
             return View(model);
         }
-
         public object DeleteOptionalSubjects(string id)
         {
             string[] splitData = id.Split('~');
@@ -2433,28 +2677,105 @@ namespace Satluj_Latest.Controllers
 
         public ActionResult VtoIXProgressCard(string id)
         {
+            if (string.IsNullOrWhiteSpace(id) || !id.Contains("~"))
+            {
+                return Content("Invalid request.");
+            }
+
             string[] splitData = id.Split('~');
-            var studentId = Convert.ToInt64(splitData[0]);
-            var declaredExamId = Convert.ToInt64(splitData[1]);
-            var DeclredExamDetails = _Entities.TbDeclaredExams.Where(x => x.Id == declaredExamId && x.IsActive).FirstOrDefault();
-            var ExamTermDetails = DeclredExamDetails.TbExamBook.Term;
-            var StudentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId && x.IsActive).FirstOrDefault();
-            var ClassDetails = DeclredExamDetails.Class;
-            var RegionDetails = ClassDetails.TbRegionsClasses.Where(x => x.IsActive == true).FirstOrDefault();
-            var ScholasticData = _Entities.TbScholasticAreas.Where(x => x.RegionId == RegionDetails.RegionId && x.IsActive && (x.SpecificTerm == null || x.SpecificTerm == DeclredExamDetails.TermId)).ToList();
-            var CoScholasticData = _Entities.TbCoScholasticAreas.Where(x => x.RegionId == RegionDetails.RegionId && x.IsActive).OrderBy(x => x.OrderNo).ThenBy(x => x.TimeStamp).ToList();
-            var schoolData = _Entities.TbLogins.Where(x => x.SchoolId == StudentDetails.SchoolId && x.RoleId == 1).FirstOrDefault();
-            var periods = _Entities.TbAcademicPeriods.Where(x => x.SchoolId == StudentDetails.SchoolId && x.ClassId == StudentDetails.ClassId && x.IsActive).OrderBy(x => x.StartDate).ToList();
+
+            if (splitData.Length < 2)
+            {
+                return Content("Invalid request format.");
+            }
+
+            long studentId = Convert.ToInt64(splitData[0]);
+            long declaredExamId = Convert.ToInt64(splitData[1]);
+
+            var DeclredExamDetails = _Entities.TbDeclaredExams
+                .FirstOrDefault(x => x.Id == declaredExamId && x.IsActive);
+
+            if (DeclredExamDetails == null)
+            {
+                return Content("Declared exam not found.");
+            }
+
+            var ExamDetails = _Entities.TbExamBooks
+                .FirstOrDefault(x => x.Id == DeclredExamDetails.ExamId && x.IsActive);
+
+            if (ExamDetails == null)
+            {
+                return Content("Exam details not found.");
+            }
+
+            var ExamTermDetails = _Entities.TbExamTerms
+                .FirstOrDefault(x => x.Id == DeclredExamDetails.TermId && x.IsActive);
+
+            if (ExamTermDetails == null)
+            {
+                return Content("Exam term details not found.");
+            }
+
+            var StudentDetails = _Entities.TbStudents
+                .FirstOrDefault(x => x.StudentId == studentId && x.IsActive);
+
+            if (StudentDetails == null)
+            {
+                return Content("Student not found.");
+            }
+
+            var ClassDetails = _Entities.TbClasses
+                .FirstOrDefault(x => x.ClassId == DeclredExamDetails.ClassId && x.IsActive);
+
+            if (ClassDetails == null)
+            {
+                return Content("Class details not found.");
+            }
+
+            var RegionDetails = _Entities.TbRegionsClasses
+                .FirstOrDefault(x => x.ClassId == ClassDetails.ClassId && x.IsActive);
+
+            if (RegionDetails == null)
+            {
+                return Content("Region details not found.");
+            }
+
+            var ScholasticData = _Entities.TbScholasticAreas
+                .Where(x => x.RegionId == RegionDetails.RegionId
+                         && x.IsActive
+                         && (x.SpecificTerm == null || x.SpecificTerm == DeclredExamDetails.TermId))
+                .ToList();
+
+            var CoScholasticData = _Entities.TbCoScholasticAreas
+                .Where(x => x.RegionId == RegionDetails.RegionId && x.IsActive)
+                .OrderBy(x => x.OrderNo)
+                .ThenBy(x => x.TimeStamp)
+                .ToList();
+
+            var schoolData = _Entities.TbLogins
+                .FirstOrDefault(x => x.SchoolId == StudentDetails.SchoolId && x.RoleId == 1);
+
+            var periods = _Entities.TbAcademicPeriods
+                .Where(x => x.SchoolId == StudentDetails.SchoolId
+                         && x.ClassId == StudentDetails.ClassId
+                         && x.IsActive)
+                .OrderBy(x => x.StartDate)
+                .ToList();
+
+           
             if (ExamTermDetails.Id == 1)
             {
                 // Term one report
                 #region Term 1
                 StudentTerm2ProgressCardModel model = new StudentTerm2ProgressCardModel();
                 model.csList = new List<ComputerScienceResultModel>();
-                model.SchoolLogo = StudentDetails.School.FilePath;
+                var schoolDetails = _Entities.TbSchools
+                                    .FirstOrDefault(x => x.SchoolId == StudentDetails.SchoolId && x.IsActive);
+
+                model.SchoolLogo = schoolDetails?.FilePath ?? "";
                 model.SchoolEmail = schoolData.Username;
                 model.SchoolWebsite = schoolData.School.Website == null ? "" : schoolData.School.Website;
-                model.RegionId = RegionDetails.Region.Id;
+                model.RegionId = RegionDetails.RegionId;
                 model.SchoolId = StudentDetails.SchoolId;
                 try
                 {
@@ -2647,7 +2968,7 @@ namespace Satluj_Latest.Controllers
                         //var returnExamresult = Item.tb_ExamResult.Where(x => x.StudentId == studentId && x.IsActive).ToList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -2747,11 +3068,13 @@ namespace Satluj_Latest.Controllers
             {
                 #region Term II
                 StudentTerm2ProgressCardModel model = new StudentTerm2ProgressCardModel();
+                var schoolDetails = _Entities.TbSchools.FirstOrDefault(x => x.SchoolId == StudentDetails.SchoolId && x.IsActive);
+                model.SchoolLogo = schoolDetails?.FilePath ?? "";
                 model.csList = new List<ComputerScienceResultModel>();// Computer Science
-                model.SchoolLogo = StudentDetails.School.FilePath;
+                //model.SchoolLogo = StudentDetails.School.FilePath;
                 model.SchoolEmail = schoolData.Username;
                 model.SchoolWebsite = schoolData.School.Website == null ? "" : schoolData.School.Website;
-                model.RegionId = RegionDetails.Region.Id;
+                model.RegionId = RegionDetails.RegionId;
                 model.SchoolId = StudentDetails.SchoolId;
                 try
                 {
@@ -2760,13 +3083,19 @@ namespace Satluj_Latest.Controllers
                     model.ExamId = _Entities.TbDeclaredExams.Where(x => x.IsActive && x.ClassId == StudentDetails.ClassId && x.TermId == 1).Select(x => x.ExamId).FirstOrDefault();
                     model.ExamId2 = _Entities.TbDeclaredExams.Where(x => x.IsActive && x.ClassId == StudentDetails.ClassId && x.TermId == 2).Select(x => x.ExamId).FirstOrDefault();
                     model.SchoolName = StudentDetails.School.SchoolName;
-                    model.AccademicSession = ClassDetails.AcademicYear.AcademicYear;
+                    var academicYearDetails = _Entities.TbAcademicYears
+                                            .FirstOrDefault(x => x.YearId == ClassDetails.AcademicYearId && x.IsActive);
+
+                    model.AccademicSession = academicYearDetails?.AcademicYear ?? "";
                     model.ReportName = _Entities.TbCertificateNames.Where(x => x.IsActive && x.SchoolId == StudentDetails.SchoolId).Select(x => x.CertificateName).FirstOrDefault() == null ? " REPORT " : _Entities.TbCertificateNames.Where(x => x.IsActive && x.SchoolId == StudentDetails.SchoolId).Select(x => x.CertificateName).FirstOrDefault();
                     model.RollNo = StudentDetails.ClasssNumber == null ? " " : StudentDetails.ClasssNumber;
                     model.StudentName = StudentDetails.StundentName;
                     model.FathersName = StudentDetails.ParentName;
                     model.MothersName = StudentDetails.MotherName == null ? " " : StudentDetails.MotherName;
-                    model.RegionName = RegionDetails.Region.RegionName;
+                    var regionMaster = _Entities.TbRegionss
+                                       .FirstOrDefault(x => x.Id == RegionDetails.RegionId && x.IsActive);
+
+                    model.RegionName = regionMaster?.RegionName ?? "";
                     //-------------new-----------------------------
                     model.AdmissionNo = StudentDetails.StudentSpecialId;
                     model.StudentImage = StudentDetails.FilePath;
@@ -2811,8 +3140,15 @@ namespace Satluj_Latest.Controllers
                     }
                     else
                         model.DateOfBirth = " ";
-                    model.ClassDivision = StudentDetails.Class.Class + "-" + StudentDetails.Division.Division;
+                    var classMaster = _Entities.TbClasses
+                                    .FirstOrDefault(x => x.ClassId == StudentDetails.ClassId && x.IsActive);
 
+                    var divisionMaster = _Entities.TbDivisions
+                        .FirstOrDefault(x => x.DivisionId == StudentDetails.DivisionId && x.IsActive);
+
+                    model.ClassDivision =
+                        (classMaster?.Class ?? "") + "-" +
+                        (divisionMaster?.Division ?? "");
                     var twoDeclaredExams = _Entities.TbDeclaredExams.Where(x => x.ClassId == StudentDetails.ClassId && x.IsActive && x.SchoolId == StudentDetails.SchoolId).ToList().OrderBy(x => x.ExamId).ToList();
 
                     var allExamTerms = _Entities.TbExamBooks.Where(x => x.SchoolId == StudentDetails.SchoolId && x.IsActive).ToList();
@@ -2822,7 +3158,15 @@ namespace Satluj_Latest.Controllers
 
                     var term1Subjects = _Entities.TbDeclaredExamSubjects.Where(x => x.DeclaredExamId == term1DeclaredExams.Id && x.IsActive).OrderBy(x => x.TimeStamp).ToList();
                     var term2Subjects = _Entities.TbDeclaredExamSubjects.Where(x => x.DeclaredExamId == term2DeclaredExams.Id && x.IsActive).OrderBy(x => x.TimeStamp).ToList();
-                    var allSubjects = term1Subjects.Select(x => x.Subject).ToList().Union(term2Subjects.Select(x => x.Subject).ToList()).ToList(); // Wants to list as the order of they created 
+                    var allSubjects = term1Subjects
+                        .Where(x => x.Subject != null)
+                        .Select(x => x.Subject)
+                        .Union(
+                            term2Subjects
+                                .Where(x => x.Subject != null)
+                                .Select(x => x.Subject)
+                        )
+                        .ToList();
                     bool haveComputerScience = false;
                     if (allSubjects.Any(x => x.SubId == 10050 || x.SubId == 20076))
                     {
@@ -2953,11 +3297,16 @@ namespace Satluj_Latest.Controllers
                         //var returnExamresult = Item.tb_ExamResult.Where(x => x.StudentId == studentId && x.IsActive).ToList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
-                            sco = allSubjects.FirstOrDefault().TbDeclaredExamSubjects.Where(x => x.IsActive).FirstOrDefault() == null ? 0 : allSubjects.FirstOrDefault().TbDeclaredExamSubjects.Where(x => x.IsActive).FirstOrDefault().TotalScore;
+                            var firstSubject = allSubjects?.FirstOrDefault();
+
+                            var declaredExamSubject = firstSubject?.TbDeclaredExamSubjects?
+                                .FirstOrDefault(x => x.IsActive);
+
+                            sco = declaredExamSubject?.TotalScore ?? 0;
                         }
                         zz.TotalScore = Math.Round(sco, MidpointRounding.AwayFromZero).ToString();
                         foreach (var sub in allSubjects)
@@ -3097,6 +3446,9 @@ namespace Satluj_Latest.Controllers
         {
             RemarkModel model = new RemarkModel();
             model.SchoolId = _user.SchoolId;
+            model.RemarkList = new Satluj_Latest.Data.School(model.SchoolId).GetAllRemarks();
+
+            ViewBag.IsAdmin = true; 
             return View(model);
         }
 
@@ -3126,6 +3478,9 @@ namespace Satluj_Latest.Controllers
         {
             var model = new RemarkModel();
             model.SchoolId = _user.SchoolId;
+            model.RemarkList = new Satluj_Latest.Data.School(model.SchoolId).GetAllRemarks();
+
+            ViewBag.IsAdmin = true;
             return PartialView("~/Views/Progress/_pv_RemarkList.cshtml", model);
         }
         public object DeleteRemark(string id)
@@ -3198,7 +3553,7 @@ namespace Satluj_Latest.Controllers
             var studentId = Convert.ToInt64(splitData[0]);
             var declaredExamId = Convert.ToInt64(splitData[1]);
             var DeclredExamDetails = _Entities.TbDeclaredExams.Where(x => x.Id == declaredExamId && x.IsActive).FirstOrDefault();
-            var ExamTermDetails = DeclredExamDetails.TbExamBook.Term;
+            var ExamTermDetails = DeclredExamDetails.Exam.Term;
             var StudentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId && x.IsActive).FirstOrDefault();
             var ClassDetails = DeclredExamDetails.Class;
             var RegionDetails = ClassDetails.TbRegionsClasses.Where(x => x.IsActive == true).FirstOrDefault();
@@ -3445,7 +3800,7 @@ namespace Satluj_Latest.Controllers
                         ScolasticAreaList zz = new ScolasticAreaList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -3857,7 +4212,7 @@ namespace Satluj_Latest.Controllers
                         ScolasticAreaList zz = new ScolasticAreaList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -4017,7 +4372,7 @@ namespace Satluj_Latest.Controllers
             string[] splitData = id.Split('~');
             var studentId = Convert.ToInt64(splitData[0]);
             var declaredExamId = Convert.ToInt64(splitData[1]);
-            var DeclredExamDetails = _Entities.TbDeclaredExams.Where(x => x.Id == declaredExamId && x.IsActive && x.TbExamBook.IsActive && x.TbExamBook.Term.IsActive && x.Class.IsActive).FirstOrDefault();
+            var DeclredExamDetails = _Entities.TbDeclaredExams.Where(x => x.Id == declaredExamId && x.IsActive && x.Exam.IsActive && x.Exam.Term.IsActive && x.Class.IsActive).FirstOrDefault();
             var ExamTermDetails = DeclredExamDetails.Exam.Term;
             var StudentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId && x.IsActive).FirstOrDefault();
             var ClassDetails = DeclredExamDetails.Class;
@@ -4151,7 +4506,7 @@ namespace Satluj_Latest.Controllers
                         ScolasticAreaList zz = new ScolasticAreaList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -4463,7 +4818,7 @@ namespace Satluj_Latest.Controllers
                         ScolasticAreaList zz = new ScolasticAreaList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -4914,7 +5269,7 @@ namespace Satluj_Latest.Controllers
             var declaredExamId = Convert.ToInt64(splitData[1]);
             var Classid = Convert.ToInt64(splitData[2]);
             var DeclredExamDetails = _Entities.TbDeclaredExams.Where(x => x.Id == declaredExamId && x.IsActive).FirstOrDefault();
-            var ExamTermDetails = DeclredExamDetails.TbExamBook.Term;
+            var ExamTermDetails = DeclredExamDetails.Exam.Term;
             var StudentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId).FirstOrDefault();
             var ClassDetails = DeclredExamDetails.Class;
             var RegionDetails = ClassDetails.TbRegionsClasses.Where(x => x.IsActive == true && x.ClassId== Classid).FirstOrDefault();
@@ -5125,7 +5480,7 @@ namespace Satluj_Latest.Controllers
                         //var returnExamresult = Item.tb_ExamResult.Where(x => x.StudentId == studentId && x.IsActive).ToList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -5431,7 +5786,7 @@ namespace Satluj_Latest.Controllers
                         //var returnExamresult = Item.tb_ExamResult.Where(x => x.StudentId == studentId && x.IsActive).ToList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -5578,7 +5933,7 @@ namespace Satluj_Latest.Controllers
             var declaredExamId = Convert.ToInt64(splitData[1]);
             var ClassId = Convert.ToInt64(splitData[2]);
             var DeclredExamDetails = _Entities.TbDeclaredExams.Where(x => x.Id == declaredExamId && x.IsActive).FirstOrDefault();
-            var ExamTermDetails = DeclredExamDetails.TbExamBook.Term;
+            var ExamTermDetails = DeclredExamDetails.Exam.Term;
             var StudentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId).FirstOrDefault();
             var ClassDetails = DeclredExamDetails.Class;
             var RegionDetails = ClassDetails.TbRegionsClasses.Where(x => x.IsActive == true && x.ClassId==ClassId).FirstOrDefault();
@@ -5802,7 +6157,7 @@ namespace Satluj_Latest.Controllers
                         ScolasticAreaList zz = new ScolasticAreaList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -6123,7 +6478,7 @@ namespace Satluj_Latest.Controllers
                         ScolasticAreaList zz = new ScolasticAreaList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -6237,8 +6592,8 @@ namespace Satluj_Latest.Controllers
             var studentId = Convert.ToInt64(splitData[0]);
             var declaredExamId = Convert.ToInt64(splitData[1]);
             var ClassId = Convert.ToInt64(splitData[2]);
-            var DeclredExamDetails = _Entities.TbDeclaredExams.Where(x => x.Id == declaredExamId && x.IsActive && x.TbExamBook.IsActive && x.TbExamBook.Term.IsActive && x.Class.IsActive).FirstOrDefault();
-            var ExamTermDetails = DeclredExamDetails.TbExamBook.Term;
+            var DeclredExamDetails = _Entities.TbDeclaredExams.Where(x => x.Id == declaredExamId && x.IsActive && x.Exam.IsActive && x.Exam.Term.IsActive && x.Class.IsActive).FirstOrDefault();
+            var ExamTermDetails = DeclredExamDetails.Exam.Term;
             var StudentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId && x.IsActive==true).FirstOrDefault();
             var ClassDetails = DeclredExamDetails.Class;
             var RegionDetails = ClassDetails.TbRegionsClasses.Where(x => x.IsActive == true && x.ClassId==ClassId).FirstOrDefault();
@@ -6343,7 +6698,7 @@ namespace Satluj_Latest.Controllers
                         ScolasticAreaList zz = new ScolasticAreaList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
@@ -6505,7 +6860,7 @@ namespace Satluj_Latest.Controllers
                         ScolasticAreaList zz = new ScolasticAreaList();
                         var returnExamresult = Item.TbExamResults.Where(x => x.StudentId == studentId && x.IsActive).OrderByDescending(x => x.Subject.TotalScore).ToList();
                         zz.subjectList = new List<SubjectDetails>();
-                        zz.ScolasticArea = Item.TbExamBook.ExamName;
+                        zz.ScolasticArea = Item.Exam.ExamName;
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {

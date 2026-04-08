@@ -37,7 +37,7 @@
                                    readonly />
                         </div>
                     </div>
-
+                    <input type="hidden" asp-for="RegionId" />
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label>Item :</label>
@@ -87,15 +87,30 @@
     </form>
 </div>
 <script>
-    $("#form-teacher-edit").submit(function (e) {
+       $(document).on("submit", "#form-teacher-edit", function (e) {
         e.preventDefault();
 
         $.ajax({
             url: $(this).attr("action"),
             type: "POST",
             data: $(this).serialize(),
-            success: EditScholasticAreaSuccess,
-            error: ajaxFailure
+            success: function (result) {
+                if (result.status) {
+                    toastrSuccess(result.msg);
+
+                    $('#modalScholasticEdit').modal('hide');
+
+                    setTimeout(function () {
+                        location.reload();
+                    }, 500);
+                } else {
+                    toastrError(result.msg);
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                toastrError("Something went wrong");
+            }
         });
     });
 </script>

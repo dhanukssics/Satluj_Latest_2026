@@ -35,6 +35,8 @@ namespace Satluj_Latest.Data
             _Entities.Entry(school).Collection(s => s.TbBookCategories).Load();
             _Entities.Entry(school).Collection(s => s.TbDesignations).Load();
             _Entities.Entry(school).Collection(s => s.TbDepartments).Load();
+            _Entities.Entry(school).Collection(s => s.TbRemarks).Load();
+
             foreach (var cat in school.TbBookCategories)
             {
                 _Entities.Entry(cat).Collection(c => c.TbLibraryBooks).Load();
@@ -989,52 +991,55 @@ namespace Satluj_Latest.Data
                             .ToList();
         }
 
-        public List<TimetableListingModel> GetTimetable(long ClassId, long DivisionId)
+        public List<TimetableListingModel> GetTimetable(long ClassId, long DivisionId, long SeasonId)
         {
-            var data = _Entities.TbTimeTables.Where(x => x.ClassId == ClassId && x.DivisionId == DivisionId && x.IsActive).ToList().OrderBy(x => x.Periods).Select(x => new TimeTable(x)).ToList();
+            var data = _Entities.TbTimeTables
+                .Where(x => x.ClassId == ClassId
+                         && x.DivisionId == DivisionId
+                         && x.IsActive
+                         && x.SeasonId == SeasonId)
+                .OrderBy(x => x.DayId)
+                .ThenBy(x => x.Periods)
+                .ToList()
+                .Select(x => new TimeTable(x))
+                .ToList();
+
             List<TimetableListingModel> list = new List<TimetableListingModel>();
+
+            string[] dayNames = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+
             for (int i = 0; i < 6; i++)
             {
                 var newData = data.Where(x => x.DayId == i).ToList();
+
                 TimetableListingModel one = new TimetableListingModel();
-                if (newData.Count > 0)
-                {
-                    one.DayName = newData[0].DayName;
-                    one.One = newData.Where(x => x.Periods == 1).Select(x => x.SubjectAbbreviation).FirstOrDefault() == null ? newData.Where(x => x.Periods == 1).Select(x => x.Subject).FirstOrDefault() : newData.Where(x => x.Periods == 1).Select(x => x.SubjectAbbreviation).FirstOrDefault().ToUpper();
-                    one.two = newData.Where(x => x.Periods == 2).Select(x => x.SubjectAbbreviation).FirstOrDefault() == null ? newData.Where(x => x.Periods == 2).Select(x => x.Subject).FirstOrDefault() : newData.Where(x => x.Periods == 2).Select(x => x.SubjectAbbreviation).FirstOrDefault().ToUpper();
-                    one.three = newData.Where(x => x.Periods == 3).Select(x => x.SubjectAbbreviation).FirstOrDefault() == null ? newData.Where(x => x.Periods == 3).Select(x => x.Subject).FirstOrDefault() : newData.Where(x => x.Periods == 3).Select(x => x.SubjectAbbreviation).FirstOrDefault().ToUpper();
-                    one.four = newData.Where(x => x.Periods == 4).Select(x => x.SubjectAbbreviation).FirstOrDefault() == null ? newData.Where(x => x.Periods == 4).Select(x => x.Subject).FirstOrDefault() : newData.Where(x => x.Periods == 4).Select(x => x.SubjectAbbreviation).FirstOrDefault().ToUpper();
-                    one.five = newData.Where(x => x.Periods == 5).Select(x => x.SubjectAbbreviation).FirstOrDefault() == null ? newData.Where(x => x.Periods == 5).Select(x => x.Subject).FirstOrDefault() : newData.Where(x => x.Periods == 5).Select(x => x.SubjectAbbreviation).FirstOrDefault().ToUpper();
-                    one.six = newData.Where(x => x.Periods == 6).Select(x => x.SubjectAbbreviation).FirstOrDefault() == null ? newData.Where(x => x.Periods == 6).Select(x => x.Subject).FirstOrDefault() : newData.Where(x => x.Periods == 6).Select(x => x.SubjectAbbreviation).FirstOrDefault().ToUpper();
-                    one.seven = newData.Where(x => x.Periods == 7).Select(x => x.SubjectAbbreviation).FirstOrDefault() == null ? newData.Where(x => x.Periods == 7).Select(x => x.Subject).FirstOrDefault() : newData.Where(x => x.Periods == 7).Select(x => x.SubjectAbbreviation).FirstOrDefault().ToUpper();
-                    one.eight = newData.Where(x => x.Periods == 8).Select(x => x.SubjectAbbreviation).FirstOrDefault() == null ? newData.Where(x => x.Periods == 8).Select(x => x.Subject).FirstOrDefault() : newData.Where(x => x.Periods == 8).Select(x => x.SubjectAbbreviation).FirstOrDefault().ToUpper();
-                }
-                else
-                {
-                    if (i == 0)
-                        one.DayName = "Monday";
-                    else if (i == 1)
-                        one.DayName = "Tuesday";
-                    else if (i == 2)
-                        one.DayName = "Wednesday";
-                    else if (i == 3)
-                        one.DayName = "Thursday";
-                    else if (i == 4)
-                        one.DayName = "Friday";
-                    if (i == 5)
-                        one.DayName = "Saturday";
-                    one.One = "";
-                    one.two = "";
-                    one.three = "";
-                    one.four = "";
-                    one.five = "";
-                    one.six = "";
-                    one.seven = "";
-                    one.eight = "";
-                }
+                one.DayName = dayNames[i];
+
+                one.One = GetPeriodValue(newData, 1);
+                one.two = GetPeriodValue(newData, 2);
+                one.three = GetPeriodValue(newData, 3);
+                one.four = GetPeriodValue(newData, 4);
+                one.five = GetPeriodValue(newData, 5);
+                one.six = GetPeriodValue(newData, 6);
+                one.seven = GetPeriodValue(newData, 7);
+                one.eight = GetPeriodValue(newData, 8);
+
                 list.Add(one);
             }
+
             return list;
+        }
+        private string GetPeriodValue(List<TimeTable> data, int period)
+        {
+            var item = data.FirstOrDefault(x => x.Periods == period);
+
+            if (item == null)
+                return "";
+
+            if (!string.IsNullOrWhiteSpace(item.SubjectAbbreviation))
+                return item.SubjectAbbreviation.ToUpper();
+
+            return item.Subject ?? "";
         }
         public List<Payment> GetDetailedCollectionReportDate(DateTime StartDate, DateTime endDate)
         {
@@ -2296,22 +2301,52 @@ namespace Satluj_Latest.Data
 
         public List<ScholasticArea> GetAllScholasticArea()
         {
-            var data = school.TbScholasticAreas.Where(x => x.IsActive).ToList().Select(x => new ScholasticArea(x)).ToList();
-            return data;
+            return _Entities.TbScholasticAreas
+                .Where(x => x.IsActive && x.SchoolId == school.SchoolId)
+                .Include(x => x.Region)
+                .Select(x => new ScholasticArea(x))
+                .ToList();
         }
         public List<Co_ScholasticArea> GetAllCoScholasticArea()
         {
-            var data = school.TbCoScholasticAreas.Where(x => x.IsActive).ToList().Select(x => new Co_ScholasticArea(x)).ToList();
-            return data;
+            return _Entities.TbCoScholasticAreas
+                .Where(x => x.IsActive && x.SchoolId == school.SchoolId)
+                .Include(x => x.Region)
+                .ToList()
+                .Select(x => new Co_ScholasticArea(x))
+                .ToList();
         }
         public List<DeclaredExams> GetAllDeclaredExamDetails()
         {
-            var data = school.TbDeclaredExams.Where(x => x.IsActive && x.Class.IsActive && x.Class.PublishStatus).ToList().Select(x => new DeclaredExams(x)).ToList();
-            return data;
+            return _Entities.TbDeclaredExams
+                .Where(x => x.IsActive && x.SchoolId == school.SchoolId)
+                .Include(x => x.Class)
+                .Include(x => x.Exam)
+                .Where(x => x.Class != null && x.Class.IsActive && x.Class.PublishStatus)
+                .ToList()
+                .Select(x => new DeclaredExams(x))
+                .ToList();
         }
-        public List<DeclaredExamSubjects> GetAllDeclaredExamSubjectList(long ExamId)
+        public List<DeclaredExamSubjects> GetAllDeclaredExamSubjectList(long examId)
         {
-            var data = school.TbDeclaredExams.Where(x => x.ExamId == ExamId && x.IsActive && x.Class.IsActive && x.Class.PublishStatus).FirstOrDefault().TbDeclaredExamSubjects.Where(x => x.IsActive).ToList().Select(x => new DeclaredExamSubjects(x)).ToList();
+            var declaredExam = _Entities.TbDeclaredExams
+                .FirstOrDefault(x => x.ExamId == examId && x.IsActive);
+
+            if (declaredExam == null)
+                return new List<DeclaredExamSubjects>();
+
+            var cls = _Entities.TbClasses
+                .FirstOrDefault(x => x.ClassId == declaredExam.ClassId && x.IsActive && x.PublishStatus);
+
+            if (cls == null)
+                return new List<DeclaredExamSubjects>();
+
+            var data = _Entities.TbDeclaredExamSubjects
+                .Where(x => x.DeclaredExamId == declaredExam.Id && x.IsActive)
+                .ToList()
+                .Select(x => new DeclaredExamSubjects(x))
+                .ToList();
+
             return data;
         }
         //Added by Gayathri A (01/06/2023)--Previous year progresscard
@@ -2332,7 +2367,11 @@ namespace Satluj_Latest.Data
                 //model.SchoolName = _user.tb_School.SchoolName;
                 //model.SchoolAdddress = _user.tb_School.Address;
                 //model.SchoolLogo = _user.tb_School.FilePath;
-                model.ExamName = data.TbExamBook.ExamName + " - " + data.TbExamTerm.DefaultExam;
+                var examName = data?.Exam?.ExamName ?? "";
+                var termName = data?.TbExamTerm?.DefaultExam ?? "";
+
+                model.ExamName = string.Join(" - ", new[] { examName, termName }
+                    .Where(x => !string.IsNullOrWhiteSpace(x)));
                 model.ClassName = data.Class.Class;
                 model.StartDate = data.StartDate;
                 model.EndDate = data.EndDate;
@@ -2369,10 +2408,28 @@ namespace Satluj_Latest.Data
         }
 
 
-        public string ExamName(long ExamId)
+        public string ExamName(long examId)
         {
-            var ExamName = school.TbDeclaredExams.Where(x => x.ExamId == ExamId && x.IsActive && x.Class.IsActive && x.Class.PublishStatus).FirstOrDefault();
-            return ExamName.TbExamBook.ExamName + " - " + ExamName.TbExamTerm.DefaultExam + " ( " + ExamName.Class.Class + " ) ";
+            var examData = _Entities.TbDeclaredExams
+                .FirstOrDefault(x => x.ExamId == examId && x.IsActive);
+
+            if (examData == null)
+                return "";
+
+            var examBook = _Entities.TbExamBooks
+                .FirstOrDefault(x => x.Id == examData.ExamId && x.IsActive);
+
+            var term = _Entities.TbExamTerms
+                .FirstOrDefault(x => x.Id == examData.TermId && x.IsActive);
+
+            var cls = _Entities.TbClasses
+                .FirstOrDefault(x => x.ClassId == examData.ClassId && x.IsActive && x.PublishStatus);
+
+            string examNameText = examBook?.ExamName ?? "";
+            string termName = term?.DefaultExam ?? "";
+            string className = cls?.Class ?? "";
+
+            return $"{examNameText} - {termName} ( {className} )";
         }
         public List<Department> GetAllDepartment()
         {

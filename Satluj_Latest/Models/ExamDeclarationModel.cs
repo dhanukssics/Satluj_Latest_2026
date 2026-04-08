@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Satluj_Latest.Data;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -20,5 +21,6 @@ namespace Satluj_Latest.Models
         public long Id { get; set; }
         public string TermName { get; set; }
         public string ClassName { get; set; }
+        public List<DeclaredExams> DeclaredExamList { get; set; }
     }
 }

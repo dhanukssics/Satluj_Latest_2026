@@ -72,7 +72,7 @@
                         $("#division-drop-down").html("");
                         $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
                         $.each(result.list, function (i, item) {
-                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                            $("#division-drop-down").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $("#division-drop-down").prop("disabled", false);
 
@@ -141,7 +141,7 @@
                         $(".slct-exam-dropdown1").html("");
                         $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- Select Exam --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-exam-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-exam-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-exam-dropdown1").prop("disabled", false);
 

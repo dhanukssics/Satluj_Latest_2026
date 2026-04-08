@@ -38,5 +38,5 @@ public partial class TbDeclaredExam
     public virtual ICollection<TbScholasticResultMain> TbScholasticResultMains { get; set; } = new List<TbScholasticResultMain>();
 
     public virtual TbExamTerm? TbExamTerm { get; set; }
-    public virtual TbExamBook? TbExamBook { get;  set; }
+    //public virtual TbExamBook? TbExamBook { get;  set; }
 }

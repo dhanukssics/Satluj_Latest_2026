@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Satluj_Latest.Models;
+using Satluj_Latest.Models.Temp;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -9,14 +10,20 @@ namespace Satluj_Latest.Data
     public class DropdownData
     {
                
-        private readonly SchoolDbContext _Entities;       
+        private readonly SchoolDbContext _Entities;
+        private readonly TempDbContext _Entitynew;
+
+        public DropdownData(SchoolDbContext entities,TempDbContext Entitynew)
+        {
+            _Entities = entities;
+            _Entitynew = Entitynew;
+        }
 
         public DropdownData(SchoolDbContext entities)
         {
             _Entities = entities;
         }
 
-        
         public List<SelectListItem> GetUnPublishedClasses(long schoolId)
         {
             var input = _Entities.TbClasses
@@ -57,16 +64,32 @@ namespace Satluj_Latest.Data
             return input.Select(x => new SelectListItem { Text = x.AcademicYear, Value = x.YearId.ToString() }).ToList();
         }
 
-        public  List<SelectListItem> GetClasses(long schoolId)
+        public List<SelectListItem> GetClasses(long schoolId)
         {
             var input = _Entities.TbClasses
                 .Where(z => z.IsActive && z.PublishStatus && z.SchoolId == schoolId)
                 .OrderBy(z => z.ClassOrder)
                 .ToList();
 
-            return input.Select(x => new SelectListItem { Text = x.Class, Value = x.ClassId.ToString() }).ToList();
+            return input.Select(x => new SelectListItem
+            {
+                Text = x.Class,
+                Value = x.ClassId.ToString()
+            }).ToList();
         }
 
+        public List<SelectListItem> GetSeasons()
+        {
+            var input = _Entitynew.TbSeasons
+                .OrderBy(z => z.SeasonName)
+                .ToList();
+
+            return input.Select(x => new SelectListItem
+            {
+                Text = x.SeasonName,
+                Value = x.SeasonId.ToString()
+            }).ToList();
+        }
         public List<SelectListItem> GetClassList()
         {
             var input = _Entities.TbClassLists.Where(z => z.IsActive).OrderBy(z => z.OrderValue).ToList();
@@ -434,8 +457,17 @@ namespace Satluj_Latest.Data
 
         public List<SelectListItem> GetAllExamsDeclared(long id, long schoolid, long classId)
         {
-            var input = _Entities.TbDeclaredExams.Where(x => x.ClassId == classId && x.Class.SchoolId == schoolid && x.IsActive).ToList();
-            return input.Select(x => new SelectListItem { Text = x.Exam.ExamName + " " + x.Exam.Term.DefaultExam, Value = x.ExamId.ToString() }).ToList();
+            return _Entities.TbDeclaredExams
+                .Where(x => x.ClassId == classId
+                         && x.Class.SchoolId == schoolid
+                         && x.IsActive)
+                .Select(x => new SelectListItem
+                {
+                    Text = (x.Exam != null ? x.Exam.ExamName : "") +
+                           (x.Exam != null && x.Exam.Term != null ? " " + x.Exam.Term.DefaultExam : ""),
+                    Value = x.ExamId.ToString()
+                })
+                .ToList();
         }
 
         public List<SelectListItem> GetTermExams(long schoolId)
@@ -448,6 +480,7 @@ namespace Satluj_Latest.Data
         {
             var input = _Entities.WithoutDeclaredExamTermResults
                 .FromSqlInterpolated($"EXEC sp_WithoutDeclaredExamTerms @SchoolId={schoolId}, @ClassId={classId}")
+                .AsEnumerable() 
                 .OrderBy(x => x.DefaultExam)
                 .ToList();
 
@@ -460,13 +493,18 @@ namespace Satluj_Latest.Data
 
         public List<SelectListItem> GetAllExamsSubjects(long id, long schoolid, long ClassId)
         {
-            var input = _Entities.TbDeclaredExamSubjects
-                .Where(x => x.DeclaredExam.SchoolId == schoolid && x.DeclaredExamId == id && x.DeclaredExam.ClassId == ClassId && x.IsActive)
+            return _Entities.TbDeclaredExamSubjects
+                .Where(x => x.DeclaredExam.SchoolId == schoolid
+                         && x.DeclaredExamId == id
+                         && x.DeclaredExam.ClassId == ClassId
+                         && x.IsActive)
+                .Select(x => new SelectListItem
+                {
+                    Text = x.Subject != null ? x.Subject.SubjectName : "",
+                    Value = x.SubjectId.ToString()
+                })
                 .ToList();
-
-            return input.Select(x => new SelectListItem { Text = x.Subject.SubjectName, Value = x.SubjectId.ToString() }).ToList();
         }
-
         public List<SelectListItem> GetAllScholasticAreas(long schoolid, long ClassId)
         {
             var regionEntry = _Entities.TbRegionsClasses.FirstOrDefault(x => x.ClassId == ClassId && x.Class.SchoolId == schoolid && x.IsActive);
@@ -1235,23 +1273,21 @@ namespace Satluj_Latest.Data
         //18-sep-2020 Jibin Start ..........................................
 
         //jibin 9/8/2020
-        public  List<SelectListItem> GetSubject(long UserId)
+        public List<SelectListItem> GetSubject(long userId)
         {
+            var subjects = (from tcs in _Entities.TbTeacherClassSubjects
+                            join s in _Entities.TbSubjects
+                                on tcs.SubjectId equals s.SubId
+                            where tcs.TeacherId == userId
+                            select new SelectListItem
+                            {
+                                Text = s.SubjectName,
+                                Value = s.SubId.ToString()
+                            })
+                            .Distinct()
+                            .ToList();
 
-            var input = _Entities.TbTeacherClassSubjects.Where(x => x.TeacherId == UserId).ToList();
-
-
-            if (input.Count == 0)//jibin 9/16/2020
-            {
-                var inputnull = _Entities.TbSubjects.ToList();
-
-                return inputnull.Select(x => new SelectListItem { Text = "No subjects Assigned", Value = "" }).ToList();
-
-
-
-            }//jibin 9/16/2020
-
-            return input.Select(x => new SelectListItem { Text = x.Subject.SubjectName, Value = x.SubjectId.ToString() }).ToList();
+            return subjects;
         }
 
         // jibin 9/17/2020
@@ -1291,7 +1327,30 @@ namespace Satluj_Latest.Data
             //  return Preschool_Li.Select(x => new SelectListItem { Text = x.Preschools, Value = x.Id }).ToList();
         }
 
-
+        public List<SelectListItem> GetTeacherAssignedSubjects(long schoolId, long teacherId, long classId)
+        {
+            return _Entities.TbTeacherClassSubjects
+                .Where(tcs => tcs.SchoolId == schoolId
+                           && tcs.TeacherId == teacherId
+                           && tcs.ClassId == classId
+                           && tcs.IsActive)
+                .Join(_Entities.TbSubjects.Where(s => s.IsActive),
+                      tcs => tcs.SubjectId,
+                      sub => sub.SubId,
+                      (tcs, sub) => new
+                      {
+                          sub.SubId,
+                          sub.SubjectName
+                      })
+                .Distinct()
+                .OrderBy(x => x.SubjectName)
+                .Select(x => new SelectListItem
+                {
+                    Text = x.SubjectName,
+                    Value = x.SubId.ToString()
+                })
+                .ToList();
+        }
     }
 }
 

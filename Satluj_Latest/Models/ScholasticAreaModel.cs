@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Satluj_Latest.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,6 @@ namespace Satluj_Latest.Models
         public long Id { get; set; }
         public string RegionName { get; set; }
         public List<SelectListItem> RegionList { get; set; }
-
+        public List<ScholasticArea> ScholasticAreaList { get; set; }
     }
 }

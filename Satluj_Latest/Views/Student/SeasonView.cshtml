@@ -1,0 +1,565 @@
+﻿@model Satluj_Latest.Models.TimeTable
+
+@{ ViewBag.Title = "SeasonView";
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml"; }
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+<style>
+    input#SeasonName {
+        font-size: 14px !important;
+        font-weight: 500;
+        line-height: 1.4;
+    }
+
+    table td input[type="date"],
+    table td input[type="time"] {
+        font-size: 14px !important;
+        font-weight: 500;
+        line-height: 1.5;
+    }
+    #seasonForm label{
+        font-size: 15px;
+    }
+    .sea{
+        font-size:20px;
+    }
+</style>
+
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0 sea">Add Season</h5>
+        </div>
+
+        <div class="card-body">
+            <form id="seasonForm">
+                <input type="hidden" id="SeasonId" />
+                <div class="row ">
+                    <div class="col-md-3">
+                        <label class="form-label">Season Name</label>
+                        <input type="text" id="SeasonName" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" id="StartDate" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">End Date</label>
+                        <input type="date" id="EndDate" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" id="StartTime" class="form-control">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">End Time</label>
+                        <input type="time" id="EndTime" class="form-control">
+                    </div>
+                    
+                </div>
+
+                <!-- ROW 2 -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Break1 Start Time</label>
+                        <input type="time" id="BrkSt1Time" class="form-control">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Break1 End Time</label>
+                        <input type="time" id="BrkEnd1Time" class="form-control">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Break2 Start Time</label>
+                        <input type="time" id="BrkSt2Time" class="form-control">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Break2 End Time</label>
+                        <input type="time" id="BrkEnd2Time" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="text-end">
+                    <button type="reset" class="btn btn-secondary me-2">Reset</button>
+                    <button type="submit" class="btn btn-primary" id="Add-season">Save</button>
+                    <button type="submit" class="btn btn-primary" id="Edit-season" onclick="updateSeason(event)">Edit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Success Alert -->
+<div id="successAlert"
+     class="alert alert-success alert-dismissible fade d-none mt-3"
+     role="alert">
+    <strong>Success!</strong> Data saved successfully.
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Success</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-0">Data saved successfully!</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered mt-4" id="seasonTable">
+    <thead class="table-primary">
+        <tr>
+            <th>Season</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Time</th>
+            <th>Break Time1</th>
+            <th>Break Time2</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@*<div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Edit Season</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="EditSeasonId" />
+
+                    <div class="mb-2">
+                        <label>Season Name</label>
+                        <input type="text" id="EditSeasonName" class="form-control">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Start Date</label>
+                            <input type="date" id="EditStartDate" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label>End Date</label>
+                            <input type="date" id="EditEndDate" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label>Start Time</label>
+                            <input type="time" id="EditStartTime" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label>End Time</label>
+                            <input type="time" id="EditEndTime" class="form-control">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="updateSeason()">Update</button>
+                </div>
+
+            </div>
+        </div>
+    </div>*@
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+        $("#Edit-season").hide();
+        loadSeasons();
+    });
+    function formatDate(dateString) {
+        if (!dateString) return '';
+
+        let date = new Date(dateString); 
+
+        let day = ("0" + date.getDate()).slice(-2);
+        let month = ("0" + (date.getMonth() + 1)).slice(-2);
+        let year = date.getFullYear();
+
+        return day + "/" + month + "/" + year;
+    }
+    function formatTime(time) {
+        if (!time) return '';
+        return time.substring(0, 5); // "HH:mm"
+    }
+
+
+    
+    function loadSeasons() {
+    $.get("/Student/GetSeasons", function (data) {
+
+        console.log("Seasons:", data);
+
+        let rows = "";
+
+        $.each(data, function (i, v) {
+            rows += `
+            <tr>
+                <td>${v.seasonName}</td>
+                <td>${formatDate(v.startDate)}</td>
+                <td>${formatDate(v.endDate)}</td>
+                <td>${formatTime(v.startTime)} - ${formatTime(v.endTime)}</td>
+                <td>${formatTime(v.break1StartTime)} - ${formatTime(v.break1EndTime)}</td>
+                <td>${formatTime(v.break2StartTime)} - ${formatTime(v.break2EndTime)}</td>
+                <td>
+                    <input type="checkbox" 
+                               ${v.isActive ? 'checked' : ''} 
+                               onchange="toggleSeasonStatus(${v.seasonId}, this)">
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="editSeason(${v.seasonId})">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteSeason(${v.seasonId})">Delete</button>
+                </td>
+            </tr>`;
+        });
+
+        $("#seasonTable tbody").html(rows);
+    });
+}
+    function toggleSeasonStatus(id, element) {
+
+        let status = $(element).is(":checked");
+
+        $.ajax({
+            url: '/Student/UpdateSeasonStatus',
+            type: 'POST',
+            data: { id: id, isActive: status },
+            success: function (response) {
+                if (response.success) {
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Updated!',
+                        text: 'Season status updated',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                } else {
+                    element.checked = !status; // revert back
+                    Swal.fire('Error', 'Failed to update status', 'error');
+                }
+            },
+            error: function () {
+                element.checked = !status; // revert back
+                Swal.fire('Error', 'Something went wrong', 'error');
+            }
+        });
+    }
+
+    $(document).ready(function () {
+
+        $("#Add-season").click(function (e) {
+            debugger;
+            e.preventDefault();
+            if (!validateSeason())
+                return;
+            let model = {
+                SeasonName: $("#SeasonName").val(),
+                StartDate: $("#StartDate").val(),
+                EndDate: $("#EndDate").val(),
+                StartTime: $("#StartTime").val(),
+                EndTime: $("#EndTime").val(),
+                Break1StartTime: $("#BrkSt1Time").val(),
+                Break1EndTime: $("#BrkEnd1Time").val(),
+                Break2StartTime: $("#BrkSt2Time").val(),
+                Break2EndTime: $("#BrkEnd2Time").val(),
+                IsActive: $("#IsActive").is(":checked")
+            };
+
+            $.ajax({
+                url: '/Student/SaveSeason',
+                type: 'POST',
+                data: JSON.stringify(model),              
+                contentType: 'application/json',          
+                success: function (response) {
+                    if (response.success) {
+
+                        $("#seasonForm").trigger("reset");
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Saved!',
+                            text: 'Season saved successfully',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                        loadSeasons();
+                    } else {
+                        Swal.fire('Error', 'Error saving season', 'error');
+                    }
+                },
+                error: function (err) {
+                    console.log(err); 
+                    Swal.fire('Error', 'Something went wrong', 'error');
+                }
+            });
+        });
+
+    });
+    //added by dhanu for edit and delete
+   function editSeason(id) {
+
+        $("#Add-season").hide();
+        $("#Edit-season").show();
+
+        $.get("/Student/GetSeasonById", { id: id }, function (v) {
+
+            console.log("Edit Data:", v);
+
+            $("#SeasonId").val(v.seasonId);
+            $("#SeasonName").val(v.seasonName);
+
+            $("#StartDate").val(v.startDate);
+            $("#EndDate").val(v.endDate);
+
+            $("#StartTime").val(formatTimeForInput(v.startTime));
+            $("#EndTime").val(formatTimeForInput(v.endTime));
+
+            $("#BrkSt1Time").val(formatTimeForInput(v.break1StartTime));
+            $("#BrkEnd1Time").val(formatTimeForInput(v.break1EndTime));
+
+            $("#BrkSt2Time").val(formatTimeForInput(v.break2StartTime));
+            $("#BrkEnd2Time").val(formatTimeForInput(v.break2EndTime));
+
+            $("#IsActive").prop("checked", v.isActive);
+        });
+    }
+    function formatTimeForInput(t) {
+        if (!t) return '';
+        return t.substring(0, 5); 
+    }
+    // Convert C# /Date()/ to yyyy-MM-dd format
+    function formatDateForInput(dateString) {
+        if (!dateString) return '';
+        return dateString; 
+    }
+    function updateSeason(e) {
+        e.preventDefault();
+
+
+        if (!validateSeason())
+            return;
+
+        let model = {
+            SeasonId: $("#SeasonId").val(),
+            SeasonName: $("#SeasonName").val(),
+            StartDate: $("#StartDate").val(),
+            EndDate: $("#EndDate").val(),
+            StartTime: $("#StartTime").val(),
+            EndTime: $("#EndTime").val(),
+            Break1StartTime: $("#BrkSt1Time").val(),
+            Break1EndTime: $("#BrkEnd1Time").val(),
+            Break2StartTime: $("#BrkSt2Time").val(),
+            Break2EndTime: $("#BrkEnd2Time").val(),
+            IsActive: $("#IsActive").is(":checked")
+        };
+
+        $.ajax({
+            url: "/Student/UpdateSeason",
+            type: "POST",
+            data: JSON.stringify(model),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+
+                if (response.success) {
+
+                    loadSeasons();
+                    $("#seasonForm").trigger("reset");
+
+                    $("#Edit-season").hide();
+                    $("#Add-season").show();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Updated!',
+                        text: 'Season updated successfully',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to update season'
+                    });
+                }
+            }
+        });
+    }
+
+   function deleteSeason(id) {
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This season will be deleted permanently!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            $.ajax({
+                url: '/Student/DeleteSeason',
+                type: 'POST',
+                data: { id: id },
+                success: function (response) {
+
+                    if (response.success) {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: 'Season has been deleted.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                        loadSeasons();
+
+                    } else {
+                        Swal.fire('Error', 'Delete failed', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'Something went wrong', 'error');
+                }
+            });
+        }
+    });
+}
+    function showPageMessage(message, type = "success") {
+        const alertDiv = $("#pageMessage");
+
+        alertDiv
+            .removeClass("d-none alert-success alert-danger")
+            .addClass(type === "success" ? "alert-success" : "alert-danger")
+            .text(message);
+
+        // scroll to bottom so user sees it
+        $("html, body").animate({
+            scrollTop: $(document).height()
+        }, 500);
+
+        // auto-hide after 4 seconds
+        setTimeout(function () {
+            alertDiv.addClass("d-none");
+        }, 4000);
+    }
+
+    function validateSeason() {
+
+        let seasonName = $("#SeasonName").val().trim();
+        let startDate = $("#StartDate").val();
+        let endDate = $("#EndDate").val();
+
+
+        // Season Name validation
+        if (seasonName === "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Validation',
+                text: 'Please enter Season Name'
+            });
+            $("#SeasonName").focus();
+            return false;
+        }
+
+        // Start Date validation
+        if (startDate === "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Validation',
+                text: 'Please select Start Date'
+            });
+            $("#StartDate").focus();
+            return false;
+        }
+
+        // End Date validation
+        if (endDate === "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Validation',
+                text: 'Please select End Date'
+            });
+            $("#EndDate").focus();
+            return false;
+        }
+
+        // Date comparison validation
+        if (new Date(endDate) < new Date(startDate)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Validation',
+                text: 'End Date cannot be less than Start Date'
+            });
+            $("#EndDate").focus();
+            return false;
+        }
+
+        // Time validation (optional)
+        //if (startTime && endTime && startTime >= endTime) {
+        //    Swal.fire({
+        //        icon: 'warning',
+        //        title: 'Validation',
+        //        text: 'End Time must be greater than Start Time'
+        //    });
+        //    $("#EndTime").focus();
+        //    return false;
+        //}
+
+        return true;
+    }
+
+</script>
+
+
+
+

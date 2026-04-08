@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Satluj_Latest.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace Satluj_Latest.Models
 {
@@ -8,5 +9,6 @@ namespace Satluj_Latest.Models
         [Required(ErrorMessage = "Required")]
         public string Remark { get; set; }
         public long RemarkId { get; set; }
+        public List<RemarkClass> RemarkList { get;  set; }
     }
 }

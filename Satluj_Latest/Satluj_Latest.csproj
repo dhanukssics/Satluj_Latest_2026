@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Content Remove="Views\Student\InstallationInstruction.cshtml" />
-    <Content Remove="Views\Student\_AddTimeTable.cshtml" />
     <Content Remove="Views\Teacher\Message.cshtml" />
   </ItemGroup>
 

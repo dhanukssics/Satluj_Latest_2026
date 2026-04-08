@@ -1,0 +1,45 @@
+﻿
+@model List<Satluj_Latest.Models.TimetableModel>
+
+
+<table class="table table-bordered table-striped">
+    <thead class="table-primary">
+        <tr>
+            <th>Day</th>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+            <th>8</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @*@{
+                    var days = new List<string> { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+                @*  *@}
+
+        @foreach (Days day in System.Enum.GetValues(typeof(Days)))
+        {
+            <tr>
+                <td>@day</td>
+
+                @foreach (Periods period in System.Enum.GetValues(typeof(Periods)))
+                {
+                    var subject = Model.FirstOrDefault(x => x.DayId == day && x.Period - 1 == period);
+
+                    <td>
+                        @(subject != null ? subject.SubjectName : "")
+                    </td>
+                }
+
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+

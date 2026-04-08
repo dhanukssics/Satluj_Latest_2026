@@ -37,6 +37,7 @@ namespace Satluj_Latest.Models
         public string ClassName { get; set; }
         public string DivisionName { get; set; }
         public List<TimetableListingModel> list = new List<TimetableListingModel>();
+        public string SeasonName {  get; set; }
     }
     public class AttSummaryModel
     {

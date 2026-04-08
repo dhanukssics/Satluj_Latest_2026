@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "CertificateName";
     Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
-    bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = ViewBag.IsAdmin != null ? Convert.ToBoolean(ViewBag.IsAdmin) : false;
 
 }
 

@@ -16,6 +16,8 @@
               asp-action="AddDeclaredExams"
               method="post">
 
+            @Html.AntiForgeryToken()
+
             <div class="row">
 
                 <div class="form-group col-sm-3">
@@ -26,27 +28,24 @@
                             id="classDataDropdown">
                         <option value="">--Choose--</option>
                     </select>
-
                     <span asp-validation-for="ClassId" class="text-danger"></span>
-
-
                 </div>
 
                 <div class="form-group col-sm-3">
                     <label>Terms :</label>
                     @Html.DropDownListFor(
-                                        m => m.TermId,
-                                        new SelectList(new[] {
-                                        new { value = 0, text = "--select term--" }
-                                        }, "value", "text"),
-                                        new { @class = "form-control term_Select", disabled = "disabled" })
+                        m => m.TermId,
+                        new SelectList(new[] {
+                            new { value = 0, text = "--select term--" }
+                        }, "value", "text"),
+                        new { @class = "form-control term_Select", id = "TermId", disabled = "disabled" })
                     @Html.ValidationMessageFor(m => m.TermId)
                 </div>
 
                 <div class="form-group col-sm-3">
                     <label>Exam Name :</label>
                     @Html.TextBoxFor(m => m.ExamName,
-                                        new { @class = "form-control", placeholder = "Exam Name" })
+                        new { @class = "form-control", placeholder = "Exam Name" })
                     @Html.ValidationMessageFor(m => m.ExamName)
                 </div>
             </div>
@@ -56,14 +55,14 @@
                 <div class="form-group col-sm-3">
                     <label>Start Date :</label>
                     @Html.TextBoxFor(m => m.StartDateString,
-                                        new { @class = "form-control date-cashentry-add" })
+                        new { @class = "form-control date-cashentry-add" })
                     @Html.ValidationMessageFor(m => m.StartDateString)
                 </div>
 
                 <div class="form-group col-sm-3">
                     <label>End Date :</label>
                     @Html.TextBoxFor(m => m.EndDateString,
-                                        new { @class = "form-control date-cashentry-add" })
+                        new { @class = "form-control date-cashentry-add" })
                     @Html.ValidationMessageFor(m => m.EndDateString)
                 </div>
 
@@ -71,7 +70,7 @@
                     <button type="submit"
                             class="btn pay-now-btn"
                             id="area-id"
-                            style="margin-top: 9%;">
+                            style="margin-top: 9%; cursor: default; pointer-events: none; opacity: .8;">
                         <i class="fa fa-save"></i> Save
                     </button>
                 </div>
@@ -79,8 +78,7 @@
         </form>
 
         <div class="table-responsive">
-            @await Html.PartialAsync(
-                        "~/Views/Progress/_pv_DeclaredExamList.cshtml", Model)
+            @await Html.PartialAsync("~/Views/Progress/_pv_DeclaredExamList.cshtml", Model)
         </div>
     </div>
 </div>
@@ -88,57 +86,183 @@
 <div class="modal fade" id="modalDeclaredExamEdit" tabindex="-1"></div>
 
 @section Scripts {
-<script>
+    <script>
+        $(document).ready(function () {
 
-    $('.date-cashentry-add').datepicker({
-        format: 'dd-mm-yyyy',
-        autoclose: true,
-        todayHighlight: true
-    });
+            // Datepicker
+            $('.date-cashentry-add').datepicker({
+                format: 'mm-dd-yyyy',
+                autoclose: true,
+                todayHighlight: true
+            });
 
-    $(document).ready(function () {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0');
-        var yyyy = today.getFullYear();
-        $('.date-cashentry-add').val(dd + '-' + mm + '-' + yyyy);
-    });
+            // Default today date
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var yyyy = today.getFullYear();
+            $('.date-cashentry-add').val(mm + '-' + dd + '-' + yyyy);
 
-    $('#form-teacher-add').on('submit', function (e) {
-        e.preventDefault();
+            // Disable save initially
+            $('#area-id').css({
+                'cursor': 'default',
+                'pointer-events': 'none',
+                'opacity': '.8'
+            });
 
-        $.ajax({
-            url: $(this).attr('action'),
-            type: 'POST',
-            data: $(this).serialize(),
-            success: AddExamDeclarationSuccess,
-            error: AddExamDeclarationFailure
+            // Class change -> load terms
+            $(document).on('change', '.pv_class-drop-down', function () {
+                var id = $(this).val();
+                var schoolId = $('#SchoolId').val();
+
+                console.log("Selected ClassId:", id);
+                console.log("SchoolId:", schoolId);
+
+                $("#TermId").html("");
+                $("#TermId").append($('<option></option>').val("").html('-- Select Terms --'));
+                $("#TermId").prop("disabled", true);
+
+                $('#area-id').css({
+                    'cursor': 'default',
+                    'pointer-events': 'none',
+                    'opacity': '.8'
+                });
+
+                if (id !== '' && id !== null) {
+                    $.ajax({
+                        url: '/Data/LoadTermsWithoutExamDeclaration',
+                        type: "GET",
+                        data: { id: id + '~' + schoolId },
+                        success: function (result) {
+                            console.log("Term Response:", result);
+
+                            $("#TermId").html("");
+
+                            if (result && result.list && result.list.length > 0) {
+                                $("#TermId").append($('<option></option>').val("").html('-- Select Terms --'));
+
+                                $.each(result.list, function (i, item) {
+                                    $("#TermId").append(
+                                        $('<option></option>')
+                                            .val(item.value || item.Value)
+                                            .html(item.text || item.Text)
+                                    );
+                                });
+
+                                $("#TermId").prop("disabled", false);
+
+                                $('#area-id').css({
+                                    'cursor': 'pointer',
+                                    'pointer-events': 'initial',
+                                    'opacity': '1'
+                                });
+                            }
+                            else {
+                                $("#TermId").append($('<option></option>').val("").html('--Already declared 2 exams --'));
+                                $("#TermId").prop("disabled", true);
+
+                                $('#area-id').css({
+                                    'cursor': 'default',
+                                    'pointer-events': 'none',
+                                    'opacity': '.8'
+                                });
+                            }
+                        },
+                        error: function (xhr) {
+                            console.log("LoadTerms Error:", xhr.responseText);
+                            toastr.error("Unable to load terms");
+                        }
+                    });
+                }
+                else {
+                    $("#TermId").html("");
+                    $("#TermId").append($('<option></option>').val("").html('-- Select Terms --'));
+                    $("#TermId").prop("disabled", true);
+
+                    $('#area-id').css({
+                        'cursor': 'default',
+                        'pointer-events': 'none',
+                        'opacity': '.8'
+                    });
+                }
+            });
+
+            // Add form submit
+            $('#form-teacher-add').on('submit', function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.status) {
+                            toastr.success(result.msg);
+                        } else {
+                            toastr.error(result.msg);
+                        }
+
+                        setTimeout(function () {
+                            window.location.href = '/Progress/ExamDeclaration/';
+                        }, 1000);
+                    },
+                    error: function () {
+                        toastr.error("Failed!");
+                    }
+                });
+            });
+
+            // DataTable
+            if (!$.fn.DataTable.isDataTable('.declared-exam-list')) {
+                $(".declared-exam-list").DataTable();
+            }
         });
-    });
 
-    function AddExamDeclarationSuccess(result) {
-        if (result.status) {
-            toastrSuccess(result.msg);
-        } else {
-            toastrError(result.msg);
+        function examOnclick(id) {
+            if (id && id !== '0') {
+                window.location.href = "/Progress/DeclaredExamSubject/" + id;
+            }
         }
-        window.location.href = '/Progress/ExamDeclaration/';
-    }
+        $(document).on("click", ".edit-class-tr", function () {
+            var id = $(this).data("exam");
 
-    function AddExamDeclarationFailure() {
-        toastrError("Failed!");
-        window.location.href = '/Progress/ExamDeclaration/';
-    }
+            console.log("Edit Declared Exam Id:", id);
 
-    $(function () {
-        $(".declared-exam-list").DataTable();
-    });
+            $.ajax({
+                url: '/Progress/DeclaredExamEditPartial?id=' + id,
+                type: 'GET',
+                success: function (result) {
+                    $("#modalDeclaredExamEdit").html(result);
+                    $("#modalDeclaredExamEdit").modal("show");
+                },
+                error: function () {
+                    toastr.error("Failed to load edit popup!");
+                }
+            });
+        });
+        $(document).on("click", ".delete-class-tr", function () {
+            var id = $(this).data("exam");
 
-    function examOnclick(id) {
-        if (id && id !== '0') {
-            window.location.href = "/Progress/DeclaredExamSubject/" + id;
-        }
-    }
+            console.log("Delete Declared Exam Id:", id);
 
-</script>
+            $.ajax({
+                url: '/Progress/DeleteDeclaredExam?id=' + id,
+                type: 'GET',
+                success: function (result) {
+                    if (result.status) {
+                        toastr.success(result.msg);
+
+                        setTimeout(function () {
+                            window.location.href = '/Progress/ExamDeclaration/';
+                        }, 800);
+                    } else {
+                        toastr.error(result.msg);
+                    }
+                },
+                error: function () {
+                    toastr.error("Delete failed!");
+                }
+            });
+        });
+    </script>
 }

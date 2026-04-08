@@ -1,0 +1,105 @@
+﻿@model Satluj_Latest.Models.TimetableModel
+
+@{
+    ViewData["Title"] = "TimeTableView";   // ✅ instead of ViewBag
+    Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<h1>TimeTable View</h1>
+
+<input type="hidden" asp-for="SchoolId" />
+
+<div class="form-group col-sm-3">
+    <label>Class :</label>
+    <select asp-for="ClassId"
+            asp-items="ViewBag.ClassList"
+            class="form-control slct-mark-dropdwn1">
+        <option value="">--Select--</option>
+    </select>
+
+    
+</div>
+
+<div class="form-group col-sm-3">
+    <label>Division :</label>
+    <select class="form-control slct-free-div-dropdown" disabled></select>
+</div>
+
+<div class="form-group col-sm-3">
+    <label>Season :</label>
+    <select asp-for="SeasonId"
+            asp-items="ViewBag.SeasonList"
+            class="form-control seasondrop">
+        <option value="">--Select--</option>
+    </select>
+</div>
+
+<div id="timetable-list-space" class="mt-4"></div>
+
+<script>
+    $(document).on('change', '.slct-mark-dropdwn1', function () {
+        //debugger;
+        $('#ClassId').val($(this).val());
+        var id = $(this).val();
+        if (id != '') {
+            $.ajax({
+                url: '/Data/LoadAllSchoolDivision?id=' + id + '&schoolid=' + $('#SchoolId').val(),
+                type: "GET",
+                success: function (result) {
+                    //debugger;
+                    if (result.list.length > 0) {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+                        $.each(result.list, function (i, item) {
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        });
+                        $(".slct-free-div-dropdown").prop("disabled", false);
+
+                    }
+                    else {
+                        $(".slct-free-div-dropdown").html("");
+                        $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- No Division Found --'));
+                        $(".slct-free-div-dropdown").prop("disabled", true);
+                    }
+                    $('#timetable-list-space').html("");
+                }
+            });
+        }
+        else {
+            $('#division-required-teacher-add').hide();
+            $(".slct-free-div-dropdown").html("");
+            $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
+            $(".slct-free-div-dropdown").prop("disabled", true);
+            $('#division-required-exam-edit').hide();
+        }
+    });
+    $(document).on('change', '.seasondrop', function () {
+        //debugger;
+        var divisonId = $('.slct-free-div-dropdown').val();
+        var classId = $('.slct-mark-dropdwn1 option:selected').val();
+        var seasonId = $('.seasondrop').val();
+
+        //var classId = $('#ClassId').val();
+        var id = classId + "~" + divisonId + "~" + seasonId;
+        $.ajax({
+            url: '/Student/GetTimeTableList_New?id=' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#timetable-list-space').html(data);
+            }
+        });
+    });
+    $(document).on('change', '.slct-free-div-dropdown', function () {
+        //debugger;
+        //  var divisonId = $('.slct-free-div-dropdown').val();
+        //            var classId = $('.slct-mark-dropdwn1 option:selected').val();
+        //var classId = $('#ClassId').val();
+
+    });
+
+
+
+</script>

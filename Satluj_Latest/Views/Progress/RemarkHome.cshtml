@@ -21,6 +21,8 @@
                   asp-controller="Progress"
                   method="post">
 
+                @Html.AntiForgeryToken()
+
                 <div class="row">
                     <div id="new-account-div">
                         <div class="form-group">
@@ -60,37 +62,32 @@
 </div>
 
 <div class="modal fade" id="modalRemarkEdit" tabindex="-1" role="dialog"></div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        $("#form-add-exam").submit(function (e) {
+        $(document).off("submit", "#form-add-exam").on("submit", "#form-add-exam", function (e) {
             e.preventDefault();
 
             $.ajax({
                 url: $(this).attr("action"),
                 type: "POST",
                 data: $(this).serialize(),
-                success: AddRemarkSuccess,
-                error: AddRemarkFailed
+                success: function (result) {
+                    if (result.status === true) {
+                        toastr.success(result.msg);
+                        $('#Remark').val('');
+                        RefreshList();
+                    } else {
+                        toastr.error(result.msg);
+                    }
+                },
+                error: function () {
+                    toastr.error('Failed!');
+                }
             });
         });
-
-        function AddRemarkSuccess(result) {
-            if (result.status === true) {
-                toastrSuccess(result.msg);
-                $('#Remark').val('');
-                RefreshList();
-            } else {
-                toastrError(result.msg);
-                $('#Remark').val('');
-            }
-        }
-
-        function AddRemarkFailed() {
-            toastrError('Failed!');
-            $('#Remark').val('');
-        }
 
         function RefreshList() {
             $('#modalRemarkEdit').modal('hide');
@@ -100,9 +97,15 @@
                 type: "GET",
                 dataType: 'html',
                 success: function (data) {
-                    $("#table-remark-list").DataTable().destroy();
+                    if ($.fn.DataTable.isDataTable("#table-remark-list")) {
+                        $("#table-remark-list").DataTable().destroy();
+                    }
+
                     $('#table-remark-list').html(data);
                     $("#table-remark-list").DataTable();
+                },
+                error: function () {
+                    toastr.error("Failed to refresh remark list!");
                 }
             });
         }
@@ -112,42 +115,38 @@
         });
 
         $(document).on('click', '.delete-remark-tr', function () {
-            var source = $(this);
+            var id = $(this).data('remarkid');
 
-            swal({
-                title: "Are you sure?",
-                text: "You will not be able to undo this!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true
-            }).then((willDelete) => {
-                if (willDelete) {
-                    $.ajax({
-                        url: '/Progress/DeleteRemark/' + $(source).data('remarkid'),
-                        type: "GET",
-                        success: function (data) {
-                            if (data.status) {
-                                toastrSuccess(data.msg);
-                                RefreshList();
-                            } else {
-                                toastrError(data.msg);
-                            }
-                        }
-                    });
+            $.ajax({
+                url: '/Progress/DeleteRemark/' + id,
+                type: "GET",
+                success: function (data) {
+                    if (data.status) {
+                        toastr.success(data.msg);
+                        RefreshList();
+                    } else {
+                        toastr.error(data.msg);
+                    }
+                },
+                error: function () {
+                    toastr.error("Delete failed!");
                 }
             });
         });
 
         $(document).on('click', '.edit-remark-tr', function () {
-            var source = $(this);
+            var id = $(this).data('remarkid');
 
             $.ajax({
-                url: '/Progress/RemarkEditPartial/' + $(source).data('remarkid'),
+                url: '/Progress/RemarkEditPartial/' + id,
                 type: "GET",
                 success: function (data) {
                     $('#modalRemarkEdit').html(data);
                     $.validator.unobtrusive.parse("#modalRemarkEdit");
                     $('#modalRemarkEdit').modal('show');
+                },
+                error: function () {
+                    toastr.error("Failed to load edit popup!");
                 }
             });
         });

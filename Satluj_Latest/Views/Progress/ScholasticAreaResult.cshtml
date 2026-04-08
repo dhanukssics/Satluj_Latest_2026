@@ -1,10 +1,11 @@
-﻿
-@model Satluj_Latest.Models.ExamResultMainModel
+﻿@model Satluj_Latest.Models.ExamResultMainModel
+
 @{
     ViewBag.Title = "ExamDeclaration";
     Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = ViewBag.IsAdmin != null && Convert.ToBoolean(ViewBag.IsAdmin);
 }
+
 @Html.HiddenFor(z => z.SchoolId, new { Value = Model.SchoolId })
 @Html.HiddenFor(z => z.ClassId, new { Value = 0 })
 @Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
@@ -15,25 +16,22 @@
 
 <div class="row">
     <div class="col-md-12">
-        <h3 style="margin-top: 5px;"> Scholastic Area Result</h3>
-        @if (IsAdmin == true)
+        <h3 style="margin-top: 5px;">Scholastic Area Result</h3>
+
+        @if (IsAdmin)
         {
             <div class="row">
                 <div class="form-group col-sm-3">
                     <div class="form-group">
-                        <label>Class : </label>
+                        <label>Class :</label>
                         <br />
                         <select asp-for="ClassId"
                                 asp-items="Model.ClassList"
                                 class="form-control pv_class-drop-down class-drop-down"
-                                data-live-search="true"
-                                name="classDropdown"
-                                id="classDataDropdown">
+                                id="classDataDropdownAdmin">
                             <option value="">--Choose--</option>
                         </select>
-
                         <span asp-validation-for="ClassId" class="text-danger"></span>
-
                     </div>
                 </div>
 
@@ -41,35 +39,37 @@
                     <label>Division</label>
                     <br />
                     <select id="division-drop-down" class="form-control slct-free-div-dropdown" disabled>
-                        <option>--Select Division --</option>
+                        <option value="">--Select Division --</option>
                     </select>
-                    <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+                    <span id="spn-error-Division" style="color:red;"></span>
                 </div>
 
                 <div class="form-group col-sm-3">
                     <div class="form-group">
                         <label>Exam :</label>
-                        <select class="form-control slct-exam-dropdown1" disabled></select>
-                        <span id="exam-required-examlist-add" style="display:none; color:red;"></span>
+                        <select class="form-control slct-exam-dropdown1" disabled>
+                            <option value="">---</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="form-group col-sm-3">
                     <div class="form-group">
                         <label>Scholastic Area :</label>
-                        <select class="form-control slct-ScholasticAreaResult-dropdown1" disabled></select>
-                        <span id="exam-required-examlist-add" style="display:none; color:red;"></span>
+                        <select class="form-control slct-ScholasticAreaResult-dropdown1" disabled>
+                            <option value="">---</option>
+                        </select>
                     </div>
                 </div>
-
-                @*/--------------------------------------*@
             </div>
+
             <div class="row">
                 <div class="form-group col-sm-3">
                     <div class="form-group">
                         <label>Subject :</label>
-                        <select class="form-control slct-subject-dropdown1" disabled></select>
-                        <span id="exam-required-examlist-add" style="display:none; color:red;"></span>
+                        <select class="form-control slct-subject-dropdown1" disabled>
+                            <option value="">---</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -79,17 +79,14 @@
             <div class="row">
                 <div class="form-group col-sm-3">
                     <div class="form-group">
-                        <label>Class : </label>
+                        <label>Class :</label>
                         <br />
                         <select asp-for="ClassId"
-                                asp-items="Model.ClassList"
+                                asp-items="Model.ClassList_wise"
                                 class="form-control pv_class-drop-down class-drop-downNonAdmin"
-                                data-live-search="true"
-                                name="classDropdown"
-                                id="classDataDropdown">
+                                id="classDataDropdownNonAdmin">
                             <option value="">--Choose--</option>
                         </select>
-
                         <span asp-validation-for="ClassId" class="text-danger"></span>
                     </div>
                 </div>
@@ -98,39 +95,42 @@
                     <label>Division</label>
                     <br />
                     <select id="division-drop-downNonAdmin" class="form-control slct-free-div-dropdownNonAdmin" disabled>
-                        <option>--Select Division --</option>
+                        <option value="">--Select Division --</option>
                     </select>
-                    <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+                    <span id="spn-error-DivisionNonAdmin" style="color:red;"></span>
                 </div>
 
                 <div class="form-group col-sm-3">
                     <div class="form-group">
                         <label>Exam :</label>
-                        <select class="form-control slct-exam-dropdown1NonAdmin" disabled></select>
-                        <span id="exam-required-examlist-add" style="display:none; color:red;"></span>
+                        <select class="form-control slct-exam-dropdown1NonAdmin" disabled>
+                            <option value="">---</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="form-group col-sm-3">
                     <div class="form-group">
                         <label>Scholastic Area :</label>
-                        <select class="form-control slct-ScholasticAreaResult-dropdown1NonAdmin" disabled></select>
-                        <span id="exam-required-examlist-add" style="display:none; color:red;"></span>
+                        <select class="form-control slct-ScholasticAreaResult-dropdown1NonAdmin" disabled>
+                            <option value="">---</option>
+                        </select>
                     </div>
                 </div>
-
-                @*/--------------------------------------*@
             </div>
+
             <div class="row">
                 <div class="form-group col-sm-3">
                     <div class="form-group">
                         <label>Subject :</label>
-                        <select class="form-control slct-subject-dropdown1NonAdmin" disabled></select>
-                        <span id="exam-required-examlist-add" style="display:none; color:red;"></span>
+                        <select class="form-control slct-subject-dropdown1NonAdmin" disabled>
+                            <option value="">---</option>
+                        </select>
                     </div>
                 </div>
             </div>
         }
+
         <div class="table-responsive">
             <table class="table custome-table" id="declaed-Sco-Exam-student-mark-list"></table>
         </div>
@@ -152,7 +152,7 @@
                         $("#division-drop-down").html("");
                         $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
                         $.each(result.list, function (i, item) {
-                            $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                            $("#division-drop-down").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $("#division-drop-down").prop("disabled", false);
 
@@ -169,7 +169,7 @@
                         $(".slct-subject-dropdown1").append($('<option></option>').val("").html('---'));
                         $(".slct-subject-dropdown1").prop("disabled", true);
 
-                        $('#declaed-exam-student-mark-list').html('');
+                        $('#declaed-Sco-Exam-student-mark-list').html('');
                     }
                     else {
                         $("#division-drop-down").html(""); //Division
@@ -216,7 +216,7 @@
 
     //Exam listing -- Division Change
     $(document).on('change', '.slct-free-div-dropdown', function () {
-        $('#declaed-exam-student-mark-list').html('');
+        $('#declaed-Sco-Exam-student-mark-list').html('');
         $('#DivisionId').val($(this).val());
         var classId = $('#ClassId').val();
         var id = $(this).val();
@@ -229,7 +229,7 @@
                         $(".slct-exam-dropdown1").html("");
                         $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- Select Exam --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-exam-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-exam-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-exam-dropdown1").prop("disabled", false);
 
@@ -295,7 +295,7 @@
                         $(".slct-ScholasticAreaResult-dropdown1").html("");
                         $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val("0").html('-- Select Scholastic Area --'));
                         $.each(result.list, function (i, item) {
-                                $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                                $(".slct-ScholasticAreaResult-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                        });
                         $(".slct-ScholasticAreaResult-dropdown1").prop("disabled", false);
 
@@ -348,8 +348,8 @@
                         $(".slct-subject-dropdown1").html("");
                         $(".slct-subject-dropdown1").append($('<option></option>').val("0").html('-- Select Exam --'));
                         $.each(result.list, function (i, item) {
-                            if (item.Value != 10050 && item.Value != 20076 && item.Value != 20084 && item.Value!=20092) {
-                                $(".slct-subject-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            if (item.value != 10050 && item.value != 20076 && item.value != 20084 && item.value!=20092) {
+                                $(".slct-subject-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                             }
                         });
                         $(".slct-subject-dropdown1").prop("disabled", false);
@@ -462,7 +462,7 @@
                         $("#division-drop-downNonAdmin").html("");
                         $("#division-drop-downNonAdmin").append($('<option></option>').val("").html('-- Select Division --'));
                         $.each(result.list, function (i, item) {
-                            $("#division-drop-downNonAdmin").append($('<option></option>').val(item.Value).html(item.Text));
+                            $("#division-drop-downNonAdmin").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $("#division-drop-downNonAdmin").prop("disabled", false);
 
@@ -479,7 +479,7 @@
                         $(".slct-subject-dropdown1NonAdmin").append($('<option></option>').val("").html('---'));
                         $(".slct-subject-dropdown1NonAdmin").prop("disabled", true);
 
-                        $('#declaed-exam-student-mark-list').html('');
+                        $('#declaed-Sco-Exam-student-mark-list').html('');
                     }
                     else {
                         $("#division-drop-downNonAdmin").html(""); //Division
@@ -526,7 +526,7 @@
 
     //Exam listing -- Division Change
     $(document).on('change', '.slct-free-div-dropdownNonAdmin', function () {
-        $('#declaed-exam-student-mark-list').html('');
+        $('#declaed-Sco-Exam-student-mark-list').html('');
         $('#DivisionId').val($(this).val());
         var classId = $('#ClassId').val();
         var id = $(this).val();
@@ -539,7 +539,7 @@
                         $(".slct-exam-dropdown1NonAdmin").html("");
                         $(".slct-exam-dropdown1NonAdmin").append($('<option></option>').val("0").html('-- Select Exam --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-exam-dropdown1NonAdmin").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-exam-dropdown1NonAdmin").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-exam-dropdown1NonAdmin").prop("disabled", false);
 

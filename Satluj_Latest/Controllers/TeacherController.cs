@@ -1068,12 +1068,14 @@ namespace Satluj_Latest.Controllers
             HealthModel model = new HealthModel();
             model.SchoolId = _user.SchoolId;
             ViewBag.classlist = _dropdown.GetClasses(model.SchoolId);
+            ViewBag.IsAdmin = true;
             return View(model);
         }
 
         public PartialViewResult SearchStudentsForHealth(string id)
         {
             string[] split = id.Split('~');
+            ViewBag.IsAdmin = true;
             HealthResultModel model = new HealthResultModel();
             model.SchoolId = _user.SchoolId;
             model.ClassId = Convert.ToInt64(split[0]);

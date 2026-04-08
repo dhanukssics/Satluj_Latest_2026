@@ -6,8 +6,7 @@
 }
 
 
-
-@Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
+@Html.Hidden("schoolid", Model.SchoolId)
 @Html.HiddenFor(z => z.ClassId, new { Value = 0 })
 @Html.HiddenFor(z => z.DivisionId, new { Value = 0 })
 @Html.HiddenFor(z => z.SubjectId, new { Value = 0 })
@@ -138,7 +137,7 @@
                 <div class="form-group col-sm-3">
                     <div>
                         <br />
-                        <button class="btn pay-now-btn " data-toggle="modal" id="saveSubject"><i class="fa fa-save"></i> Save</button>
+                        <button type="button" class="btn pay-now-btn " data-toggle="modal" id="saveSubject"><i class="fa fa-save"></i> Save</button>
                     </div>
                 </div>
                 <div class="btn fa-pull-right " id="temp">
@@ -184,7 +183,7 @@
                             $("#subject-drop-down").append($('<option></option>').val("").html('-- Select Subject--'));
                             $.each(result.list, function (i, item) {
 
-                                $("#subject-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                                $("#subject-drop-down").append($('<option></option>').val(item.value).html(item.text));
 
 
                             });
@@ -227,45 +226,56 @@
         });
 
         $(document).on('change', '#teacherId', function () {
-            array = [];
-            var id = $(this).val();
-            $('#teacherId').val($(this).val());
+    array = [];
+    var id = $(this).val();
+    var scid = $('#schoolid').val();
 
-            var scid = $('#schoolid').val();
+    // Reset class + division
+    $("#clas-drop-down").html("");
+    $("#clas-drop-down").append($('<option></option>').val("").html('-- Select Classes--'));
+    $("#clas-drop-down").prop("disabled", true);
 
-            if (id != '') {
-                $.ajax({
+    $("#division-drop-down").html("");
+    $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+    $("#division-drop-down").prop("disabled", true);
 
-                    url: '/Data/LoadAllClassesTeacherWise?id=' + id,
-                    type: "GET",
-                    data: { 'TeacherId': id, 'SchoolId': scid },
-                    success: function (result) {
+    $('#divtest').html('');
 
-                        if (result.list.length > 0) {
-                            $("#clas-drop-down").html("");
-                            $("#clas-drop-down").append($('<option></option>').val("").html('-- Select Classes--'));
-                            $.each(result.list, function (i, item) {
-                                $("#clas-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
-                            });
-                            $("#clas-drop-down").prop("disabled", false);
-                            $('#optional-subjects-student-mark-list').html('');
-                        }
-                        else {
-                            $(".slct-free-div-dropdown2").html(""); // Division
-                            $(".slct-free-div-dropdown2").append($('<option></option>').val("").html('---'));
-                            $(".slct-free-div-dropdown2").prop("disabled", true);
-                            $('#optional-subjects-student-mark-list').html('');
-                        }
-                    }
-                });
-            }
-            else {
-                $(".slct-free-div-dropdown").html(""); // Division
-                $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
-                $(".slct-free-div-dropdown").prop("disabled", true);
-                $('#optional-subjects-student-mark-list').html('');
+    if (id != '') {
+        $.ajax({
+            url: '/Data/LoadAllClassesTeacherWise?id=' + id,
+            type: "GET",
+            data: { 'TeacherId': id, 'SchoolId': scid },
+            success: function (result) {
+
+                console.log("Class Result:", result);
+
+                if (result && result.list && result.list.length > 0) {
+                    $("#clas-drop-down").html("");
+                    $("#clas-drop-down").append($('<option></option>').val("").html('-- Select Classes--'));
+
+                    $.each(result.list, function (i, item) {
+                        $("#clas-drop-down").append(
+                            $('<option></option>')
+                                .val(item.value || item.Value)
+                                .html(item.text || item.Text)
+                        );
+                    });
+
+                    $("#clas-drop-down").prop("disabled", false);
+                }
+                else {
+                    $("#clas-drop-down").html("");
+                    $("#clas-drop-down").append($('<option></option>').val("").html('No classes assigned'));
+                    $("#clas-drop-down").prop("disabled", true);
+                }
+            },
+            error: function (err) {
+                console.log("Class dropdown error:", err);
             }
         });
+    }
+});
 
 
 
@@ -297,64 +307,75 @@
         });
 
         $(document).on('change', '#clas-drop-down', function () {
-            array = [];
-            var id = $(this).val();
-            $('#ClassId').val($(this).val());
-            if (id != '') {
-                $.ajax({
-                    url: '/Data/LoadDivision?id=' + id,
-                    type: "GET",
-                    success: function (result) {
-                        if (result.list.length > 0) {
-                            $("#division-drop-down").html("");
-                            $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
-                            $.each(result.list, function (i, item) {
-                                $("#division-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
-                            });
-                            $("#division-drop-down").prop("disabled", false);
-                            $('#optional-subjects-student-mark-list').html('');
-                        }
-                        else {
-                            $(".slct-free-div-dropdown").html(""); // Division
-                            $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
-                            $(".slct-free-div-dropdown").prop("disabled", true);
-                            $('#optional-subjects-student-mark-list').html('');
-                        }
-                    }
-                });
-            }
-            else {
-                $(".slct-free-div-dropdown").html(""); // Division
-                $(".slct-free-div-dropdown").append($('<option></option>').val("").html('---'));
-                $(".slct-free-div-dropdown").prop("disabled", true);
-                $('#optional-subjects-student-mark-list').html('');
+    array = [];
+    var id = $(this).val();
+    $('#ClassId').val($(this).val());
+
+    // Reset division
+    $("#division-drop-down").html("");
+    $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+    $("#division-drop-down").prop("disabled", true);
+
+    $('#divtest').html('');
+
+    if (id != '') {
+        $.ajax({
+            url: '/Data/LoadDivision?id=' + id,
+            type: "GET",
+            success: function (result) {
+
+                console.log("Division Result:", result);
+
+                if (result && result.list && result.list.length > 0) {
+                    $("#division-drop-down").html("");
+                    $("#division-drop-down").append($('<option></option>').val("").html('-- Select Division --'));
+
+                    $.each(result.list, function (i, item) {
+                        $("#division-drop-down").append(
+                            $('<option></option>')
+                                .val(item.value || item.Value)
+                                .html(item.text || item.Text)
+                        );
+                    });
+
+                    $("#division-drop-down").prop("disabled", false);
+                }
+                else {
+                    $("#division-drop-down").html("");
+                    $("#division-drop-down").append($('<option></option>').val("").html('No division assigned'));
+                    $("#division-drop-down").prop("disabled", true);
+                }
+            },
+            error: function (err) {
+                console.log("Division dropdown error:", err);
             }
         });
-
+    }
+});
 
 
 
 
         function Refresh() {
-
             array = [];
             $('#divtest').html('');
 
-            classId = $('#clas-drop-down').val();
+            var classId = $('#clas-drop-down').val();
 
             if (classId != '') {
                 $.ajax({
-                    url: '/Student/ListAssessmentadm/' + classId,
-                    type: "POST",
-                    dataType: 'html',
-                    success: function (data) {
-
-                        $('#divtest').html(data);
-                    }
+                url: '/Student/ListAssessmentadm/' + classId,
+                type: "POST",
+                dataType: 'html',
+                success: function (data) {
+                    $('#divtest').html(data);
+                },
+                error: function (err) {
+                    console.log("Refresh Error:", err);
+                }
                 });
             }
             else {
-                toastrError('Please select all details!');
                 $('#divtest').html('');
             }
         }
@@ -363,46 +384,52 @@
 
 
         $(document).ready(function () {
-            $("#saveSubject").click(function () {
+            $("#saveSubject").click(function (e) {
+                e.preventDefault();
+
                 var formData = new FormData();
                 var totalFiles = document.getElementById("fileInput").files.length;
 
-                if (totalFiles != 0) {
+                var subid = $('#subject-drop-down').val();
+                var clsid = $('#clas-drop-down').val();
+                var division = $('#division-drop-down').val();
+                var des = $('#description').val();
+                var teacher = $("#teacherId option:selected").text().trim();
 
-                    for (var i = 0; i < totalFiles; i++) {
-                        var file = document.getElementById("fileInput").files[i];
-                        var subid = $('#subject-drop-down').val().trim();
-                        var clsid = $('#clas-drop-down').val().trim();
-                        var division = $('#division-drop-down').val().trim();
-                        var des = $('#description').val().trim();
-                        var teacher = $("#teacherId option:selected").text().trim();
-
-                        formData.append("FileUpload", file);
-                        formData.append("subjectId", subid);
-                        formData.append("classid", clsid);
-                        formData.append("division", division);
-                        formData.append("Description", des);
-                        formData.append("TeacherName", teacher);
-
-                    }
+                // Validation
+                if (!$('#teacherId').val()) {
+                    toastr.warning("Please select teacher");
+                    return false;
                 }
 
-                else
-                {
-                    var subid = $('#subject-drop-down').val().trim();
-                    var clsid = $('#clas-drop-down').val().trim();
-                    var division = $('#division-drop-down').val().trim();
-                    var des = $('#description').val().trim();
-                    var teacher = $("#teacherId option:selected").text().trim();
-
-
-                    formData.append("subjectId", subid);
-                    formData.append("classid", clsid);
-                    formData.append("division", division);
-                    formData.append("Description", des);
-                    formData.append("TeacherName", teacher);
-
+                if (!subid) {
+                    toastr.warning("Please select subject");
+                    return false;
                 }
+
+                if (!clsid) {
+                    toastr.warning("Please select class");
+                    return false;
+                }
+
+                if (!division) {
+                    toastr.warning("Please select division");
+                    return false;
+                }
+
+                // Files
+                for (var i = 0; i < totalFiles; i++) {
+                    var file = document.getElementById("fileInput").files[i];
+                    formData.append("trackFiles", file);
+                }
+
+                // Model values
+                formData.append("user.SubjectId", subid);
+                formData.append("user.ClassId", clsid);
+                formData.append("user.Division", division);
+                formData.append("user.Description", des);
+                formData.append("user.TeacherName", teacher);
+
                 $.ajax({
                     type: "POST",
                     url: '/Student/UploadFileadm',
@@ -411,19 +438,29 @@
                     contentType: false,
                     processData: false,
                     success: function (response) {
+                    console.log("Save Response:", response);
 
+                    if (response.status) {
+                        toastr.success(response.message || "Files uploaded successfully");
 
+                        $('#description').val('');
+                        $('#fileInput').val('');
+
+                        Refresh();
                         $("#temp").load(" #temp");
-
-
-                    },
-                    error: function (error) {
-
                     }
+                    else {
+                        toastr.error(response.message || "Save failed");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log("Save Error:", error);
+                    console.log(xhr.responseText);
+                    toastr.error("Something went wrong while saving");
+                }
                 });
             });
         });
-
 
     </script>
 

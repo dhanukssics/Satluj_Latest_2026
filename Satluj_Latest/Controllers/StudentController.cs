@@ -2,12 +2,18 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Satluj_Latest;
+using Satluj_Latest.Controllers;
 using Satluj_Latest.Data;
 using Satluj_Latest.Models;
+using Satluj_Latest.Models.Temp;
 using Satluj_Latest.Repository;
 using Satluj_Latest.Utility;
-using Satluj_Latest.Controllers;
-using System.Linq;
+using System.Web.Mvc;
+using FileResult = Microsoft.AspNetCore.Mvc.FileResult;
+using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
+using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
+using PartialViewResult = Microsoft.AspNetCore.Mvc.PartialViewResult;
+
 
 
 namespace TrackTap.Controllers
@@ -16,9 +22,12 @@ namespace TrackTap.Controllers
     {
         private readonly IWebHostEnvironment _env;
         private readonly DropdownData _dropdown;
-        public StudentController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities, IWebHostEnvironment env) : base(schoolRepository, parentRepository, teacherRepository, Entities)
+        private readonly TempDbContext _Entitynew;
+        public StudentController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities, IWebHostEnvironment env, TempDbContext Entitynew,DropdownData dropdown) : base(schoolRepository, parentRepository, teacherRepository, Entities)
         {
             _env = env;
+            _Entitynew = Entitynew;
+            _dropdown = dropdown;
         }
 
         // GET: Student
@@ -102,59 +111,128 @@ namespace TrackTap.Controllers
             TimetableModel model = new TimetableModel();
             model.SchoolId = _user.SchoolId;
             model.Period = Periods.One;
-            model.SchoolName = _user.School.SchoolName;
+            var school = _Entities.TbSchools
+                        .FirstOrDefault(x => x.SchoolId == _user.SchoolId);
+
+            model.SchoolName = school?.SchoolName ?? "";
+            ViewBag.ClassList = _dropdown.GetClasses(model.SchoolId);
+            ViewBag.SeasonList = _dropdown.GetSeasons();
+            ViewBag.TeacherList = _dropdown.GetTeachers(model.SchoolId);
+            ViewBag.SubjectList = _dropdown.GetSubjectss(model.SchoolId);
             return View(model);
         }
+      
+
+
         public PartialViewResult GetTimeTableList(string id)
         {
-            string[] splitdata = id.Split('~');
             var model = new TimetableModel();
+
+            if (string.IsNullOrEmpty(id))
+                return PartialView("~/Views/Student/_TimetableList.cshtml", model);
+
+            string[] splitdata = id.Split('~');
+
             model.SchoolId = _user.SchoolId;
-            model.ClassId = Convert.ToInt64(splitdata[0]);
-            model.DivisonId = Convert.ToInt64(splitdata[1]);
-            model.ClassName = new Division(model.DivisonId).ClassName;
-            model.DivisionName = new Division(model.DivisonId).DivisionName;
+
+            // Safe parsing
+            if (splitdata.Length > 0)
+                model.ClassId = Convert.ToInt64(splitdata[0]);
+
+            if (splitdata.Length > 1)
+                model.DivisonId = Convert.ToInt64(splitdata[1]);
+
+            if (splitdata.Length > 2)
+                model.SeasonId = Convert.ToInt64(splitdata[2]);
+            else
+                model.SeasonId = 0; // or current season if needed
+
+            // NOW query after assigning values
+            var data = (from d in _Entities.TbDivisions
+                        join c in _Entities.TbClasses
+                            on d.ClassId equals c.ClassId
+                        where d.DivisionId == model.DivisonId
+                        select new
+                        {
+                            d.Division,
+                            c.Class
+                        }).FirstOrDefault();
+
+            model.DivisionName = data?.Division ?? "";
+            model.ClassName = data?.Class ?? "";
+            ViewBag.IsAdmin = true;
             return PartialView("~/Views/Student/_TimetableList.cshtml", model);
+        }
+        
+        [HttpGet]
+        public IActionResult GetTeacherSubjects(long schoolId, long teacherId, long classId)
+        {
+            var subjects = _dropdown
+                .GetTeacherAssignedSubjects(schoolId, teacherId, classId);
+
+            return Json(subjects); 
         }
         public async Task<IActionResult> SubmitTimetable(TimetableModel model)
         {
             bool status = false;
             string msg = "Failed";
+
             try
             {
-                int day = Convert.ToInt32((Days)model.DayId);
+                int day = (int)model.DayId;
                 int period = (int)model.Period + 1;
-                if (await _Entities.TbTimeTables.AnyAsync(x => x.SchoolId == _user.SchoolId && x.ClassId == model.ClassId && x.DivisionId == model.DivisonId && x.Periods == ((int)model.Period + 1) && x.DayId == (int)model.DayId && x.IsActive))
+
+
+                if (await _Entities.TbTimeTables.AnyAsync(x =>
+                    x.SchoolId == _user.SchoolId &&
+                    x.ClassId == model.ClassId &&
+                    x.DivisionId == model.DivisonId &&
+                    x.SeasonId == model.SeasonId &&
+                    x.Periods == period &&
+                    x.DayId == day &&
+                    x.IsActive))
                 {
-                    msg = "Already assigned this period, please edit the data!";
+                    msg = "Already assigned this period for this season, please edit the data!";
                 }
 
-                else if (await _Entities.TbTimeTables.AnyAsync(x => x.SchoolId == _user.SchoolId && x.TeacherId == model.TeacherId && x.Periods == period && x.DayId == day && x.IsActive && x.TimeStamp.Year==DateTime.Now.Year))
+
+                else if (await _Entities.TbTimeTables.AnyAsync(x =>
+                    x.SchoolId == _user.SchoolId &&
+                    x.TeacherId == model.TeacherId &&
+                    x.SeasonId == model.SeasonId &&
+                    x.Periods == period &&
+                    x.DayId == day &&
+                    x.IsActive))
                 {
-                    msg = " Already assigned this teacher to an another class !";
+                    msg = "Teacher already assigned in this period for this season!";
                 }
                 else
                 {
-                    var data = new TbTimeTable();
-                    data.SchoolId = _user.SchoolId;
-                    data.ClassId = model.ClassId;
-                    data.DivisionId = model.DivisonId;
-                    data.TeacherId = model.TeacherId;
-                    data.SubjectId = model.SubjectId;
-                    data.DayId = (int)model.DayId;
-                    data.Periods = (int)model.Period + 1;
-                    data.IsActive = true;
-                    data.TimeStamp = CurrentTime;
-                    await _Entities.TbTimeTables.AddAsync(data);
-                    status =await  _Entities.SaveChangesAsync() > 0;
-                    msg = " Timetable added !";
+                    var data = new TbTimeTable
+                    {
+                        SchoolId = _user.SchoolId,
+                        ClassId = model.ClassId,
+                        DivisionId = model.DivisonId,
+                        TeacherId = model.TeacherId,
+                        SubjectId = model.SubjectId,
+                        DayId = day,
+                        Periods = period,
+                        SeasonId = model.SeasonId,
+                        IsActive = true,
+                        TimeStamp = CurrentTime
+                    };
+
+                    _Entities.TbTimeTables.Add(data);
+                    status = await _Entities.SaveChangesAsync() > 0;
+                    msg = "Timetable added!";
                 }
             }
             catch (Exception ex)
             {
-                msg = "Please select all data";
+                // msg = "Please select all data";
+                msg = ex.Message;
             }
-            //msg = status ? " Timetable added" : "Failed!";
+
             return Json(new { status = status, msg = msg });
         }
         public PartialViewResult EditTimeTable(string id)
@@ -1243,15 +1321,19 @@ namespace TrackTap.Controllers
 
 
 
-        public FileResult DownloadFiles(string Filename)
+        public IActionResult DownloadFiles(string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return NotFound("File name is missing.");
 
-            string path = AppDomain.CurrentDomain.BaseDirectory + "/Media/Uploads/";
-            byte[] fileBytes = System.IO.File.ReadAllBytes(path + Filename);
-            string fileName = Filename;
-            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+            string uploadFolder = Path.Combine(_env.WebRootPath, "Media", "Uploads");
+            string fullPath = Path.Combine(uploadFolder, fileName);
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound("File not found.");
+
+            return PhysicalFile(fullPath, "application/octet-stream", fileName);
         }
-
 
         public IActionResult View_Answer(int id, string divid, int subid)
         {
@@ -1284,6 +1366,223 @@ namespace TrackTap.Controllers
         #endregion
 
         //18-sep-2020 Jibin End..........................................
+
+        #region  Season Added by Gayathri A
+        public IActionResult SeasonView()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateSeasonStatus(long id, bool isActive)
+        {
+            var season = await _Entitynew.TbSeasons
+                .FirstOrDefaultAsync(x => x.SeasonId == id);
+
+            if (season == null)
+                return NotFound(new { success = false });
+
+            season.IsActive = isActive;
+
+            await _Entitynew.SaveChangesAsync();
+
+            return Ok(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveSeason([FromBody] TbSeason model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { success = false });
+            }
+
+            var season = new TbSeason  
+            {
+                SeasonName = model.SeasonName,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                StartTime = model.StartTime,
+                EndTime = model.EndTime,
+                IsActive = model.IsActive,
+                Break1StartTime = model.Break1StartTime,
+                Break1EndTime = model.Break1EndTime,
+                Break2StartTime = model.Break2StartTime,
+                Break2EndTime = model.Break2EndTime
+            };
+
+            await _Entitynew.TbSeasons.AddAsync(season);
+            await _Entitynew.SaveChangesAsync();
+
+            return Ok(new { success = true });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSeasons()
+        {
+            var data = await _Entitynew.TbSeasons
+                .Select(x => new
+                {
+                    SeasonId = x.SeasonId,
+                    SeasonName = x.SeasonName,
+                    StartDate = x.StartDate,
+                    EndDate = x.EndDate,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    Break1StartTime = x.Break1StartTime,
+                    Break1EndTime = x.Break1EndTime,
+                    Break2StartTime = x.Break2StartTime,
+                    Break2EndTime = x.Break2EndTime,
+                    IsActive = x.IsActive
+                })
+                .ToListAsync();
+
+            return Ok(data);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetSeasonById(long id)
+        {
+            var season = await _Entitynew.TbSeasons.FindAsync(id);
+
+            if (season == null)
+                return NotFound();
+
+            var result = new
+            {
+                SeasonId = season.SeasonId,
+                SeasonName = season.SeasonName,
+                StartDate = season.StartDate,
+                EndDate = season.EndDate,
+                StartTime = ToTimeString(season.StartTime),
+                EndTime = ToTimeString(season.EndTime),
+                Break1StartTime = ToTimeString(season.Break1StartTime),
+                Break1EndTime = ToTimeString(season.Break1EndTime),
+                Break2StartTime = ToTimeString(season.Break2StartTime),
+                Break2EndTime = ToTimeString(season.Break2EndTime),
+                IsActive = season.IsActive
+            };
+
+            return Ok(result);
+        }
+
+
+
+        private string ToTimeString(object value)
+        {
+            if (value == null)
+                return "";
+
+            // ✅ FIX: Handle TimeOnly
+            if (value is TimeOnly t)
+                return t.ToString("HH:mm");
+
+            // TimeSpan
+            if (value is TimeSpan ts)
+                return ts.ToString(@"hh\:mm");
+
+            // DateTime
+            if (value is DateTime dt)
+                return dt.ToString("HH:mm");
+
+            // String
+            if (value is string s && !string.IsNullOrWhiteSpace(s))
+                return s.Length >= 5 ? s.Substring(0, 5) : s;
+
+            return "";
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteSeason(long id)
+        {
+            var season = await _Entitynew.TbSeasons.FindAsync(id);
+
+            if (season == null)
+                return NotFound(new { success = false });
+
+            _Entitynew.TbSeasons.Remove(season);
+            await _Entitynew.SaveChangesAsync();
+
+            return Ok(new { success = true });
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateSeason([FromBody] TbSeason model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { success = false });
+            }
+
+            var season = await _Entitynew.TbSeasons
+                .FirstOrDefaultAsync(x => x.SeasonId == model.SeasonId);
+
+            if (season == null)
+                return NotFound(new { success = false });
+
+            season.SeasonName = model.SeasonName;
+            season.StartDate = model.StartDate;
+            season.EndDate = model.EndDate;
+            season.StartTime = model.StartTime;
+            season.EndTime = model.EndTime;
+            season.Break1StartTime = model.Break1StartTime;
+            season.Break1EndTime = model.Break1EndTime;
+            season.Break2StartTime = model.Break2StartTime;
+            season.Break2EndTime = model.Break2EndTime;
+            season.IsActive = model.IsActive;
+
+            await _Entitynew.SaveChangesAsync();
+
+            return Ok(new { success = true });
+        }
+        public IActionResult TimeTableView()
+        {
+            var model = new TimetableModel
+            {
+                SchoolId = _user.SchoolId
+            };
+            ViewBag.ClassList = _dropdown.GetClasses(model.SchoolId);
+            ViewBag.SeasonList = _dropdown.GetSeasons();
+
+            return View(model);
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetTimeTableList_New(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest("Invalid request");
+
+            var split = id.Split('~');
+
+            if (split.Length < 3)
+                return BadRequest("Invalid format");
+
+            int classId = Convert.ToInt32(split[0]);
+            int divisionId = Convert.ToInt32(split[1]);
+            int seasonid = Convert.ToInt32(split[2]);
+
+            var model = await (from t in _Entities.TbTimeTables
+                               join s in _Entities.TbSubjects
+                                    on t.SubjectId equals s.SubId
+                               where t.ClassId == classId
+                                     && t.DivisionId == divisionId
+                                     && t.SeasonId == seasonid
+                               select new Satluj_Latest.Models.TimetableModel
+                               {
+                                   ClassId = t.ClassId,
+                                   DivisonId = t.DivisionId,
+                                   SubjectId = t.SubjectId,
+                                   SubjectName = s.SubjectName,
+                                   PeriodId = t.Periods,
+                                   DayId = (Days)t.DayId,
+                                   Period = (Periods)t.Periods
+                               }).ToListAsync();
+
+            return PartialView("pv_Timetable", model);
+        }
+        #endregion
+
     }
 }
 

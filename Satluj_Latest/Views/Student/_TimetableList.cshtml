@@ -1,7 +1,7 @@
 ﻿@model Satluj_Latest.Models.TimetableModel
 @{
-    var timeTable = new Satluj_Latest.Data.School(Model.SchoolId).GetTimetable(Model.ClassId, Model.DivisonId);
-        bool IsAdmin = ViewBag.IsAdmin;
+    var timeTable = new Satluj_Latest.Data.School(Model.SchoolId).GetTimetable(Model.ClassId, Model.DivisonId,Model.SeasonId);
+    bool IsAdmin = ViewBag.IsAdmin != null ? Convert.ToBoolean(ViewBag.IsAdmin) : false;
 }
 
 

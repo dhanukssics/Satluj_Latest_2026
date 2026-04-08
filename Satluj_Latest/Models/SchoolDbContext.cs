@@ -80,7 +80,7 @@ public partial class SchoolDbContext : DbContext
     public DbSet<BillFeeDateHistory> BillFeeDateHistory { get; set; }
     public DbSet<SPDayBookStatus> SPDayBookStatuses { get; set; }
     public  DbSet<sp_StudentMarkPercentage_Result> spStudentMarkPercentage_Result { get; set; }
-
+    public DbSet<OptionalStudentDto> OptionalStudentDtos { get; set; }
     public DbSet<sp_TrialBalance_Result>SpTrialBalanceResults { get; set; }
     public DbSet<SPBalanceSheet> SPBalanceSheetResults { get; set; }
     public DbSet<sp_BankStatement_Result> SPBankStatementResults { get; set; }
@@ -516,6 +516,7 @@ public partial class SchoolDbContext : DbContext
         modelBuilder.Entity<SPPushBusStart>().HasNoKey();
         modelBuilder.Entity<SPFullFees>().HasNoKey();
         modelBuilder.Entity<SPUnassignedTeachers>().HasNoKey();
+        modelBuilder.Entity<OptionalStudentDto>().HasNoKey();
         modelBuilder.Entity<SP_UnassignedTeachers_Result>(entity =>
         {
             entity.HasNoKey();
@@ -2794,7 +2795,7 @@ public partial class SchoolDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tb_Certi__3214EC07AB90932C");
 
-            entity.ToTable("TbCertificateNames");
+            entity.ToTable("tb_CertificateName");
 
             entity.Property(e => e.TimeStamp).HasColumnType("datetime");
 
@@ -2855,7 +2856,7 @@ public partial class SchoolDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tb_Co_Sc__3214EC07356C644C");
 
-            entity.ToTable("TbCoScholasticAreas");
+            entity.ToTable("tb_Co_ScholasticArea");
 
             entity.Property(e => e.TimeStamp).HasColumnType("datetime");
 
@@ -2966,7 +2967,7 @@ public partial class SchoolDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tb_Decla__3214EC07E504B20E");
 
-            entity.ToTable("TbDeclaredExams");
+            entity.ToTable("tb_DeclaredExams");
 
             entity.Property(e => e.EndDate).HasColumnType("datetime");
             entity.Property(e => e.StartDate).HasColumnType("datetime");
@@ -2996,7 +2997,7 @@ public partial class SchoolDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tb_Decla__3214EC07B117C3AE");
 
-            entity.ToTable("TbDeclaredExamsubjects");
+            entity.ToTable("tb_DeclaredExamsubjects");
 
             entity.Property(e => e.ExamDate).HasColumnType("datetime");
             entity.Property(e => e.TimeStamp).HasColumnType("datetime");
@@ -3127,7 +3128,7 @@ public partial class SchoolDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tb_ExamB__3214EC072226BD25");
 
-            entity.ToTable("TbExamBooks");
+            entity.ToTable("tb_ExamBook");
 
             entity.Property(e => e.TimeStamp).HasColumnType("datetime");
 
@@ -3982,7 +3983,7 @@ public partial class SchoolDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tb_Schol__3214EC073CBD522D");
 
-            entity.ToTable("TbScholasticAreas");
+            entity.ToTable("tb_ScholasticArea");
 
             entity.Property(e => e.DividedBy).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.TimeStamp).HasColumnType("datetime");
@@ -4442,7 +4443,7 @@ public partial class SchoolDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tb_Stude__3214EC078ACFBD14");
 
-            entity.ToTable("TbStudentsRemark");
+            entity.ToTable("tb_StudentRemark");
 
             entity.Property(e => e.TimeStamp).HasColumnType("datetime");
 
@@ -4594,7 +4595,7 @@ public partial class SchoolDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tb_Teach__3214EC0752577D77");
 
-            entity.ToTable("tb_TeachersClassSubject");
+            entity.ToTable("tb_TeacherClassSubject");
 
             entity.Property(e => e.TimeStamp).HasColumnType("datetime");
 

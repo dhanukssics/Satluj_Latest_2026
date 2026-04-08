@@ -199,7 +199,10 @@
                                                 <li class="@(((controller == "school" && action == "summaryhome")) ? "active" : "")"><i class="fa fa-file-archive-o"></i> SUMMARY  </li></a>
                                             </ul>
                                         </li>
-
+                                        <a href="/School/Chats">
+                                        <li class="sub-menu  @(((controller == "school" && action == "chats")) ? "active" : "")">
+                                             <span><i class="fa fa-comments-o"></i> CHATS </span>
+                                        </li></a>
                                         @*.....................Pramotion....................*@
 
 
@@ -219,6 +222,9 @@
                                         <li class="sub-menu @(((controller == "student" && action == "subjects") || (controller == "student" && action == "timetable")|| (controller == "progress" && action == "optionalsubjects") || (controller == "progress" && action == "optionalsubjectslist")) ? " open" : "")">
                                             <span><i class="icon-school"></i>  CURRICULUM     </span>
                                             <ul>
+                                                <a href="/Student/SeasonView">
+                                                    <li class="isHiddenFromMobile @(((controller == "student" && action == "SeasonView")) ? "active" : "")"><i class="fa fa-hourglass-2"></i>  SEASON</li></a>
+
                                                 <a href="/Student/Subjects">
                                                 <li class="isHiddenFromMobile @(((controller == "student" && action == "subjects")) ? "active" : "")"><i class="fa fa-hourglass-2"></i>  SUBJECTS</li></a>
                                                 <a href="/Student/TimeTable">
@@ -758,6 +764,13 @@
                                                 </ul>
                                             </li>
                                         }
+                                        @if (data.Any(x => x.MainId == 16))
+                                        {
+                                            <a href="/School/Chats">
+                                            <li class="sub-menu  @(((controller == "school" && action == "chats")) ? "open" : "")">
+                                                <span><i class="fa fa-comments-o"></i> CHATS </span>
+                                            </li></a>
+                                        }
                                     </ul>
                                 </div>
                             </div>
@@ -872,3 +885,4 @@
     }
 
 </script>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @RenderSection("Scripts", required: false)

@@ -55,8 +55,8 @@
         <h3 style="text-align:center;">  Time Table</h3>
         <label class="mobile-label"></label>
         <ul class="timetable-menu">
-            <li class="active" style="width:48%; font-size: large; height:5%;" id="ClassWiseTimeTable"></i><a onclick="ClassWiseView()"> Class Time Table</a></li>
-            <li id="TeacherWiseTimeTable" style="width:48%;  font-size: large; height:5%;"></i><a onclick="TeacherWiseView()">Teacher Time Table</a></li>
+            <li class="active" style="width:48%; font-size: large; height:5%;padding:10px;" id="ClassWiseTimeTable"></i><a onclick="ClassWiseView()"> Class Time Table</a></li>
+            <li id="TeacherWiseTimeTable" style="width:48%;  font-size: large; height:5%;padding:10px;"></i><a onclick="TeacherWiseView()">Teacher Time Table</a></li>
         </ul>
     </div>
 </div>
@@ -162,20 +162,38 @@
     });
 
     function LoadData() {
-        var divisonId = $('.slct-free-div-dropdown option:selected').val();
-        var classId = $('.slct-mark-dropdwn1 option:selected').val();
+            var divisonId = $('.slct-free-div-dropdown').val();
+            var classId = $('.slct-mark-dropdwn1').val();
+            var seasonId = $('#SeasonId').val();
 
-        var id = classId + "~" + divisonId;
-        $.ajax({
-            url: '/Student/GetTimeTableList/' + id,
-            type: "GET",
-            dataType: 'html',
-            success: function (data) {
-                $('#timetable-list-space').html(data);
+            if (!classId || classId == "0") {
+                toastrError("Please select class");
+                return;
             }
-        });
-    }
 
+            if (!divisonId || divisonId == "0") {
+                toastrError("Please select division");
+                return;
+            }
+
+            if (!seasonId || seasonId == "0") {
+                toastrError("Please select season");
+                return;
+            }
+
+            var id = classId + "~" + divisonId + "~" + seasonId;
+
+            console.log("LoadData ID:", id);
+
+            $.ajax({
+                url: '/Student/GetTimeTableList/' + id,
+                type: "GET",
+                dataType: 'html',
+                success: function (data) {
+                $('#timetable-list-space').html(data);
+                }
+            });
+    }
     function AddTimetableSuccess(result) {
         if (result.status == true) {
             toastrSuccess(result.msg);
@@ -190,12 +208,12 @@
         toastrError(result.msg)
     }
 
-    $(document).on('change', '.slct-free-div-dropdown', function () {
+    $(document).on('change', '.slct-free-div-dropdown,#SeasonId', function () {
         //debugger;
         var divisonId = $('.slct-free-div-dropdown').val();
         var classId = $('.slct-mark-dropdwn1 option:selected').val();
-        //var classId = $('#ClassId').val();
-        var id = classId + "~" + divisonId;
+        var seasonId = $('#SeasonId').val();
+        var id = classId + "~" + divisonId + "~" + seasonId;
         $.ajax({
             url: '/Student/GetTimeTableList/' + id,
             type: "GET",

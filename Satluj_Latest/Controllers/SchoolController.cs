@@ -12,6 +12,7 @@ using Satluj_Latest.Data;
 using Satluj_Latest.Helper;
 using Satluj_Latest.MapModel;
 using Satluj_Latest.Models;
+using Satluj_Latest.Models.Temp;
 using Satluj_Latest.Models.ViewModels;
 using Satluj_Latest.PostModel;
 using Satluj_Latest.Repository;
@@ -44,16 +45,17 @@ namespace Satluj_latestversion.Controllers
     public class SchoolController : BaseController
     {
         private readonly IWebHostEnvironment _env;
-
+        private readonly TempDbContext _EntityNew;
         public DateTime CurrentTime =>
             TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
             TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
         private readonly DropdownData _dropdown;
         
-        public SchoolController(DropdownData dropdown,SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities, IWebHostEnvironment env) : base(schoolRepository, parentRepository, teacherRepository, Entities)
+        public SchoolController(DropdownData dropdown,SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities, IWebHostEnvironment env,TempDbContext EntityNew) : base(schoolRepository, parentRepository, teacherRepository, Entities)
         {
             _env = env;
             _dropdown = dropdown;
+            _EntityNew = EntityNew;
 
         }
 
@@ -8413,7 +8415,7 @@ namespace Satluj_latestversion.Controllers
             return View(modelMain);
         }
 
-        public ActionResult GenerateTimetableSummary(string id)
+        public ActionResult GenerateTimetableSummary(string id, long seasonId)
         {
             string[] split = id.Split('~');
             TimetableSummaryFull model = new TimetableSummaryFull();
@@ -8448,122 +8450,407 @@ namespace Satluj_latestversion.Controllers
                     one.ClassName = item1.Class.Class;
                     one.DivisionName = item1.Division;
                     one.list = new List<TimetableListingModel>();
-                    one.list = new Satluj_Latest.Data.School(_user.SchoolId).GetTimetable(ClassId, item1.DivisionId);
+                    one.list = new Satluj_Latest.Data.School(_user.SchoolId).GetTimetable(ClassId, item1.DivisionId,seasonId);
                     model._list.Add(one);
                 }
             }
             return View(model);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         //chnaged by gayathri a
+        //chat added by dhanu on 4th mar 2026
+        #region chat 
+        [HttpGet]
+        public async Task<IActionResult> LoadMessages(int conversationId)
+        {
+            var chatUserIdString = HttpContext.Session.GetString("ChatUserId");
 
+            if (string.IsNullOrEmpty(chatUserIdString))
+                return Json(new { error = "Chat session expired" });
+
+            int myChatUserId = Convert.ToInt32(chatUserIdString);
+
+            var msgs = await (
+                from m in _EntityNew.TbChatMessages
+                join u in _EntityNew.TbChatUsers
+                    on m.FromChatUserId equals u.ChatUserId
+                where m.ConversationId == conversationId
+                orderby m.CreatedOn
+                select new
+                {
+                    FromName = u.DisplayName,
+                    MessageText = m.MessageText,
+                    CreatedOn = m.CreatedOn,
+                    IsMine = m.FromChatUserId == myChatUserId
+                }
+            ).ToListAsync();
+
+            var result = msgs.Select(x => new
+            {
+                x.FromName,
+                x.MessageText,
+                Time = x.CreatedOn.ToString("hh:mm tt"),
+                x.IsMine
+            });
+
+            return Json(result);
+        }
+        [HttpGet]
+        public async Task<IActionResult> LoadStudentsByClass(long classId, long divisionId)
+        {
+            var userJson = HttpContext.Session.GetString("User");
+
+            if (string.IsNullOrEmpty(userJson))
+                return Json(new { error = "Session expired" });
+
+            var user = Newtonsoft.Json.JsonConvert.DeserializeObject<TbLogin>(userJson);
+
+            long schoolId = user.SchoolId;
+
+            var students = await _Entities.TbStudents
+                .Where(s => s.ClassId == classId &&
+                            s.DivisionId == divisionId &&
+                            s.SchoolId == schoolId &&
+                            s.IsActive)
+                .Select(s => new StudentChatVM
+                {
+                    StudentId = s.StudentId,
+                    ParentId = s.ParentId,
+                    StudentName = s.StundentName,
+                    ParentName = s.ParentName
+                })
+                .OrderBy(x => x.StudentName)
+                .ToListAsync();
+
+            return Json(students);
+        }
+        public async Task<IActionResult> Chats()
+        {
+            var userJson = HttpContext.Session.GetString("User");
+
+            if (string.IsNullOrEmpty(userJson))
+                return RedirectToAction("SchoolLogin", "Account");
+
+            var user = Newtonsoft.Json.JsonConvert.DeserializeObject<TbLogin>(userJson);
+
+            int chatUserId;
+            long schoolId = user.SchoolId;
+            int userType = Convert.ToInt32(HttpContext.Session.GetString("UserType"));
+
+            // -----------------------------
+            // RESTORE CHAT USER SESSION
+            // -----------------------------
+            var chatUserIdString = HttpContext.Session.GetString("ChatUserId");
+
+            if (!string.IsNullOrEmpty(chatUserIdString))
+            {
+                chatUserId = Convert.ToInt32(chatUserIdString);
+            }
+            else
+            {
+                TbChatUser chatUser = null;
+
+                if (userType == (int)Satluj_Latest.UserRole.Teacher)
+                {
+                    var teacher = await _Entities.TbTeachers
+                        .FirstOrDefaultAsync(t => t.UserId == user.UserId);
+
+                    if (teacher != null)
+                    {
+                        chatUser = await _EntityNew.TbChatUsers
+                            .FirstOrDefaultAsync(x =>
+                                x.RefId == teacher.TeacherId.ToString() &&
+                                x.UserType == "Teacher");
+
+                        if (chatUser == null)
+                        {
+                            chatUser = new TbChatUser
+                            {
+                                RefId = teacher.TeacherId.ToString(),
+                                UserType = "Teacher",
+                                DisplayName = teacher.TeacherName,
+                                CreatedOn = DateTime.Now
+                            };
+
+                            _EntityNew.TbChatUsers.Add(chatUser);
+                            await _EntityNew.SaveChangesAsync();
+                        }
+                    }
+                }
+                else
+                {
+                    chatUser = await _EntityNew.TbChatUsers
+                        .FirstOrDefaultAsync(x => x.RefId == user.UserId.ToString());
+
+                    if (chatUser == null)
+                    {
+                        chatUser = new TbChatUser
+                        {
+                            RefId = user.UserId.ToString(),
+                            UserType = "School",
+                            DisplayName = user.Name,
+                            CreatedOn = DateTime.Now
+                        };
+
+                        _EntityNew.TbChatUsers.Add(chatUser);
+                        await _EntityNew.SaveChangesAsync();
+                    }
+                }
+
+                if (chatUser == null)
+                    return RedirectToAction("SchoolLogin", "Account");
+
+                chatUserId = chatUser.ChatUserId;
+                HttpContext.Session.SetString("ChatUserId", chatUserId.ToString());
+            }
+
+            var model = new ChatsPageVM();
+
+            // -----------------------------
+            // GET LATEST ACADEMIC YEAR
+            // -----------------------------
+            var academicYear = await _Entities.TbAcademicYears
+                .OrderByDescending(x => x.YearId)
+                .FirstOrDefaultAsync();
+
+            if (academicYear == null)
+                return View(model);
+
+            int startYear = int.Parse(academicYear.AcademicYear.Split('-')[0]);
+            int endYear = int.Parse(academicYear.AcademicYear.Split('-')[1]);
+            var latestAcademicYearId = academicYear.YearId;
+
+            // -----------------------------
+            // LOAD CLASSES FOR DROPDOWN
+            // -----------------------------
+            if (userType == (int)Satluj_Latest.UserRole.Teacher)
+            {
+                var teacher = await _Entities.TbTeachers
+                    .FirstOrDefaultAsync(t => t.UserId == user.UserId);
+
+                if (teacher != null)
+                {
+                    long teacherId = teacher.TeacherId;
+
+                    model.TeacherClasses = await (
+                        from tcs in _Entities.TbTeacherClassSubjects
+                        join c in _Entities.TbClasses on tcs.ClassId equals c.ClassId
+                        join d in _Entities.TbDivisions on tcs.DivisionId equals d.DivisionId
+                        where tcs.TeacherId == teacherId
+                              && c.SchoolId == schoolId
+                              && tcs.IsActive
+                              && tcs.TimeStamp.Year >= startYear
+                              && tcs.TimeStamp.Year <= endYear
+                        select new TeacherClassVM
+                        {
+                            ClassId = tcs.ClassId,
+                            DivisionId = tcs.DivisionId,
+                            ClassName = c.Class,
+                            DivisionName = d.Division,
+                            ClassTitle = c.Class + " " + d.Division
+                        }
+                    )
+                    .GroupBy(x => new { x.ClassId, x.DivisionId })
+                    .Select(g => g.FirstOrDefault())
+                    .OrderBy(x => x.ClassName)
+                    .ThenBy(x => x.DivisionName)
+                    .ToListAsync();
+                }
+            }
+            else
+            {
+                model.TeacherClasses = await (
+                    from c in _Entities.TbClasses
+                    join d in _Entities.TbDivisions on c.ClassId equals d.ClassId
+                    where c.SchoolId == schoolId
+                          && c.AcademicYearId == latestAcademicYearId
+                    select new TeacherClassVM
+                    {
+                        ClassId = c.ClassId,
+                        DivisionId = d.DivisionId,
+                        ClassName = c.Class,
+                        DivisionName = d.Division,
+                        ClassTitle = c.Class + " " + d.Division
+                    }
+                )
+                .OrderBy(x => x.ClassName)
+                .ThenBy(x => x.DivisionName)
+                .ToListAsync();
+            }
+
+            // -----------------------------
+            // LOAD CHAT LIST
+            // -----------------------------
+            model.AllChats = await (
+                from c in _EntityNew.TbChatConversations
+                join cp in _EntityNew.TbChatParticipants
+                    on c.ConversationId equals cp.ConversationId
+                where cp.ChatUserId == chatUserId
+
+                let lastMsg = _EntityNew.TbChatMessages
+                    .Where(m => m.ConversationId == c.ConversationId)
+                    .OrderByDescending(m => m.CreatedOn)
+                    .FirstOrDefault()
+
+                select new ChatListVM
+                {
+                    ConversationId = c.ConversationId,
+                    ChatTitle = c.Title,
+                    LastMessage = lastMsg != null ? lastMsg.MessageText : null,
+                    LastMessageTime = lastMsg != null ? (DateTime?)lastMsg.CreatedOn : null,
+                    UnreadCount = _EntityNew.TbChatMessages.Count(m =>
+                        m.ConversationId == c.ConversationId &&
+                        !m.IsRead &&
+                        m.FromChatUserId != chatUserId)
+                }
+            )
+            .OrderByDescending(x => x.LastMessageTime)
+            .ToListAsync();
+
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> OpenOneToOneChat(int studentId)
+        {
+            var chatUserIdString = HttpContext.Session.GetString("ChatUserId");
+
+            if (string.IsNullOrEmpty(chatUserIdString))
+                return Json(new { error = "Chat session expired" });
+
+            int chatUserId = Convert.ToInt32(chatUserIdString);
+
+            var teacherChatUser = await _EntityNew.TbChatUsers
+                .FirstOrDefaultAsync(x => x.ChatUserId == chatUserId);
+
+            if (teacherChatUser == null)
+                return Json(new { error = "Teacher chat user not found" });
+
+            var student = await _Entities.TbStudents
+                .FirstOrDefaultAsync(s => s.StudentId == studentId);
+
+            if (student == null)
+                return Json(new { error = "Student not found" });
+
+            var parent = await _Entities.TbParents
+                .FirstOrDefaultAsync(p => p.ParentId == student.ParentId);
+
+            var studentChatUser = await _EntityNew.TbChatUsers
+                .FirstOrDefaultAsync(u => u.RefId == student.StudentId.ToString() && u.UserType == "Student");
+
+            if (studentChatUser == null)
+            {
+                studentChatUser = new TbChatUser
+                {
+                    RefId = student.StudentId.ToString(),
+                    UserType = "Student",
+                    DisplayName = student.StundentName,
+                    CreatedOn = DateTime.Now
+                };
+
+                _EntityNew.TbChatUsers.Add(studentChatUser);
+                await _EntityNew.SaveChangesAsync();
+            }
+
+            var conversation = await (
+                from c in _EntityNew.TbChatConversations
+                join p1 in _EntityNew.TbChatParticipants on c.ConversationId equals p1.ConversationId
+                join p2 in _EntityNew.TbChatParticipants on c.ConversationId equals p2.ConversationId
+                where !c.IsGroup &&
+                      p1.ChatUserId == chatUserId &&
+                      p2.ChatUserId == studentChatUser.ChatUserId
+                select c
+            ).FirstOrDefaultAsync();
+
+            if (conversation == null)
+            {
+                conversation = new TbChatConversation
+                {
+                    IsGroup = false,
+                    Title = student.StundentName + (parent != null ? " (" + parent.ParentName + ")" : ""),
+                    CreatedBy = chatUserId,
+                    CreatedOn = DateTime.Now
+                };
+
+                _EntityNew.TbChatConversations.Add(conversation);
+                await _EntityNew.SaveChangesAsync();
+
+                _EntityNew.TbChatParticipants.Add(new TbChatParticipant
+                {
+                    ConversationId = conversation.ConversationId,
+                    ChatUserId = chatUserId
+                });
+
+                _EntityNew.TbChatParticipants.Add(new TbChatParticipant
+                {
+                    ConversationId = conversation.ConversationId,
+                    ChatUserId = studentChatUser.ChatUserId
+                });
+
+                await _EntityNew.SaveChangesAsync();
+            }
+
+            return Json(new { conversationId = conversation.ConversationId });
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllChats()
+        {
+            var chatUserIdString = HttpContext.Session.GetString("ChatUserId");
+
+            if (string.IsNullOrEmpty(chatUserIdString))
+                return Json(new { error = "Chat session expired" });
+
+            int chatUserId = Convert.ToInt32(chatUserIdString);
+
+            var chats = await (
+                from c in _EntityNew.TbChatConversations
+                join cp in _EntityNew.TbChatParticipants
+                    on c.ConversationId equals cp.ConversationId
+                where cp.ChatUserId == chatUserId
+
+                let lastMsg = _EntityNew.TbChatMessages
+                    .Where(m => m.ConversationId == c.ConversationId)
+                    .OrderByDescending(m => m.CreatedOn)
+                    .FirstOrDefault()
+
+                select new
+                {
+                    ConversationId = c.ConversationId,
+                    ChatTitle = c.Title,
+                    LastMessage = lastMsg != null ? lastMsg.MessageText : "No messages yet",
+                    LastMessageTime = lastMsg != null ? lastMsg.CreatedOn : (DateTime?)null,
+                    UnreadCount = _EntityNew.TbChatMessages.Count(m =>
+                        m.ConversationId == c.ConversationId &&
+                        !m.IsRead &&
+                        m.FromChatUserId != chatUserId)
+                }
+
+            ).OrderByDescending(x => x.LastMessageTime).ToListAsync();
+
+            return Json(chats);
+        }
+        [HttpPost]
+        public async Task<IActionResult> MarkMessagesRead(int conversationId)
+        {
+            var chatUserIdString = HttpContext.Session.GetString("ChatUserId");
+
+            if (string.IsNullOrEmpty(chatUserIdString))
+                return Json(new { success = false, message = "Chat session expired" });
+
+            int chatUserId = Convert.ToInt32(chatUserIdString);
+
+            var unread = await _EntityNew.TbChatMessages
+                .Where(m => m.ConversationId == conversationId
+                         && !m.IsRead
+                         && m.FromChatUserId != chatUserId)
+                .ToListAsync();
+
+            foreach (var msg in unread)
+                msg.IsRead = true;
+
+            await _EntityNew.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+        #endregion
 
 
     }

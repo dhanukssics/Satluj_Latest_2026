@@ -73,7 +73,7 @@
                         $(".slct-class-dropdwn1").html("");
                         $(".slct-class-dropdwn1").append($('<option></option>').val("0").html('-- Select Class --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-class-dropdwn1").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-class-dropdwn1").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-class-dropdwn1").prop("disabled", false);
                         $('#class-required-progress').hide();
@@ -149,7 +149,7 @@
                         $(".slct-free-div-dropdown").html("");
                         $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown").prop("disabled", false);
                         $('#division-required-exam-edit').hide();
@@ -206,7 +206,7 @@
                         $(".slct-exam-dropdown1").html("");
                         $(".slct-exam-dropdown1").append($('<option></option>').val("0").html('-- Select Exam --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-exam-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-exam-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-exam-dropdown1").prop("disabled", false);
                         $('#exam-required-examlist-add').hide();

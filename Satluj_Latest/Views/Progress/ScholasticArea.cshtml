@@ -112,27 +112,32 @@
         }
 
         // Delete Scholastic Area
-        $(document).on('click', '.delete-class-tr', function () {
-            var source = $(this);
+            $(document).on('click', '.delete-class-tr', function () {
+            var id = $(this).data('scho');
 
             swal({
                 title: "Are you sure?",
                 text: "You will not be able to undo this!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true
-            }).then((isConfirm) => {
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                closeOnConfirm: true
+            }, function (isConfirm) {
                 if (isConfirm) {
                     $.ajax({
-                        url: '/Progress/DeleteScholastic/' + $(source).data('scho'),
+                        url: '/Progress/DeleteScholastic/' + id,
                         type: "GET",
                         success: function (data) {
                             if (data.status) {
-                                toastrSuccess(data.msg);
-                                setTimeout(() => location.reload(), 300);
+                                toastr.success(data.msg);
+                                setTimeout(() => location.reload(), 500);
                             } else {
-                                YesDelete($(source).data('scho'));
+                                YesDelete(id);
                             }
+                        },
+                        error: function (xhr) {
+                            console.log(xhr.responseText);
+                            toastr.error("Delete failed");
                         }
                     });
                 }
@@ -143,21 +148,26 @@
             swal({
                 title: "The score for this area is already given. Are you sure?",
                 text: "You will not be able to undo this!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true
-            }).then((isConfirm) => {
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                closeOnConfirm: true
+            }, function (isConfirm) {
                 if (isConfirm) {
                     $.ajax({
                         url: '/Progress/DeleteResultEnteredScholasticArea/' + id,
                         type: "GET",
                         success: function (data) {
                             if (data.status) {
-                                toastrSuccess(data.msg);
-                                setTimeout(() => location.reload(), 300);
+                                toastr.success(data.msg);
+                                setTimeout(() => location.reload(), 500);
                             } else {
-                                toastrError(data.msg);
+                                toastr.error(data.msg);
                             }
+                        },
+                        error: function (xhr) {
+                            console.log(xhr.responseText);
+                            toastr.error("Delete failed");
                         }
                     });
                 }

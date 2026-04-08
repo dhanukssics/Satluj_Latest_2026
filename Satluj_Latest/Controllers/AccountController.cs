@@ -8,6 +8,7 @@ using Satluj_Latest;
 
 using Satluj_Latest.Helper;
 using Satluj_Latest.Models;
+using Satluj_Latest.Models.Temp;
 using Satluj_Latest.PostModel;
 using Satluj_Latest.Repository;
 using Satluj_Latest.Utility;
@@ -21,8 +22,11 @@ using System.Net.Mail;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Web;
+using System.Web.Mvc;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
+using PartialViewResult = Microsoft.AspNetCore.Mvc.PartialViewResult;
 
 
 
@@ -35,6 +39,7 @@ namespace Satluj_Latest.Controllers
     public class AccountController : PreLoginController
     {
         private readonly SchoolDbContext _Entities;
+        private readonly TempDbContext _EntityNew;
         private readonly IWebHostEnvironment _env;
         private readonly IHttpContextAccessor _httpContextAccessor;
         //
@@ -42,9 +47,10 @@ namespace Satluj_Latest.Controllers
         public DateTime currentTime = DateTime.UtcNow;
 
         public AccountController(SchoolDbContext Entities, IWebHostEnvironment env,IHttpContextAccessor httpContextAccessor, SchoolRepository schoolRepository,
-                    ParentRepository parentRepository) : base(schoolRepository, parentRepository)
+                    ParentRepository parentRepository,TempDbContext EntityNew) : base(schoolRepository, parentRepository)
         {
             _Entities = Entities;
+            _EntityNew = EntityNew;
             _httpContextAccessor = httpContextAccessor;
             _env = env;
         }
@@ -109,10 +115,10 @@ namespace Satluj_Latest.Controllers
                 {
                     // 1. Create claims
                     var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.AdminId.ToString()),
-        new Claim(ClaimTypes.Name, user.UserName)
-    };
+                            {
+                                new Claim(ClaimTypes.NameIdentifier, user.AdminId.ToString()),
+                                new Claim(ClaimTypes.Name, user.UserName)
+                            };
 
                     // 2. Create identity & principal
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -205,19 +211,19 @@ namespace Satluj_Latest.Controllers
                 return Json(new { Status = Status, Message = Message });
             }
         }
-        public ActionResult SchoolRegistration()
+        public IActionResult SchoolRegistration()
         {
             return View();
         }
-        public ActionResult StudentDetails()
+        public IActionResult StudentDetails()
         {
             return View();
         }
-        public ActionResult StaffLogin()
+        public IActionResult StaffLogin()
         {
             return View();
         }
-        public ActionResult MasterLogin()
+        public IActionResult MasterLogin()
         {
             return View();
         }
@@ -265,7 +271,42 @@ namespace Satluj_Latest.Controllers
                         else if (user.RoleId == (int)UserRole.Teacher)
                         {
                             //ModelState.AddModelError("CustomError", "Username/Password not matching.");                      
-                            return Json(new { status = true, msg = "Success", userType = user.RoleId });
+                            //return Json(new { status = true, msg = "Success", userType = user.RoleId });
+                            var teacher = _Entities.TbTeachers
+                                                .FirstOrDefault(t => t.UserId == user.UserId);
+
+                            if (teacher != null)
+                            {
+                                var chatUser = _EntityNew.TbChatUsers.FirstOrDefault(x =>
+                                                   x.RefId == teacher.TeacherId.ToString() &&
+                                                   x.UserType == "Teacher");
+
+                                if (chatUser == null)
+                                {
+                                    chatUser = new TbChatUser
+                                    {
+                                        RefId = teacher.TeacherId.ToString(),
+                                        UserType = "Teacher",
+                                        DisplayName = teacher.TeacherName,
+                                        CreatedOn = DateTime.UtcNow
+                                    };
+
+                                    _EntityNew.TbChatUsers.Add(chatUser);
+                                    _Entities.SaveChanges();
+                                }
+
+                                HttpContext.Session.SetInt32("ChatUserId", chatUser.ChatUserId);
+                            }
+                            // 2. STORE ChatUserId IN SESSION
+
+
+                           
+                            return Json(new
+                            {
+                                status = true,
+                                msg = "Success",
+                                userType = user.RoleId
+                            });
                         }
                         else if (user.RoleId == (int)UserRole.Master)
                         {
@@ -343,7 +384,36 @@ namespace Satluj_Latest.Controllers
                         else if (user.RoleId == (int)UserRole.Teacher)
                         {
                             //ModelState.AddModelError("CustomError", "Username/Password not matching.");                      
-                            return Json(new { status = true, msg = "Success", userType = user.RoleId });
+                            //return Json(new { status = true, msg = "Success", userType = user.RoleId });
+                            var teacher = _Entities.TbTeachers
+                                                .FirstOrDefault(t => t.UserId == user.UserId);
+
+                            var chatUser = _EntityNew.TbChatUsers.FirstOrDefault(x =>
+                                               x.RefId == teacher.TeacherId.ToString() &&
+                                               x.UserType == "Teacher");
+
+                            if (chatUser == null)
+                            {
+                                chatUser = new TbChatUser
+                                {
+                                    RefId = teacher.TeacherId.ToString(),
+                                    UserType = "Teacher",
+                                    DisplayName = user.Name,
+                                    CreatedOn = DateTime.UtcNow
+                                };
+
+                                _EntityNew.TbChatUsers.Add(chatUser);
+                                _EntityNew.SaveChanges();
+                            }
+
+                            // 2. STORE ChatUserId IN SESSION
+                            HttpContext.Session.SetInt32("ChatUserId", chatUser.ChatUserId);
+                            return Json(new
+                            {
+                                status = true,
+                                msg = "Success",
+                                userType = user.RoleId
+                            });
                         }
                         else if (user.RoleId == (int)UserRole.Master)
                         {
@@ -694,7 +764,7 @@ namespace Satluj_Latest.Controllers
             return PartialView("~/Views/Account/_pv_StudentDetailsNonLoginParent.cshtml", model);
         }
 
-        public ActionResult BillingDetails(string id)
+        public IActionResult BillingDetails(string id)
         {
             string[] splitData = id.Split('~');
             long studentId = Convert.ToInt64(splitData[0]);
@@ -1053,7 +1123,7 @@ namespace Satluj_Latest.Controllers
             return PartialView("~/Views/Account/_pv_PrintAccountBillData.cshtml", model);
         }
         #region PaymentGateway
-        public ActionResult CoursePayment(string id)
+        public IActionResult CoursePayment(string id)
         {
 
             bool status = true;
@@ -1119,7 +1189,7 @@ namespace Satluj_Latest.Controllers
             //return View("CCAVRequestHandler",pay);
             return Json(new { status = status });
         }
-        public ActionResult PaymentPost()
+        public IActionResult PaymentPost()
         {
             PaymentModels model = new PaymentModels();
             PaymentModels pay = new PaymentModels();
@@ -1148,7 +1218,7 @@ namespace Satluj_Latest.Controllers
             model.Amount = pay.Amount;
             return View(model);
         }
-        public ActionResult CCAVRequestHandler()
+        public IActionResult CCAVRequestHandler()
         {
 
             PaymentModels pay = new PaymentModels();
@@ -1196,7 +1266,7 @@ namespace Satluj_Latest.Controllers
             //pay.strAccessCode = strAccessCode;
             return View(pay);
         }
-        public ActionResult ccavResponseHandler()
+        public IActionResult ccavResponseHandler()
         {
             bool status = false;
             PaymentModels model = new PaymentModels();
@@ -1418,7 +1488,7 @@ namespace Satluj_Latest.Controllers
             return true;
         }
 
-        public ActionResult DummyHome()
+        public IActionResult DummyHome()
         {
             return View();
         }
@@ -1438,11 +1508,11 @@ namespace Satluj_Latest.Controllers
             }
             return Json(new { Status = Status, Message = Message });
         }
-        public ActionResult ForgotPassword()
+        public IActionResult ForgotPassword()
         {
             return View();
         }
-        public ActionResult ForgotPasswordParent()
+        public IActionResult ForgotPasswordParent()
         {
             return View();
         }
@@ -1605,21 +1675,21 @@ namespace Satluj_Latest.Controllers
             else
                 return RedirectToAction("ExpiredResetPassword");// expired link 
         }
-        public ActionResult ResetSchoolPassword(string id)
+        public IActionResult ResetSchoolPassword(string id)
         {
             Guid schoolGuid = new Guid(id);
             var model = new ChangePasswordModel();
             model.LoginGuid = schoolGuid;
             return View(model);
         }
-        public ActionResult ResetParentPassword(string id)
+        public IActionResult ResetParentPassword(string id)
         {
             Guid schoolGuid = new Guid(id);
             var model = new ChangePasswordModel();
             model.LoginGuid = schoolGuid;
             return View(model);
         }
-        public ActionResult ExpiredResetPassword()
+        public IActionResult ExpiredResetPassword()
         {
             return View();
         }

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Satluj_Latest.Data;
+using Satluj_Latest.Hubs;
 using Satluj_Latest.Models;
+using Satluj_Latest.Models.Temp;
 using Satluj_Latest.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,8 +17,15 @@ builder.Services.AddScoped<DropdownData>();
 
 builder.Services.AddDbContext<SchoolDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SatlujCon")));
-builder.Services.AddScoped<DropdownData>();
+builder.Services.AddDbContext<TempDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SatlujTemp")));
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
 builder.Services.AddSession();
+builder.Services.AddSignalR();
 builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", options =>
     {
@@ -49,6 +58,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Home}/{id?}")
     .WithStaticAssets();
-
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
