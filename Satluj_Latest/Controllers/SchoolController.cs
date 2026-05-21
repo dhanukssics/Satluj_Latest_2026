@@ -734,10 +734,23 @@ namespace Satluj_latestversion.Controllers
             model.schoolId = _user.SchoolId;
             model.startDate = CurrentTime;
             model.endDate = CurrentTime;
+            model.CalendarEvents = new Satluj_Latest.Data.School(model.schoolId).GetCalendarEventByDate(model.startDate, model.endDate);
+
+            ViewBag.IsAdmin = true;
+
             return View(model);
         }
         public PartialViewResult AddCalendarEventView()
         {
+            CalendarEventModels model = new CalendarEventModels();
+            model.schoolId = _user.SchoolId;
+            model.startDate = CurrentTime;
+            model.endDate = CurrentTime;
+
+            model.CalendarEvents = new Satluj_Latest.Data.School(model.schoolId)
+                .GetCalendarEventByDate(model.startDate, model.endDate);
+
+            ViewBag.IsAdmin = true;
             return PartialView("~/Views/School/_pv_CalendarEvent_Add.cshtml");
         }
         [HttpPost]
@@ -745,45 +758,51 @@ namespace Satluj_latestversion.Controllers
         {
             bool status = false;
             string message = "Failed";
-            var calender = new TbCalenderEvent();
-            calender.EventHead = model.eventHead;
-            calender.EventDetails = model.eventDetails;
 
-            string[] splitData = model.eventDate.Split('-');
-            var zdd = splitData[0];
-            var zmm = splitData[1];
-            var zyyyy = splitData[2];
-            var Date = zmm + '-' + zdd + '-' + zyyyy;
-            calender.EventDate = Convert.ToDateTime(Date);
-            calender.SchoolId = _user.SchoolId;
-            calender.IsActive = true;
-            calender.TimeStamp = CurrentTime;
+            DateTime parsedDate;
+            if (!DateTime.TryParseExact(
+                model.eventDate,
+                "yyyy-MM-dd",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None,
+                out parsedDate))
+            {
+                return Json(new { status = false, msg = "Invalid date format" });
+            }
+
+            var calender = new TbCalenderEvent
+            {
+                EventHead = model.eventHead,
+                EventDetails = model.eventDetails,
+                EventDate = parsedDate,
+                SchoolId = _user.SchoolId,
+                IsActive = true,
+                TimeStamp = CurrentTime
+            };
+
             _Entities.TbCalenderEvents.Add(calender);
             status = _Entities.SaveChanges() > 0;
+
             if (status)
             {
-                // Create a notification entry added by dhanu for api 6 Nov 2025
-                var notification = new TbNotification();
-                notification.UserName = null; 
-                notification.NotificationMessage = $"{model.eventHead}";
-                notification.CreatedAt = CurrentTime;
-                notification.IsRead = 0;
-                notification.Source = "Event";
-                notification.SchoolId = 3;
-                notification.ClassId = null;
-                notification.DivisionId = null;
-                notification.SourceId = calender.EventId;
+                var notification = new TbNotification
+                {
+                    UserName = null,
+                    NotificationMessage = model.eventHead,
+                    CreatedAt = CurrentTime,
+                    IsRead = 0,
+                    Source = "Event",
+                    SchoolId = _user.SchoolId, 
+                    SourceId = calender.EventId
+                };
+
                 _Entities.TbNotifications.Add(notification);
                 _Entities.SaveChanges();
+            }
 
-                message = "Event Added and Notification Created";
-            }
-            else
-            {
-                message = "Failed to Add Event";
-            }
-            message = status ? " Event Added" : "Failed";
-            return Json(new { status = status, msg = message });
+            message = status ? "Event Added" : "Failed";
+
+            return Json(new { status, msg = message });
         }
         public PartialViewResult EditCalendarEventView(string id)
         {
@@ -829,6 +848,7 @@ namespace Satluj_latestversion.Controllers
                 _Entities.TbNotifications.RemoveRange(notifications);
             }
 
+            
             _Entities.TbCalenderEvents.Remove(calender);
             status = _Entities.SaveChanges() > 0 ? true : false;
             message = status ? "Event deleted successfully!" : "Failed to delete Event!";
@@ -853,6 +873,7 @@ namespace Satluj_latestversion.Controllers
             model.schoolId = _user.SchoolId;
             model.startDate = startTime;
             model.endDate = endTime;
+            ViewBag.IsAdmin = true;
             return PartialView("~/Views/School/_pv_CalendarEvent_list.cshtml", model);
 
         }
@@ -4963,6 +4984,7 @@ namespace Satluj_latestversion.Controllers
         {
             Satluj_Latest.Models.CircularList model = new Satluj_Latest.Models.CircularList();
             model.schoolId = _user.SchoolId;
+            model.IsAdmin = true;
             return PartialView("~/Views/School/_pv_CircularNotification.cshtml", model);
         }
         public object DeleteCircularNotification(string id)
@@ -5290,6 +5312,7 @@ namespace Satluj_latestversion.Controllers
         {
             var model = new ExamsModel();
             model.SchoolId = _user.SchoolId;
+            ViewBag.ClassList = _dropdown.GetClasses(model.SchoolId);
             return PartialView("~/Views/School/_pv_AddNewExams.cshtml", model);
         }
         public object SubmitAddExam(ExamsModel model)
@@ -8477,6 +8500,7 @@ namespace Satluj_latestversion.Controllers
                 orderby m.CreatedOn
                 select new
                 {
+                    MessageId = m.MessageId,
                     FromName = u.DisplayName,
                     MessageText = m.MessageText,
                     CreatedOn = m.CreatedOn,
@@ -8486,6 +8510,7 @@ namespace Satluj_latestversion.Controllers
 
             var result = msgs.Select(x => new
             {
+                x.MessageId,
                 x.FromName,
                 x.MessageText,
                 Time = x.CreatedOn.ToString("hh:mm tt"),
@@ -8534,7 +8559,13 @@ namespace Satluj_latestversion.Controllers
 
             int chatUserId;
             long schoolId = user.SchoolId;
-            int userType = Convert.ToInt32(HttpContext.Session.GetString("UserType"));
+            int userType;
+            var userTypeString = HttpContext.Session.GetString("UserType");
+
+            if (!int.TryParse(userTypeString, out userType))
+            {
+                return RedirectToAction("SchoolLogin", "Account");
+            }
 
             // -----------------------------
             // RESTORE CHAT USER SESSION
@@ -8734,15 +8765,15 @@ namespace Satluj_latestversion.Controllers
                 .FirstOrDefaultAsync(p => p.ParentId == student.ParentId);
 
             var studentChatUser = await _EntityNew.TbChatUsers
-                .FirstOrDefaultAsync(u => u.RefId == student.StudentId.ToString() && u.UserType == "Student");
+                .FirstOrDefaultAsync(u => u.RefId == student.StudentId.ToString() && u.UserType == "Parent");
 
             if (studentChatUser == null)
             {
                 studentChatUser = new TbChatUser
                 {
                     RefId = student.StudentId.ToString(),
-                    UserType = "Student",
-                    DisplayName = student.StundentName,
+                    UserType = "Parent",
+                    DisplayName = student.ParentName,
                     CreatedOn = DateTime.Now
                 };
 
@@ -8790,6 +8821,30 @@ namespace Satluj_latestversion.Controllers
 
             return Json(new { conversationId = conversation.ConversationId });
         }
+        [HttpPost]
+        public async Task<IActionResult> SendMessage(int conversationId, string message)
+        {
+            var chatUserIdString = HttpContext.Session.GetString("ChatUserId");
+
+            if (string.IsNullOrEmpty(chatUserIdString))
+                return Json(new { success = false });
+
+            int chatUserId = Convert.ToInt32(chatUserIdString);
+
+            var msg = new TbChatMessage
+            {
+                ConversationId = conversationId,
+                MessageText = message,
+                FromChatUserId = chatUserId,
+                CreatedOn = DateTime.Now,
+                IsRead = false
+            };
+
+            _EntityNew.TbChatMessages.Add(msg);
+            await _EntityNew.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
         [HttpGet]
         public async Task<IActionResult> GetAllChats()
         {
@@ -8825,7 +8880,14 @@ namespace Satluj_latestversion.Controllers
 
             ).OrderByDescending(x => x.LastMessageTime).ToListAsync();
 
-            return Json(chats);
+            return Json(chats.Select(x => new
+            {
+                conversationId = x.ConversationId,
+                chatTitle = x.ChatTitle,
+                lastMessage = x.LastMessage,
+                lastMessageTime = x.LastMessageTime,
+                unreadCount = x.UnreadCount
+            }));
         }
         [HttpPost]
         public async Task<IActionResult> MarkMessagesRead(int conversationId)
@@ -8849,6 +8911,39 @@ namespace Satluj_latestversion.Controllers
             await _EntityNew.SaveChangesAsync();
 
             return Json(new { success = true });
+        }
+        [HttpGet]
+        public async Task<IActionResult> LoadNewMessages(
+    int conversationId,
+    int lastMessageId)
+        {
+            var chatUserIdString =
+                HttpContext.Session.GetString("ChatUserId");
+
+            if (string.IsNullOrEmpty(chatUserIdString))
+                return Json(new List<object>());
+
+            int myChatUserId =
+                Convert.ToInt32(chatUserIdString);
+
+            var msgs = await (
+                from m in _EntityNew.TbChatMessages
+                join u in _EntityNew.TbChatUsers
+                    on m.FromChatUserId equals u.ChatUserId
+                where m.ConversationId == conversationId
+                      && m.MessageId > lastMessageId
+                orderby m.MessageId
+                select new
+                {
+                    m.MessageId,
+                    FromName = u.DisplayName,
+                    m.MessageText,
+                    m.CreatedOn,
+                    IsMine = m.FromChatUserId == myChatUserId
+                }
+            ).ToListAsync();
+
+            return Json(msgs);
         }
         #endregion
 

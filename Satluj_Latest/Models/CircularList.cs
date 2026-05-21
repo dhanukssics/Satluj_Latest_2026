@@ -4,5 +4,6 @@
     {
 
         public long schoolId { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

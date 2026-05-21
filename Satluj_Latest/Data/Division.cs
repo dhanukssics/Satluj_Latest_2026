@@ -12,7 +12,13 @@ namespace Satluj_Latest.Data
     {
         private TbDivision division;
         public Division(TbDivision obj) { division = obj; }
-        public Division(long id) { division = _Entities.TbDivisions.FirstOrDefault(z => z.DivisionId == id); }
+        public Division(long id)
+        {
+            division = _Entities.TbDivisions
+                .Include(x => x.TbTeacherClasses)
+                .FirstOrDefault(z => z.DivisionId == id);
+        }
+        
         public long DivisionId { get { return division.DivisionId; } }
         public long ClassId { get { return division.ClassId; } }
         public string ClassName { get { return division.Class.Class; } }
@@ -52,13 +58,15 @@ namespace Satluj_Latest.Data
         }
         public string getTeacherClass()
         {
-            var data = division.TbTeacherClasses.ToList().Select(z => new Teacher(z.Teacher)).FirstOrDefault();
-            if (data != null)
-                return data.TeacherName;
-            else
-                return string.Empty;
-        }
+            var teacherClass = division.TbTeacherClasses.FirstOrDefault();
 
+            if (teacherClass == null)
+                return string.Empty;
+
+            var teacher = new Teacher(teacherClass.TeacherId);
+
+            return teacher.TeacherName;
+        }
         public List<TbAttendance> GetAttendance(DateTime maxDate, DateTime minDate, int shift)
         {
             return division.TbAttendances.Where(z =>z.AttendanceDate >= minDate && z.AttendanceDate <= maxDate && z.ShiftStatus == shift).ToList().Select(z => new TbAttendance(z)).ToList();

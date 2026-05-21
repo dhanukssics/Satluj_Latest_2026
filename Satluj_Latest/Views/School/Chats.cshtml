@@ -79,11 +79,18 @@
             background: #f1f6ff;
         }
 
-    .chat-avatar {
+    .chat-avatar-text {
         width: 42px;
         height: 42px;
         border-radius: 50%;
         margin-right: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #fff;
+        background: #4e73df;
+        text-transform: uppercase;
     }
 
     .chat-info {
@@ -128,11 +135,6 @@
         color: #777;
     }
 
-        .chat-empty img {
-            width: 70px;
-            margin-bottom: 10px;
-        }
-
     .chat-box {
         width: 100%;
         padding: 20px;
@@ -140,8 +142,8 @@
     }
 
     .msg {
-        padding: 6px 10px;
-        margin-bottom: 6px;
+        padding: 8px 12px;
+        margin-bottom: 8px;
         border-radius: 8px;
         max-width: 70%;
         word-break: break-word;
@@ -153,8 +155,14 @@
         }
 
         .msg.received {
-            background: #fff;
+            background: #f1f1f1;
         }
+
+    .msg-time {
+        font-size: 10px;
+        color: #777;
+        margin-top: 3px;
+    }
 
     .class-dropdown {
         padding: 10px;
@@ -168,13 +176,15 @@
 
 <div class="chat-shell">
     <div class="container-fluid chat-wrapper">
-        <div class="row" style="height:100%">
+        <div class="row" style="height:100%;">
 
+            <!-- HEADER -->
             <div class="chat-header">
                 <ul class="nav nav-tabs chat-tabs">
                     <li class="active" id="allTabBtn">
                         <a href="javascript:void(0);" onclick="showAllTab()">All</a>
                     </li>
+
                     <li id="classTabBtn">
                         <a href="javascript:void(0);" onclick="showClassTab()">Classes</a>
                     </li>
@@ -183,90 +193,126 @@
                 <input type="text"
                        id="chatSearch"
                        class="form-control input-sm"
-                       placeholder="Search student / parent..."
+                       placeholder="Search..."
                        onkeyup="filterChats()" />
             </div>
 
-            <!-- LEFT PANEL -->
+            <!-- LEFT -->
             <div class="col-md-3 chat-sidebar">
+
                 <div class="tab-content" style="height:100%;">
 
                     <!-- ALL CHATS -->
-                    <div id="allTab" class="tab-pane fade in active" style="height:100%;">
+                    <div id="allTab"
+                         class="tab-pane fade in active"
+                         style="height:100%;">
+
                         <ul class="chat-list" id="allChatList">
+
                             @foreach (var chat in Model.AllChats)
                             {
                                 <li class="chat-item"
-                                    onclick="openChat(this,'@chat.ChatTitle',@chat.ConversationId)">
+                                    onclick="openChat(this,
+                                        '@chat.ChatTitle.Replace("'", "\\'")',
+                                        @chat.ConversationId)">
 
-                                    <img src="https://i.pravatar.cc/42" class="chat-avatar" />
+                                    <div class="chat-avatar-text">
+                                        @(string.IsNullOrWhiteSpace(chat.ChatTitle)
+                                                                            ? "?"
+                                                                            : chat.ChatTitle.Substring(0, 1))
+                                </div>
 
                                     <div class="chat-info">
                                         <strong>@chat.ChatTitle</strong>
-
-                                        @if (!string.IsNullOrEmpty(chat.LastMessage))
-                                        {
-                                            <p>@chat.LastMessage</p>
-                                        }
-                                        else
-                                        {
-                                            <p>No messages yet</p>
-                                        }
+                                        <p>@(chat.LastMessage ?? "No messages yet")</p>
                                     </div>
 
-                                    @if (chat.UnreadCount > 0)
+                                @if (chat.UnreadCount > 0)
                                     {
-                                        <span class="badge bg-danger unread-badge">@chat.UnreadCount</span>
+                                        <span class="badge bg-danger unread-badge">
+                                            @chat.UnreadCount
+                                        </span>
                                     }
                                 </li>
                             }
+
                         </ul>
                     </div>
 
                     <!-- CLASS TAB -->
-                    <div id="classTab" class="tab-pane fade" style="height:100%;">
+                    <div id="classTab"
+                         class="tab-pane fade"
+                         style="height:100%;">
+
                         <div class="class-dropdown">
-                            <select id="classSelector" class="form-control" onchange="loadStudents()">
-                                <option value="">-- Select Class --</option>
+
+                            <select id="classSelector"
+                                    class="form-control"
+                                    onchange="loadStudents()">
+
+                                <option value="">
+                                    -- Select Class --
+                                </option>
 
                                 @foreach (var cls in Model.TeacherClasses)
                                 {
-                                    <option value="@cls.ClassId|@cls.DivisionId">@cls.ClassTitle</option>
+                                    <option value="@cls.ClassId|@cls.DivisionId">
+                                        @cls.ClassTitle
+                                    </option>
                                 }
+
                             </select>
+
                         </div>
 
                         <ul class="chat-list" id="studentList"></ul>
+
                     </div>
 
                 </div>
+
             </div>
 
-            <!-- RIGHT PANEL -->
+            <!-- RIGHT -->
             <div class="col-md-9 chat-content">
+
                 <div id="emptyChat" class="chat-empty">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1041/1041916.png" width="70" />
                     <h4>No Conversation Selected</h4>
                     <p>Select a student to start chat</p>
                 </div>
 
                 <div id="chatBox" class="chat-box">
+
                     <h4 id="chatTitle"></h4>
+
                     <hr />
 
                     <div id="messages"
-                         style="height:350px;overflow-y:auto;border:1px solid #eee;padding:10px"></div>
+                         style="height:350px;
+                                overflow-y:auto;
+                                border:1px solid #eee;
+                                padding:10px;">
+                    </div>
 
                     <div class="input-group" style="margin-top:10px">
+
                         <input type="text"
                                id="msgInput"
                                class="form-control"
                                placeholder="Type message..." />
+
                         <span class="input-group-btn">
-                            <button class="btn btn-primary" type="button" onclick="sendMsg()">Send</button>
+                            <button class="btn btn-primary"
+                                    type="button"
+                                    onclick="sendMsg()">
+                                Send
+                            </button>
                         </span>
+
                     </div>
+
                 </div>
+
             </div>
 
         </div>
@@ -274,287 +320,429 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
 
     <script>
-        var CURRENT_CHAT_USER_ID = @chatUserId;
+
+        var CURRENT_CHAT_USER_ID = Number('@chatUserId') || 0;
+
         var currentConversationId = 0;
 
-        const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/chatHub?chatUserId=" + CURRENT_CHAT_USER_ID)
-        .withAutomaticReconnect()
-        .build();
+        var lastMessageId = 0;
 
-        connection.on("receiveMessage", function (from, message, senderId, conversationId) {
-        if (senderId == CURRENT_CHAT_USER_ID)
-        return;
+        // =========================
+        // TABS
+        // =========================
 
-        if (currentConversationId == conversationId) {
-        $('#messages').append(`
-        <div class="msg received">${escapeHtml(message)}</div>
-        `);
-
-        $('#messages').scrollTop($('#messages')[0].scrollHeight);
-
-        $.post('/School/MarkMessagesRead', { conversationId: currentConversationId }, function () {
-        loadAllChats();
-        });
-        } else {
-        loadAllChats();
-        }
-        });
-
-        connection.on("updateChatList", function (conversationId, message, time) {
-        loadAllChats();
-        });
-
-        connection.start()
-        .then(function () {
-        console.log("SignalR connected");
-        })
-        .catch(function (err) {
-        console.error("SignalR start failed:", err.toString());
-        });
-
-        // ---------------------------
-        // TAB SWITCHING
-        // ---------------------------
         function showAllTab() {
-        resetChatView();
 
-        $('#allTab').addClass('in active').show();
-        $('#classTab').removeClass('in active').hide();
+            resetChatView();
 
-        $('#allTabBtn').addClass('active');
-        $('#classTabBtn').removeClass('active');
+            $('#allTab').addClass('in active').show();
 
-        loadAllChats();
+            $('#classTab').removeClass('in active').hide();
+
+            $('#allTabBtn').addClass('active');
+
+            $('#classTabBtn').removeClass('active');
+
+            loadAllChats();
         }
 
         function showClassTab() {
-        resetChatView();
 
-        $('#classTab').addClass('in active').show();
-        $('#allTab').removeClass('in active').hide();
+            resetChatView();
 
-        $('#classTabBtn').addClass('active');
-        $('#allTabBtn').removeClass('active');
+            $('#classTab').addClass('in active').show();
+
+            $('#allTab').removeClass('in active').hide();
+
+            $('#classTabBtn').addClass('active');
+
+            $('#allTabBtn').removeClass('active');
         }
 
-        // ---------------------------
+        // =========================
         // OPEN CHAT
-        // ---------------------------
+        // =========================
+
         function openChat(el, name, conversationId) {
-        $('.chat-item').removeClass('active');
 
-        if (el) {
-        $(el).addClass('active');
+            $('.chat-item').removeClass('active');
+
+            if (el)
+                $(el).addClass('active');
+
+            currentConversationId = conversationId;
+
+            lastMessageId = 0;
+
+            $('#emptyChat').hide();
+
+            $('#chatBox').show();
+
+            $('#chatTitle').text(name);
+
+            $('#messages').html('');
+
+            $.post('/School/MarkMessagesRead',
+                { conversationId: conversationId });
+
+            loadMessages();
         }
 
-        currentConversationId = conversationId;
+        // =========================
+        // LOAD FULL MESSAGES
+        // =========================
 
-        $('#emptyChat').hide();
-        $('#chatBox').show();
-        $('#chatTitle').text(name);
-        $('#messages').html('');
+        function loadMessages() {
 
-        $.post('/School/MarkMessagesRead', { conversationId: conversationId }, function () {
-        loadAllChats();
-        });
+            if (currentConversationId === 0)
+                return;
 
-        connection.invoke("JoinConversation", conversationId)
-        .catch(err => console.error(err.toString()));
+            $.get('/School/LoadMessages',
+                { conversationId: currentConversationId },
+                function (data) {
 
-        $.get('/School/LoadMessages', { conversationId: conversationId }, function (data) {
-        data.forEach(function (m) {
-        var cls = m.isMine ? 'sent' : 'received';
+                    $('#messages').html('');
 
-        $('#messages').append(`
-        <div class="msg ${cls}">
-        ${escapeHtml(m.messageText)}
-        </div>
-        `);
-        });
+                    data.forEach(function (m) {
 
-        $('#messages').scrollTop($('#messages')[0].scrollHeight);
-        });
+                        var cls = m.isMine
+                            ? 'sent'
+                            : 'received';
+
+                        $('#messages').append(`
+                            <div class="msg ${cls}">
+                                <div>${escapeHtml(m.messageText)}</div>
+                                <div class="msg-time">${m.time}</div>
+                            </div>
+                        `);
+
+                        lastMessageId = m.MessageId || 0;
+                    });
+
+                    scrollBottom();
+                });
         }
+
+        // =========================
+        // LOAD NEW MESSAGES
+        // =========================
+
+        function loadNewMessages() {
+
+            if (currentConversationId === 0)
+                return;
+
+            $.get('/School/LoadNewMessages',
+                {
+                    conversationId: currentConversationId,
+                    lastMessageId: lastMessageId
+                },
+                function (data) {
+
+                    data.forEach(function (m) {
+
+                        var cls = m.isMine
+                            ? 'sent'
+                            : 'received';
+
+                        $('#messages').append(`
+                            <div class="msg ${cls}">
+                                <div>${escapeHtml(m.messageText)}</div>
+                            </div>
+                        `);
+
+                        lastMessageId = m.MessageId || 0;
+                    });
+
+                    scrollBottom();
+                });
+        }
+
+        // =========================
+        // SEND MESSAGE
+        // =========================
 
         function sendMsg() {
-        var msg = $('#msgInput').val().trim();
 
-        if (!msg || currentConversationId === 0)
-        return;
+            var msg = $('#msgInput').val().trim();
 
-        $('#messages').append(`
-        <div class="msg sent">
-        ${escapeHtml(msg)}
-        </div>
-        `);
+            if (!msg || currentConversationId === 0)
+                return;
 
-        connection.invoke("SendMessage", currentConversationId, msg, CURRENT_CHAT_USER_ID)
-        .catch(err => console.error(err.toString()));
+            $.post('/School/SendMessage',
+                {
+                    conversationId: currentConversationId,
+                    message: msg
+                },
+                function (res) {
 
-        $('#msgInput').val('');
-        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                    if (res.success) {
 
-        loadAllChats();
+                        $('#msgInput').val('');
+
+                        loadMessages();
+
+                        loadAllChats();
+                    }
+                });
         }
 
-        // ---------------------------
-        // CLASS STUDENT LOAD
-        // ---------------------------
-        function loadStudents() {
-        var val = $('#classSelector').val();
+        // =========================
+        // LOAD CHAT LIST
+        // =========================
 
-        if (!val) {
-        $('#studentList').html('');
-        return;
-        }
-
-        var parts = val.split('|');
-        var classId = parts[0];
-        var divisionId = parts[1];
-
-        $.get('/School/LoadStudentsByClass', { classId: classId, divisionId: divisionId }, function (data) {
-        var html = '';
-
-        data.forEach(function (s) {
-        html += `
-        <li class="chat-item"
-        data-student="${s.studentId}"
-        data-name="${encodeURIComponent(s.studentName)}"
-        onclick="openOneToOneChatFromEl(this)">
-
-        <img src="https://i.pravatar.cc/42" class="chat-avatar"/>
-
-        <div class="chat-info">
-        <strong>${escapeHtml(s.studentName)}</strong>
-        <p>Parent: ${escapeHtml(s.parentName)}</p>
-        </div>
-        </li>
-        `;
-        });
-
-        $('#studentList').html(html);
-        });
-        }
-
-        function openOneToOneChatFromEl(el) {
-        $('.chat-item').removeClass('active');
-        $(el).addClass('active');
-
-        var studentId = $(el).data('student');
-        var studentName = decodeURIComponent($(el).data('name'));
-
-        $.get('/School/OpenOneToOneChat', { studentId: studentId }, function (res) {
-        loadAllChats();
-        openChat(el, studentName, res.conversationId);
-        });
-        }
-
-        // ---------------------------
-        // ALL CHAT LIST
-        // ---------------------------
         function loadAllChats() {
-        $.get('/School/GetAllChats', function (data) {
-        var html = '';
 
-        data.forEach(function (chat) {
-        var unreadHtml = '';
+            $.get('/School/GetAllChats',
+                function (data) {
 
-        if (chat.unreadCount > 0) {
-        unreadHtml = `<span class="badge bg-danger unread-badge">${chat.unreadCount}</span>`;
+                    var html = '';
+
+                    data.forEach(function (chat) {
+
+                        var unread = chat.unreadCount > 0
+                            ? `<span class="badge bg-danger unread-badge">
+                                    ${chat.unreadCount}
+                               </span>`
+                            : '';
+
+                        html += `
+                            <li class="chat-item"
+                                onclick="openChat(
+                                    this,
+                                    '${escapeJs(chat.chatTitle)}',
+                                    ${chat.conversationId})">
+
+                                <div class="chat-avatar-text">
+                                    ${getInitial(chat.chatTitle)}
+                                </div>
+
+                                <div class="chat-info">
+                                    <strong>
+                                        ${escapeHtml(chat.chatTitle)}
+                                    </strong>
+
+                                    <p>
+                                        ${escapeHtml(chat.lastMessage || 'No messages yet')}
+                                    </p>
+                                </div>
+
+                                ${unread}
+
+                            </li>
+                        `;
+                    });
+
+                    $('#allChatList').html(html);
+                });
         }
 
-        html += `
-        <li class="chat-item"
-        onclick="openChat(this,'${escapeJs(chat.chatTitle)}',${chat.conversationId})">
+        // =========================
+        // LOAD STUDENTS
+        // =========================
 
-        <img src="https://i.pravatar.cc/42" class="chat-avatar"/>
+        function loadStudents() {
 
-        <div class="chat-info">
-        <strong>${escapeHtml(chat.chatTitle)}</strong>
-        <p>${escapeHtml(chat.lastMessage || 'No messages yet')}</p>
-        </div>
+            var val = $('#classSelector').val();
 
-        ${unreadHtml}
-        </li>
-        `;
-        });
+            if (!val) {
 
-        $('#allChatList').html(html);
-        });
+                $('#studentList').html('');
+
+                return;
+            }
+
+            var parts = val.split('|');
+
+            $.get('/School/LoadStudentsByClass',
+                {
+                    classId: parts[0],
+                    divisionId: parts[1]
+                },
+                function (data) {
+
+                    var html = '';
+
+                    data.forEach(function (s) {
+
+                        html += `
+                            <li class="chat-item"
+                                onclick="openOneToOne(
+                                    ${s.studentId},
+                                    '${escapeJs(s.studentName)}')">
+
+                                <div class="chat-avatar-text">
+                                    ${getInitial(s.studentName)}
+                                </div>
+
+                                <div class="chat-info">
+                                    <strong>
+                                        ${escapeHtml(s.studentName)}
+                                    </strong>
+
+                                    <p>
+                                        Parent :
+                                        ${escapeHtml(s.parentName)}
+                                    </p>
+                                </div>
+
+                            </li>
+                        `;
+                    });
+
+                    $('#studentList').html(html);
+                });
         }
 
-        // ---------------------------
-        // RESET / SEARCH
-        // ---------------------------
-        function resetChatView() {
-        currentConversationId = 0;
+        // =========================
+        // OPEN ONE TO ONE
+        // =========================
 
-        $('#chatBox').hide();
-        $('#messages').html('');
-        $('#chatTitle').text('');
-        $('#emptyChat').show();
-        $('#chatSearch').val('');
-        $('.chat-item').removeClass('active');
+        function openOneToOne(studentId, name) {
+
+            $.get('/School/OpenOneToOneChat',
+                { studentId: studentId },
+                function (res) {
+
+                    loadAllChats();
+
+                    openChat(null, name, res.conversationId);
+                });
         }
+
+        // =========================
+        // POLLING
+        // =========================
+
+        setInterval(function () {
+
+            if (currentConversationId !== 0) {
+
+                loadNewMessages();
+            }
+
+            loadAllChats();
+
+        }, 3000);
+
+        // =========================
+        // SEARCH
+        // =========================
 
         function filterChats() {
-        var value = $('#chatSearch').val().toLowerCase();
 
-        $('#allChatList .chat-item').each(function () {
-        var title = $(this).find('strong').text().toLowerCase();
-        var subtitle = $(this).find('p').text().toLowerCase();
+            var value = $('#chatSearch').val().toLowerCase();
 
-        if (title.indexOf(value) > -1 || subtitle.indexOf(value) > -1) {
-        $(this).show();
-        } else {
-        $(this).hide();
+            $('#allChatList .chat-item').each(function () {
+
+                var title =
+                    $(this).find('strong').text().toLowerCase();
+
+                var subtitle =
+                    $(this).find('p').text().toLowerCase();
+
+                $(this).toggle(
+                    title.includes(value) ||
+                    subtitle.includes(value)
+                );
+            });
+
+            $('#studentList .chat-item').each(function () {
+
+                var title =
+                    $(this).find('strong').text().toLowerCase();
+
+                var subtitle =
+                    $(this).find('p').text().toLowerCase();
+
+                $(this).toggle(
+                    title.includes(value) ||
+                    subtitle.includes(value)
+                );
+            });
         }
-        });
 
-        $('#studentList .chat-item').each(function () {
-        var student = $(this).find('strong').text().toLowerCase();
-        var parent = $(this).find('p').text().toLowerCase();
+        // =========================
+        // RESET
+        // =========================
 
-        if (student.indexOf(value) > -1 || parent.indexOf(value) > -1) {
-        $(this).show();
-        } else {
-        $(this).hide();
+        function resetChatView() {
+
+            currentConversationId = 0;
+
+            lastMessageId = 0;
+
+            $('#chatBox').hide();
+
+            $('#messages').html('');
+
+            $('#chatTitle').text('');
+
+            $('#emptyChat').show();
+
+            $('#chatSearch').val('');
+
+            $('.chat-item').removeClass('active');
         }
-        });
-        }
 
-        // ---------------------------
+        // =========================
         // HELPERS
-        // ---------------------------
+        // =========================
+
+        function scrollBottom() {
+
+            $('#messages')
+                .scrollTop($('#messages')[0].scrollHeight);
+        }
+
         function escapeHtml(text) {
-        if (!text) return '';
-        return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+            if (!text)
+                return '';
+
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
         }
 
         function escapeJs(text) {
-        if (!text) return '';
-        return text.replace(/'/g, "\\'");
+
+            if (!text)
+                return '';
+
+            return text.replace(/'/g, "\\'");
         }
 
-        // initial load
+        function getInitial(name) {
+
+            if (!name)
+                return '?';
+
+            return name.trim().charAt(0).toUpperCase();
+        }
+
+        // =========================
+        // INIT
+        // =========================
+
         $(document).ready(function () {
-        showAllTab();
 
-        $('#msgInput').keypress(function (e) {
-        if (e.which === 13) {
-        sendMsg();
-        return false;
-        }
+            showAllTab();
+
+            $('#msgInput').keypress(function (e) {
+
+                if (e.which === 13) {
+
+                    sendMsg();
+
+                    return false;
+                }
+            });
         });
-        });
+
     </script>
+
 }

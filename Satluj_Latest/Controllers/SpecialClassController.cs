@@ -79,7 +79,7 @@ namespace Satluj_Latest.Controllers
             {
                 SchoolId = _user.SchoolId
             };
-
+            ViewBag.IsAdmin = true;
             return PartialView("~/Views/SpecialClass/_pv_AssesmentList.cshtml", model);
         }
 
@@ -1579,10 +1579,15 @@ namespace Satluj_Latest.Controllers
         //--------------------------------------------------------------------------------------------------
         public IActionResult NonEducationalHome()
         {
-            NonSubjectScoreModel model = new NonSubjectScoreModel();
-            model.SchoolId = _user.SchoolId;
+            NonSubjectScoreModel model = new NonSubjectScoreModel
+            {
+                SchoolId = _user.SchoolId,
+                IsAdminCheck = HttpContext.Session.GetInt32("isAdmin") ?? 0
+            };
+
             ViewBag.Vassessments = _dropdown.GetVAssesments(model.SchoolId);
             ViewBag.VClassDivisinLists = _dropdown.GetVClassDivisinLists(model.SchoolId);
+
             return View(model);
         }
 
@@ -3741,10 +3746,17 @@ namespace Satluj_Latest.Controllers
         {
             V_ProgressCard model = new V_ProgressCard();
             model.StudentId = Convert.ToInt64(id);
-            var studentDetails = _Entities.TbStudents.Where(x => x.StudentId == model.StudentId).FirstOrDefault();
+            var studentDetails = _Entities.TbStudents
+                            .Include(x => x.Class)
+                                .ThenInclude(x => x.AcademicYear)
+                            .Include(x => x.Division)
+                            .FirstOrDefault(x => x.StudentId == model.StudentId);
             model.ReportName = _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault() == null ? " " : _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault();
-            model.SchoolName = studentDetails.School.SchoolName;
-            model.SchoolLogo = "http://satluj.schoolman.in" + studentDetails.School.FilePath;
+            var school = _Entities.TbSchools
+                        .FirstOrDefault(x => x.SchoolId == studentDetails.SchoolId);
+            model.SchoolName = school.SchoolName;
+            model.SchoolLogo = "http://satluj.schoolman.in" + school.FilePath;
+
             model.AcademicYear = studentDetails.Class.AcademicYear.AcademicYear;
             //model.StudentProfile = "http://satluj.schoolman.in" + studentDetails.FilePath;
             model.StudentProfile = studentDetails.FilePath;
@@ -3763,8 +3775,11 @@ namespace Satluj_Latest.Controllers
             }
             model.FatherName = studentDetails.ParentName;
             model.MotherName = studentDetails.MotherName ?? "";
-            var assesmentList = _Entities.TbVAssesments.Where(x => x.SchoolId == studentDetails.SchoolId && x.IsActive).OrderBy(x => x.Period.StartDate).ToList();
-
+            var assesmentList = _Entities.TbVAssesments
+                .Include(x => x.Period)
+                .Where(x => x.SchoolId == studentDetails.SchoolId && x.IsActive)
+                .OrderBy(x => x.Period.StartDate)
+                .ToList();
             //-------------CASE I---------------------
             #region Case I
             model._CaseI = new List<CaseI>();
@@ -4432,8 +4447,15 @@ namespace Satluj_Latest.Controllers
             {
                 //var enumList = new int[] { 0, 1, 2, 3 }.ToList();//Modified by Gayathri A Class V Progresscard recreation
                 var enumList = new int[] { 10, 11, 12, 13 }.ToList();
-                var totalScoreData = _Entities.TbVTotalScoreLists.Where(x => enumList.Contains(x.EnumTypeId) && x.SchoolId == schoolId && x.IsActive == true).ToList();
-                if (totalScoreData != null && totalScoreData.Count > 0)
+                var totalScoreData = _Entities.TbVTotalScoreLists
+                    .Where(x =>
+                        (x.EnumTypeId == 10 ||
+                         x.EnumTypeId == 11 ||
+                         x.EnumTypeId == 12 ||
+                         x.EnumTypeId == 13)
+                        && x.SchoolId == schoolId
+                        && x.IsActive)
+                    .ToList(); if (totalScoreData != null && totalScoreData.Count > 0)
                 {
                     totalScore = totalScoreData.Sum(x => x.Mark);
                     count = totalScoreData.Count();
@@ -5920,7 +5942,7 @@ namespace Satluj_Latest.Controllers
             {
                 SchoolId = _user.SchoolId,
                 UserId = _user.UserId,
-                IsAdminCheck = Convert.ToInt32(HttpContext.Session.GetInt32("isAdmin"))
+                IsAdminCheck = HttpContext.Session.GetInt32("isAdmin") ?? 0
             };
             ViewBag.classpreschool = _dropdown.GetClass_Preschool(model.SchoolId);
             return View(model);
@@ -6002,11 +6024,13 @@ namespace Satluj_Latest.Controllers
 
             //model.StudentId = Convert.ToInt64(id);
             var studentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId).FirstOrDefault();
+            var school = _Entities.TbSchools
+.FirstOrDefault(x => x.SchoolId == studentDetails.SchoolId);
             Titl.ReportName = _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault() == null ? " " : _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault();
-            Titl.SchoolName = studentDetails.School.SchoolName;
-            Titl.SchoolLogo = "http://satluj.schoolman.in" + studentDetails.School.FilePath;
+            Titl.SchoolName = school.SchoolName;
+            Titl.SchoolLogo = "http://satluj.schoolman.in" + school.FilePath;
             //model.AcademicYear = studentDetails.tb_Class.tb_AcademicYear.AcademicYear;
-            Titl.StudentProfile = "http://satluj.schoolman.in" + studentDetails.FilePath;
+            Titl.StudentProfile = "http://satluj.schoolman.in" + school.FilePath;
             //model.StudentName = studentDetails.StundentName;
             //model.ClassDivision = studentDetails.tb_Class.Class + " " + studentDetails.tb_Division.Division;
             //model.RollNo = studentDetails.ClasssNumber;
@@ -6301,6 +6325,9 @@ namespace Satluj_Latest.Controllers
                 UserId = _user.UserId,
                 IsAdminCheck = Convert.ToInt32(HttpContext.Session.GetInt32("isAdmin"))
             };
+
+            ViewBag.IsAdmin = model.IsAdminCheck == 1;
+
             ViewBag.ClassList = _dropdown
                     .GetClass_Preschool_One_Four(model.SchoolId)
                     .Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
@@ -7655,7 +7682,7 @@ namespace Satluj_Latest.Controllers
                 IsAdminCheck = HttpContext.Session.GetInt32("isAdmin") ?? 0,
             };
             ViewBag.classpreschoo = _dropdown.GetClass_Preschool_One_Four(model.SchoolId);
-
+            ViewBag.IsAdmin = model.IsAdminCheck == 1;
 
             return View(model);
         }
@@ -7737,11 +7764,14 @@ namespace Satluj_Latest.Controllers
                         
 
             var studentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId).FirstOrDefault();
+            var school = _Entities.TbSchools
+    .FirstOrDefault(x => x.SchoolId == studentDetails.SchoolId);
+
             Titl.ReportName = _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault() == null ? " " : _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault();
-            Titl.SchoolName = studentDetails.School.SchoolName;
-            Titl.SchoolLogo = "http://satluj.schoolman.in" + studentDetails.School.FilePath;
+            Titl.SchoolName = school.SchoolName;
+            Titl.SchoolLogo = "http://satluj.schoolman.in" + school.FilePath;
             
-            Titl.StudentProfile = "http://satluj.schoolman.in" + studentDetails.FilePath;
+            Titl.StudentProfile = "http://satluj.schoolman.in" + school.FilePath;
              
             Titl.Static_Date = static_Date;
 
@@ -8130,11 +8160,13 @@ namespace Satluj_Latest.Controllers
 
 
             var studentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId).FirstOrDefault();
+            var school = _Entities.TbSchools
+    .FirstOrDefault(x => x.SchoolId == studentDetails.SchoolId);
             Titl.ReportName = _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault() == null ? " " : _Entities.TbCertificateNames.Where(x => x.SchoolId == _user.SchoolId && x.IsActive).Select(x => x.CertificateName).FirstOrDefault();
-            Titl.SchoolName = studentDetails.School.SchoolName;
-            Titl.SchoolLogo = "http://satluj.schoolman.in" + studentDetails.School.FilePath;
+            Titl.SchoolName = school.SchoolName;
+            Titl.SchoolLogo = "http://satluj.schoolman.in" + school.FilePath;
 
-            Titl.StudentProfile = "http://satluj.schoolman.in" + studentDetails.FilePath;
+            Titl.StudentProfile = "http://satluj.schoolman.in" +school.FilePath;
 
             Titl.Static_Date = static_Date;
 

@@ -20,6 +20,6 @@ namespace Satluj_Latest.Models
         public string eventDate { get; set; }
         public DateTime startDate { get; set; }
         public DateTime endDate { get; set; }
-
+        public List<TbCalenderEvent> CalendarEvents { get; set; } = new List<TbCalenderEvent>();
     }
 }

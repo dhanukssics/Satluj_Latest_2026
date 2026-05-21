@@ -138,7 +138,7 @@
                         $(".slct-free-div-dropdown").html("");
                         $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown").prop("disabled", false);
 
@@ -186,7 +186,7 @@
             console.log("LoadData ID:", id);
 
             $.ajax({
-                url: '/Student/GetTimeTableList/' + id,
+                url: '/Student/GetTimeTableList?id=' + id,
                 type: "GET",
                 dataType: 'html',
                 success: function (data) {
@@ -213,9 +213,17 @@
         var divisonId = $('.slct-free-div-dropdown').val();
         var classId = $('.slct-mark-dropdwn1 option:selected').val();
         var seasonId = $('#SeasonId').val();
+        if (!classId || classId == "0")
+            return;
+
+        if (!divisonId || divisonId == "0")
+            return;
+
+        if (!seasonId || seasonId == "0")
+            return;
         var id = classId + "~" + divisonId + "~" + seasonId;
         $.ajax({
-            url: '/Student/GetTimeTableList/' + id,
+            url: '/Student/GetTimeTableList?id=' + id,
             type: "GET",
             dataType: 'html',
             success: function (data) {

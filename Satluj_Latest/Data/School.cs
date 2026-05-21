@@ -26,8 +26,16 @@ namespace Satluj_Latest.Data
             // Load AcademicYear + Divisions
             foreach (var cls in school.TbClasses)
             {
-                _Entities.Entry(cls).Reference(c => c.AcademicYear).Load();   // FIX
+                _Entities.Entry(cls).Reference(c => c.AcademicYear).Load();
+
                 _Entities.Entry(cls).Collection(c => c.TbDivisions).Load();
+
+                foreach (var div in cls.TbDivisions)
+                {
+                    _Entities.Entry(div)
+                        .Collection(d => d.TbTeacherClasses)
+                        .Load();
+                }
             }
 
             _Entities.Entry(school).Collection(s => s.TbStudents).Load();
@@ -36,7 +44,9 @@ namespace Satluj_Latest.Data
             _Entities.Entry(school).Collection(s => s.TbDesignations).Load();
             _Entities.Entry(school).Collection(s => s.TbDepartments).Load();
             _Entities.Entry(school).Collection(s => s.TbRemarks).Load();
-
+            _Entities.Entry(school).Collection(s => s.TbCirculars).Load();
+            _Entities.Entry(school).Collection(s => s.TbCalenderEvents).Load();
+            _Entities.Entry(school).Collection(x => x.TbVAssesments).Load();
             foreach (var cat in school.TbBookCategories)
             {
                 _Entities.Entry(cat).Collection(c => c.TbLibraryBooks).Load();
@@ -178,7 +188,10 @@ namespace Satluj_Latest.Data
         }
         public List<TbCircular> AllCircularList()
         {
-            return _Entities.TbCirculars.Where(z => z.SchoolId == school.SchoolId && z.IsActive).ToList().Select(x => new TbCircular(x)).ToList();
+            return _Entities.TbCirculars
+                    .Where(z => z.SchoolId == school.SchoolId && z.IsActive)
+                    .Select(x => new TbCircular(x))
+                    .ToList();
         }
 
         public List<TbCalenderEvent> GetCalendarUpcomingEvent()
@@ -189,11 +202,15 @@ namespace Satluj_Latest.Data
         }
         public List<TbCalenderEvent> GetCalendarEventByDate(DateTime startDate, DateTime endDate)
         {
-            string StartDate = startDate.Date.ToString("yyyy-MM-dd") + ' ' + "12:00:00 AM";
-            DateTime minDate = Convert.ToDateTime(StartDate);
-            string EndDate = endDate.Date.ToString("yyyy-MM-dd") + ' ' + "11:59:00 PM";
-            DateTime maxDate = Convert.ToDateTime(EndDate);
-            return school.TbCalenderEvents.Where(z => z.EventDate >= minDate && z.EventDate <= maxDate).ToList().Select(z => new TbCalenderEvent(z)).ToList();
+            DateTime minDate = startDate.Date;
+            DateTime maxDate = endDate.Date.AddDays(1);
+
+            var data = school.TbCalenderEvents
+                .Where(z => z.EventDate >= minDate && z.EventDate < maxDate)
+                .Select(z => new TbCalenderEvent(z))
+                .ToList();
+
+            return data ?? new List<TbCalenderEvent>(); 
         }
 
         public List<IncomeExp> GetTrialBalance()
@@ -466,24 +483,29 @@ namespace Satluj_Latest.Data
         }
         public List<TbExam> AllExamList(string Classname)
         {
-            List<TbExam> data = new List<TbExam>();
-            if (Classname != string.Empty)
+            var query = _Entities.TbExams
+                .Include(x => x.Class)
+                .Where(x => x.SchoolId == school.SchoolId && x.IsActive);
+
+            if (!string.IsNullOrEmpty(Classname))
             {
-                if (Classname != null)
+                var classObj = _Entities.TbClasses
+                    .FirstOrDefault(x => x.Class == Classname
+                                      && x.IsActive
+                                      && x.SchoolId == SchoolId
+                                      && x.PublishStatus);
+
+                if (classObj != null)
                 {
-                    var classId = _Entities.TbClasses.Where(x => x.Class == Classname && x.IsActive && x.SchoolId == SchoolId && x.PublishStatus).FirstOrDefault();
-                    data = _Entities.TbExams.Where(x => x.SchoolId == school.SchoolId && x.IsActive && x.ClassId == classId.ClassId).ToList().Select(x => new TbExam(x)).ToList();
-                }
-                else
-                {
-                    data = _Entities.TbExams.Where(x => x.SchoolId == school.SchoolId && x.IsActive).ToList().Select(x => new TbExam(x)).ToList();
+                    query = query.Where(x => x.ClassId == classObj.ClassId);
                 }
             }
             else
             {
-                data = _Entities.TbExams.Where(x => x.SchoolId == school.SchoolId && x.IsActive && x.Class.IsActive && x.Class.PublishStatus).ToList().Select(x => new TbExam(x)).ToList();
+                query = query.Where(x => x.Class.IsActive && x.Class.PublishStatus);
             }
-            return data;
+
+            return query.ToList();
         }
         public List<TbTrip> GetTripDetailById(DateTime selDate, long busId)
         {
@@ -2468,8 +2490,11 @@ namespace Satluj_Latest.Data
         }
         public List<V_Assesment> GetAllAssesmentDetails()
         {
-            var data = school.TbVAssesments.Where(x => x.IsActive).ToList().Select(x => new V_Assesment(x)).ToList();
-            return data;
+            return _Entities.TbVAssesments
+                            .Include(x => x.Period)
+                            .Where(x => x.IsActive && x.SchoolId == school.SchoolId)
+                            .Select(x => new V_Assesment(x))
+                            .ToList();
         }
         public List<Student> Listing_V_ClassStudents(long DivisionId)
         {

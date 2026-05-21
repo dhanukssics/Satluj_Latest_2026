@@ -92,7 +92,8 @@ namespace Satluj_Latest.Data
 
         public Teacher(long teacherId)
         {
-            this.teacherId = teacherId;
+            teacher = _Entities.TbTeachers
+        .FirstOrDefault(x => x.TeacherId == teacherId);
         }
 
         public List<UserModule> GetTearhersModules()

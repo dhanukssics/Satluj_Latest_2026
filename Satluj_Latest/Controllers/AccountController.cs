@@ -193,7 +193,7 @@ namespace Satluj_Latest.Controllers
                             new CookieOptions { HttpOnly = true });
 
                         // 3. Session Values
-                        HttpContext.Session.SetString("UserType", ((int)UserRole.Parent).ToString());
+                        HttpContext.Session.SetInt32("UserType", (int)UserRole.Parent);
                         HttpContext.Session.SetString("Parent", Newtonsoft.Json.JsonConvert.SerializeObject(data.Item3));
 
                         // 4. Redirect
@@ -255,12 +255,38 @@ namespace Satluj_Latest.Controllers
 
                         // 3. Session
                         HttpContext.Session.SetString("User", Newtonsoft.Json.JsonConvert.SerializeObject(user));
-                        HttpContext.Session.SetString("UserType", user.RoleId.ToString());
+                        HttpContext.Session.SetInt32("UserType", user.RoleId);
                         HttpContext.Session.SetString("IsAdmin", "true");
 
                         if (user.RoleId == (int)UserRole.School)
                         {
                             //Session.Timeout = 180;
+                            // CREATE / GET CHAT USER FOR SCHOOL
+                            var chatUser = _EntityNew.TbChatUsers
+                                .FirstOrDefault(x =>
+                                    x.RefId == user.UserId.ToString() &&
+                                    x.UserType == "School");
+
+                            if (chatUser == null)
+                            {
+                                chatUser = new TbChatUser
+                                {
+                                    RefId = user.UserId.ToString(),
+                                    UserType = "School",
+                                    DisplayName = user.Name, // or SchoolName
+                                    CreatedOn = DateTime.UtcNow,
+                                    IsOnline = true
+                                };
+
+                                _EntityNew.TbChatUsers.Add(chatUser);
+                                _EntityNew.SaveChanges();
+                            }
+
+                            // STORE ChatUserId IN SESSION
+                            HttpContext.Session.SetString(
+                                "ChatUserId",
+                                chatUser.ChatUserId.ToString()
+                            );
                             return Json(new { status = true, msg = "Success", userType = 1 });
                         }
                         else if (user.RoleId == (int)UserRole.Staff)
@@ -292,10 +318,13 @@ namespace Satluj_Latest.Controllers
                                     };
 
                                     _EntityNew.TbChatUsers.Add(chatUser);
-                                    _Entities.SaveChanges();
+                                    _EntityNew.SaveChanges();
                                 }
 
-                                HttpContext.Session.SetInt32("ChatUserId", chatUser.ChatUserId);
+                                HttpContext.Session.SetString(
+                                        "ChatUserId",
+                                        chatUser.ChatUserId.ToString()
+                                    );
                             }
                             // 2. STORE ChatUserId IN SESSION
 
@@ -351,7 +380,7 @@ namespace Satluj_Latest.Controllers
 
                         // Session
                         HttpContext.Session.SetString("User", Newtonsoft.Json.JsonConvert.SerializeObject(user));
-                        HttpContext.Session.SetString("UserType", user.RoleId.ToString());
+                        HttpContext.Session.SetInt32("UserType", user.RoleId);
 
 
                         if (user.RoleId == (int)UserRole.Teacher)
@@ -374,6 +403,32 @@ namespace Satluj_Latest.Controllers
                         if (user.RoleId == (int)UserRole.School)
                         {
                             //Session.Timeout = 180;
+                            // CREATE / GET CHAT USER FOR SCHOOL
+                            var chatUser = _EntityNew.TbChatUsers
+                                .FirstOrDefault(x =>
+                                    x.RefId == user.UserId.ToString() &&
+                                    x.UserType == "School");
+
+                            if (chatUser == null)
+                            {
+                                chatUser = new TbChatUser
+                                {
+                                    RefId = user.UserId.ToString(),
+                                    UserType = "School",
+                                    DisplayName = user.Name, // or SchoolName
+                                    CreatedOn = DateTime.UtcNow,
+                                    IsOnline = true
+                                };
+
+                                _EntityNew.TbChatUsers.Add(chatUser);
+                                _EntityNew.SaveChanges();
+                            }
+
+                            // STORE ChatUserId IN SESSION
+                            HttpContext.Session.SetString(
+                                "ChatUserId",
+                                chatUser.ChatUserId.ToString()
+                            );
                             return Json(new { status = true, msg = "Success", userType = 1 });
                         }
                         else if (user.RoleId == (int)UserRole.Staff)
@@ -407,7 +462,10 @@ namespace Satluj_Latest.Controllers
                             }
 
                             // 2. STORE ChatUserId IN SESSION
-                            HttpContext.Session.SetInt32("ChatUserId", chatUser.ChatUserId);
+                            HttpContext.Session.SetString(
+                                "ChatUserId",
+                                chatUser.ChatUserId.ToString()
+                            );
                             return Json(new
                             {
                                 status = true,
@@ -466,7 +524,7 @@ namespace Satluj_Latest.Controllers
 
                         // 3. Store session values (must be strings / JSON)
                         HttpContext.Session.SetString("Parent", Newtonsoft.Json.JsonConvert.SerializeObject(parent));
-                        HttpContext.Session.SetString("UserType", model.userType.ToString());
+                        HttpContext.Session.SetInt32("UserType", model.userType);
                         HttpContext.Session.SetString("IsAdmin", "false");
 
                         //Session.Timeout = 180;
@@ -512,7 +570,7 @@ namespace Satluj_Latest.Controllers
                         // 3. Store Session values (must be string or JSON)
 
                         HttpContext.Session.SetString("User", Newtonsoft.Json.JsonConvert.SerializeObject(user));
-                        HttpContext.Session.SetString("UserType", user.RoleId.ToString());
+                        HttpContext.Session.SetInt32("UserType", user.RoleId);
                         HttpContext.Session.SetString("IsAdmin", "true");
 
                         if (user.RoleId == (int)UserRole.Master)
@@ -666,7 +724,7 @@ namespace Satluj_Latest.Controllers
                     var user = _Entities.TbLogins.FirstOrDefault(x => x.UserId == schoolData.TbLogins.FirstOrDefault().UserId);
 
                     HttpContext.Session.SetString("User", Newtonsoft.Json.JsonConvert.SerializeObject(user));
-                    HttpContext.Session.SetString("UserType", ((int)UserRole.School).ToString());
+                    HttpContext.Session.SetInt32("UserType", (int)UserRole.School);
 
 
                     return Json(new { Status = Status, Message = Message });

@@ -1046,30 +1046,44 @@ namespace Satluj_Latest.Data
            
         };
 
-        public  List<SelectListItem> Scholasticareas_others(long SchoolId,string id)
+        public List<SelectListItem> Scholasticareas_others(long SchoolId, string id)
         {
-            switch(id)
+            switch (id)
             {
                 case "1":
                     var input1 = English_Li.ToList();
-                    return input1.Select(x => new SelectListItem { Text = x.Subjects, Value = x.Id.ToString() }).ToList();
-                    
+                    return input1.Select(x => new SelectListItem
+                    {
+                        Text = x.Subjects,
+                        Value = x.Id.ToString()
+                    }).ToList();
+
                 case "2":
                     var input2 = Hindi_Li.ToList();
-                    return input2.Select(x => new SelectListItem { Text = x.Subjects, Value = x.Id.ToString() }).ToList();
+                    return input2.Select(x => new SelectListItem
+                    {
+                        Text = x.Subjects,
+                        Value = x.Id.ToString()
+                    }).ToList();
 
                 case "3":
                     var input3 = Mathematics_Li.ToList();
-                    return input3.Select(x => new SelectListItem { Text = x.Subjects, Value = x.Id.ToString() }).ToList();
+                    return input3.Select(x => new SelectListItem
+                    {
+                        Text = x.Subjects,
+                        Value = x.Id.ToString()
+                    }).ToList();
 
                 case "4":
                     var input4 = EnvironmentalStudies_Li.ToList();
-                    return input4.Select(x => new SelectListItem { Text = x.Subjects, Value = x.Id.ToString() }).ToList();
-                    
+                    return input4.Select(x => new SelectListItem
+                    {
+                        Text = x.Subjects,
+                        Value = x.Id.ToString()
+                    }).ToList();
             }
-            return null;
 
-            
+            return new List<SelectListItem>();
         }
 
         private  List<Preschool_Subjects> Assesments_others_Li = new List<Preschool_Subjects>()

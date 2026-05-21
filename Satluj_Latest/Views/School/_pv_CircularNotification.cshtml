@@ -1,7 +1,7 @@
 ﻿@model Satluj_Latest.Models.CircularList
 @{
     var circular = new Satluj_Latest.Data.School(Model.schoolId);
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = Model.IsAdmin;
 }
 <thead>
     <tr>

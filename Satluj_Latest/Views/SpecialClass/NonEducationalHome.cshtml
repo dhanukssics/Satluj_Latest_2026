@@ -1,7 +1,7 @@
 ﻿@model Satluj_Latest.Models.NonSubjectScoreModel
 @{
     Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = Model.IsAdminCheck == 1;
 }
 @Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
 

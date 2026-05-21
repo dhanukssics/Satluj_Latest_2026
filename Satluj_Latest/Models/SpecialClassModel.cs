@@ -133,6 +133,8 @@ namespace Satluj_Latest.Models
         public long AssesmentTableId { get; set; }
         public long DivisionId { get; set; }
         public VNonSubjectSkills VMarkTypeId { get; set; }
+        public int IsAdminCheck { get; set; }
+
     }
 
     public class StudentNonSubjectSkillMarks

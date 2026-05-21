@@ -1,7 +1,8 @@
 ﻿@model Satluj_Latest.Models.SubjectScoreModel
+@using Microsoft.AspNetCore.Mvc.Rendering
 @{
     Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = Model.IsAdminCheck == 1;
 }
 @Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
 @Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
@@ -34,13 +35,11 @@
                         <label>Division : </label>
                         <br />
                         <select asp-for="DivisionId"
-                                asp-items="ViewBag.VClassDivisinLists"
-                                class="form-control division-drop-down class-drop-down"
-                                data-live-search="true"
-                                name="classDropdown">
+                                asp-items="@(ViewBag.VClassDivisinLists as List<SelectListItem>)"
+                                class="form-control division-drop-down class-drop-down">
                             <option value="">--Choose--</option>
                         </select>
-
+                            
                         <span asp-validation-for="DivisionId" class="text-danger"></span>
 
                     </div>
@@ -91,10 +90,8 @@
                         <label>Division : </label>
                         <br />
                         <select asp-for="DivisionId"
-                                asp-items="ViewBag.Vdivisionlistuser"
-                                class="form-control division-drop-down class-drop-down"
-                                data-live-search="true"
-                                name="classDropdown">
+                                asp-items="@(ViewBag.VClassDivisinLists as List<SelectListItem>)"
+                                class="form-control division-drop-down class-drop-down">
                             <option value="">--Choose--</option>
                         </select>
 
@@ -147,7 +144,7 @@
                         $(".slct-subject-dropdown").html("");
                         $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-subject-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-subject-dropdown").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-subject-dropdown").prop("disabled", false);
                     }
@@ -179,7 +176,7 @@
                         $(".slct-subject-dropdown").html("");
                         $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-subject-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-subject-dropdown").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-subject-dropdown").prop("disabled", false);
                     }
@@ -255,7 +252,7 @@
     function LoadAsNonAdmin() {
         var divisionId = $(".division-drop-down option:selected").val();
         var subjectId = $(".slct-subject-dropdown option:selected").val();
-        var skillId =  $(".skill_selctionByTeacher option:selected").val();
+        var skillId =  $(".skill_selction option:selected").val();
         var assesmentId = $(".assesment-id option:selected").val();
         var id = divisionId + '~' + subjectId + '~' + skillId + '~' + assesmentId;
         $.ajax({
@@ -743,7 +740,7 @@
     };
 
     //LIST SUBJECT BY USER
-    $(document).on('change', '.skill_selctionByTeacher', function () {
+    $(document).on('change', '.skill_selction', function () {
         $('#result-entry-div-id').html('');
         var divisionId = $(".division-drop-down option:selected").val();
         if (divisionId == 0) {
@@ -760,7 +757,7 @@
                             $(".slct-subject-dropdown").html("");
                             $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
                             $.each(result.list, function (i, item) {
-                                $(".slct-subject-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                                $(".slct-subject-dropdown").append($('<option></option>').val(item.value).html(item.text));
                             });
                             $(".slct-subject-dropdown").prop("disabled", false);
                         }
@@ -788,7 +785,7 @@
         if (admin==1) {
         }
         else {
-            var id = $(".skill_selctionByTeacher option:selected").val();
+            var id = $(".skill_selction option:selected").val();
             if (id != '') {
                 var divisionId = $(".division-drop-down option:selected").val();
                 $.ajax({
@@ -799,7 +796,7 @@
                             $(".slct-subject-dropdown").html("");
                             $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
                             $.each(result.list, function (i, item) {
-                                $(".slct-subject-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                                $(".slct-subject-dropdown").append($('<option></option>').val(item.value).html(item.text));
                             });
                             $(".slct-subject-dropdown").prop("disabled", false);
                         }

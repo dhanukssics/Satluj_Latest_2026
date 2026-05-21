@@ -2,7 +2,7 @@
 @model Satluj_Latest.Models.StudentSkillMarks
 @{
     int count = 1;
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = false;
     var scoreDetails = new Satluj_Latest.Data.School(Model.SchoolId).Get_V_TotalScores(9);
     var It = "";
     var GeneralStudies = "";

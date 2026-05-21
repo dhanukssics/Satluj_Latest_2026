@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,6 +13,8 @@ namespace Satluj_Latest.Models
         public long TeacherId { get; set; }
         public long SubjectId { get; set; }
         public List<ClassMainList> ClassList { get; set; }
+        public IEnumerable<SelectListItem> Teachers { get; set; }
+        public IEnumerable<SelectListItem> Subjects { get; set; }
     }
     public class ClassMainList
     {

@@ -17,7 +17,12 @@
 </thead>
 <tbody>
     @{
-        var StudentList = Model.Data.GetStudentDetails().Where(z => z.ClassId == Model.value.classId && z.DivisionId == Model.value.divId).ToList();
+        var division = Model.Data.Divisions
+        .FirstOrDefault(x => x.DivisionId == Model.value.divId);
+
+        var StudentList = division != null
+        ? division.GetStudentDetails()
+        : new List<Satluj_Latest.Data.Student>();
         if (StudentList.Count > 0)
         {
             int i = 1;

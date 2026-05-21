@@ -74,7 +74,23 @@
             }
         });
     });
+        $(document).on('shown.bs.modal', '#modalAddExams', function () {
 
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+
+        $('.date-exam-add').datepicker({
+            format: 'mm-dd-yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        // set correct format
+        $('.date-exam-add').val(mm + '-' + dd + '-' + yyyy);
+
+    });
 
     $(document).on('click', '#btn-add-exam', function () {
         $.ajax({

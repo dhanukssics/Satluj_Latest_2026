@@ -17,8 +17,9 @@ namespace Satluj_Latest.Controllers
     public class PerformanceController : BaseController
     {
         private readonly DropdownData _dropdown;
-        public PerformanceController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities) : base(schoolRepository, parentRepository, teacherRepository, Entities)
+        public PerformanceController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities,DropdownData dropdown) : base(schoolRepository, parentRepository, teacherRepository, Entities)
         {
+            this._dropdown = dropdown;
         }
 
         public IActionResult TeacherRoleManagement()
@@ -125,17 +126,30 @@ namespace Satluj_Latest.Controllers
             PerformanceModel model = new PerformanceModel();
             model.SchoolId = _user.SchoolId;
             model.ClassList = new List<ClassMainList>();
-            ViewBag.teacherlist = _dropdown.GetTeachers(model.SchoolId);
-            ViewBag.subjectlist = _dropdown.GetSubjectss(model.SchoolId);
+            model.Teachers = _dropdown.GetTeachers(model.SchoolId);
+            model.Subjects = _dropdown.GetSubjectss(model.SchoolId);
 
             return View(model);
         }
         public IActionResult EditTeacherRoleManagement(string id)
         {
+            if (string.IsNullOrEmpty(id) || !id.Contains("~"))
+                return BadRequest("Invalid ID");
+
             string[] splitData = id.Split('~');
-            var teacherId = Convert.ToInt64(splitData[0]);
-            var subjectId = Convert.ToInt64(splitData[1]);
-            var teacher = _Entities.TbTeachers.Where(x => x.TeacherId == teacherId).FirstOrDefault();
+
+            if (!long.TryParse(splitData[0], out var teacherId) ||
+                !long.TryParse(splitData[1], out var subjectId))
+            {
+                return BadRequest("Invalid Teacher or Subject ID");
+            }
+
+            var teacher = _Entities.TbTeachers
+                        .Include(x => x.UserTypeNavigation)
+                        .FirstOrDefault(x => x.TeacherId == teacherId);
+
+            if (teacher == null)
+                return NotFound("Teacher not found");
             PerformanceModel model = new PerformanceModel();
             if (teacher.UserType != null && teacher.UserTypeNavigation.IsAdmin == true)
             {
@@ -228,7 +242,7 @@ namespace Satluj_Latest.Controllers
                     {
                         foreach (var item in old)
                         {
-                            var isExistsThis = model.ClassList.Where(x => x.ClassId == item.DivisionId).FirstOrDefault();
+                            var isExistsThis = model.ClassList.Where(x => x.ClassId == item.ClassId).FirstOrDefault();
                             if (isExistsThis != null)
                             {
 
@@ -871,7 +885,13 @@ namespace Satluj_Latest.Controllers
             model.TeacherListModel = new List<TeacherListModel>();
             if (model.TeacherId == 0) // All teachers 
             {
-                var data = _Entities.TbTeacherClassSubjects.Where(x => x.IsActive && x.SchoolId == model.SchoolId && x.Class.IsActive && x.Class.PublishStatus).ToList();
+                var data = _Entities.TbTeacherClassSubjects
+                            .Include(x => x.Teacher)
+                            .Include(x => x.Subject)
+                            .Include(x => x.Class)
+                            .Include(x => x.Division)
+                            .Where(x => x.IsActive && x.SchoolId == model.SchoolId && x.Class.IsActive && x.Class.PublishStatus)
+                            .ToList();
                 var dataTeachersOnly = data.Select(x => x.TeacherId).Distinct().ToList();
                 foreach (var item in dataTeachersOnly)
                 {
@@ -903,7 +923,17 @@ namespace Satluj_Latest.Controllers
             }
             else// Particular Teacher
             {
-                var data = _Entities.TbTeacherClassSubjects.Where(x => x.IsActive && x.SchoolId == model.SchoolId && x.TeacherId == model.TeacherId && x.Class.IsActive && x.Class.PublishStatus).ToList();
+                var data = _Entities.TbTeacherClassSubjects
+                            .Include(x => x.Teacher)
+                            .Include(x => x.Subject)
+                            .Include(x => x.Class)
+                            .Include(x => x.Division)
+                            .Where(x => x.IsActive
+                                && x.SchoolId == model.SchoolId
+                                && x.TeacherId == model.TeacherId
+                                && x.Class.IsActive
+                                && x.Class.PublishStatus)
+                            .ToList();
                 var dataTeachersOnly = data.Select(x => x.TeacherId).Distinct().ToList();
                 foreach (var item in dataTeachersOnly)
                 {

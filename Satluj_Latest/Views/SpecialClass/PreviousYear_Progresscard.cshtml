@@ -191,7 +191,7 @@
                         $(".classDropdown").html("");
                         $(".classDropdown").append($('<option></option>').val("0").html('-- Select Class --'));
                         $.each(result.list, function (i, item) {
-                            $(".classDropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".classDropdown").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".classDropdown").prop("disabled", false);
                     }

@@ -30,7 +30,7 @@
                     <label>Teacher </label>
                     <br />
                     <select asp-for="TeacherId"
-                            asp-items="ViewBag.teacherlist"
+                            asp-items="Model.Teachers"
                             class="form-control"
                             id="teacher-id"
                             data-live-search="true"
@@ -46,7 +46,7 @@
                     <label>Subject</label>
                     <br />
                     <select asp-for="SubjectId"
-                            asp-items="ViewBag.subjectlist"
+                            asp-items="Model.Subjects"
                             class="form-control"
                             id="subject-id"
                             data-live-search="true"
@@ -90,26 +90,26 @@
     }
 
     $(document).on('click', '#btn-teacher-subject', function () {
-        debugger;
-        $('#list-out-allTeacherSubject').html('');
+
         var teacherId = $('#teacher-id').val();
         var subjectId = $('#subject-id').val();
+
+        if (!teacherId || !subjectId) {
+            alert("Please select Teacher and Subject");
+            return;
+        }
+
         var id = teacherId + '~' + subjectId;
-        if (id != '') {
-            $.ajax({
-                url: '/Performance/EditTeacherRoleManagement/' + id,
-                type: "GET",
-                dataType: 'html',
-                success: function (data) {
-                    $('#list-out-allTeacherSubject').html('');
-                    $('#list-out-allTeacherSubject').html(data);
-                    PushIntoArrayTheAllCheckedItems();
-                }
-            });
-        }
-        else {
-            $('#list-out-allTeacherSubject').html('');
-        }
+
+        $.ajax({
+            url: '/Performance/EditTeacherRoleManagement/' + id,
+            type: "GET",
+            dataType: 'html',
+            success: function (data) {
+                $('#list-out-allTeacherSubject').html(data);
+                PushIntoArrayTheAllCheckedItems();
+            }
+        });
     });
 
     $(window).load(function () {

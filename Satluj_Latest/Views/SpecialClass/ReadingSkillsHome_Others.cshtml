@@ -1,7 +1,7 @@
 ﻿@model Satluj_Latest.Models.SubjectScoreModel
 @{
     Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = Model.IsAdminCheck == 1;
 }
 @Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
 @Html.HiddenFor(z => z.SubjectId, new { Value = @Model.SubjectId })
@@ -167,7 +167,7 @@
                             $(".class-drop-down").html("");
                             $(".class-drop-down").append($('<option></option>').val("0").html('-- Select Division --'));
                             $.each(result.list, function (i, item) {
-                                $(".class-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                                $(".class-drop-down").append($('<option></option>').val(item.value).html(item.text));
                             });
                             $(".class-drop-down").prop("disabled", false);
                         }
@@ -221,7 +221,7 @@
                     $(".assesment-id").html("");
                     $(".assesment-id").append($('<option></option>').val("0").html('-- Select Assesments --'));
                     $.each(result.list, function (i, item) {
-                        $(".assesment-id").append($('<option></option>').val(item.Value).html(item.Text));
+                        $(".assesment-id").append($('<option></option>').val(item.value).html(item.text));
                     });
                     $(".assesment-id").prop("disabled", false);
                 }
@@ -255,7 +255,7 @@
                     $(".slct-subject-dropdown").html("");
                     $(".slct-subject-dropdown").append($('<option></option>').val("0").html('-- Select Subject --'));
                     $.each(result.list, function (i, item) {
-                        $(".slct-subject-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                        $(".slct-subject-dropdown").append($('<option></option>').val(item.value).html(item.text));
                     });
                     $(".slct-subject-dropdown").prop("disabled", false);
                 }
@@ -286,7 +286,7 @@
                         $(".skill_selction").html("");
                         $(".skill_selction").append($('<option></option>').val("0").html('-- Select Subject --'));
                         $.each(result.list, function (i, item) {
-                            $(".skill_selction").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".skill_selction").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".skill_selction").prop("disabled", false);
                     }

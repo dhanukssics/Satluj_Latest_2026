@@ -87,6 +87,9 @@
         $.ajax({
             url: '/SpecialClass/AssesmentListPartialView',
             type: 'GET',
+            data: {
+                schoolId: $("#SchoolId").val()
+            },
             success: function (data) {
                 $('#assesment-list-id').html(data);
             }

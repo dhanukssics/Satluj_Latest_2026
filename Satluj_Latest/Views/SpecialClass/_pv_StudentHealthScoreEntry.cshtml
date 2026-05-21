@@ -3,7 +3,7 @@
 @model Satluj_Latest.Models.StudentNonSubjectSkillMarks
 @{
     int count = 1;
-        bool IsAdmin = ViewBag.IsAdmin;
+        bool IsAdmin = true;
 }
 @Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
 @Html.HiddenFor(z => z.DivisionId, new { Value = @Model.DivisionId })

@@ -1,7 +1,7 @@
 ﻿@model Satluj_Latest.Models.CalendarEventModels
 @{
-    var calender = new Satluj_Latest.Data.School(Model.schoolId).GetCalendarEventByDate(Model.startDate, Model.endDate);
-        bool IsAdmin = ViewBag.IsAdmin;
+   
+    bool IsAdmin = ViewBag.IsAdmin as bool? ?? false;
 }
 
 
@@ -26,32 +26,36 @@
     </tr>
 </thead>
 <tbody>
-    @{
+    @if (Model?.CalendarEvents != null && Model.CalendarEvents.Any())
+    {
         int i = 1;
-        foreach (var cal in calender)
+        foreach (var cal in Model.CalendarEvents)
         {
             <tr>
-                <td class="ng-teacherDetails-click">
-                    @i
-                </td>
-                <td class="ng-teacherDetails-click">
-                    @cal.EventHead
-                </td>
-                <td class="ng-teacherDetails-click">
-                    @cal.EventDetails
-                </td>
-                <td class="ng-teacherDetails-click">
-                    @cal.EventDate.ToString("dd/MM/yyyy")
-                </td>
-                @if (IsAdmin == true)
+                <td>@i</td>
+                <td>@cal.EventHead</td>
+                <td>@cal.EventDetails</td>
+                <td>@cal.EventDate.ToString("dd/MM/yyyy")</td>
+
+                @if (IsAdmin)
                 {
                     <td>
-                        <button class="delete-category-tr btn-peek" data-id="@cal.EventId"><i class="fa fa-trash "></i></button>
-                        <button class="edit-staff-tr pay-now-btn" data-id="@cal.EventId"><i class="fa fa-edit "></i></button>
+                        <button class="delete-category-tr btn-peek" data-id="@cal.EventId">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                        <button class="edit-staff-tr pay-now-btn" data-id="@cal.EventId">
+                            <i class="fa fa-edit"></i>
+                        </button>
                     </td>
                 }
             </tr>
             i++;
         }
+    }
+    else
+    {
+        <tr>
+            <td colspan="5" style="text-align:center;">No Events Found</td>
+        </tr>
     }
 </tbody>

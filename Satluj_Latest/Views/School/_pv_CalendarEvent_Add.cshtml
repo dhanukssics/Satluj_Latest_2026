@@ -24,11 +24,7 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label asp-for="eventDate"></label>
-                    <input asp-for="eventDate"
-                           class="form-control"
-                           autocomplete="off"
-                           placeholder="Select Date"
-                           id="eventDate" />
+                    <input type="date" asp-for="eventDate" class="form-control" placeholder="Select Date" />
                     <span asp-validation-for="eventDate"></span>
                 </div>
 
@@ -78,4 +74,5 @@
             }
         });
     });
+       
 </script>

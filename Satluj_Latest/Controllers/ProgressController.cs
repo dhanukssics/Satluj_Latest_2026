@@ -2781,14 +2781,33 @@ namespace Satluj_Latest.Controllers
                 {
                     model.StudentId = studentId;
                     model.ExamId = declaredExamId;
-                    model.SchoolName = StudentDetails.School.SchoolName;
-                    model.AccademicSession = ClassDetails.AcademicYear.AcademicYear;
-                    model.ReportName = _Entities.TbCertificateNames.Where(x => x.IsActive && x.SchoolId == StudentDetails.SchoolId).Select(x => x.CertificateName).FirstOrDefault() == null ? " REPORT " : _Entities.TbCertificateNames.Where(x => x.IsActive && x.SchoolId == StudentDetails.SchoolId).Select(x => x.CertificateName).FirstOrDefault();
-                    model.RollNo = StudentDetails.ClasssNumber == null ? " " : StudentDetails.ClasssNumber;
-                    model.StudentName = StudentDetails.StundentName;
-                    model.FathersName = StudentDetails.ParentName;
-                    model.MothersName = StudentDetails.MotherName == null ? " " : StudentDetails.MotherName;
-                    model.RegionName = RegionDetails.Region.RegionName;
+                                        
+                    var academicYearDetails = _Entities.TbAcademicYears
+                        .FirstOrDefault(x => x.YearId == ClassDetails.AcademicYearId && x.IsActive);
+
+                    var regionMaster = _Entities.TbRegionss
+                        .FirstOrDefault(x => x.Id == RegionDetails.RegionId && x.IsActive);
+
+                    // Assign safely
+                    model.SchoolName = schoolDetails?.SchoolName ?? "";
+                    model.AccademicSession = academicYearDetails?.AcademicYear ?? "";
+
+                    // Avoid duplicate DB calls
+                    var certificateName = _Entities.TbCertificateNames
+                        .Where(x => x.IsActive && x.SchoolId == StudentDetails.SchoolId)
+                        .Select(x => x.CertificateName)
+                        .FirstOrDefault();
+
+                    model.ReportName = string.IsNullOrWhiteSpace(certificateName) ? " REPORT " : certificateName;
+
+                    // Simple fields (safe already)
+                    model.RollNo = StudentDetails.ClasssNumber ?? " ";
+                    model.StudentName = StudentDetails.StundentName ?? "";
+                    model.FathersName = StudentDetails.ParentName ?? "";
+                    model.MothersName = StudentDetails.MotherName ?? " ";
+
+                    // Region (safe)
+                    model.RegionName = regionMaster?.RegionName ?? ""; 
                     //-----------------New-------------------
                     model.AdmissionNo = StudentDetails.StudentSpecialId;
                     model.StudentImage = StudentDetails.FilePath;
@@ -2830,7 +2849,15 @@ namespace Satluj_Latest.Controllers
                     }
                     else
                         model.DateOfBirth = " ";
-                    model.ClassDivision = StudentDetails.Class.Class + "-" + StudentDetails.Division.Division;
+                    var classMaster = _Entities.TbClasses
+                                        .FirstOrDefault(x => x.ClassId == StudentDetails.ClassId && x.IsActive);
+
+                    var divisionMaster = _Entities.TbDivisions
+                        .FirstOrDefault(x => x.DivisionId == StudentDetails.DivisionId && x.IsActive);
+
+                    model.ClassDivision =
+                        (classMaster?.Class ?? "") + "-" +
+                        (divisionMaster?.Division ?? "");
 
                     var twoDeclaredExams = _Entities.TbDeclaredExams.Where(x => x.ClassId == StudentDetails.ClassId && x.IsActive && x.SchoolId == StudentDetails.SchoolId && x.Id == model.ExamId).ToList().OrderBy(x => x.ExamId).ToList();
 

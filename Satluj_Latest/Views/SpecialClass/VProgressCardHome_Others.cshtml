@@ -142,7 +142,7 @@
                         $(".class-drop-down").html("");
                         $(".class-drop-down").append($('<option></option>').val("0").html('-- Select Division --'));
                         $.each(result.list, function (i, item) {
-                            $(".class-drop-down").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".class-drop-down").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".class-drop-down").prop("disabled", false);
                     }
