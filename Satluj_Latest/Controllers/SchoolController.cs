@@ -422,8 +422,15 @@ namespace Satluj_latestversion.Controllers
         #region Library
         public ActionResult BookCategory()
         {
-            LibraryModels model = new LibraryModels();
-            model.schoolId = _user.SchoolId;
+            LibraryModels model = new LibraryModels
+            {
+                schoolId = _user.SchoolId,
+                IsAdmin = HttpContext.Session.GetInt32("isAdmin") == 1,
+                CategoryList = _Entities.TbBookCategories
+                    .Where(x => x.SchoolId == _user.SchoolId && x.IsActive)
+                    .ToList()
+            };
+
             return View(model);
         }
         public PartialViewResult EditCategoryView(string id)
@@ -494,9 +501,19 @@ namespace Satluj_latestversion.Controllers
         }
         public PartialViewResult BookCategoryListPartial()
         {
-            LibraryModels model = new LibraryModels();
-            model.schoolId = _user.SchoolId;
-            return PartialView("~/Views/School/_pv_BookCategory_list.cshtml", model);
+            var model = new LibraryModels
+            {
+                schoolId = _user.SchoolId,
+                IsAdmin = HttpContext.Session.GetInt32("isAdmin") == 1,
+                CategoryList = _Entities.TbBookCategories
+                    .Where(x => x.SchoolId == _user.SchoolId && x.IsActive)
+                    .ToList()
+            };
+
+            return PartialView(
+                "~/Views/School/_pv_BookCategory_list.cshtml",
+                model
+            );
         }
 
         public ActionResult LibraryBook()
@@ -734,8 +751,13 @@ namespace Satluj_latestversion.Controllers
             model.schoolId = _user.SchoolId;
             model.startDate = CurrentTime;
             model.endDate = CurrentTime;
-            model.CalendarEvents = new Satluj_Latest.Data.School(model.schoolId).GetCalendarEventByDate(model.startDate, model.endDate);
-
+            model.CalendarEvents = _Entities.TbCalenderEvents
+                .Where(x => x.SchoolId == model.schoolId
+                         && x.IsActive
+                         && x.EventDate.Date >= model.startDate.Date
+                         && x.EventDate.Date <= model.endDate.Date)
+                .OrderByDescending(x => x.EventDate)
+                .ToList();
             ViewBag.IsAdmin = true;
 
             return View(model);
@@ -4814,8 +4836,17 @@ namespace Satluj_latestversion.Controllers
         //---------------Archana 02-Feb-2018--------------
         public ActionResult CircularNotification()
         {
-            var model = new Satluj_Latest.Models.CircularList();
-            model.schoolId = _user.SchoolId;
+            var model = new Satluj_Latest.Models.CircularList
+            {
+                schoolId = _user.SchoolId,
+                IsAdmin = true,
+
+                CircularData = _Entities.TbCirculars
+                    .Where(x => x.SchoolId == _user.SchoolId && x.IsActive)
+                    .OrderByDescending(x => x.CircularDate)
+                    .ToList()
+            };
+
             return View(model);
         }
 

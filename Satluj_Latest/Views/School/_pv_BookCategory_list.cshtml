@@ -1,7 +1,9 @@
 ﻿@model Satluj_Latest.Models.LibraryModels
 @{
-    var category = new Satluj_Latest.Data.School(Model.schoolId).GetBookCategory();
-        bool IsAdmin = ViewBag.IsAdmin;
+    
+    var category = Model.CategoryList;
+    bool IsAdmin = Model.IsAdmin;
+
 }
 
 
@@ -13,7 +15,7 @@
         <th>
             Category
         </th>
-        @if (IsAdmin == true)
+        @if (IsAdmin)
         {
             <th></th>
         }
@@ -33,7 +35,7 @@
                 <td class="ng-teacherDetails-click">
                     @cat.Category
                 </td>
-                @if (IsAdmin == true)
+                @if (IsAdmin=true)
                 {
                     <td>
                         <button class="delete-category-tr btn-peek" data-id="@cat.CategoryId"><i class="fa fa-trash "></i></button>

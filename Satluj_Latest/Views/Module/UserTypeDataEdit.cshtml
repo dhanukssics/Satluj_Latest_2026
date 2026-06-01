@@ -84,7 +84,7 @@
         var id = user + '~' + typeId;
         if (id != '') {
             $.ajax({
-                url: '/Module/EditListOfUserType/' + id,
+                url: '/Module/EditListOfUserType?id=' + id,
                 type: "GET",
                 dataType: 'html',
                 success: function (data) {
@@ -94,7 +94,7 @@
             });
         }
         else {
-            $('#list-ouut-all usertypes').html('');
+            $('#list-ouut-allusertypes').html('');
         }
     });
 
@@ -112,7 +112,7 @@
                         $("#usertype-selection").html("");
                         $("#usertype-selection").append($('<option></option>').val("0").html('-- Choose --'));
                         $.each(result.list, function (i, item) {
-                            $("#usertype-selection").append($('<option></option>').val(item.Value).html(item.Text));
+                            $("#usertype-selection").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $("#usertype-selection").prop("disabled", false);
                     }
@@ -144,7 +144,7 @@
                     $("#usertype-selection").html("");
                     $("#usertype-selection").append($('<option></option>').val("0").html('-- Choose --'));
                     $.each(result.list, function (i, item) {
-                        $("#usertype-selection").append($('<option></option>').val(item.Value).html(item.Text));
+                        $("#usertype-selection").append($('<option></option>').val(item.value).html(item.text));
                     });
                     $("#usertype-selection").prop("disabled", false);
                 }
@@ -161,11 +161,11 @@
     $(document).on('click', '#editUserType-data-id', function () {
         $('#editUserType-data-id').prop('disabled', true);
         ajaxLoaderStart();
-        if ($('#usertype-selection').text != '') {
+        if ($('#usertype-selection option:selected').text() != '') {
             if (array.length > 0) {
                 var ob = new Object();
                 ob.userType = $('#user-type-type').val();
-                ob.UserTypeName = $('#usertype-selection').text();
+                ob.UserTypeName = $('#usertype-selection option:selected').text()();
                 ob.UserTypeId = $('#usertype-selection').val();
                 if ($('#isAdmin-check-id').is(":checked")) {
                     ob.IsAdmin = true;
@@ -289,7 +289,7 @@
         var id = user + '~' + typeId;
         if (id != '') {
             $.ajax({
-                url: '/Module/EditListOfUserType/' + id,
+                url: '/Module/EditListOfUserType?id=' + id,
                 type: "GET",
                 dataType: 'html',
                 success: function (data) {
@@ -299,7 +299,7 @@
             });
         }
         else {
-            $('#list-ouut-all usertypes').html('');
+            $('#list-ouut-allusertypes').html('');
         }
     }
 

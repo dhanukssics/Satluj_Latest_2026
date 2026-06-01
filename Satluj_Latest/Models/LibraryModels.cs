@@ -25,6 +25,9 @@ namespace Satluj_Latest.Models
         public int status { get; set; }
         public bool isActive { get; set; }
         public string ReferenceNumber { get; set; }
+        public bool IsAdmin { get; set; }
+        public List<TbBookCategory> CategoryList { get; set; }
+    = new List<TbBookCategory>();
     }
 }
 

@@ -116,14 +116,12 @@ function (isConfirm) {
     });
 
 
-    $(document).on('change', '.upload-clean-Formats-dev-edit', function () {
-        //debugger;
-        //alert('hi');
-        var source = $(this);
-        var userId = $('#UserId').val();
+        $(document).on('change', '.upload-clean-Formats-dev-edit', function () {
+
         var formData = new FormData();
-        formData.append("documentFile", this.files[0]);
-        formData.append("UserId", userId);
+
+        formData.append("file", this.files[0]);
+
         $.ajax({
             type: "POST",
             url: "/School/DocumentUpload",
@@ -131,18 +129,26 @@ function (isConfirm) {
             data: formData,
             contentType: false,
             processData: false,
-            beforeSend: function (xhr) {
-            },
+
             success: function (response) {
+
                 if (response.Status) {
-                    var data = response.UserData;
-                    $('#FilePath').val(data);
-                }
-                else {
-                    toastrError('No such Files!');
+
+                    $('#FilePath').val(response.UserData);
+
+                    toastrSuccess("File uploaded successfully");
+
+                } else {
+
+                    toastrError(response.Message);
+
                 }
             },
-            error: function (data) {
+
+            error: function () {
+
+                toastrError('Upload failed');
+
             }
         });
 

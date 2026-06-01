@@ -12,7 +12,7 @@
             <div class="modal-header">
                 <button type="button"
                         class="close"
-                        data-bs-dismiss="modal"
+                        data-dismiss="modal"
                         aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -93,8 +93,8 @@
         </div>
     </div>
 </form>
-@section Scripts {
-    <script>
+
+<script>
         $("#form-login").submit(function (e) {
             e.preventDefault();
 
@@ -110,10 +110,7 @@
                 }
             });
         });
-    </script>
-}
 
-<script>
     $('#DocumentDateString').datepicker({
         format: "dd-mm-yyyy",
         autoclose: true,
@@ -124,7 +121,8 @@
     $(document).on('change', '.upload-clean-Formats-dev', function () {
 
         var formData = new FormData();
-        formData.append("documentFile", this.files[0]);
+
+        formData.append("file", this.files[0]);
 
         $.ajax({
             type: "POST",
@@ -132,14 +130,29 @@
             data: formData,
             contentType: false,
             processData: false,
+
             success: function (response) {
-                if (response.status) {
-                    $('#FilePath').val(response.userData);
+
+                if (response.Status) {
+
+                    $('#FilePath').val(response.UserData);
+
+                    toastrSuccess('File uploaded successfully');
+
                 } else {
-                    toastrError('No such Files!');
+
+                    toastrError(response.Message);
+
                 }
+            },
+
+            error: function () {
+
+                toastrError('Upload failed');
+
             }
         });
+
     });
 
     function CircularNotificationsAddSuccess(result) {

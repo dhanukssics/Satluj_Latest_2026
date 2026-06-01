@@ -26,18 +26,25 @@ namespace Satluj_Latest.Controllers
                 mainList = new List<MainModuleList>()
             };
 
-            var list = _Entities.TbSubModules.Where(x => x.IsActive).ToList();
+            var list = _Entities.TbSubModules
+                        .Include(x => x.Main)
+                        .Where(x => x.IsActive)
+                        .ToList();
+
 
             var mainList = list
-                .Select(x => x.Main.MainModule)
-                .Distinct()
-                .ToList();
+                        .Where(x => x.Main != null)
+                        .Select(x => x.Main.MainModule)
+                        .Distinct()
+                        .ToList();
 
             foreach (var item in mainList)
             {
                 string subIdString = string.Empty;
                 string main = Convert.ToString(item);
-                var sub = list.Where(x => x.Main.MainModule == main).ToList();
+                var sub = list
+                        .Where(x => x.Main != null && x.Main.MainModule == main)
+                        .ToList();
 
                 var one = new MainModuleList
                 {
@@ -135,14 +142,13 @@ namespace Satluj_Latest.Controllers
 
             // Use ThenBy for multiple sort keys
             var data = _Entities.TbUserModuleDetails
-                .Include(d => d.UserModule)
-                .Include(d => d.SubModule)
-                .Include(d => d.Main)
-                .Where(x => x.UserModule.SchoolId == _user.SchoolId && x.IsActive)
-                .OrderBy(x => x.UserModule.UserTypeName)
-                .ThenBy(x => x.UserModule.TbUserModuleDetails)
-                .ThenBy(x => x.SubModule.SubModule)
-                .ToList();
+                        .Include(d => d.UserModule)
+                        .Include(d => d.SubModule)
+                        .Include(d => d.Main)
+                        .Where(x => x.UserModule.SchoolId == _user.SchoolId && x.IsActive)
+                        .OrderBy(x => x.UserModule.UserTypeName)
+                        .ThenBy(x => x.SubModule.SubModule)
+                        .ToList();
 
             foreach (var item in data)
             {
@@ -246,7 +252,10 @@ namespace Satluj_Latest.Controllers
             var userType = Convert.ToInt64(parts[0]);
             var typeId = Convert.ToInt64(parts[1]); // kept for parity though not used below (original code had it)
 
-            var userData = _Entities.TbUserModuleDetails.Where(x => x.UserModuleId == userType).ToList();
+            var userData = _Entities.TbUserModuleDetails
+                            .Include(x => x.Main)
+                            .Where(x => x.UserModuleId == userType)
+                            .ToList();
 
             var model = new UserModuleModel
             {
@@ -254,15 +263,29 @@ namespace Satluj_Latest.Controllers
                 mainList = new List<MainModuleList>()
             };
 
-            var list = _Entities.TbSubModules.Where(x => x.IsActive).ToList();
-            var mainList = list.Select(x => x.Main.MainModule).Distinct().ToList();
+            var list = _Entities.TbSubModules
+                        .Include(x => x.Main)
+                        .Where(x => x.IsActive)
+                        .ToList();
+            var mainList = list
+                            .Where(x => x.Main != null)
+                            .Select(x => x.Main.MainModule)
+                            .Distinct()
+                            .ToList();
 
             foreach (var item in mainList)
             {
                 string subIdString = string.Empty;
                 string main = Convert.ToString(item);
-                var sub = list.Where(x => x.Main.MainModule == main).ToList();
-                var userMainExists = userData.Where(x => x.Main.MainModule == main && x.IsActive).ToList();
+                var sub = list
+                            .Where(x => x.Main != null &&
+                                        x.Main.MainModule == main)
+                            .ToList();
+                var userMainExists = userData
+                                    .Where(x => x.Main != null &&
+                                                x.Main.MainModule == main &&
+                                                x.IsActive)
+                                    .ToList();
 
                 var one = new MainModuleList
                 {
