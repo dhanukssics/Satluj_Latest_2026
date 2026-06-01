@@ -632,16 +632,25 @@ namespace Satluj_Latest.Data
 
         public List<SelectListItem> GetAllDivisionTeacherWise(long classId, long schoolId, long teacherId)
         {
-            var input = _Entities.TbTeacherClassSubjects
-                .Where(x => x.SchoolId == schoolId && x.ClassId == classId && x.TeacherId == teacherId && x.IsActive && x.Class.PublishStatus == true && x.Class.IsActive)
-                .ToList()
-                .Select(x => new { x.DivisionId, x.Division.Division })
+            return _Entities.TbTeacherClassSubjects
+                .Include(x => x.Division)
+                .Include(x => x.Class)
+                .Where(x => x.SchoolId == schoolId
+                         && x.ClassId == classId
+                         && x.TeacherId == teacherId
+                         && x.IsActive
+                         && x.Class != null
+                         && x.Class.PublishStatus
+                         && x.Class.IsActive
+                         && x.Division != null)
+                .Select(x => new SelectListItem
+                {
+                    Text = x.Division.Division,
+                    Value = x.DivisionId.ToString()
+                })
                 .Distinct()
                 .ToList();
-
-            return input.Select(x => new SelectListItem { Text = x.Division.ToString(), Value = x.DivisionId.ToString() }).ToList();
         }
-
         public List<SelectListItem> GetAllSubjectsOfExamInTeacherWise(long classId, long schoolId, long teacherId, long examId, long divisionId)
         {
             List<long> allowed;

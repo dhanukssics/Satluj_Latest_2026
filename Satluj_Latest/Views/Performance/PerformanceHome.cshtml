@@ -150,7 +150,7 @@
                         $(".slct-free-div-dropdown").html("");
                         $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('All'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown").prop("disabled", false);
                         $('#division-required-exam-edit').hide();
@@ -198,7 +198,7 @@
                     if (result.list.length > 0) {
                         $(".slct-free-div-dropdown1").html("");
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown1").prop("disabled", false);
                         $('#exam-required-examlist-edit').hide();
@@ -235,7 +235,7 @@
                             $(".slct-free-div-dropdown2").append($('<option></option>').val("-1").html('Total'));
                         }
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown2").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown2").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown2").prop("disabled", false);
                         $('#subject-required-subject-add').hide();
@@ -274,7 +274,7 @@
                             $(".slct-free-div-dropdown2").append($('<option></option>').val("-1").html('Total'));
                         }
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown2").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown2").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown2").prop("disabled", false);
                         $('#subject-required-subject-add').hide();
@@ -335,7 +335,7 @@
                         $(".slct-free-div-dropdownNonAdmin").html("");
                         $(".slct-free-div-dropdownNonAdmin").append($('<option></option>').val("0").html('All'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdownNonAdmin").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdownNonAdmin").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdownNonAdmin").prop("disabled", false);
                         $('#division-required-exam-editNonAdmin').hide();
@@ -383,7 +383,7 @@
                     if (result.list.length > 0) {
                         $(".slct-free-div-dropdown1NonAdmin").html("");
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown1NonAdmin").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown1NonAdmin").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown1NonAdmin").prop("disabled", false);
                         $('#exam-required-examlist-editNonAdmin').hide();
@@ -420,7 +420,7 @@
                             $(".slct-free-div-dropdown2NonAdmin").append($('<option></option>').val("-1").html('Total'));
                         }
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown2NonAdmin").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown2NonAdmin").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown2NonAdmin").prop("disabled", false);
                         $('#subject-required-subject-addNonAdmin').hide();
@@ -456,7 +456,7 @@
                             $(".slct-free-div-dropdown2NonAdmin").append($('<option></option>').val("-1").html('Total'));
                         }
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown2NonAdmin").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown2NonAdmin").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown2NonAdmin").prop("disabled", false);
                         $('#subject-required-subject-addNonAdmin').hide();

@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "StudentMarks";
     Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = ViewBag.IsAdmin as bool? ?? false;
 }
 @Html.HiddenFor(z => z.SchoolId, new { Value = @Model.SchoolId })
 @Html.HiddenFor(z => z.ClassId, new { Value = 0 })
@@ -130,7 +130,7 @@
                         $(".slct-free-div-dropdown").html("");
                         $(".slct-free-div-dropdown").append($('<option></option>').val("0").html('-- Select Division --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown").prop("disabled", false);
                         $('#division-required-exam-edit').hide();
@@ -188,7 +188,7 @@
                         $(".slct-free-div-dropdown1").html("");
                         $(".slct-free-div-dropdown1").append($('<option></option>').val("0").html('-- Select Exam --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown1").prop("disabled", false);
                         $('#exam-required-examlist-edit').hide();
@@ -221,7 +221,7 @@
                         $(".slct-free-div-dropdown2").html("");
                         $(".slct-free-div-dropdown2").append($('<option></option>').val("0").html('-- Select Subject --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown2").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown2").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown2").prop("disabled", false);
                         $('#subject-required-subject-add').hide();
@@ -401,7 +401,7 @@
                         $(".slct-free-div-dropdownNonAdmin").html("");
                         $(".slct-free-div-dropdownNonAdmin").append($('<option></option>').val("0").html('-- Select Division --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdownNonAdmin").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdownNonAdmin").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdownNonAdmin").prop("disabled", false);
                         $('#division-required-exam-editNonAdmin').hide();
@@ -459,7 +459,7 @@
                         $(".slct-free-div-dropdown1NonAdmin").html("");
                         $(".slct-free-div-dropdown1NonAdmin").append($('<option></option>').val("0").html('-- Select Exam --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown1NonAdmin").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown1NonAdmin").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown1NonAdmin").prop("disabled", false);
                         $('#exam-required-examlist-editNonAdmin').hide();
@@ -495,7 +495,7 @@
                         $(".slct-free-div-dropdown2NonAdmin").html("");
                         $(".slct-free-div-dropdown2NonAdmin").append($('<option></option>').val("0").html('-- Select Subject --'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-free-div-dropdown2NonAdmin").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-free-div-dropdown2NonAdmin").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-free-div-dropdown2NonAdmin").prop("disabled", false);
                         $('#subject-required-subject-addNonAdmin').hide();

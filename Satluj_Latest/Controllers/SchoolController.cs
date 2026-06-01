@@ -5913,6 +5913,7 @@ namespace Satluj_latestversion.Controllers
             model.UserId = _user.UserId;
             ViewBag.classlist = _dropdown.GetClasses(model.SchoolId);
             ViewBag.UserClasses= _dropdown.GetClassesUserWise(model.SchoolId, model.UserId);
+            ViewBag.IsAdmin = true;
             return View(model);
         }
         public ActionResult DiaryUpload()

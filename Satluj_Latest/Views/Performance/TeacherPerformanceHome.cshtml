@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "PerformanceHome";
     Layout = "~/Views/Shared/_SchoolAdminLayout.cshtml";
-        bool IsAdmin = ViewBag.IsAdmin;
+    bool IsAdmin = ViewBag.IsAdmin as bool? ?? false;
 }
 <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
 <script src="https://www.amcharts.com/lib/3/pie.js"></script>
@@ -100,7 +100,7 @@
                         $(".slct-class-dropdown1").html("");
                         $(".slct-class-dropdown1").append($('<option></option>').val("0").html('All'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-class-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-class-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-class-dropdown1").prop("disabled", false);
 
@@ -181,7 +181,7 @@
                         $(".slct-div-dropdown1").html("");
                         $(".slct-div-dropdown1").append($('<option></option>').val("0").html('All'));
                         $.each(result.list, function (i, item) {
-                            $(".slct-div-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-div-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-div-dropdown1").prop("disabled", false);
                         FillExam();
@@ -237,7 +237,7 @@
                     if (result.list.length > 0) {
                         $(".slct-exam-dropdown1").html("");
                         $.each(result.list, function (i, item) {
-                            $(".slct-exam-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-exam-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-exam-dropdown1").prop("disabled", false);
 
@@ -289,7 +289,7 @@
                     if (result.list.length > 0) {
                         $(".slct-sub-dropdown1").html("");
                         $.each(result.list, function (i, item) {
-                            $(".slct-sub-dropdown1").append($('<option></option>').val(item.Value).html(item.Text));
+                            $(".slct-sub-dropdown1").append($('<option></option>').val(item.value).html(item.text));
                         });
                         $(".slct-sub-dropdown1").prop("disabled", false);
 

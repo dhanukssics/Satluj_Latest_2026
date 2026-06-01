@@ -971,7 +971,7 @@ namespace Satluj_Latest.Controllers
             model.SchoolId = _user.SchoolId;
             model.UserId = _user.UserId;
             ViewBag.Teacherlist = _dropdown.GetTeachers(model.SchoolId);
-            
+            ViewBag.IsAdmin = true;
             return View(model);
         }
         public IActionResult TeacherPieChartPartial(string id)
