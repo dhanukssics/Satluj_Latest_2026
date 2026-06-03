@@ -2,7 +2,8 @@
 @model Satluj_Latest.Models.Chart
 @{
     ViewBag.Title = "PerformanceHome";
-        bool IsAdmin = ViewBag.IsAdmin;
+        // bool IsAdmin = ViewBag.IsAdmin; 2-6-2026
+    bool IsAdmin = ViewBag.IsAdmin != null ? Convert.ToBoolean(ViewBag.IsAdmin) : false;
     int count = 1;
 
 }
