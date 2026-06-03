@@ -334,37 +334,85 @@
         });
 
     });
-        $('.slct-teacherclass-dropdwn').change(function () {
+        // $('.slct-teacherclass-dropdwn').change(function () {
+
+        // var classId = $(this).val();
+
+        // if (classId != "") {
+
+        //     $.ajax({
+        //         url: '/School/GetFreeDivision',
+        //         type: 'GET',
+        //         data: { classId: classId },
+        //         success: function (data) {
+
+        //             var divisionDropdown = $('.slct-free-div-dropdown');
+        //             divisionDropdown.empty();
+
+        //             divisionDropdown.append('<option value="">--Choose--</option>');
+
+        //             $.each(data, function (i, item) {
+        //                 divisionDropdown.append(
+        //                     $('<option>', {
+        //                         value: item.value,
+        //                         text: item.text
+        //                     })
+        //                 );
+        //             });
+
+        //             divisionDropdown.prop('disabled', false);
+        //         }
+        //     });
+            $(document).on('change', '.slct-teacherclass-dropdwn', function () {
 
         var classId = $(this).val();
+
+        var divisionDropdown = $('.slct-free-div-dropdown');
+
+        divisionDropdown.empty();
+        divisionDropdown.append('<option value="">Loading...</option>');
 
         if (classId != "") {
 
             $.ajax({
                 url: '/School/GetFreeDivision',
                 type: 'GET',
+                cache: false,
                 data: { classId: classId },
+
                 success: function (data) {
 
-                    var divisionDropdown = $('.slct-free-div-dropdown');
-                    divisionDropdown.empty();
+                    console.log(data);
 
+                    divisionDropdown.empty();
                     divisionDropdown.append('<option value="">--Choose--</option>');
 
                     $.each(data, function (i, item) {
+
                         divisionDropdown.append(
                             $('<option>', {
-                                value: item.value,
-                                text: item.text
+                                value: item.value || item.Value,
+                                text: item.text || item.Text
                             })
                         );
                     });
 
                     divisionDropdown.prop('disabled', false);
+                },
+
+                error: function (xhr, status, error) {
+
+                    console.log("Status:", xhr.status);
+                    console.log("Error:", error);
+                    console.log("Response:", xhr.responseText);
+
+                    toastr.error("Unable to load divisions");
                 }
             });
         }
     });
+    //     }
+    // });
 
 
 </script>
