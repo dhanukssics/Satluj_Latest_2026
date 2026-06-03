@@ -2865,9 +2865,17 @@ namespace Satluj_Latest.Controllers
                     var term1DeclaredExams = twoDeclaredExams.Where(x => x.Id == twoDeclaredExams[0].Id && x.IsActive).FirstOrDefault();
                     //var term2DeclaredExams = twoDeclaredExams.Where(x => x.ExamId == allExamTerms[1].Id && x.IsActive).FirstOrDefault();
 
-                    var term1Subjects = _Entities.TbDeclaredExamSubjects.Where(x => x.DeclaredExamId == term1DeclaredExams.Id && x.IsActive).OrderBy(x => x.TimeStamp).ToList();
+                    var term1Subjects = _Entities.TbDeclaredExamSubjects
+                                        .Include(x => x.Subject)
+                                        .ThenInclude(x => x.TbDeclaredExamSubjects)
+                                        .Where(x => x.DeclaredExamId == term1DeclaredExams.Id && x.IsActive)
+                                        .OrderBy(x => x.TimeStamp)
+                                        .ToList();
                     //var term2Subjects = _Entities.TbDeclaredExamsubjects.Where(x => x.DeclaredExamId == term2DeclaredExams.Id && x.IsActive).ToList();
-                    var allSubjects = term1Subjects.Select(x => x.Subject).ToList().ToList();
+                    var allSubjects = term1Subjects
+                                        .Where(x => x.Subject != null)
+                                        .Select(x => x.Subject)
+                                        .ToList();
                     bool haveComputerScience = false;
                     if (allSubjects.Any(x => x.SubId == 10050 || x.SubId == 20076)) // Information Technology Without Code for VI to VIII
                     {
@@ -2923,8 +2931,16 @@ namespace Satluj_Latest.Controllers
                                 if (scholastics != null)
                                 {
                                     //var main = scholastics.tb_ScolasticAreaResultDetails.Where(x => x.SubjectId == sub.SubId).Select(x => x.Score).FirstOrDefault();
-                                    var mainFull = _Entities.TbScolasticAreaResultDetails.Where(x => x.SubjectId == sub.SubId && x.Main.ExamId == Item.Id && x.Main.StudentId == studentId && x.Main.ScholasticId == data.Id && x.IsActive && x.Main.IsActive).FirstOrDefault();
-                                    if (mainFull != null)
+                                    var mainFull = _Entities.TbScolasticAreaResultDetails
+                                        .Include(x => x.Main)
+                                            .ThenInclude(x => x.Scholastic)
+                                        .FirstOrDefault(x =>
+                                            x.SubjectId == sub.SubId &&
+                                            x.Main.ExamId == Item.Id &&
+                                            x.Main.StudentId == studentId &&
+                                            x.Main.ScholasticId == data.Id &&
+                                            x.IsActive &&
+                                            x.Main.IsActive); if (mainFull != null)
                                     {
                                         if (mainFull.Score == 0)
                                         {
@@ -2999,7 +3015,12 @@ namespace Satluj_Latest.Controllers
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
-                            sco = allSubjects.FirstOrDefault().TbDeclaredExamSubjects.Where(x => x.IsActive == true).FirstOrDefault() == null ? 0 : allSubjects.FirstOrDefault().TbDeclaredExamSubjects.Where(x => x.IsActive == true).FirstOrDefault().TotalScore;
+                            var firstSubject = allSubjects?.FirstOrDefault();
+
+                            var declaredExamSubject = firstSubject?.TbDeclaredExamSubjects?
+                                .FirstOrDefault(x => x.IsActive);
+
+                            sco = declaredExamSubject?.TotalScore ?? 0;
                         }
                         zz.TotalScore = Math.Round(sco, MidpointRounding.AwayFromZero).ToString();
                         foreach (var sub in allSubjects)
@@ -3579,15 +3600,28 @@ namespace Satluj_Latest.Controllers
             string[] splitData = id.Split('~');
             var studentId = Convert.ToInt64(splitData[0]);
             var declaredExamId = Convert.ToInt64(splitData[1]);
-            var DeclredExamDetails = _Entities.TbDeclaredExams.Where(x => x.Id == declaredExamId && x.IsActive).FirstOrDefault();
-            var ExamTermDetails = DeclredExamDetails.Exam.Term;
-            var StudentDetails = _Entities.TbStudents.Where(x => x.StudentId == studentId && x.IsActive).FirstOrDefault();
-            var ClassDetails = DeclredExamDetails.Class;
+            var DeclredExamDetails = _Entities.TbDeclaredExams
+                                    .Include(x => x.Class)
+                                        .ThenInclude(x => x.TbRegionsClasses)
+                                            .ThenInclude(x => x.Region)
+                                    .Include(x => x.Exam)
+                                        .ThenInclude(x => x.Term)
+                                    .FirstOrDefault(x => x.Id == declaredExamId && x.IsActive);
+            var StudentDetails = _Entities.TbStudents
+                            .Include(x => x.Class)
+                            .Include(x => x.Division)
+                            .Include(x => x.School)
+                            .FirstOrDefault(x => x.StudentId == studentId);
+            var ClassDetails = _Entities.TbClasses
+                            .Include(x => x.AcademicYear)
+                            .FirstOrDefault(x => x.ClassId == DeclredExamDetails.ClassId);
             var RegionDetails = ClassDetails.TbRegionsClasses.Where(x => x.IsActive == true).FirstOrDefault();
             var ScholasticData = _Entities.TbScholasticAreas.Where(x => x.RegionId == RegionDetails.RegionId && x.IsActive && (x.SpecificTerm == null || x.SpecificTerm == DeclredExamDetails.TermId)).ToList();
             var CoScholasticData = _Entities.TbCoScholasticAreas.Where(x => x.RegionId == RegionDetails.RegionId && x.IsActive).OrderBy(x => x.OrderNo).ThenBy(x => x.TimeStamp).ToList();
             var schoolData = _Entities.TbLogins.Where(x => x.SchoolId == StudentDetails.SchoolId && x.RoleId == 1).FirstOrDefault();
             var periods = _Entities.TbAcademicPeriods.Where(x => x.SchoolId == StudentDetails.SchoolId && x.ClassId == StudentDetails.ClassId && x.IsActive).OrderBy(x => x.StartDate).ToList();
+            var ExamTermDetails = _Entities.TbExamTerms
+                                .FirstOrDefault(x => x.Id == DeclredExamDetails.TermId);
             if (ExamTermDetails.Id == 1)
             {
                 // Term one report
@@ -3662,7 +3696,10 @@ namespace Satluj_Latest.Controllers
 
                     var term1Subjects = _Entities.TbDeclaredExamSubjects.Where(x => x.DeclaredExamId == term1DeclaredExams.Id && x.IsActive).OrderBy(x => x.TimeStamp).ToList();
                     //var term2Subjects = _Entities.TbDeclaredExamsubjects.Where(x => x.DeclaredExamId == term2DeclaredExams.Id && x.IsActive).ToList();
-                    var allSubjects = term1Subjects.Select(x => x.Subject).ToList();
+                    var allSubjects = term1Subjects
+                        .Where(x => x.Subject != null)
+                        .Select(x => x.Subject)
+                        .ToList();
                     bool haveComputerScience = false;
                     bool havemarketing = false;
                     
@@ -3831,7 +3868,14 @@ namespace Satluj_Latest.Controllers
                         decimal sco = returnExamresult.FirstOrDefault() == null ? 0 : returnExamresult.FirstOrDefault().Subject.TotalScore;
                         if (sco == 0)
                         {
-                            sco = allSubjects.FirstOrDefault().TbDeclaredExamSubjects.Where(x => x.IsActive).OrderByDescending(x => x.TotalScore).FirstOrDefault() == null ? 0 : allSubjects.FirstOrDefault().TbDeclaredExamSubjects.Where(x => x.IsActive).OrderByDescending(x => x.TotalScore).FirstOrDefault().TotalScore;
+                            var firstSubject = allSubjects?.FirstOrDefault();
+
+                            var declaredExamSubject = firstSubject?.TbDeclaredExamSubjects?
+                                .Where(x => x.IsActive)
+                                .OrderByDescending(x => x.TotalScore)
+                                .FirstOrDefault();
+
+                            sco = declaredExamSubject?.TotalScore ?? 0;
                             sco = 80; //Add 80 mark for theory by Gayathri A(07/10/2023)
                         }
                         else

@@ -8372,7 +8372,7 @@ namespace Satluj_latestversion.Controllers
             model.FatherContact =  studentDetails.Parent.ContactNumber;
             model.MotherContact =  studentDetails.Parent.MotherContactNo;
             model.GuardianContact =  studentDetails.Parent.GuardianContactNo;
-            model.FatherEmail = studentDetails.ParentEmail;
+            model.FatherEmail = studentDetails.Parent.Email;
             model.MotherEmail =  studentDetails.Parent.MotherEmail;
             model.GuardianEmail =  studentDetails.Parent.GuardianEmail;
             return PartialView("~/Views/School/_pv_AddStudentPerentsInfoView.cshtml", model);
