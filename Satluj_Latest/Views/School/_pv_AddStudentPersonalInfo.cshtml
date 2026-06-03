@@ -58,7 +58,7 @@
                     </div>
 
                     <div class="col-sm-6">
-                        <label>Roll No.</label>
+                        <label>Roll No.</label><span style="color:red">***</span>
                         <input asp-for="RollNo1" class="form-control" placeholder="Roll No." />
                         <span asp-validation-for="RollNo1"></span>
                     </div>
@@ -78,7 +78,9 @@
 
         <div class="col-sm-4">
             <label>Email</label><span style="color:red">***</span>
-            <input asp-for="parentEmail" class="form-control" />
+            @* <input asp-for="parentEmail" class="form-control" /> *@
+            <input asp-for="parentEmail" id="parentEmail" class="form-control" />
+
             <span asp-validation-for="parentEmail"></span>
         </div>
 
@@ -93,19 +95,20 @@
     <!-- Contact -->
     <div class="row">
         <div class="col-sm-4">
-            <label>Mobile No.</label>
+            <label>Mobile No.</label><span style="color:red">***</span>
             <input asp-for="MobileNo" class="form-control" />
             <span asp-validation-for="MobileNo"></span>
         </div>
 
         <div class="col-sm-4">
             <label>Contact No.</label><span style="color:red">***</span>
-            <input asp-for="contactNo" class="form-control" type="number" />
+            <input asp-for="contactNo" id="contactNo" class="form-control" type="number" />
+            @* <input asp-for="contactNo" class="form-control" type="number" /> *@
             <span asp-validation-for="contactNo"></span>
         </div>
 
         <div class="col-sm-4">
-            <label>DOB</label>
+            <label>DOB</label><span style="color:red">***</span>
             <input asp-for="DOBstring" class="form-control" />
         </div>
     </div>
@@ -113,12 +116,12 @@
     <!-- Joining / Category / Blood -->
     <div class="row">
         <div class="col-sm-4">
-            <label>Date of Joining</label>
+            <label>Date of Joining</label><span style="color:red">***</span>
             <input asp-for="DateOfJoiningString" class="form-control" />
         </div>
 
         <div class="col-sm-4">
-            <label>Category</label>
+            <label>Category</label><span style="color:red">***</span>
             <select asp-for="CategoryId"
                     asp-items="Html.GetEnumSelectList<StudentCategory>()"
                     class="form-control">
@@ -128,7 +131,7 @@
         </div>
 
         <div class="col-sm-4">
-            <label>Blood Group</label>
+            <label>Blood Group</label><span style="color:red">***</span>
             <select id="slct-bloodGroup" class="form-control">
                 <option value="">--Choose--</option>
                 <option>O+</option>
@@ -146,24 +149,24 @@
     <!-- Address -->
     <div class="row">
         <div class="col-sm-4">
-            <label>Address</label>
+            <label>Address</label><span style="color:red">***</span>
             <textarea asp-for="address" class="form-control"></textarea>
         </div>
 
         <div class="col-sm-4">
-            <label>City</label>
+            <label>City</label><span style="color:red">***</span>
             <input asp-for="city" class="form-control" />
         </div>
 
         <div class="col-sm-4">
-            <label>State</label>
+            <label>State</label><span style="color:red">***</span>
             <input asp-for="state" class="form-control" />
         </div>
     </div>
 
     <div class="row">
         <div class="col-sm-4">
-            <label>Pin</label>
+            <label>Pin</label><span style="color:red">***</span>
             <input asp-for="Pincode" class="form-control" type="number" maxlength="6" />
         </div>
     </div>
@@ -175,19 +178,151 @@
     </div>
 
 </form>
-<script>
-    $("#form-login").submit(function (e) {
+<script> 
+    $("#form-login").submit(function (e) 
+    { 
         e.preventDefault();
+        var email = $("#parentEmail").val();
+        var mobileNo = $("#MobileNo").val();
+        var contactNo = $("#contactNo").val();
+        var admissionNo = $("#admissionNo").val();
+        var rollNo = $("#RollNo1").val();
+        var dob = $("#DOBstring").val()
+        var joiningDate = $("#DateOfJoiningString").val();
+        var category = $("#CategoryId").val();
+        var address = $("#address").val();
+        var city = $("#city").val();
+        var state = $("#state").val();
+        var pin = $("#Pincode").val();
+        var bloodGroup = $("#slct-bloodGroup").val();
 
-        $.ajax({
-            url: this.action,
-            type: "POST",
-            data: new FormData(this),
-            processData: false,
-            contentType: false,
-            success: StudentAddSuccess,
-            error: StudentAddFailed
-        });
-    });
-        
-</script>
+        if ($.trim(email) == "") {
+            toastrWarning("Email is required.");
+            $("#parentEmail").focus();
+            return false;
+        }
+        var emailPattern = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+        if (!emailPattern.test(email)) {
+            toastrWarning("Enter a valid Email Address.");
+            $("#parentEmail").focus();
+            return false;
+        }
+         if ($.trim(mobileNo) == "") {
+            toastrWarning("Mobile Number is required.");
+            $("#MobileNo").focus();
+            return false;
+        }
+
+        if (!/^[0-9]{10}$/.test(mobileNo)) {
+            toastrWarning("Enter a valid 10 digit Mobile Number.");
+            $("#MobileNo").focus();
+            return false;
+        }
+        if ($.trim(contactNo) == "") {
+            toastrWarning("Contact Number is required.");
+            $("#contactNo").focus();
+            return false;
+        }
+
+        if (!/^[0-9]{10}$/.test(contactNo)) {
+            toastrWarning("Enter a valid 10 digit Contact Number.");
+            $("#contactNo").focus();
+            return false;
+        }
+            // Admission Number
+        if ($.trim(admissionNo) == "") {
+            toastrWarning("Admission Number is required.");
+            $("#admissionNo").focus();
+            return false;
+        }
+            // Letters and numbers only
+        if (!/^[A-Za-z0-9]+$/.test(admissionNo)) {
+            toastrWarning("Admission Number should contain only letters and numbers.");
+            $("#admissionNo").focus();
+            return false;
+        }
+            // Roll Number
+        if ($.trim(rollNo) == "") {
+            toastrWarning("Roll Number is required.");
+            $("#RollNo1").focus();
+            return false;
+        }
+
+        // Numbers only
+        if (!/^[0-9]+$/.test(rollNo)) {
+            toastrWarning("Roll Number should contain only numbers.");
+            $("#RollNo1").focus();
+            return false;
+        }
+            // DOB
+        if ($.trim(dob) == "") {
+            toastrWarning("Date of Birth is required.");
+            $("#DOBstring").focus();
+            return false;
+        }
+            if ($.trim(category) == "") {
+            toastrWarning("Please select Category.");
+            $("#CategoryId").focus();
+            return false;
+         }
+            if ($.trim(address) == "") {
+            toastrWarning("Address is required.");
+            $("#address").focus();
+            return false;
+        }
+            if ($.trim(city) == "") {
+            toastrWarning("City is required.");
+            $("#city").focus();
+            return false;
+        }
+
+            if (!/^[A-Za-z ]+$/.test(city)) {
+            toastrWarning("City should contain only letters.");
+            $("#city").focus();
+            return false;
+        }
+            if ($.trim(state) == "") {
+            toastrWarning("State is required.");
+            $("#state").focus();
+            return false;
+        }
+
+           if (!/^[A-Za-z ]+$/.test(state)) {
+            toastrWarning("State should contain only letters.");
+            $("#state").focus();
+            return false;
+        }
+            if ($.trim(pin) == "") {
+            toastrWarning("Pin Code is required.");
+            $("#Pincode").focus();
+            return false;
+        }
+            if ($.trim(bloodGroup) == "") {
+            toastrWarning("Please select Blood Group.");
+            $("#slct-bloodGroup").focus();
+            return false;
+        }
+            if ($.trim(joiningDate) == "") {
+            toastrWarning("Date of Joining is required.");
+            $("#DateOfJoiningString").focus();
+            return false;
+        }
+
+        // dd-mm-yyyy format validation
+        var datePattern = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
+
+        if (!datePattern.test(joiningDate)) {
+            toastrWarning("Enter Date of Joining in DD-MM-YYYY format.");
+            $("#DateOfJoiningString").focus();
+            return false;
+        }
+
+        $.ajax({ 
+            url: this.action, 
+            type: "POST", 
+            data: new FormData(this), 
+            processData: false, 
+            contentType: false, 
+            success: StudentAddSuccess, 
+            error: StudentAddFailed }); });
+    </script>

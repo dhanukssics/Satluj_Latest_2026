@@ -9,14 +9,14 @@ namespace Satluj_Latest.Controllers
         private readonly DropdownData _dropdown;
         public DataController(DropdownData dropdown)
         {
-            _dropdown = dropdown;
+            _dropdown = dropdown;// test
         }
 
         public object LoadDivision(long id)
         {
        
             var result = _dropdown.GetDivision(id);
-            return Json(new { status = result.Count > 0, list = result });
+            return Json(new { status = result.Count > 0, list = result });//29
         }
 
         public object LoadClassesByAcademicYear(string id)

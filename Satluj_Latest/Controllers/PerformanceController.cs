@@ -1341,7 +1341,21 @@ namespace Satluj_Latest.Controllers
                 else// PARTICULAR CLASS **************************************************************************************************************
                 {
                     #region
-                    var allclasss = FullData.Where(x => x.SchoolId == _user.SchoolId && x.TeacherId == TeacherId && x.IsActive && x.ClassId == ClassId).OrderBy(x => x.Class.ClassOrder).ToList().Select(x => new { x.ClassId, x.Class.Class }).Distinct().FirstOrDefault();
+                    var allclasss = FullData
+                         .Where(x => x.SchoolId == _user.SchoolId
+                                  && x.TeacherId == TeacherId
+                                  && x.IsActive
+                                  && x.ClassId == ClassId
+                                  && x.Class != null)
+                         .OrderBy(x => x.Class.ClassOrder)
+                         .Select(x => new
+                         {
+                             x.ClassId,
+                             Class = x.Class.Class
+                         })
+                         .Distinct()
+                         .FirstOrDefault();
+                    //var allclasss = FullData.Where(x => x.SchoolId == _user.SchoolId && x.TeacherId == TeacherId && x.IsActive && x.ClassId == ClassId).OrderBy(x => x.Class.ClassOrder).ToList().Select(x => new { x.ClassId, x.Class.Class }).Distinct().FirstOrDefault();
                     if (DivisionId == 0)//All Divisions
                     {
                         #region
@@ -1600,7 +1614,21 @@ namespace Satluj_Latest.Controllers
                     else // Particular Divisions
                     {
                         #region
-                        var allDivisions = FullData.Where(x => x.SchoolId == _user.SchoolId && x.DivisionId == DivisionId && x.ClassId == ClassId && x.TeacherId == TeacherId && x.IsActive).ToList().Select(x => new { x.DivisionId, x.Division.Division }).Distinct().FirstOrDefault();
+                        var allDivisions = FullData
+                    .Where(x => x.SchoolId == _user.SchoolId
+                             && x.DivisionId == DivisionId
+                             && x.ClassId == ClassId
+                             && x.TeacherId == TeacherId
+                             && x.IsActive
+                             && x.Division != null)
+                    .Select(x => new
+                    {
+                        x.DivisionId,
+                        Division = x.Division.Division
+                    })
+                    .Distinct()
+                    .FirstOrDefault();
+                        //var allDivisions = FullData.Where(x => x.SchoolId == _user.SchoolId && x.DivisionId == DivisionId && x.ClassId == ClassId && x.TeacherId == TeacherId && x.IsActive).ToList().Select(x => new { x.DivisionId, x.Division.Division }).Distinct().FirstOrDefault();
                         if (ExamId == 0) // All Exams 
                         {
                             #region
@@ -1784,10 +1812,36 @@ namespace Satluj_Latest.Controllers
                                         foreach (var item2 in input)
                                         {
                                             #region
-                                            var subId = exams.Where(x => x.SubjectId == item2.SubjectId).FirstOrDefault();
+                                            //var subId = exams.Where(x => x.SubjectId == item2.SubjectId).FirstOrDefault();
+                                            //SingleCharts one = new SingleCharts();
+                                            //one.ChartName = allclasss.Class + "(" + allDivisions.Division + ")" + "-" + allExams.ExamName + "(" + item2.Subject + ")";
+                                            //var markData = data.Where(x => x.DivisionId == allDivisions.DivisionId && x.SubjectId == subId.SubId).ToList();
+                                            #region
+                                            var subId = exams.FirstOrDefault(x => x.SubjectId == item2.SubjectId);
+
+                                            if (subId == null)
+                                            {
+                                                continue;
+                                            }
+
+                                            if (allDivisions == null)
+                                            {
+                                                continue;
+                                            }
+
                                             SingleCharts one = new SingleCharts();
-                                            one.ChartName = allclasss.Class + "(" + allDivisions.Division + ")" + "-" + allExams.ExamName + "(" + item2.Subject + ")";
-                                            var markData = data.Where(x => x.DivisionId == allDivisions.DivisionId && x.SubjectId == subId.SubId).ToList();
+
+                                            string className = allclasss?.Class ?? "";
+                                            string divisionName = allDivisions?.Division ?? "";
+                                            string examName = allExams?.ExamName ?? "";
+                                            string subjectName = item2?.Subject ?? "";
+
+                                            one.ChartName = className + "(" + divisionName + ")" + "-" + examName + "(" + subjectName + ")";
+
+                                            var markData = data.Where(x => x.DivisionId == allDivisions.DivisionId
+                                                                        && x.SubjectId == subId.SubId)
+                                                               .ToList();
+                                            #endregion
                                             var totalStudents = _Entities.TbStudents.Where(x => x.ClassId == ClassId && x.DivisionId == allDivisions.DivisionId && x.IsActive).ToList();
                                             decimal NTP = markData.Where(x => x.Percentage < 41).Count();
                                             decimal Average = markData.Where(x => x.Percentage > 42 && x.Percentage < 71).Count();

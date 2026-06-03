@@ -23,6 +23,10 @@
     }
 
     .timetable-menu li {
+        cursor: pointer;
+    }
+
+    .timetable-menu li {
         display: inline-block;
         text-align: center;
         background: #fff;
@@ -349,6 +353,7 @@
             toastrSuccess(result.msg);
             $('#studentStudentAdd').hide();
             CheckingForSiblings(result);
+             $('#studentId').val(result.studentId);
             //var divisionId = result.division;
             //var classId = result.classId;
             //var studentId = result.studentId;
@@ -493,7 +498,43 @@
             }
         });
     });
+//    function ValidatePersonalInfo() {
 
+//     var email = $('#Email').val();
+//     var mobile = $('#ContactNo').val();
+
+//     Email required
+//     if ($.trim(email) === '') {
+//         toastrWarning('Email is required.');
+//         $('#Email').focus();
+//         return false;
+//     }
+
+//     Email format
+//    var emailPattern = '';
+//     if (!emailPattern.test(email)) {
+//         toastrWarning('Enter a valid email address.');
+//         $('#Email').focus();
+//         return false;
+//     }
+
+//     Mobile required
+//     if ($.trim(mobile) === '') {
+//         toastrWarning('Mobile number is required.');
+//         $('#ContactNo').focus();
+//         return false;
+//     }
+
+//     Mobile format
+//     var mobilePattern = /^[0-9]{10}$/;
+//     if (!mobilePattern.test(mobile)) {
+//         toastrWarning('Enter a valid 10-digit mobile number.');
+//         $('#ContactNo').focus();
+//         return false;
+//     }
+
+//     return true;
+// }
     function ParentOnlyView(result) {
         var studId = result.studentId;
         if (studId != '0') {
@@ -503,10 +544,9 @@
                 success: function (data) {
                     $('#peranseIfo_id').addClass('active');
                     $('#personalIfo_id').removeClass('active');
-                    $('#add-info-view-space').html('');
                     $('#add-info-view-space').html(data);
                     $.validator.unobtrusive.parse($("#add-info-view-space"));
-                },
+                }
             });
         }
     }
@@ -517,11 +557,9 @@
         ParentInfoView(classId);
     });
 
-
     $(document).on('click', '#parentViewPageCompleteBtnId', function () {
         window.location.href = '/School/AddNewStudentsFullDetails/';
     });
-
 
     $(document).on('change', '#classDataDropdown', function () {
 
@@ -533,7 +571,6 @@
                 url: '/Data/LoadDivision?id=' + classId,
                 type: "GET",
                 success: function (result) {
-
 
                     $(".division_Select").html("");
 
@@ -567,8 +604,62 @@
     });
 
 
+    // ======================
+    // PERSONAL INFO TAB
+    // ======================
+    $(document).on('click', '#personalIfo_id', function () {
+
+        var studentId = $('#studentId').val();
+
+        if (studentId == '' || studentId == '0' || studentId == undefined) {
+            toastrWarning('Please save Personal Information first.');
+            return false;
+        }
+
+        $('#personalIfo_id').addClass('active');
+        $('#peranseIfo_id').removeClass('active');
+
+        $.ajax({
+            url: '/School/AddNewStudent/' + studentId,
+            type: 'GET',
+            dataType: 'html',
+            success: function (data) {
+
+                $('#add-info-view-space').html(data);
+
+                $.validator.unobtrusive.parse($("#add-info-view-space"));
+            },
+            error: function () {
+                toastrError('Unable to load student information.');
+            }
+        });
+    });
 
 
+    // ======================
+    // PARENT INFO TAB
+    // ======================
+    $(document).on('click', '#peranseIfo_id', function () {
+
+        var studentId = $('#studentId').val();
+
+        if (studentId == '' || studentId == '0' || studentId == undefined) {
+
+            toastrWarning('Please fill Personal Information and click Save & Continue first.');
+            return false;
+        }
+
+            if (!ValidatePersonalInfo()) {
+            return false;
+        }
+
+        $('#peranseIfo_id').addClass('active');
+        $('#personalIfo_id').removeClass('active');
+
+        var classId = $('#ClassIdForParent').val();
+
+        ParentInfoView(classId);
+    });
 
 
 

@@ -104,7 +104,7 @@ namespace Satluj_Latest.Controllers
                 };
 
                 _Entities.TbUserModuleMains.Add(main);
-                status = _Entities.SaveChanges() > 0;
+                status = _Entities.SaveChanges() > 0;// v
 
                 if (status)
                 {

@@ -21,11 +21,23 @@
             </div>
             <div class="col-md-12">
                 <label>Date</label>
-                <div style="width:20%">
-                    <input type="text" class="form-control attendance-date" data-date-end-date="0d" value="@Model.DatetimeString.ToString("dd-MM-yyyy")">
-                    <i class="fa fa-calendar"></i>
+                <div style="width:20%; position:relative;">
+                    <input type="text"
+                           class="form-control attendance-date"
+                           data-date-end-date="0d"
+                           value="@Model.DatetimeString.ToString("dd-MM-yyyy")">
+
+                    <i class="fa fa-calendar"
+                       style="position:absolute;
+                           right:10px;
+                           top:50%;
+                           transform:translateY(-50%);
+                           pointer-events:none;
+                           color:#666;">
+                    </i>
                 </div>
             </div>
+
             <div class="col-md-12" style="margin-top:10px;">
                 <button class="btn pay-now-btn" id="attendance-btn-id">Attendance Summary</button>
                 <button class="btn pay-now-btn" id="timetable-btn-id">Timetable Summary</button>
