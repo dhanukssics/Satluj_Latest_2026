@@ -334,37 +334,92 @@
         });
 
     });
-        $('.slct-teacherclass-dropdwn').change(function () {
+        // $('.slct-teacherclass-dropdwn').change(function () {
+
+        // var classId = $(this).val();
+
+        // if (classId != "") {
+
+        //     $.ajax({
+        //         url: '/School/GetFreeDivision',
+        //         type: 'GET',
+        //         data: { classId: classId },
+        //         success: function (data) {
+
+        //             var divisionDropdown = $('.slct-free-div-dropdown');
+        //             divisionDropdown.empty();
+
+        //             divisionDropdown.append('<option value="">--Choose--</option>');
+
+        //             $.each(data, function (i, item) {
+        //                 divisionDropdown.append(
+        //                     $('<option>', {
+        //                         value: item.value,
+        //                         text: item.text
+        //                     })
+        //                 );
+        //             });
+
+        //             divisionDropdown.prop('disabled', false);
+        //         }
+        //     });
+        //     }
+    // });
+
+   $(document).on('change', '.slct-teacherclass-dropdwn', function () {
 
         var classId = $(this).val();
+        var divisionDropdown = $('.slct-free-div-dropdown');
 
-        if (classId != "") {
+        divisionDropdown.empty();
+        divisionDropdown.append('<option value="">Loading...</option>');
 
-            $.ajax({
-                url: '/School/GetFreeDivision',
-                type: 'GET',
-                data: { classId: classId },
-                success: function (data) {
-
-                    var divisionDropdown = $('.slct-free-div-dropdown');
-                    divisionDropdown.empty();
-
-                    divisionDropdown.append('<option value="">--Choose--</option>');
-
-                    $.each(data, function (i, item) {
-                        divisionDropdown.append(
-                            $('<option>', {
-                                value: item.value,
-                                text: item.text
-                            })
-                        );
-                    });
-
-                    divisionDropdown.prop('disabled', false);
-                }
-            });
+        if (classId === '') {
+            divisionDropdown.empty();
+            divisionDropdown.append('<option value="">--Choose--</option>');
+            divisionDropdown.prop('disabled', true);
+            return;
         }
-    });
 
+        $.ajax({
+            url: '/School/GetFreeDivision',
+            type: 'GET',
+            cache: false,
+            data: { classId: classId },
+
+            success: function (data) {
+
+                console.log('Division Data:', data);
+
+                divisionDropdown.empty();
+                divisionDropdown.append('<option value="">--Choose--</option>');
+
+                $.each(data, function (i, item) {
+
+                    divisionDropdown.append(
+                        $('<option>', {
+                            value: item.Value || item.value,
+                            text: item.Text || item.text
+                        })
+                    );
+                });
+
+                divisionDropdown.prop('disabled', false);
+            },
+
+            error: function (xhr, status, error) {
+
+                console.log("Status:", xhr.status);
+                console.log("Error:", error);
+                console.log("Response:", xhr.responseText);
+
+                divisionDropdown.empty();
+                divisionDropdown.append('<option value="">--Choose--</option>');
+
+                toastr.error("Unable to load divisions");
+            }
+        });
+    });
+    
 
 </script>

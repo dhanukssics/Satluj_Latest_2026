@@ -2753,8 +2753,22 @@ namespace Satluj_latestversion.Controllers
         }
         public JsonResult GetFreeDivision(long classId)
         {
-            var divisions = _dropdown.GetFreeDivision(classId);
-            return Json(divisions);
+            try
+            {
+                var divisions = _dropdown.GetFreeDivision(classId);
+
+                return Json(divisions);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    error = true,
+                    message = ex.Message
+                });
+            }
+            //var divisions = _dropdown.GetFreeDivision(classId);
+            //return Json(divisions);
         }
 
 
