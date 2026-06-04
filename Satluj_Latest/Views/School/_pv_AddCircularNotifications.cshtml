@@ -52,7 +52,7 @@
                         </button>
                     </div>
 
-                    <input asp-for="FilePath" type="hidden" />
+                    <input type="hidden" id="FilePath" name="FilePath">
                     <span asp-validation-for="FilePath"
                           class="text-danger"></span>
                 </div>
@@ -95,7 +95,9 @@
 </form>
 
 <script>
+    
         $("#form-login").submit(function (e) {
+            console.log("FilePath =", $('input[name="FilePath"]').val());
             e.preventDefault();
 
             $.ajax({
@@ -131,20 +133,22 @@
             contentType: false,
             processData: false,
 
-            success: function (response) {
+                success: function (response) {
 
-                if (response.Status) {
+                    console.log(response);
 
-                    $('#FilePath').val(response.UserData);
+                    if (response.status) {
 
-                    toastrSuccess('File uploaded successfully');
+                        $('input[name="FilePath"]').val(response.userData);
 
-                } else {
+                        console.log($('input[name="FilePath"]').val());
 
-                    toastrError(response.Message);
-
-                }
-            },
+                        toastrSuccess('File uploaded successfully');
+                    }
+                    else {
+                        toastrError(response.message);
+                    }
+                },
 
             error: function () {
 
