@@ -2,7 +2,8 @@
 @model Satluj_Latest.Models.LibraryModels
 @{
     var books = new Satluj_Latest.Data.School(Model.schoolId).GetAllBook();
-        bool IsAdmin = ViewBag.IsAdmin;
+        // bool IsAdmin = ViewBag.IsAdmin;
+        bool IsAdmin = ViewBag.IsAdmin ?? false;
 }
 
 
@@ -37,6 +38,7 @@
 <tbody>
     @{
         int i = 1;
+        @if (books != null){
         foreach (var book in books)
         {
             <tr>
@@ -56,7 +58,8 @@
                     @book.ReferenceNumber
                 </td>
                 <td class="">
-                    @book.Category.Category
+                   
+                   @(book.Category != null ? book.Category.Category : "")
                 </td>
                 <td class="">
                     @if (book.Status == 0)
@@ -89,5 +92,7 @@
             </tr>
             i++;
         }
+        
     }
+  }
 </tbody>

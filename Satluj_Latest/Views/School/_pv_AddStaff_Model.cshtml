@@ -62,7 +62,8 @@
                     </div>
 
                     <div class="col-sm-6">
-                        <label asp-for="DesignationId"></label>
+                        <label>Designation</label>
+                        @* <label asp-for="DesignationId"></label> *@
                         <select asp-for="DesignationId"
                                 asp-items="Model.Designations"
                                 class="form-control">
@@ -82,7 +83,8 @@
                     </div>
 
                     <div class="col-sm-6">
-                        <label asp-for="DepartmentId"></label>
+                        @* <label asp-for="DepartmentId"></label> *@
+                        <label>Department</label>
                         <select asp-for="DepartmentId"
                                 asp-items="Model.Departments"
                                 class="form-control">
@@ -127,7 +129,8 @@
                     </div>
 
                     <div class="col-sm-6">
-                        <label asp-for="UserTypeId"></label>
+                        @* <label asp-for="UserTypeId"></label> *@
+                        <label>UserType</label>
                         <select asp-for="UserTypeId"
                                 asp-items="Model.UserTypes"
                                 class="form-control">
