@@ -4915,6 +4915,7 @@ namespace Satluj_latestversion.Controllers
         [HttpPost]
         public object SubmitAddCircularNotifications(AddCircularNotification model)
         {
+            var postedFilePath = Request.Form["FilePath"];
             long userId = _user.UserId;
             long schoolId = _user.SchoolId;
             string msg = "Failed";
@@ -4989,7 +4990,7 @@ namespace Satluj_latestversion.Controllers
             {
                 msg = ex.Message;
             }
-            return Json(new { status = status, message = status ? "Circular notification added successfully" : "Failed to Circular notification documents", UserData = circular.SchoolId });
+            return Json(new { status = status, message = status ? "Circular added successfully" : "Failed to Circular", UserData = circular.SchoolId });
         }
 
         private bool SendMailsForOnlyCircularNotification(TbStudent item, TbCircular circular, string school)
@@ -4999,7 +5000,7 @@ namespace Satluj_latestversion.Controllers
             var emailTemplate = System.IO.File.ReadAllText(filePath);
             string Message = "Your kid " + item.StundentName + "'s School have a Circular";
             string message2 = circular.Description + " , " + circular.CircularDate.ToShortDateString();
-            string filePathDoc = "http://sutluj.schoolman.in" + circular.FilePath;
+            string filePathDoc = "http://testsatluj.schoolman.in" + circular.FilePath;
             string downLoad = "Download";
             if (circular.FilePath == null || circular.FilePath == "")
             {
@@ -7996,6 +7997,7 @@ namespace Satluj_latestversion.Controllers
                 parent.MotherOccupation = model.MotherOccupation;
                 parent.MotherContactNo = model.MotherContact;
                 parent.MotherEmail = model.MotherEmail;
+                parent.Email = model.FatherEmail;
                 //parent.MotherAddress = model.MotherAddress;
                 //parent.MotherCountryId = Convert.ToInt32(model.MotherCountryId);
                 //parent.MotherState = model.MotherState;
