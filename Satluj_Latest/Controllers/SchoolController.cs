@@ -4893,10 +4893,12 @@ namespace Satluj_latestversion.Controllers
 
                 if (!Directory.Exists(folderPath))
                     Directory.CreateDirectory(folderPath);
+				string originalFileName = Path.GetFileNameWithoutExtension(file.FileName);
 
-                string originalFileName = Path.GetFileNameWithoutExtension(file.FileName);
-                string extension = Path.GetExtension(file.FileName);
-                string finalFileName = originalFileName + extension;
+				originalFileName = Regex.Replace(originalFileName, @"[^a-zA-Z0-9_\-]", "_");
+
+				string extension = Path.GetExtension(file.FileName);
+				string finalFileName = originalFileName + extension;
 
                 string fullPath = Path.Combine(folderPath, finalFileName);
                 int counter = 1;
@@ -5014,7 +5016,7 @@ namespace Satluj_latestversion.Controllers
             var emailTemplate = System.IO.File.ReadAllText(filePath);
             string Message = "Your kid " + item.StundentName + "'s School have a Circular";
             string message2 = circular.Description + " , " + circular.CircularDate.ToShortDateString();
-            string filePathDoc = "http://testsatluj.schoolman.in" + circular.FilePath;
+            string filePathDoc = "https://testsatluj.schoolman.in" + circular.FilePath;
             string downLoad = "Download";
             if (circular.FilePath == null || circular.FilePath == "")
             {
