@@ -77,23 +77,4 @@
         </div>
     </form>
 </div>
-@section Scripts {
 
-    <script>
-        $("#form-login").submit(function (e) {
-            e.preventDefault();
-
-            $.ajax({
-                url: $(this).attr("action"),
-                type: "POST",
-                data: $(this).serialize(),
-                success: function (result) {
-                    AddClassSuccess(result);
-                },
-                error: function () {
-                    ajaxFailure();
-                }
-            });
-        });
-    </script>
-}

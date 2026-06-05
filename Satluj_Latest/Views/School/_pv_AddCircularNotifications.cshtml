@@ -160,12 +160,12 @@
     });
 
     function CircularNotificationsAddSuccess(result) {
-        if (result.status === true) {
-            $('#modalAddCircular').modal('hide');
-            RefresData();
+        if (result.status) {
             toastrSuccess(result.message);
-        } else {
-            toastrError("Error");
+
+            setTimeout(function () {
+                window.location.href = result.redirectUrl;
+            }, 1000);
         }
     }
 

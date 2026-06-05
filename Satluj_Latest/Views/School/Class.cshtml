@@ -249,4 +249,20 @@ function (isConfirm) {
         var link = '/School/SchoolClassDivisionPrint/' + id;
         window.open(link, '_blank');
     });
+        $(document).on('submit', '#form-login', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (result) {
+                AddClassSuccess(result);
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                ajaxFailure();
+            }
+        });
+    });
 </script>

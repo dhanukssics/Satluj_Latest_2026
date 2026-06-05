@@ -81,13 +81,14 @@ namespace Satluj_latestversion.Controllers
             var model = new SchoolValue();
             model.schoolId = _user.SchoolId;
             ViewBag.classlist = _dropdown.GetClasses(model.schoolId);
-            return View(model);
+			ViewBag.IsAdmin = true;
+			return View(model);
         }
         public PartialViewResult AddClassParialView()
         {
             AddClassModel model = new AddClassModel();
             model.SchoolId = _user.SchoolId;
-            ViewBag.ClassList = _dropdown.GetClassList();
+            ViewBag.classlist = _dropdown.GetClassList();
             return PartialView("_pv_AddClass", model);
 
         }
@@ -145,9 +146,10 @@ namespace Satluj_latestversion.Controllers
                     newClass.ClassOrder = model.OrderValue;
                     newClass.AcademicYearId = academicYear.YearId;
                     newClass.PublishStatus = true;
-                    _Entities.TbClasses.Add(newClass);
+					_Entities.TbClasses.Add(newClass);
+					_Entities.SaveChanges();
 
-                    var newDiv = new TbDivision();
+					var newDiv = new TbDivision();
                     newDiv.ClassId = newClass.ClassId;
                     newDiv.Division = model.Division.ToUpper();
                     newDiv.DivisionGuid = Guid.NewGuid();
@@ -5014,7 +5016,7 @@ namespace Satluj_latestversion.Controllers
             {
                 msg = ex.Message;
             }
-            return Json(new { status = status, message = status ? "Circular added successfully" : "Failed to Circular", UserData = circular.SchoolId });
+            return Json(new { status = status, message = status ? "Circular added successfully" : "Failed to Circular", UserData = circular.SchoolId, redirectUrl = Url.Action("CircularNotification", "School") });
         }
 
         private bool SendMailsForOnlyCircularNotification(TbStudent item, TbCircular circular, string school)
