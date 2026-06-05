@@ -182,10 +182,17 @@ namespace Satluj_Latest.Data
         }
         public List<TbLibraryBook> GetAllBook()
         {
-            var result = school.TbBookCategories.Where(x => x.IsActive).ToList().SelectMany(z => z.TbLibraryBooks.Where(m => m.IsActive).ToList()).ToList().Select(x => new TbLibraryBook(x)).ToList();
-            return result;
-
+            return school.TbBookCategories
+                .Where(x => x.IsActive)
+                .SelectMany(z => z.TbLibraryBooks.Where(m => m.IsActive))
+                .ToList();
         }
+        //public List<TbLibraryBook> GetAllBook()
+        //{
+        //    var result = school.TbBookCategories.Where(x => x.IsActive).ToList().SelectMany(z => z.TbLibraryBooks.Where(m => m.IsActive).ToList()).ToList().Select(x => new TbLibraryBook(x)).ToList();
+        //    return result;
+
+        //}
         public List<TbCircular> AllCircularList()
         {
             return _Entities.TbCirculars

@@ -671,6 +671,14 @@ namespace Satluj_latestversion.Controllers
             bool status = false;
             string message = "Failed";
             var book = _Entities.TbLibraryBooks.Where(z => z.BookId == model.bookId).FirstOrDefault();
+            if (book == null)
+            {
+                return Json(new
+                {
+                    status = false,
+                    msg = "Book not found. BookId = " + model.bookId
+                });
+            }
             book.CategoryId = model.categoryId;
             book.Title = model.title;
             book.Author = model.author;
