@@ -14,7 +14,7 @@ namespace Satluj_Latest.Controllers
         private readonly DropdownData _dropdown;
         public ModuleController(SchoolRepository schoolRepository, ParentRepository parentRepository, TeacherRepository teacherRepository, SchoolDbContext Entities, DropdownData dropdown) : base(schoolRepository, parentRepository, teacherRepository, Entities)
         {
-            _dropdown = dropdown;
+            _dropdown = dropdown; 
         }
         
        
