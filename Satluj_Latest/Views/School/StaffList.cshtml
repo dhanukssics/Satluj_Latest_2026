@@ -133,36 +133,86 @@
         });
 
 
-        $(document).on('click', '#btn-dummy-addteacher', function () {
-            RolesList();
-            var status = true;
-            if ($('#classId').val() != '') {
-                if ($('#divisionId').val() == 0) {
-                    $('#division-required-teacher-add').text("Required");
-                    $('#division-required-teacher-add').show();
-                    var form_data = $("#form-teacher-add input[type=text]").serializeArray();
-                    $(form_data).each(function () {
-                        if (this.value == "" || this.value == null) {
-                            status = false;
-                        }
-                    });
+        // $(document).on('click', '#btn-dummy-addteacher', function () {
+        //     RolesList();
+        //     var status = true;
+        //     if ($('#classId').val() != '') {
+        //         if ($('#divisionId').val() == 0) {
+        //             $('#division-required-teacher-add').text("Required");
+        //             $('#division-required-teacher-add').show();
+        //             var form_data = $("#form-teacher-add input[type=text]").serializeArray();
+        //             $(form_data).each(function () {
+        //                 if (this.value == "" || this.value == null) {
+        //                     status = false;
+        //                 }
+        //             });
 
-                    if (!status) {
-                        $('#btn-addteacher').trigger('click');
-                    }
+        //             if (!status) {
+        //                 $('#btn-addteacher').trigger('click');
+        //             }
+        //         }
+        //         else {
+        //             $('#division-required-teacher-add').hide();
+        //             $('#btn-addteacher').trigger('click');
+        //         }
+        //     }
+        //     else {
+        //         $('#division-required-teacher-add').hide();
+        //         $('#btn-addteacher').trigger('click');
+        //     }
+
+        // });
+        $(document).on('click', '#btn-dummy-addteacher', function () {
+
+    RolesList();
+
+    // Name Validation
+    var teacherName = $('#teacherName').val() || $('[name="teacherName"]').val();
+    var nameRegex = /^[A-Za-z\s]+$/;
+
+    if (!nameRegex.test(teacherName)) {
+        toastr.error("Teacher name should contain only alphabets");
+        return false;
+    }
+
+    // Email Validation
+    var email = $('#emailId').val() || $('[name="emailId"]').val();
+    var emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+    if (email != "" && !emailRegex.test(email)) {
+        toastr.error("Please enter a valid email address");E
+        return false;
+    }
+
+    var status = true;
+
+    if ($('#classId').val() != '') {
+        if ($('#divisionId').val() == 0 || $('#divisionId').val() == '') {
+
+            $('#division-required-teacher-add').text("Required");
+            $('#division-required-teacher-add').show();
+
+            var form_data = $("#form-teacher-add input[type=text]").serializeArray();
+
+            $(form_data).each(function () {
+                if (this.value == "" || this.value == null) {
+                    status = false;
                 }
-                else {
-                    $('#division-required-teacher-add').hide();
-                    $('#btn-addteacher').trigger('click');
-                }
-            }
-            else {
-                $('#division-required-teacher-add').hide();
+            });
+
+            if (!status) {
                 $('#btn-addteacher').trigger('click');
             }
-
-        });
-
+        }
+        else {
+            $('#division-required-teacher-add').hide();
+            $('#btn-addteacher').trigger('click');
+        }
+    }
+    else {
+        $('#division-required-teacher-add').hide();
+        $('#btn-addteacher').trigger('click');
+    }
+});
 
 
 

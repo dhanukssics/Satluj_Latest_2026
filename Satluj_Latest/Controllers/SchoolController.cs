@@ -2894,6 +2894,8 @@ namespace Satluj_latestversion.Controllers
             bool status = false;
             string msg = "Failed";
             var teacher = _Entities.TbTeachers.FirstOrDefault(z => z.TeacherId == model.teacherId);
+            var teacherClass = _Entities.TbTeacherClasses
+        .FirstOrDefault(x => x.TeacherId == model.teacherId);
             if (teacher != null)
             {
                 teacher.ContactNumber = model.contactNumber;
@@ -2901,6 +2903,22 @@ namespace Satluj_latestversion.Controllers
                 teacher.Email = model.emailId;
                 teacher.DepartmentId = model.DepartmentId;
                 teacher.DesignationId = model.DesignationId;
+
+                if (teacherClass != null)
+                {
+                    model.classId = teacherClass.ClassId.ToString();
+                    model.divisionId = teacherClass.DivisionId.ToString();
+                }
+
+                ViewBag.Classes = new DropdownData(_Entities).GetClassList();
+
+                if (teacherClass != null)
+                {
+                    ViewBag.Divisions = new DropdownData(_Entities)
+                        .GetDivision(teacherClass.ClassId);
+                }
+
+
                 if (model.UserTypeId != null && model.UserTypeId != 0)
                     teacher.UserType = model.UserTypeId;
                 //----------------------------------

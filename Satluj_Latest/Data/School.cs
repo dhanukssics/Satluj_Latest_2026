@@ -3,6 +3,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Satluj_Latest.Models;
 using Satluj_Latest.Utility;
+using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +24,8 @@ namespace Satluj_Latest.Data
 
             // Load classes
             _Entities.Entry(school).Collection(s => s.TbClasses).Load();
+            _Entities.Database.SetCommandTimeout(300);
+
 
             // Load AcademicYear + Divisions
             foreach (var cls in school.TbClasses)
