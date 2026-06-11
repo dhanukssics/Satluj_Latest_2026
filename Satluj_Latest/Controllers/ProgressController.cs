@@ -836,7 +836,9 @@ namespace Satluj_Latest.Controllers
             model.ClassList = _dropdown.GetClasses(model.SchoolId)?.ToList() ?? new List<SelectListItem>();
             model.ClassList_wise = _dropdown.GetClassesUserWise(model.SchoolId, model.UserId)?.ToList() ?? new List<SelectListItem>();
 
-            ViewBag.IsAdmin = true;   
+            //ViewBag.IsAdmin = true;
+            bool isAdmin = _user.RoleId == 1;
+            ViewBag.IsAdmin = isAdmin;
             ViewBag.RoleId = _user.RoleId;
 
             return View(model);
@@ -1114,7 +1116,9 @@ namespace Satluj_Latest.Controllers
             //DropdownData dropdown = new DropdownData();
             model.ClassList = (List<SelectListItem>)_dropdown.GetClasses(model.SchoolId);
             model.ClassList_wise = _dropdown.GetClassesUserWise(model.SchoolId,model.UserId);
-            ViewBag.IsAdmin = true;
+            //ViewBag.IsAdmin = true;
+            bool isAdmin = _user.RoleId == 1;
+            ViewBag.IsAdmin = isAdmin;
             return View(model);
         }
 
@@ -1262,7 +1266,8 @@ namespace Satluj_Latest.Controllers
             //if (Convert.ToDecimal(model.ListData.Max(x => x.Mark)) > model.TotalScore)
             if (Convert.ToDecimal(maxGivenMark.Mark) > model.TotalScore)
             {
-                msg = "The mark should be higher than the total mark";
+                //msg = "The mark should be higher than the total mark";
+                msg = "Mark should be less than or equal to the Total Mark.";
             }
             else
             {
@@ -1360,7 +1365,10 @@ namespace Satluj_Latest.Controllers
             model.ClassList_wise = _dropdown.GetClassesUserWise(model.SchoolId, model.UserId)?.ToList() ?? new List<SelectListItem>();
 
             // VERY IMPORTANT
-            ViewBag.IsAdmin = true;
+            //ViewBag.IsAdmin = true;
+            bool isAdmin = _user.RoleId == 1;
+            ViewBag.IsAdmin = isAdmin;
+
 
             return View(model);
         }

@@ -20,11 +20,12 @@ namespace Satluj_Latest.Data
         { school = obj; }
         public School(long id)
         {
+            _Entities.Database.SetCommandTimeout(300);
             school = _Entities.TbSchools.FirstOrDefault(z => z.SchoolId == id);
 
             // Load classes
             _Entities.Entry(school).Collection(s => s.TbClasses).Load();
-            _Entities.Database.SetCommandTimeout(300);
+            //_Entities.Database.SetCommandTimeout(300);
 
 
             // Load AcademicYear + Divisions
@@ -2283,7 +2284,19 @@ namespace Satluj_Latest.Data
             #endregion SubId!=0 and Head!=0: Means wants to show only the particular head with particular sub
             return list.OrderBy(x => x.AccountHead).ToList();
         }
+        //public List<Class> NotRegionAssignedClass()
+        //{
+        //    var assignedClassIds = _Entities.SPClassWithRegion
+        //        .FromSqlRaw("EXEC sp_ClassWithRegion {0}", school.SchoolId)
+        //        .Select(x => x.ClassId)
+        //        .ToHashSet();
 
+        //    return school.TbClasses
+        //        .Where(x => x.IsActive && x.PublishStatus)
+        //        .Select(x => new Class(x))
+        //        .Where(x => !assignedClassIds.Contains(x.ClassId))
+        //        .ToList();
+        //}
         public List<Class> NotRegionAssignedClass()
         {
             var assignedClassIds = _Entities.SPClassWithRegion
@@ -2291,7 +2304,7 @@ namespace Satluj_Latest.Data
        .AsEnumerable()
        .Select(x => x.ClassId)
        .ToList();
-          
+
             var allClasses = school.TbClasses
                             .Where(x => x.IsActive && x.PublishStatus == true)
                             .ToList()

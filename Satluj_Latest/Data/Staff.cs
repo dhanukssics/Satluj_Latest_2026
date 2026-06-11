@@ -25,8 +25,10 @@ namespace Satluj_Latest.Data
         public string Contact { get { return staff.Contact; } }
         public string Address { get { return staff.Address; } }
         public System.DateTime DOB { get { return staff.Dob; } }
-        public string EmailId { get { return staff.User.Username; } }
-        public string Password { get { return staff.User.Password; } }
+        //public string EmailId { get { return staff.User.Username; } }
+        public string EmailId => staff?.User?.Username;
+        public string Password => staff?.User?.Password ?? "";
+        //public string Password { get { return staff.User.Password; } }
         public bool IsActive { get { return staff.IsActive; } }
         public System.DateTime TimeStamp { get { return staff.TimeStamp; } }
         public Nullable<long> DesignationId { get { return staff.DesignationId; } }
@@ -51,23 +53,43 @@ namespace Satluj_Latest.Data
                 roles = String.Join(",", from item in list select item.RoleName);
             return roles;
         }
+        //public string Department()
+        //{
+        //    string department = "";
+        //    long teacherId = staff.UserId;
+        //    var dep = staff.Department;
+        //    if (dep != null)
+        //        department = dep.DepartmentName;
+        //    return department;
+        //}
         public string Department()
         {
-            string department = "";
-            long teacherId = staff.UserId;
-            var dep = staff.Department;
-            if (dep != null)
-                department = dep.DepartmentName;
-            return department;
+            if (staff.DepartmentId == null)
+                return "";
+
+            return _Entities.TbDepartments
+                .Where(x => x.Id == staff.DepartmentId)
+                .Select(x => x.DepartmentName)
+                .FirstOrDefault() ?? "";
         }
+        //public string Designation()
+        //{
+        //    string designation = "";
+        //    long teacherId = staff.UserId;
+        //    var des = staff.Designation;
+        //    if (des != null)
+        //        designation = des.DesignationName;
+        //    return designation;
+        //}
         public string Designation()
         {
-            string designation = "";
-            long teacherId = staff.UserId;
-            var des = staff.Designation;
-            if (des != null)
-                designation = des.DesignationName;
-            return designation;
+            if (staff.DesignationId == null)
+                return "";
+
+            return _Entities.TbDesignations
+                .Where(x => x.Id == staff.DesignationId)
+                .Select(x => x.DesignationName)
+                .FirstOrDefault() ?? "";
         }
         public string RoleIdString()
         {

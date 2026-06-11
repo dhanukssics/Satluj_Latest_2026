@@ -13,6 +13,7 @@ using System.Net.Mail;
 using System.Text;
 using static Satluj_Latest.Models.SchoolValue;
 using Student = Satluj_Latest.Models.Student;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 
 
@@ -29,14 +30,95 @@ namespace Satluj_Latest.Controllers
         }
 
         // GET: Teacher
+        //public IActionResult Attendance()
+        //{
+        //    SchoolModel model = new SchoolModel();
+        //    model.schoolId = _user.SchoolId;
+        //    model.userId = _user.UserId;
+        //    model.Selecteddate = CurrentTime;
+        //   // DropdownData dropdown = new DropdownData();
+        //    ViewBag.TeacherClassList = _dropdown.GetTeacherClass(model.userId);
+        //    ViewBag.Classlist = _dropdown.GetClasses(model.schoolId);
+
+        //    return View(model);
+        //}                            changed 10-6-2026
+        //public IActionResult Attendance()
+        //{
+        //    SchoolModel model = new SchoolModel();
+        //    model.schoolId = _user.SchoolId;
+        //    model.userId = _user.UserId;
+        //    model.Selecteddate = CurrentTime;
+
+        //    var teacher = _Entities.TbTeachers
+        //        .FirstOrDefault(x => x.UserId == model.userId && x.IsActive);
+
+        //    if (teacher != null)
+        //    {
+        //        ViewBag.TeacherClassList =
+        //            _dropdown.GetTeacherClass(teacher.TeacherId);
+        //    }
+
+        //    ViewBag.Classlist = _dropdown.GetClasses(model.schoolId);
+
+        //    return View(model);
+        //}
         public IActionResult Attendance()
         {
             SchoolModel model = new SchoolModel();
             model.schoolId = _user.SchoolId;
             model.userId = _user.UserId;
             model.Selecteddate = CurrentTime;
-           // DropdownData dropdown = new DropdownData();
-            ViewBag.TeacherClassList = _dropdown.GetTeacherClass(model.userId);
+
+            var teacher = _Entities.TbTeachers
+                .FirstOrDefault(x => x.UserId == model.userId && x.IsActive);
+
+            if (teacher != null)
+            {
+                // CLASS
+                var teacherClasses = _Entities.TbTeacherClasses
+                    .Where(x => x.TeacherId == teacher.TeacherId)
+                    .Join(_Entities.TbClasses,
+                        tc => tc.ClassId,
+                        c => c.ClassId,
+                        (tc, c) => new SelectListItem
+                        {
+                            Value = tc.ClassId.ToString(),
+                            Text = c.Class
+                        })
+                    .Distinct()
+                    .ToList();
+
+                ViewBag.TeacherClassList = teacherClasses;
+
+                // DIVISION
+                var teacherDivisions = _Entities.TbTeacherClasses
+            .Where(x => x.TeacherId == teacher.TeacherId)
+            .Join(_Entities.TbDivisions,
+                tc => tc.DivisionId,
+                d => d.DivisionId,
+                (tc, d) => new SelectListItem
+                {
+                    Value = d.DivisionId.ToString(),
+                    Text = d.Division
+                })
+            .GroupBy(x => x.Value)
+            .Select(g => g.First())
+            .ToList();
+                System.Diagnostics.Debug.WriteLine("DIVISION COUNT: " + teacherDivisions.Count);
+
+                foreach (var item in teacherDivisions)
+                {
+                    System.Diagnostics.Debug.WriteLine($"DIV: {item.Value} - {item.Text}");
+                }
+
+                ViewBag.TeacherDivisionList = teacherDivisions;
+            }
+            else
+            {
+                ViewBag.TeacherClassList = new List<SelectListItem>();
+                ViewBag.TeacherDivisionList = new List<SelectListItem>();
+            }
+
             ViewBag.Classlist = _dropdown.GetClasses(model.schoolId);
 
             return View(model);
@@ -1068,7 +1150,9 @@ namespace Satluj_Latest.Controllers
             HealthModel model = new HealthModel();
             model.SchoolId = _user.SchoolId;
             ViewBag.classlist = _dropdown.GetClasses(model.SchoolId);
-            ViewBag.IsAdmin = true;
+            //ViewBag.IsAdmin = true;
+            bool isAdmin = _user.RoleId == 1;
+            ViewBag.IsAdmin = isAdmin;
             return View(model);
         }
 

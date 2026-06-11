@@ -518,10 +518,24 @@ namespace Satluj_latestversion.Controllers
             );
         }
 
+        //public ActionResult LibraryBook()
+        //{
+        //    LibraryModels model = new LibraryModels();
+        //    model.schoolId = _user.SchoolId;
+        //    return View(model);
+        //}
         public ActionResult LibraryBook()
         {
             LibraryModels model = new LibraryModels();
+
             model.schoolId = _user.SchoolId;
+
+            model.BookList = _Entities.TbLibraryBooks
+                .Include(x => x.Category)   // 🔥 IMPORTANT FIX
+                .Where(x => x.IsActive && x.Category.SchoolId == _user.SchoolId)
+                .OrderBy(x => x.BookId)
+                .ToList();
+
             return View(model);
         }
         public PartialViewResult AddLibraryBookView()
@@ -537,52 +551,146 @@ namespace Satluj_latestversion.Controllers
         [HttpPost]
         public object AddLibraryBook(LibraryModels model)
         {
-            bool status = false;
-            string message = "Failed";
-            long SlNo = 0;
-            var slNo = _Entities.TbLibraryBookSerialNumbers.Where(z => z.SchoolId == _user.SchoolId).FirstOrDefault();
-            if (slNo != null)
+            try
             {
-                SlNo = slNo.SerialNo;
-            }
+                if (model == null)
+                {
+                    return Json(new { status = false, msg = "Model is null" });
+                }
 
-            for (int i = 0; i < model.bookCount; i++)
-            {
-                var book = new TbLibraryBook();
-                SlNo = SlNo + 1;
-                book.CategoryId = model.categoryId;
-                book.Title = model.title;
-                book.Author = model.author;
-                book.Status = 0; //Available
-                book.IsActive = true;
-                book.TimeStamp = CurrentTime;
-                book.SerialNumber = SlNo;
-                book.ReferenceNumber = model.ReferenceNumber == null ? " " : model.ReferenceNumber;
-                _Entities.TbLibraryBooks.Add(book);
+                bool status = false;
+                string message = "Failed";
+
+                long SlNo = 0;
+
+                var slNo = _Entities.TbLibraryBookSerialNumbers
+                    .FirstOrDefault(z => z.SchoolId == _user.SchoolId);
+
+                if (slNo != null)
+                {
+                    SlNo = slNo.SerialNo;
+                }
+
+                // 🔴 FIX: ensure at least 1 book is inserted
+                int count = model.bookCount <= 0 ? 1 : (int)model.bookCount;
+
+                for (int i = 0; i < count; i++)
+                {
+                    SlNo++;
+
+                    var book = new TbLibraryBook
+                    {
+                        CategoryId = model.categoryId,
+                        Title = model.title,
+                        Author = model.author,
+                        Status = 0,
+                        IsActive = true,
+                        TimeStamp = CurrentTime,
+                        SerialNumber = SlNo,
+                        ReferenceNumber = model.ReferenceNumber ?? ""
+                    };
+
+                    _Entities.TbLibraryBooks.Add(book);
+                }
+
                 status = _Entities.SaveChanges() > 0;
-            }
 
-            if (status)
+                if (status)
+                {
+                    if (slNo != null)
+                    {
+                        slNo.SerialNo = SlNo;
+                    }
+                    else
+                    {
+                        _Entities.TbLibraryBookSerialNumbers.Add(new TbLibraryBookSerialNumber
+                        {
+                            SchoolId = _user.SchoolId,
+                            SerialNo = SlNo
+                        });
+                    }
+
+                    _Entities.SaveChanges();
+                }
+
+                message = status ? "Book Added" : "Failed";
+
+                return Json(new { status, msg = message });
+            }
+            catch (Exception ex)
             {
-                var srlNo1 = _Entities.TbLibraryBookSerialNumbers.Where(z => z.SchoolId == _user.SchoolId).FirstOrDefault();
-                if (srlNo1 != null)
+                return Json(new
                 {
-                    srlNo1.SerialNo = SlNo;
-                    status = _Entities.SaveChanges() > 0 ? true : false;
-
-                }
-                else
-                {
-                    var slNoTable = new TbLibraryBookSerialNumber();
-                    slNoTable.SchoolId = _user.SchoolId;
-                    slNoTable.SerialNo = SlNo;
-                    _Entities.TbLibraryBookSerialNumbers.Add(slNoTable);
-                    status = _Entities.SaveChanges() > 0 ? true : false;
-                }
+                    status = false,
+                    msg = ex.InnerException != null ? ex.InnerException.Message : ex.Message
+                });
             }
-            message = status ? " Book Added" : "Failed";
-            return Json(new { status = status, msg = message });
         }
+        //public object AddLibraryBook(LibraryModels model)
+        //{
+        //    try
+        //    {
+        //        bool status = false;
+        //        string message = "Failed";
+        //        long SlNo = 0;
+        //        var slNo = _Entities.TbLibraryBookSerialNumbers.Where(z => z.SchoolId == _user.SchoolId).FirstOrDefault();
+        //        if (slNo != null)
+        //        {
+        //            SlNo = slNo.SerialNo;
+        //        }
+        //        if (model == null)
+        //        {
+        //            return Json(new { status = false, msg = "Model is null" });
+        //        }
+
+        //        for (int i = 0; i < model.bookCount; i++)
+        //        {
+        //            var book = new TbLibraryBook();
+        //            SlNo = SlNo + 1;
+        //            book.CategoryId = model.categoryId;
+        //            book.Title = model.title;
+        //            book.Author = model.author;
+        //            book.Status = 0; //Available
+        //            book.IsActive = true;
+        //            book.TimeStamp = CurrentTime;
+        //            book.SerialNumber = SlNo;
+        //            book.ReferenceNumber = model.ReferenceNumber == null ? " " : model.ReferenceNumber;
+        //            _Entities.TbLibraryBooks.Add(book);
+        //            status = _Entities.SaveChanges() > 0;
+        //        }
+
+        //        if (status)
+        //        {
+        //            var srlNo1 = _Entities.TbLibraryBookSerialNumbers.Where(z => z.SchoolId == _user.SchoolId).FirstOrDefault();
+        //            if (srlNo1 != null)
+        //            {
+        //                srlNo1.SerialNo = SlNo;
+        //                status = _Entities.SaveChanges() > 0 ? true : false;
+
+        //            }
+        //            else
+        //            {
+        //                var slNoTable = new TbLibraryBookSerialNumber();
+        //                slNoTable.SchoolId = _user.SchoolId;
+        //                slNoTable.SerialNo = SlNo;
+        //                _Entities.TbLibraryBookSerialNumbers.Add(slNoTable);
+        //                status = _Entities.SaveChanges() > 0 ? true : false;
+        //            }
+        //        }
+        //        message = status ? " Book Added" : "Failed";
+        //        return Json(new { status = status, msg = message });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new
+        //        {
+        //            status = false,
+        //            msg = ex.InnerException != null
+        //                    ? ex.InnerException.Message
+        //                    : ex.Message
+        //        });
+        //    }
+        //}
         public PartialViewResult IssueLibraryBookView(string id)
         {
             LibraryModels model = new LibraryModels();
@@ -2885,6 +2993,39 @@ namespace Satluj_latestversion.Controllers
                     .Select(r => new RoleVM { Id = r.Id, RoleName = r.RoleName })
                     .ToList()
             };
+            var teacherClass = _Entities.TbTeacherClasses
+                .FirstOrDefault(x => x.TeacherId == id);
+
+            if (teacherClass != null)
+            {
+                model.classId = teacherClass.ClassId.ToString();
+                model.divisionId = teacherClass.DivisionId.ToString();
+            }
+
+            //ViewBag.Classes = new DropdownData(_Entities).GetClassList();
+            ViewBag.Classes = _Entities.TbClasses
+            .Where(x => x.IsActive)
+            .OrderBy(x => x.ClassOrder)
+            .Select(x => new SelectListItem
+            {
+                Value = x.ClassId.ToString(),
+                Text = x.Class
+            })
+            .ToList();
+
+            System.Diagnostics.Debug.WriteLine("Selected ClassId = " + model.classId);
+
+            foreach (SelectListItem cls in ViewBag.Classes)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"Value={cls.Value}, Text={cls.Text}");
+            }
+
+
+            ViewBag.Divisions = teacherClass != null
+                ? new DropdownData(_Entities).GetDivision(teacherClass.ClassId)
+                : new List<SelectListItem>();
+
 
             return PartialView("~/Views/School/_pv_Teacher_EditModel.cshtml", model);
         }
@@ -3012,93 +3153,186 @@ namespace Satluj_latestversion.Controllers
             return PartialView("~/Views/School/_pv_AddStaff_Model.cshtml", model);
         }
 
+        //public object AddStaff(StaffModels model)
+        //{
+        //    bool status = false;
+        //    string msg = "Failed";
+        //    if (_Entities.TbLogins.Any(x => x.Username.ToLower() == model.emailId.ToLower() && x.IsActive && x.SchoolId == _user.SchoolId))
+        //    {
+        //        msg = "Email Id already exist! ";
+        //    }
+        //    else
+        //    {
+        //        var login = new TbLogin();
+        //        login.SchoolId = _user.SchoolId;
+        //        login.RoleId = (int)UserRole.Staff;
+        //        login.Name = model.Name;
+        //        login.Username = model.emailId;
+        //        login.Password = model.Password;
+        //        login.IsActive = true;
+        //        login.TimeStamp = CurrentTime;
+        //        login.DisableStatus = false;
+        //        login.LoginGuid = Guid.NewGuid();
+        //        _Entities.TbLogins.Add(login);
+        //        status = _Entities.SaveChanges() > 0;
+        //        if (status)
+        //        {
+        //            var staff = new TbStaff();
+        //            staff.UserId = login.UserId;
+        //            staff.StaffName = model.Name;
+        //            staff.Contact = model.Contact;
+        //            staff.Address = model.Address;
+        //            staff.IsActive = true;
+        //            staff.TimeStamp = CurrentTime;
+        //            try
+        //            {
+        //                if (model.DOBstring != "")
+        //                {
+        //                    string[] splitData = model.DOBstring.Split('-');
+        //                    var dd = splitData[0];
+        //                    var mm = splitData[1];
+        //                    var yyyy = splitData[2];
+        //                    var dob = mm + '-' + dd + '-' + yyyy;
+        //                    staff.Dob = Convert.ToDateTime(dob);
+        //                }
+        //            }
+        //            catch
+        //            {
+
+        //            }
+        //            if (model.DepartmentId != 0)
+        //                staff.DepartmentId = model.DepartmentId;
+        //            if (model.DesignationId != 0)
+        //                staff.DesignationId = model.DesignationId;
+        //            if (model.UserTypeId != null)
+        //                staff.UserType = model.UserTypeId;
+
+        //            _Entities.TbStaffs.Add(staff);
+        //            status = _Entities.SaveChanges() > 0;
+        //            if (status)
+        //            {
+        //                if (model.RoleData != "")
+        //                {
+        //                    string[] splitData = model.RoleData.Split(',');
+        //                    foreach (var item in splitData)
+        //                    {
+        //                        var role = new TbUserRole();
+        //                        role.UserId = staff.UserId;
+        //                        role.RoleId = Convert.ToInt64(item);
+        //                        role.IsActive = true;
+        //                        role.TimeStamp = CurrentTime;
+        //                        _Entities.TbUserRoles.Add(role);
+        //                        _Entities.SaveChanges();
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        msg = status ? " Staff added" : "Failed to add Staff";
+        //    }
+        //    return Json(new { status = status, msg = msg });
+        //} changed due some error in 6-11-2026
         public object AddStaff(StaffModels model)
         {
-            bool status = false;
-            string msg = "Failed";
-            if (_Entities.TbLogins.Any(x => x.Username.ToLower() == model.emailId.ToLower() && x.IsActive && x.SchoolId == _user.SchoolId))
+            try
             {
-                msg = "Email Id already exist! ";
-            }
-            else
-            {
-                var login = new TbLogin();
-                login.SchoolId = _user.SchoolId;
-                login.RoleId = (int)UserRole.Staff;
-                login.Name = model.Name;
-                login.Username = model.emailId;
-                login.Password = model.Password;
-                login.IsActive = true;
-                login.TimeStamp = CurrentTime;
-                login.DisableStatus = false;
-                login.LoginGuid = Guid.NewGuid();
-                _Entities.TbLogins.Add(login);
-                status = _Entities.SaveChanges() > 0;
-                if (status)
+                if (_Entities.TbLogins.Any(x =>
+                    x.Username.ToLower() == model.emailId.ToLower()
+                    && x.IsActive
+                    && x.SchoolId == _user.SchoolId))
                 {
-                    var staff = new TbStaff();
-                    staff.UserId = login.UserId;
-                    staff.StaffName = model.Name;
-                    staff.Contact = model.Contact;
-                    staff.Address = model.Address;
-                    staff.IsActive = true;
-                    staff.TimeStamp = CurrentTime;
-                    try
-                    {
-                        if (model.DOBstring != "")
-                        {
-                            string[] splitData = model.DOBstring.Split('-');
-                            var dd = splitData[0];
-                            var mm = splitData[1];
-                            var yyyy = splitData[2];
-                            var dob = mm + '-' + dd + '-' + yyyy;
-                            staff.Dob = Convert.ToDateTime(dob);
-                        }
-                    }
-                    catch
-                    {
+                    return Json(new { status = false, msg = "Email already exists!" });
+                }
 
-                    }
-                    if (model.DepartmentId != 0)
-                        staff.DepartmentId = model.DepartmentId;
-                    if (model.DesignationId != 0)
-                        staff.DesignationId = model.DesignationId;
-                    if (model.UserTypeId != null)
-                        staff.UserType = model.UserTypeId;
+                // 1. CREATE LOGIN
+                var login = new TbLogin
+                {
+                    SchoolId = _user.SchoolId,
+                    RoleId = (int)UserRole.Staff,
+                    Name = model.Name,
+                    Username = model.emailId,
+                    Password = model.Password,
+                    IsActive = true,
+                    TimeStamp = CurrentTime,
+                    DisableStatus = false,
+                    LoginGuid = Guid.NewGuid()
+                };
 
-                    _Entities.TbStaffs.Add(staff);
-                    status = _Entities.SaveChanges() > 0;
-                    if (status)
+                _Entities.TbLogins.Add(login);
+                _Entities.SaveChanges();
+
+                var userId = login.UserId;
+
+                // 2. CREATE STAFF
+                var staff = new TbStaff
+                {
+                    UserId = userId,
+                    StaffName = model.Name,
+                    Contact = model.Contact,
+                    Address = model.Address,
+                    IsActive = true,
+                    TimeStamp = CurrentTime,
+                    DepartmentId = model.DepartmentId != 0 ? model.DepartmentId : null,
+                    DesignationId = model.DesignationId != 0 ? model.DesignationId : null,
+                    UserType = model.UserTypeId
+                };
+
+                // DOB SAFE PARSE
+                if (!string.IsNullOrEmpty(model.DOBstring))
+                {
+                    DateTime dob;
+                    if (DateTime.TryParseExact(model.DOBstring, "dd-MM-yyyy",
+                        null, System.Globalization.DateTimeStyles.None, out dob))
                     {
-                        if (model.RoleData != "")
-                        {
-                            string[] splitData = model.RoleData.Split(',');
-                            foreach (var item in splitData)
-                            {
-                                var role = new TbUserRole();
-                                role.UserId = staff.UserId;
-                                role.RoleId = Convert.ToInt64(item);
-                                role.IsActive = true;
-                                role.TimeStamp = CurrentTime;
-                                _Entities.TbUserRoles.Add(role);
-                                _Entities.SaveChanges();
-                            }
-                        }
+                        staff.Dob = dob;
                     }
                 }
-                msg = status ? " Staff added" : "Failed to add Staff";
+
+                _Entities.TbStaffs.Add(staff);
+                _Entities.SaveChanges();
+
+                // 3. SAVE ROLES
+                if (!string.IsNullOrEmpty(model.RoleData))
+                {
+                    var roles = model.RoleData.Split(',');
+
+                    foreach (var item in roles)
+                    {
+                        _Entities.TbUserRoles.Add(new TbUserRole
+                        {
+                            UserId = userId,
+                            RoleId = Convert.ToInt64(item),
+                            IsActive = true,
+                            TimeStamp = CurrentTime
+                        });
+                    }
+
+                    _Entities.SaveChanges();
+                }
+
+                return Json(new { status = true, msg = "Staff added successfully" });
             }
-            return Json(new { status = status, msg = msg });
+            catch (Exception ex)
+            {
+                return Json(new { status = false, msg = ex.Message });
+            }
         }
         public PartialViewResult StaffListPartial()
         {
             var model = new StaffListViewModel();
             model.SchoolId = _user.SchoolId;
 
+            //model.Staffs = _Entities.TbStaffs
+            //                .Where(s => s.User.SchoolId == _user.SchoolId && s.IsActive)
+            //                .Select(s => new Satluj_Latest.Data.Staff(s))
+            //                .ToList();
             model.Staffs = _Entities.TbStaffs
-                            .Where(s => s.User.SchoolId == _user.SchoolId && s.IsActive)
-                            .Select(s => new Satluj_Latest.Data.Staff(s))
-                            .ToList();
+                                .Include(x => x.User)
+                                .Include(x => x.Department)
+                                .Include(x => x.Designation)
+                                .Where(s => s.User.SchoolId == _user.SchoolId && s.IsActive)
+                                .ToList()
+                                .Select(s => new Satluj_Latest.Data.Staff(s))
+                                .ToList();
 
             model.IsAdmin = true;
 
@@ -5958,7 +6192,11 @@ namespace Satluj_latestversion.Controllers
             model.UserId = _user.UserId;
             ViewBag.classlist = _dropdown.GetClasses(model.SchoolId);
             ViewBag.UserClasses= _dropdown.GetClassesUserWise(model.SchoolId, model.UserId);
-            ViewBag.IsAdmin = true;
+            //ViewBag.IsAdmin = true;
+            bool admin = (_user.RoleId == 1);
+            ViewBag.IsAdmin = admin;
+
+
             return View(model);
         }
         public ActionResult DiaryUpload()

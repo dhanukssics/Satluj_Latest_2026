@@ -1,7 +1,8 @@
 ﻿
 @model Satluj_Latest.Models.LibraryModels
 @{
-    var books = new Satluj_Latest.Data.School(Model.schoolId).GetAllBook();
+    // var books = new Satluj_Latest.Data.School(Model.schoolId).GetAllBook();
+    var books = Model.BookList;
         // bool IsAdmin = ViewBag.IsAdmin;
         bool IsAdmin = ViewBag.IsAdmin ?? false;
 }

@@ -10,11 +10,12 @@
 
     <form id="form-teacher-add"
           asp-controller="School"
-          asp-action="EditLibraryBook"
+          asp-action="AddLibraryBook"
+          @* asp-action="EditLibraryBook" *@
           method="post">
 
-        <input type="hidden" asp-for="bookId" />
-        <input type="hidden" asp-for="categoryId" />
+        @* <input type="hidden" asp-for="bookId" />
+        <input type="hidden" asp-for="categoryId" /> *@
 
         <div class="modal-content">
 

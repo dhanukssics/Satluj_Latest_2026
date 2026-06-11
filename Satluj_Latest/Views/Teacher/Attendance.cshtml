@@ -55,12 +55,30 @@
             <input type="hidden" id="hfShiftStatus" value="" />
             <input type="hidden" id="hfUserId" value="@Model.userId" />
 
-            <div class="form-group col-sm-2">
+            @* <div class="form-group col-sm-2">
                 <label>Division</label>
                 <select id="division-drop-down" class="form-control" disabled>
                     <option>--Select Division --</option>
                 </select>
                 <span id="spn-error-Division" data-val="0" data-myval="10" style="color:red;"></span>
+            </div> *@
+            <div class="form-group col-sm-2">
+                <label>Division</label>
+
+                <select id="DivisionId"
+                        name="DivisionId"
+                        class="form-control">
+
+                    <option value="">--Select Division--</option>
+
+                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.TeacherDivisionList)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+
+                </select>
+
+                <span id="spn-error-Division" style="color:red;"></span>
             </div>
 
             <div class="form-group col-sm-2">

@@ -90,10 +90,23 @@ namespace Satluj_Latest.Data
                 Value = x.SeasonId.ToString()
             }).ToList();
         }
+        //public List<SelectListItem> GetClassList()
+        //{
+        //    var input = _Entities.TbClassLists.Where(z => z.IsActive).OrderBy(z => z.OrderValue).ToList();
+        //    return input.Select(x => new SelectListItem { Text = x.ClassName, Value = x.OrderValue.ToString() }).ToList();
+        //}added 6-10-2025
         public List<SelectListItem> GetClassList()
         {
-            var input = _Entities.TbClassLists.Where(z => z.IsActive).OrderBy(z => z.OrderValue).ToList();
-            return input.Select(x => new SelectListItem { Text = x.ClassName, Value = x.OrderValue.ToString() }).ToList();
+            var input = _Entities.TbClassLists
+                .Where(z => z.IsActive)
+                .OrderBy(z => z.OrderValue)
+                .ToList();
+
+            return input.Select(x => new SelectListItem
+            {
+                Text = x.ClassName,
+                Value = x.OrderValue.ToString()   // <-- Problem
+            }).ToList();
         }
 
         public  List<SelectListItem> GetDivision(long classId)

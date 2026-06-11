@@ -28,6 +28,8 @@ namespace Satluj_Latest.Models
         public bool IsAdmin { get; set; }
         public List<TbBookCategory> CategoryList { get; set; }
     = new List<TbBookCategory>();
+
+     public List<TbLibraryBook> BookList { get; set; } = new List<TbLibraryBook>();
     }
 }
 
